@@ -14,14 +14,34 @@ export interface User {
   lastLogin: string;
   status: UserStatus;
   totalReferrals: number;
+  referralCount?: number;
   totalReferralBonus: number;
   totalEarnings: number;
   emailVerified: boolean;
   isAdmin?: boolean;
+  activationPaid: boolean;
+  activationPaidAt?: string | null;
 }
 
-export type TransactionType = 'deposit' | 'withdrawal' | 'referral_bonus' | 'task_reward' | 'admin_credit' | 'admin_debit';
+export type TransactionType = 'deposit' | 'withdrawal' | 'referral_bonus' | 'task_reward' | 'admin_credit' | 'admin_debit' | 'activation_fee';
 export type TransactionStatus = 'pending' | 'completed' | 'approved' | 'rejected';
+
+export interface ActivationRequest {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  amount: number;
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  paymentProofRef: string;
+  senderName: string;
+  status: TransactionStatus;
+  createdAt: string;
+  processedAt?: string;
+  adminNote?: string;
+}
 
 export interface Transaction {
   id: string;
@@ -123,6 +143,7 @@ export interface SiteSettings {
   maintenanceMode: boolean;
   referralBonusAmount: number;
   welcomeBonusAmount: number;
+  activationFeeAmount: number;
   minDeposit: number;
   minWithdrawal: number;
   announcementBanner?: string;

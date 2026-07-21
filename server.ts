@@ -167,6 +167,37 @@ app.post('/api/wallet/withdraw', authMiddleware, (req: Request, res: Response) =
   }
 });
 
+// --- ACTIVATION ENDPOINTS ---
+app.get('/api/activation/status', authMiddleware, (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const status = db.getUserActivation(userId);
+    res.json(status);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/activation/pay', authMiddleware, (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const { senderName, paymentProofRef } = req.body;
+
+    if (!senderName || !paymentProofRef) {
+      res.status(400).json({ error: 'Please enter sender name and payment reference.' });
+      return;
+    }
+
+    const activationReq = db.createActivationRequest(userId, senderName, paymentProofRef);
+    res.status(201).json({
+      message: 'Activation payment request submitted successfully! Awaiting administrator confirmation.',
+      activation: activationReq,
+    });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 // --- REFERRALS ---
 app.get('/api/referrals/stats', authMiddleware, (req: Request, res: Response) => {
   try {
@@ -304,6 +335,67 @@ app.post('/api/admin/users/:id/adjust-balance', adminMiddleware, (req: Request, 
 
     const updatedUser = db.adjustUserBalance(userId, Number(amount), type, reason);
     res.json(updatedUser);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/users/:id/activation', adminMiddleware, (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    const { activationPaid } = req.body;
+    if (typeof activationPaid !== 'boolean') {
+      res.status(400).json({ error: 'activationPaid boolean is required.' });
+      return;
+    }
+    const updatedUser = db.setUserActivationStatus(userId, activationPaid);
+    res.json(updatedUser);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/users/:id/referral-count', adminMiddleware, (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    const { referralCount } = req.body;
+    if (typeof referralCount !== 'number') {
+      res.status(400).json({ error: 'referralCount number is required.' });
+      return;
+    }
+    const updatedUser = db.setUserReferralCount(userId, referralCount);
+    res.json(updatedUser);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/admin/activations', adminMiddleware, (req: Request, res: Response) => {
+  try {
+    const activations = db.listActivations();
+    res.json(activations);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/activations/:id/approve', adminMiddleware, (req: Request, res: Response) => {
+  try {
+    const activationId = req.params.id;
+    const { adminNote } = req.body;
+    const approved = db.approveActivation(activationId, adminNote);
+    res.json({ message: 'Activation approved successfully!', activation: approved });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/activations/:id/reject', adminMiddleware, (req: Request, res: Response) => {
+  try {
+    const activationId = req.params.id;
+    const { adminNote } = req.body;
+    const rejected = db.rejectActivation(activationId, adminNote);
+    res.json({ message: 'Activation request rejected.', activation: rejected });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }

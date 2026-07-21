@@ -20,6 +20,7 @@ export const Sidebar: React.FC = () => {
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Wallet & Bank', path: '/wallet', icon: Wallet },
     { name: 'Refer & Earn', path: '/referrals', icon: Users, badge: '₦1,200' },
+    { name: 'Withdrawal Activation', path: '/activation', icon: Zap, badge: 'Required' },
     { name: 'Tasks & Rewards', path: '/tasks', icon: CheckSquare },
     { name: 'Transaction History', path: '/history', icon: History },
     { name: 'Profile & Account', path: '/profile', icon: User },

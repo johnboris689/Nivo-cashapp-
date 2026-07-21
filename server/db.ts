@@ -7,6 +7,7 @@ import {
   Transaction,
   DepositRequest,
   WithdrawalRequest,
+  ActivationRequest,
   Task,
   TaskCompletion,
   ReferralRecord,
@@ -21,6 +22,7 @@ interface DatabaseSchema {
   transactions: Transaction[];
   deposits: DepositRequest[];
   withdrawals: WithdrawalRequest[];
+  activations: ActivationRequest[];
   tasks: Task[];
   taskCompletions: TaskCompletion[];
   referrals: ReferralRecord[];
@@ -58,6 +60,8 @@ function getInitialDb(): DatabaseSchema {
     totalEarnings: 250000,
     emailVerified: true,
     isAdmin: true,
+    activationPaid: true,
+    activationPaidAt: new Date().toISOString(),
     passwordHash: adminPasswordHash,
   };
 
@@ -135,6 +139,7 @@ function getInitialDb(): DatabaseSchema {
     maintenanceMode: false,
     referralBonusAmount: 1200,
     welcomeBonusAmount: 0,
+    activationFeeAmount: 520,
     minDeposit: 1000,
     minWithdrawal: 2000,
     announcementBanner: '🔥 Refer friends & earn ₦1,200 instantly per verified registration! Fast payouts guaranteed.',
@@ -149,6 +154,7 @@ function getInitialDb(): DatabaseSchema {
     transactions: [],
     deposits: [],
     withdrawals: [],
+    activations: [],
     tasks: sampleTasks,
     taskCompletions: [],
     referrals: [],
@@ -172,16 +178,23 @@ class Database {
         const raw = fs.readFileSync(DB_FILE, 'utf-8');
         const parsed = JSON.parse(raw);
         return {
-          users: parsed.users || [],
+          users: (parsed.users || []).map((u: any) => ({
+            ...u,
+            activationPaid: u.activationPaid ?? u.isAdmin ?? false,
+          })),
           transactions: parsed.transactions || [],
           deposits: parsed.deposits || [],
           withdrawals: parsed.withdrawals || [],
+          activations: parsed.activations || [],
           tasks: parsed.tasks || [],
           taskCompletions: parsed.taskCompletions || [],
           referrals: parsed.referrals || [],
           notifications: parsed.notifications || [],
           bankDetails: parsed.bankDetails || getInitialDb().bankDetails,
-          settings: parsed.settings || getInitialDb().settings,
+          settings: {
+            ...getInitialDb().settings,
+            ...(parsed.settings || {}),
+          },
         };
       }
     } catch (err) {
@@ -225,6 +238,8 @@ class Database {
         totalEarnings: 250000,
         emailVerified: true,
         isAdmin: true,
+        activationPaid: true,
+        referralCount: 5,
         passwordHash: adminPasswordHash,
       };
       this.data.users.push(adminUser);
@@ -305,10 +320,13 @@ class Database {
       lastLogin: new Date().toISOString(),
       status: 'active',
       totalReferrals: 0,
+      referralCount: 0,
       totalReferralBonus: 0,
       totalEarnings: 0,
       emailVerified: true,
       isAdmin: false,
+      activationPaid: false,
+      activationPaidAt: null,
       passwordHash: passwordHash,
     };
 
@@ -620,6 +638,18 @@ class Database {
     const user = this.data.users.find(u => u.id === userId);
     if (!user) throw new Error('User not found.');
 
+    // MANDATORY WITHDRAWAL ELIGIBILITY CHECKS
+    const requiredReferrals = 5;
+    const currentRefs = user.totalReferrals || 0;
+    const isActivated = !!user.activationPaid;
+    const activationFee = this.data.settings.activationFeeAmount || 520;
+
+    if (currentRefs < requiredReferrals || !isActivated) {
+      throw new Error(
+        `Withdrawal locked. Complete the following before withdrawing: Invite 5 successful referrals (Current: ${currentRefs}/${requiredReferrals}). Pay your ₦${activationFee} activation fee (Activation: ${isActivated ? 'Paid' : 'Not Paid'}).`
+      );
+    }
+
     if (amount < this.data.settings.minWithdrawal) {
       throw new Error(`Minimum withdrawal amount is ₦${this.data.settings.minWithdrawal.toLocaleString()}`);
     }
@@ -888,6 +918,161 @@ class Database {
       totalWalletBalances,
       totalTasksCompleted,
     };
+  }
+
+  // --- ACTIVATION SYSTEM ---
+  public createActivationRequest(userId: string, senderName: string, paymentProofRef: string): ActivationRequest {
+    const user = this.data.users.find(u => u.id === userId);
+    if (!user) throw new Error('User not found.');
+
+    if (user.activationPaid) {
+      throw new Error('Your account is already activated for withdrawals.');
+    }
+
+    const pending = this.data.activations.find(a => a.userId === userId && a.status === 'pending');
+    if (pending) {
+      throw new Error('You already have a pending activation request awaiting approval.');
+    }
+
+    const feeAmount = this.data.settings.activationFeeAmount || 520;
+
+    const activationReq: ActivationRequest = {
+      id: crypto.randomUUID(),
+      userId: user.id,
+      userName: user.fullName,
+      userEmail: user.email,
+      amount: feeAmount,
+      bankName: this.data.bankDetails.bankName,
+      accountName: this.data.bankDetails.accountName,
+      accountNumber: this.data.bankDetails.accountNumber,
+      senderName: senderName,
+      paymentProofRef: paymentProofRef,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    };
+
+    this.data.activations.unshift(activationReq);
+
+    this.data.transactions.unshift({
+      id: crypto.randomUUID(),
+      userId: user.id,
+      type: 'activation_fee',
+      amount: feeAmount,
+      description: `Withdrawal Activation Fee Payment (Ref: ${paymentProofRef})`,
+      status: 'pending',
+      reference: `ACT-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    });
+
+    this.saveData();
+    return activationReq;
+  }
+
+  public listActivations(): ActivationRequest[] {
+    return this.data.activations;
+  }
+
+  public getUserActivation(userId: string): { request?: ActivationRequest; activationPaid: boolean; feeAmount: number } {
+    const user = this.data.users.find(u => u.id === userId);
+    const req = this.data.activations.find(a => a.userId === userId);
+    const feeAmount = this.data.settings.activationFeeAmount || 520;
+    return {
+      request: req,
+      activationPaid: user ? !!user.activationPaid : false,
+      feeAmount,
+    };
+  }
+
+  public approveActivation(activationId: string, adminNote?: string): ActivationRequest {
+    const req = this.data.activations.find(a => a.id === activationId);
+    if (!req) throw new Error('Activation request not found.');
+    if (req.status !== 'pending') throw new Error(`Activation request is already ${req.status}`);
+
+    req.status = 'approved';
+    req.processedAt = new Date().toISOString();
+    req.adminNote = adminNote || 'Approved by administrator';
+
+    const user = this.data.users.find(u => u.id === req.userId);
+    if (user) {
+      user.activationPaid = true;
+      user.activationPaidAt = new Date().toISOString();
+
+      // Update tx
+      const tx = this.data.transactions.find(
+        t => t.userId === user.id && t.type === 'activation_fee' && t.status === 'pending'
+      );
+      if (tx) tx.status = 'approved';
+
+      this.data.notifications.unshift({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        title: '🎉 Account Withdrawal Activated!',
+        message: `Your activation payment of ₦${req.amount.toLocaleString()} has been approved. Your account is now activated for withdrawals!`,
+        type: 'success',
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    this.saveData();
+    return req;
+  }
+
+  public rejectActivation(activationId: string, adminNote?: string): ActivationRequest {
+    const req = this.data.activations.find(a => a.id === activationId);
+    if (!req) throw new Error('Activation request not found.');
+    if (req.status !== 'pending') throw new Error(`Activation request is already ${req.status}`);
+
+    req.status = 'rejected';
+    req.processedAt = new Date().toISOString();
+    req.adminNote = adminNote || 'Rejected by administrator';
+
+    const tx = this.data.transactions.find(
+      t => t.userId === req.userId && t.type === 'activation_fee' && t.status === 'pending'
+    );
+    if (tx) tx.status = 'rejected';
+
+    this.data.notifications.unshift({
+      id: crypto.randomUUID(),
+      userId: req.userId,
+      title: '❌ Activation Payment Declined',
+      message: `Your activation payment request of ₦${req.amount.toLocaleString()} was declined. Reason: ${req.adminNote}`,
+      type: 'alert',
+      read: false,
+      createdAt: new Date().toISOString(),
+    });
+
+    this.saveData();
+    return req;
+  }
+
+  public setUserActivationStatus(userId: string, activationPaid: boolean): User {
+    const user = this.data.users.find(u => u.id === userId);
+    if (!user) throw new Error('User not found.');
+
+    user.activationPaid = activationPaid;
+    if (activationPaid) {
+      user.activationPaidAt = user.activationPaidAt || new Date().toISOString();
+    } else {
+      user.activationPaidAt = null;
+    }
+
+    this.saveData();
+    const { passwordHash: _, ...cleanUser } = user;
+    return cleanUser;
+  }
+
+  public setUserReferralCount(userId: string, count: number): User {
+    const user = this.data.users.find(u => u.id === userId);
+    if (!user) throw new Error('User not found.');
+
+    const newCount = Math.max(0, count);
+    user.totalReferrals = newCount;
+    user.referralCount = newCount;
+
+    this.saveData();
+    const { passwordHash: _, ...cleanUser } = user;
+    return cleanUser;
   }
 
   public getSiteSettings(): SiteSettings {

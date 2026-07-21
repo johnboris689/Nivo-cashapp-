@@ -15,6 +15,7 @@ import { ReferralsPage } from './pages/ReferralsPage';
 import { TasksPage } from './pages/TasksPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { ActivationPage } from './pages/ActivationPage';
 
 // Admin Pages
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
@@ -25,6 +26,7 @@ import { AdminWithdrawalsPage } from './pages/admin/AdminWithdrawalsPage';
 import { AdminTasksPage } from './pages/admin/AdminTasksPage';
 import { AdminReferralsPage } from './pages/admin/AdminReferralsPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
+import { AdminActivationsPage } from './pages/admin/AdminActivationsPage';
 
 // UI Components
 import { Navbar } from './components/Navbar';
@@ -110,6 +112,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const adminNav = [
     { name: 'Dashboard', path: '/admin', icon: ShieldCheck },
     { name: 'Users & Wallets', path: '/admin/users', icon: Users },
+    { name: 'Activations', path: '/admin/activations', icon: Sparkles },
     { name: 'Deposits', path: '/admin/deposits', icon: Building2 },
     { name: 'Withdrawals', path: '/admin/withdrawals', icon: ArrowUpRight },
     { name: 'Tasks', path: '/admin/tasks', icon: CheckSquare },
@@ -241,6 +244,14 @@ export function App() {
               </UserLayout>
             }
           />
+          <Route
+            path="/activation"
+            element={
+              <UserLayout>
+                <ActivationPage />
+              </UserLayout>
+            }
+          />
 
           {/* Admin Protected Routes */}
           <Route path="/admin/login" element={<AdminLoginPage />} />
@@ -257,6 +268,14 @@ export function App() {
             element={
               <AdminLayout>
                 <AdminUsersPage />
+              </AdminLayout>
+            }
+          />
+          <Route
+            path="/admin/activations"
+            element={
+              <AdminLayout>
+                <AdminActivationsPage />
               </AdminLayout>
             }
           />

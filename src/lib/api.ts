@@ -1,4 +1,4 @@
-import { User, Transaction, DepositRequest, WithdrawalRequest, Task, NotificationItem, BankDetails, SiteSettings, AdminStats, ReferralRecord } from '../types';
+import { User, Transaction, DepositRequest, WithdrawalRequest, ActivationRequest, Task, NotificationItem, BankDetails, SiteSettings, AdminStats, ReferralRecord } from '../types';
 
 const TOKEN_KEY = 'nivo_auth_token';
 const ADMIN_TOKEN_KEY = 'nivo_admin_token';
@@ -219,4 +219,40 @@ export const api = {
     }, true),
 
   getAdminReferrals: () => request<ReferralRecord[]>('/api/admin/referrals', {}, true),
+
+  // Activation & Manual Overrides
+  getActivationStatus: () =>
+    request<{ request?: ActivationRequest; activationPaid: boolean; feeAmount: number }>('/api/activation/status'),
+
+  submitActivationPayment: (senderName: string, paymentProofRef: string) =>
+    request<{ message: string; activation: ActivationRequest }>('/api/activation/pay', {
+      method: 'POST',
+      body: JSON.stringify({ senderName, paymentProofRef }),
+    }),
+
+  getAdminActivations: () => request<ActivationRequest[]>('/api/admin/activations', {}, true),
+
+  approveActivation: (activationId: string, adminNote?: string) =>
+    request<{ message: string; activation: ActivationRequest }>(`/api/admin/activations/${activationId}/approve`, {
+      method: 'POST',
+      body: JSON.stringify({ adminNote }),
+    }, true),
+
+  rejectActivation: (activationId: string, adminNote?: string) =>
+    request<{ message: string; activation: ActivationRequest }>(`/api/admin/activations/${activationId}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({ adminNote }),
+    }, true),
+
+  setUserActivationStatus: (userId: string, activationPaid: boolean) =>
+    request<User>(`/api/admin/users/${userId}/activation`, {
+      method: 'POST',
+      body: JSON.stringify({ activationPaid }),
+    }, true),
+
+  setUserReferralCount: (userId: string, referralCount: number) =>
+    request<User>(`/api/admin/users/${userId}/referral-count`, {
+      method: 'POST',
+      body: JSON.stringify({ referralCount }),
+    }, true),
 };

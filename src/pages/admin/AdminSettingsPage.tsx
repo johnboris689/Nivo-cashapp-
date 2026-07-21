@@ -15,6 +15,7 @@ export const AdminSettingsPage: React.FC = () => {
   const [telegramChannel, setTelegramChannel] = useState('https://t.me/nivocash');
   const [minDeposit, setMinDeposit] = useState('1000');
   const [minWithdrawal, setMinWithdrawal] = useState('2000');
+  const [activationFeeAmount, setActivationFeeAmount] = useState('520');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [announcementBanner, setAnnouncementBanner] = useState('');
 
@@ -27,6 +28,7 @@ export const AdminSettingsPage: React.FC = () => {
       setTelegramChannel(data.telegramChannel);
       setMinDeposit(data.minDeposit.toString());
       setMinWithdrawal(data.minWithdrawal.toString());
+      setActivationFeeAmount((data.activationFeeAmount || 520).toString());
       setMaintenanceMode(data.maintenanceMode);
       setAnnouncementBanner(data.announcementBanner || '');
     } catch (err) {
@@ -50,6 +52,7 @@ export const AdminSettingsPage: React.FC = () => {
         telegramChannel,
         minDeposit: Number(minDeposit),
         minWithdrawal: Number(minWithdrawal),
+        activationFeeAmount: Number(activationFeeAmount),
         maintenanceMode,
         announcementBanner,
       });
@@ -113,7 +116,7 @@ export const AdminSettingsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-xs font-bold text-zinc-300 mb-1">Telegram Community Link</label>
               <input
@@ -142,6 +145,17 @@ export const AdminSettingsPage: React.FC = () => {
                 required
                 value={minWithdrawal}
                 onChange={(e) => setMinWithdrawal(e.target.value)}
+                className="w-full bg-[#171b26] border border-zinc-800 rounded-xl px-4 py-3 text-amber-400 font-bold text-xs focus:outline-none focus:border-amber-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-zinc-300 mb-1">Activation Fee (₦)</label>
+              <input
+                type="number"
+                required
+                value={activationFeeAmount}
+                onChange={(e) => setActivationFeeAmount(e.target.value)}
                 className="w-full bg-[#171b26] border border-zinc-800 rounded-xl px-4 py-3 text-amber-400 font-bold text-xs focus:outline-none focus:border-amber-500"
               />
             </div>
