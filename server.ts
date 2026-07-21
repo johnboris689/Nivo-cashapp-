@@ -278,20 +278,20 @@ app.post('/api/notifications/mark-read', authMiddleware, (req: Request, res: Res
 app.post('/api/admin/login', (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    if (email !== 'talkdavidjohn@gmail.com') {
-      res.status(401).json({ error: 'Invalid administrator email or credentials.' });
+    if (!email || !password) {
+      res.status(400).json({ error: 'Email and password are required.' });
       return;
     }
 
     const result = db.loginUser(email, password);
     if (!result.user.isAdmin) {
-      res.status(403).json({ error: 'User is not an administrator.' });
+      res.status(403).json({ error: 'Access denied. Account does not have administrator privileges.' });
       return;
     }
 
     res.json(result);
   } catch (err: any) {
-    res.status(401).json({ error: 'Invalid administrator credentials.' });
+    res.status(401).json({ error: err.message || 'Invalid administrator credentials.' });
   }
 });
 
