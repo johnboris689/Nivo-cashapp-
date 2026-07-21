@@ -64,28 +64,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Header Greeting */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#141414] p-6 rounded-3xl border border-white/5">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-white">
-              Welcome back, <span className="text-[#F27D26]">{user?.fullName}</span> 👋
-            </h1>
-            <span className="bg-[#F27D26]/10 text-[#F27D26] text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-[#F27D26]/20">
-              Verified Account
-            </span>
-          </div>
-          <p className="text-xs text-gray-400 mt-1">
-            Manage your wallet, complete tasks, and earn ₦{bonusAmount.toLocaleString()} per referral.
-          </p>
+      <div className="bg-[#141414] p-6 rounded-3xl border border-white/5">
+        <div className="flex flex-wrap items-center gap-2">
+          <h1 className="text-2xl font-bold text-white">
+            Welcome back, <span className="text-[#F27D26]">{user?.fullName}</span> 👋
+          </h1>
+          <span className="bg-[#F27D26]/10 text-[#F27D26] text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-[#F27D26]/20">
+            Verified Account
+          </span>
         </div>
-
-        <button
-          onClick={() => setShowShareModal(true)}
-          className="flex items-center justify-center gap-2 bg-[#F27D26] hover:bg-[#E6721F] text-black font-bold text-xs px-6 py-3.5 rounded-2xl shadow-lg shadow-orange-950/20 transition-all hover:scale-105 cursor-pointer shrink-0"
-        >
-          <Share2 className="w-4 h-4" />
-          <span>Share Referral Link</span>
-        </button>
       </div>
 
       {/* Primary Wallet Hero Card */}
