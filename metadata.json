@@ -1,0 +1,6 @@
+{
+  "name": "Nivo Cash App",
+  "description": "Nivo Cash App - Premium Fintech, Wallet & Digital Earnings Platform",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
