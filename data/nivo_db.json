@@ -1,0 +1,196 @@
+{
+  "users": [
+    {
+      "id": "admin-0000-0000-0000-000000000000",
+      "fullName": "David John (Admin)",
+      "username": "admin",
+      "email": "talkdavidjohn@gmail.com",
+      "phone": "+2348000000000",
+      "walletBalance": 251200,
+      "referralCode": "NIVOADMIN",
+      "referralLink": "",
+      "referrerId": null,
+      "createdAt": "2026-07-22T10:54:05.069Z",
+      "lastLogin": "2026-07-22T10:59:28.437Z",
+      "status": "active",
+      "totalReferrals": 16,
+      "totalReferralBonus": 19200,
+      "totalEarnings": 251200,
+      "emailVerified": true,
+      "isAdmin": true,
+      "activationPaid": true,
+      "activationPaidAt": "2026-07-22T10:54:05.069Z",
+      "passwordHash": "$2b$10$.lJUKHgY80kSRh9bGznG/ekpeUpDCZ4X163/pU8oW8ykBWwrsAlDS"
+    },
+    {
+      "id": "1887d4cd-bdb0-4a0c-b918-598d004fc920",
+      "fullName": "Test User",
+      "username": "user_1784717961246",
+      "email": "user_1784717961246@test.com",
+      "phone": "+2348123456789",
+      "walletBalance": 0,
+      "referralCode": "NIVO3H7VX",
+      "referralLink": "https://ais-dev-fkgbvdctfqqjpexkmckbiq-560222299408.europe-west2.run.app/register?ref=NIVO3H7VX",
+      "referrerId": null,
+      "createdAt": "2026-07-22T10:59:21.382Z",
+      "lastLogin": "2026-07-22T10:59:21.382Z",
+      "status": "active",
+      "totalReferrals": 0,
+      "referralCount": 0,
+      "totalReferralBonus": 0,
+      "totalEarnings": 0,
+      "emailVerified": true,
+      "isAdmin": false,
+      "activationPaid": false,
+      "activationPaidAt": null,
+      "passwordHash": "$2b$10$g2icBkynjZGiQUuv3w5wluC1roxwkgt383UFJ64gs8DsEbkdNo2v6"
+    },
+    {
+      "id": "852885fd-940c-4b82-b9b3-533641163c5f",
+      "fullName": "Referred Friend",
+      "username": "ref_1784717968447",
+      "email": "referred_1784717968447@test.com",
+      "phone": "+2348000001111",
+      "walletBalance": 0,
+      "referralCode": "NIVOZLZ38",
+      "referralLink": "https://ais-dev-fkgbvdctfqqjpexkmckbiq-560222299408.europe-west2.run.app/register?ref=NIVOZLZ38",
+      "referrerId": "admin-0000-0000-0000-000000000000",
+      "createdAt": "2026-07-22T10:59:28.551Z",
+      "lastLogin": "2026-07-22T10:59:28.551Z",
+      "status": "active",
+      "totalReferrals": 0,
+      "referralCount": 0,
+      "totalReferralBonus": 0,
+      "totalEarnings": 0,
+      "emailVerified": true,
+      "isAdmin": false,
+      "activationPaid": false,
+      "activationPaidAt": null,
+      "passwordHash": "$2b$10$EXPhEXqMGBBgDxNFYJv7vuMqT3iV2A55X38Wsl/GxV1sc0K9H7Wzq"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "879ae5dd-09a5-4864-ad08-04905a40f329",
+      "userId": "admin-0000-0000-0000-000000000000",
+      "type": "referral_bonus",
+      "amount": 1200,
+      "description": "Referral bonus for inviting @ref_1784717968447",
+      "status": "completed",
+      "reference": "REF-1784717968551-5614",
+      "createdAt": "2026-07-22T10:59:28.551Z",
+      "details": {
+        "referredUser": "ref_1784717968447",
+        "referredUserId": "852885fd-940c-4b82-b9b3-533641163c5f"
+      }
+    }
+  ],
+  "deposits": [],
+  "withdrawals": [],
+  "activations": [],
+  "tasks": [
+    {
+      "id": "task-1",
+      "title": "Follow Nivo Cash on X (Twitter)",
+      "description": "Follow our official X handle @NivoCashApp for real-time updates and daily giveaway announcements.",
+      "rewardAmount": 500,
+      "category": "social",
+      "actionUrl": "https://x.com",
+      "enabled": true,
+      "createdAt": "2026-07-22T10:54:05.069Z",
+      "completionCount": 142
+    },
+    {
+      "id": "task-2",
+      "title": "Join Official Nivo Telegram Community",
+      "description": "Join over 25,000 active members in our official VIP Telegram group.",
+      "rewardAmount": 600,
+      "category": "social",
+      "actionUrl": "https://telegram.org",
+      "enabled": true,
+      "createdAt": "2026-07-22T10:54:05.069Z",
+      "completionCount": 289
+    },
+    {
+      "id": "task-3",
+      "title": "Daily Check-In Streak",
+      "description": "Log into Nivo Cash App daily to claim your free daily login bonus.",
+      "rewardAmount": 300,
+      "category": "daily",
+      "actionUrl": "#",
+      "enabled": true,
+      "createdAt": "2026-07-22T10:54:05.069Z",
+      "completionCount": 512
+    },
+    {
+      "id": "task-4",
+      "title": "Subscribe to Nivo Cash YouTube Channel",
+      "description": "Subscribe and click the notification bell on our YouTube tutorials channel.",
+      "rewardAmount": 500,
+      "category": "social",
+      "actionUrl": "https://youtube.com",
+      "enabled": true,
+      "createdAt": "2026-07-22T10:54:05.069Z",
+      "completionCount": 98
+    },
+    {
+      "id": "task-5",
+      "title": "Download Nivo Cash Android & iOS App",
+      "description": "Download and rate our high-performance mobile app 5 stars on the app store.",
+      "rewardAmount": 1000,
+      "category": "download",
+      "actionUrl": "#",
+      "enabled": true,
+      "createdAt": "2026-07-22T10:54:05.069Z",
+      "completionCount": 310
+    }
+  ],
+  "taskCompletions": [],
+  "referrals": [
+    {
+      "id": "e6c6a7e3-af22-4fc6-a42c-60ac8c67d9ae",
+      "referrerId": "admin-0000-0000-0000-000000000000",
+      "referredUserId": "852885fd-940c-4b82-b9b3-533641163c5f",
+      "referredUserName": "Referred Friend",
+      "referredUserEmail": "referred_1784717968447@test.com",
+      "bonusAmount": 1200,
+      "status": "successful",
+      "createdAt": "2026-07-22T10:59:28.551Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "e558519b-9730-456b-aea9-9059d451b7b8",
+      "userId": "admin-0000-0000-0000-000000000000",
+      "title": "🎉 Referral Reward Received!",
+      "message": "Congratulations! You just earned ₦1,200 because Referred Friend (@ref_1784717968447) joined using your referral link.",
+      "type": "success",
+      "read": false,
+      "createdAt": "2026-07-22T10:59:28.555Z"
+    }
+  ],
+  "bankDetails": {
+    "bankName": "Guaranty Trust Bank (GTBank)",
+    "accountName": "Nivo Cash App Global Ltd",
+    "accountNumber": "0123456789",
+    "instructions": "Please transfer the exact amount and include your username in the transaction remarks. Upload or enter transaction reference after payment.",
+    "minDeposit": 1000,
+    "maxDeposit": 1000000
+  },
+  "settings": {
+    "appName": "Nivo Cash App",
+    "websiteName": "Nivo Cash App",
+    "logoText": "NIVO CASH",
+    "maintenanceMode": false,
+    "referralBonusAmount": 1200,
+    "welcomeBonusAmount": 0,
+    "activationFeeAmount": 520,
+    "minDeposit": 1000,
+    "minWithdrawal": 2000,
+    "announcementBanner": "🔥 Refer friends & earn ₦1,200 instantly per verified registration! Fast payouts guaranteed.",
+    "bannerNotice": "🔥 Refer friends & earn ₦1,200 instantly per verified registration! Fast payouts guaranteed.",
+    "supportEmail": "support@nivocash.app",
+    "telegramChannel": "https://t.me/NivoCashOfficial",
+    "telegramGroupUrl": "https://t.me/NivoCashOfficial"
+  }
+}

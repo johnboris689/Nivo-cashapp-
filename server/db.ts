@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
 import {
   User,
   Transaction,
@@ -16,6 +17,11 @@ import {
   SiteSettings,
   AdminStats,
 } from '../src/types/index.js';
+
+const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://qfedzccwjkgzftdtaysp.supabase.co';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+
+export const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 interface DatabaseSchema {
   users: (User & { passwordHash: string })[];
@@ -170,6 +176,43 @@ class Database {
   constructor() {
     this.data = this.load();
     this.ensureAdminUser();
+    this.initSupabaseSync();
+  }
+
+  private async initSupabaseSync() {
+    try {
+      if (!supabase) return;
+      const { data, error } = await supabase.storage.from('nivo_db').download('data.json');
+      if (data) {
+        const text = await data.text();
+        const parsed = JSON.parse(text);
+        if (parsed && Array.isArray(parsed.users) && parsed.users.length > 0) {
+          this.data = {
+            users: parsed.users.map((u: any) => ({
+              ...u,
+              activationPaid: u.activationPaid ?? u.isAdmin ?? false,
+            })),
+            transactions: parsed.transactions || [],
+            deposits: parsed.deposits || [],
+            withdrawals: parsed.withdrawals || [],
+            activations: parsed.activations || [],
+            tasks: parsed.tasks || [],
+            taskCompletions: parsed.taskCompletions || [],
+            referrals: parsed.referrals || [],
+            notifications: parsed.notifications || [],
+            bankDetails: parsed.bankDetails || getInitialDb().bankDetails,
+            settings: {
+              ...getInitialDb().settings,
+              ...(parsed.settings || {}),
+            },
+          };
+          this.ensureAdminUser();
+          console.log(`✅ Loaded ${this.data.users.length} users and database state from Supabase PostgreSQL.`);
+        }
+      }
+    } catch (err) {
+      console.error('Error syncing data from Supabase PostgreSQL:', err);
+    }
   }
 
   private load(): DatabaseSchema {
@@ -198,28 +241,40 @@ class Database {
         };
       }
     } catch (err) {
-      console.error('Error loading database file, initializing fresh DB:', err);
+      console.error('Error loading local database file, initializing fresh DB:', err);
     }
     const fresh = getInitialDb();
     this.saveData(fresh);
     return fresh;
   }
 
-  private saveData(dataToSave?: DatabaseSchema) {
+  private async saveData(dataToSave?: DatabaseSchema) {
+    const data = dataToSave || this.data;
     try {
-      const data = dataToSave || this.data;
       fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
     } catch (err) {
-      console.error('Error saving database:', err);
+      console.error('Error saving local database file:', err);
+    }
+
+    // Persist permanently to Supabase PostgreSQL database bucket
+    try {
+      if (supabase) {
+        await supabase.storage.from('nivo_db').upload('data.json', JSON.stringify(data, null, 2), {
+          contentType: 'application/json',
+          upsert: true,
+        });
+      }
+    } catch (err) {
+      console.error('Error persisting to Supabase PostgreSQL:', err);
     }
   }
 
-  private ensureAdminUser() {
+  private async ensureAdminUser() {
     const adminEmail = 'talkdavidjohn@gmail.com';
-    const existingAdmin = this.data.users.find(u => u.email.toLowerCase() === adminEmail.toLowerCase());
+    let existingAdmin = this.data.users.find(u => u.email.toLowerCase() === adminEmail.toLowerCase());
     
+    const adminPasswordHash = bcrypt.hashSync('Boris$689', 10);
     if (!existingAdmin) {
-      const adminPasswordHash = bcrypt.hashSync('Boris$689', 10);
       const adminUser: User & { passwordHash: string } = {
         id: 'admin-0000-0000-0000-000000000000',
         fullName: 'David John (Admin)',
@@ -233,24 +288,48 @@ class Database {
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString(),
         status: 'active',
-        totalReferrals: 0,
-        totalReferralBonus: 0,
+        totalReferrals: 15,
+        totalReferralBonus: 18000,
         totalEarnings: 250000,
         emailVerified: true,
         isAdmin: true,
         activationPaid: true,
-        referralCount: 5,
+        activationPaidAt: new Date().toISOString(),
         passwordHash: adminPasswordHash,
       };
       this.data.users.push(adminUser);
-      this.saveData();
+      existingAdmin = adminUser;
     } else {
-      // Ensure admin password is reset to specified requirement if needed
       if (!bcrypt.compareSync('Boris$689', existingAdmin.passwordHash)) {
-        existingAdmin.passwordHash = bcrypt.hashSync('Boris$689', 10);
-        existingAdmin.isAdmin = true;
-        this.saveData();
+        existingAdmin.passwordHash = adminPasswordHash;
       }
+      existingAdmin.isAdmin = true;
+      existingAdmin.activationPaid = true;
+    }
+
+    this.saveData();
+
+    // Ensure admin is registered in Supabase Auth PostgreSQL
+    try {
+      if (supabase) {
+        const { data: listData } = await supabase.auth.admin.listUsers();
+        const found = listData?.users.find(u => u.email?.toLowerCase() === adminEmail.toLowerCase());
+        if (!found) {
+          await supabase.auth.admin.createUser({
+            email: adminEmail,
+            password: 'Boris$689',
+            email_confirm: true,
+            user_metadata: {
+              fullName: existingAdmin.fullName,
+              username: existingAdmin.username,
+              isAdmin: true,
+            },
+          });
+          console.log('✅ Admin account ensured in Supabase Auth PostgreSQL.');
+        }
+      }
+    } catch (err) {
+      console.error('Error syncing admin to Supabase Auth:', err);
     }
   }
 
@@ -389,8 +468,27 @@ class Database {
       }
     }
 
-    // Save changes
+    // Save changes to Supabase PostgreSQL database
     this.saveData();
+
+    // Register user account in Supabase Auth PostgreSQL
+    try {
+      if (supabase) {
+        supabase.auth.admin.createUser({
+          email: newUser.email,
+          password: userData.passwordRaw,
+          email_confirm: true,
+          user_metadata: {
+            fullName: newUser.fullName,
+            username: newUser.username,
+            phone: newUser.phone,
+            referralCode: refCode,
+          },
+        }).catch(err => console.error('Supabase Auth user creation error:', err));
+      }
+    } catch (e) {
+      console.error('Supabase Auth error:', e);
+    }
 
     const { passwordHash: _, ...cleanUser } = newUser;
     return { user: cleanUser, token: cleanUser.id };
