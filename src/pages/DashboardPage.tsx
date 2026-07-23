@@ -14,6 +14,10 @@ import {
   ShieldCheck,
   Zap,
   TrendingUp,
+  Eye,
+  EyeOff,
+  History,
+  ArrowDownLeft,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { StatCard } from '../components/StatCard';
@@ -27,12 +31,14 @@ interface DashboardPageProps {
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onOpenWithdraw }) => {
-  const { user, settings, refreshUser } = useAuth();
+  const { user, settings } = useAuth();
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [tasks, setTasks] = useState<(Task & { completed: boolean })[]>([]);
   const [showShareModal, setShowShareModal] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [showBalance, setShowBalance] = useState(true);
 
   const bonusAmount = settings?.referralBonusAmount || 1200;
 
@@ -61,59 +67,144 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
     }
   };
 
+  const copyReferralLink = () => {
+    if (user?.referralLink) {
+      navigator.clipboard.writeText(user.referralLink);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    }
+  };
+
+  const quickActions = [
+    { label: 'Deposit', icon: PlusCircle, action: onOpenDeposit, isButton: true },
+    { label: 'Withdraw', icon: ArrowUpRight, action: onOpenWithdraw, isButton: true },
+    { label: 'Tasks', icon: CheckSquare, path: '/tasks', isButton: false },
+    { label: 'Referrals', icon: Users, path: '/referrals', isButton: false },
+    { label: 'History', icon: History, path: '/history', isButton: false },
+    { label: 'Wallet', icon: Wallet, path: '/wallet', isButton: false },
+  ];
+
   return (
-    <div className="space-y-6 animate-fade-in pb-12">
-      {/* Header Greeting */}
-      <div className="bg-[#141414] p-6 rounded-3xl border border-white/5">
-        <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-2xl font-bold text-white">
-            Welcome back, <span className="text-[#F27D26]">{user?.fullName}</span> 👋
-          </h1>
-          <span className="bg-[#F27D26]/10 text-[#F27D26] text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-[#F27D26]/20">
-            Verified Account
-          </span>
-        </div>
-      </div>
-
-      {/* Primary Wallet Hero Card */}
-      <div className="bg-gradient-to-br from-[#F27D26] via-[#E6721F] to-[#CC5F10] rounded-[32px] p-8 text-black shadow-2xl shadow-orange-950/20 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative overflow-hidden">
-        <div className="space-y-4">
+    <div className="space-y-4 animate-fade-in pb-16">
+      {/* Greeting Banner */}
+      <div className="flex items-center justify-between bg-[#141414] px-4 py-3 rounded-2xl border border-white/5">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-full bg-[#F27D26]/20 text-[#F27D26] flex items-center justify-center font-bold text-sm border border-[#F27D26]/30">
+            {user?.fullName?.charAt(0) || 'U'}
+          </div>
           <div>
-            <p className="text-sm font-bold opacity-70 uppercase tracking-tighter">Available Wallet Balance</p>
-            <h2 className="text-4xl sm:text-6xl font-black tracking-tight">
-              ₦{user?.walletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 }) || '0.00'}
-            </h2>
+            <h1 className="text-sm font-bold text-white flex items-center gap-1.5">
+              <span>Hi, {user?.fullName?.split(' ')[0]}</span> 👋
+            </h1>
+            <p className="text-[10px] text-gray-400">Welcome to Nivo Cash</p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={onOpenDeposit}
-              className="bg-black text-white hover:bg-zinc-900 px-6 py-3.5 rounded-2xl font-bold text-sm flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
-            >
-              <PlusCircle className="w-4 h-4" />
-              Deposit Funds
-            </button>
-            <button
-              onClick={onOpenWithdraw}
-              className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-black px-6 py-3.5 rounded-2xl font-bold text-sm flex items-center gap-2 cursor-pointer transition-all"
-            >
-              <ArrowUpRight className="w-4 h-4" />
-              Withdraw
-            </button>
+        </div>
+        <span className="bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold px-2.5 py-0.5 rounded-full border border-emerald-500/20 flex items-center gap-1">
+          <ShieldCheck className="w-3 h-3" />
+          Verified
+        </span>
+      </div>
+
+      {/* Redesigned Compact Wallet Balance Card (OPay-Inspired) */}
+      <div className="bg-gradient-to-br from-[#F27D26] via-[#E86C15] to-[#D95B00] rounded-[24px] p-5 text-black shadow-xl shadow-orange-950/20 relative overflow-hidden">
+        {/* Card Decorative Elements */}
+        <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/10 blur-xl pointer-events-none" />
+
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold text-black/70 uppercase tracking-wider">
+            Available Balance
+          </span>
+          <button
+            onClick={() => setShowBalance(!showBalance)}
+            className="flex items-center gap-1 bg-black/15 hover:bg-black/25 text-black text-[11px] font-bold px-2.5 py-1 rounded-full backdrop-blur-sm transition-all cursor-pointer"
+          >
+            {showBalance ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+            <span>{showBalance ? 'Hide' : 'Show'}</span>
+          </button>
+        </div>
+
+        <div className="my-3 flex items-baseline justify-between flex-wrap gap-2">
+          <h2 className="text-3xl sm:text-4xl font-black tracking-tight font-mono">
+            {showBalance
+              ? `₦${user?.walletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 }) || '0.00'}`
+              : '••••••••'}
+          </h2>
+          <div className="text-right">
+            <span className="text-[10px] font-bold text-black/60 uppercase block">Total Earned</span>
+            <span className="text-xs font-black">
+              ₦{user?.totalEarnings.toLocaleString() || '0.00'}
+            </span>
           </div>
         </div>
 
-        <div className="text-left md:text-right">
-          <p className="text-xs font-bold opacity-70 uppercase">Total Earnings</p>
-          <p className="text-2xl sm:text-3xl font-black">₦{user?.totalEarnings.toLocaleString() || '0.00'}</p>
+        {/* Compact Deposit & Withdraw Pill Buttons */}
+        <div className="flex items-center gap-3 mt-4 pt-3 border-t border-black/10">
+          <button
+            onClick={onOpenDeposit}
+            className="flex-1 bg-black text-white hover:bg-zinc-900 active:scale-95 transition-all text-xs font-extrabold h-11 rounded-full flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
+          >
+            <PlusCircle className="w-4 h-4 text-[#F27D26]" />
+            <span>Deposit</span>
+          </button>
+          <button
+            onClick={onOpenWithdraw}
+            className="flex-1 bg-white/20 hover:bg-white/30 active:scale-95 text-black transition-all text-xs font-extrabold h-11 rounded-full flex items-center justify-center gap-1.5 backdrop-blur-md cursor-pointer"
+          >
+            <ArrowUpRight className="w-4 h-4" />
+            <span>Withdraw</span>
+          </button>
         </div>
       </div>
 
-      {/* Key Analytics Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Quick Actions Grid (OPay-Inspired Compact Grid) */}
+      <div className="bg-[#141414] border border-white/5 rounded-2xl p-4">
+        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">
+          Quick Actions
+        </p>
+        <div className="grid grid-cols-6 gap-2">
+          {quickActions.map((action, idx) => {
+            const Icon = action.icon;
+            if (action.isButton) {
+              return (
+                <button
+                  key={idx}
+                  onClick={action.action}
+                  className="flex flex-col items-center gap-1.5 group cursor-pointer"
+                >
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#1D1D1D] border border-white/5 flex items-center justify-center text-[#F27D26] group-hover:border-[#F27D26]/50 group-hover:bg-[#F27D26]/10 group-active:scale-95 transition-all shadow-sm">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-semibold text-gray-300 group-hover:text-white truncate max-w-full">
+                    {action.label}
+                  </span>
+                </button>
+              );
+            } else {
+              return (
+                <Link
+                  key={idx}
+                  to={action.path!}
+                  className="flex flex-col items-center gap-1.5 group cursor-pointer"
+                >
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#1D1D1D] border border-white/5 flex items-center justify-center text-[#F27D26] group-hover:border-[#F27D26]/50 group-hover:bg-[#F27D26]/10 group-active:scale-95 transition-all shadow-sm">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-semibold text-gray-300 group-hover:text-white truncate max-w-full">
+                    {action.label}
+                  </span>
+                </Link>
+              );
+            }
+          })}
+        </div>
+      </div>
+
+      {/* Dashboard Statistics (Compact 2-Column Responsive Grid) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard
           title="Total Earnings"
           value={`₦${(user?.totalEarnings || 0).toLocaleString()}`}
-          subtitle="Lifetime earnings"
+          subtitle="Lifetime balance"
           icon={TrendingUp}
           highlight
         />
@@ -126,109 +217,109 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
         <StatCard
           title="Referral Bonus"
           value={`₦${(user?.totalReferralBonus || 0).toLocaleString()}`}
-          subtitle={`₦${bonusAmount} per user`}
+          subtitle={`₦${bonusAmount} per referral`}
           icon={Sparkles}
         />
         <StatCard
           title="Referral Code"
           value={user?.referralCode || 'NIVO123'}
-          subtitle={copiedCode ? 'Copied code!' : 'Click to copy code'}
+          subtitle={copiedCode ? 'Code copied!' : 'Click to copy code'}
           icon={Copy}
           onClick={copyReferralCode}
         />
       </div>
 
-      {/* Referral Banner & Tasks Widget Split */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Referral System Promo Box */}
-        <div className="lg:col-span-2 bg-[#141414] border border-white/5 rounded-3xl p-8 flex flex-col justify-between">
+      {/* Referral Card & Daily Tasks Grid */}
+      <div className="grid lg:grid-cols-3 gap-4">
+        {/* Referral Program Compact Card */}
+        <div className="lg:col-span-2 bg-[#141414] border border-white/5 rounded-2xl p-5 flex flex-col justify-between space-y-4">
           <div>
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Zap className="w-5 h-5 text-[#F27D26]" />
-                Referral Program
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <Zap className="w-4 h-4 text-[#F27D26]" />
+                <span>Referral Earnings</span>
               </h3>
-              <span className="text-[#F27D26] text-xs font-bold bg-[#F27D26]/10 px-3 py-1 rounded-full border border-[#F27D26]/20">
-                MASTER PROGRAM
+              <span className="text-[#F27D26] text-[10px] font-extrabold bg-[#F27D26]/10 px-2.5 py-0.5 rounded-full border border-[#F27D26]/20">
+                ₦{bonusAmount.toLocaleString()} / REGISTRATION
               </span>
             </div>
 
-            <p className="text-xs text-gray-400 mb-6 leading-relaxed">
-              Earn ₦{bonusAmount.toLocaleString()} instantly per verified registration! Share your code or referral link with friends.
+            <p className="text-[11px] text-gray-400 mb-3">
+              Share your link or referral code to earn instant cash directly into your wallet.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <p className="text-xs text-gray-500 font-bold uppercase">Your Referral Link</p>
-                <div className="bg-black border border-white/5 p-3 rounded-xl flex justify-between items-center">
-                  <span className="text-sm text-gray-400 truncate pr-2">{user?.referralLink}</span>
-                  <button
-                    onClick={() => setShowShareModal(true)}
-                    className="text-[#F27D26] text-xs font-bold hover:underline shrink-0 cursor-pointer"
-                  >
-                    COPY
-                  </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="bg-[#1A1A1A] border border-white/5 p-2.5 rounded-xl flex items-center justify-between">
+                <div className="min-w-0 pr-2">
+                  <span className="text-[9px] text-gray-400 font-bold uppercase block">Referral Link</span>
+                  <span className="text-xs text-white truncate block">{user?.referralLink}</span>
                 </div>
+                <button
+                  onClick={copyReferralLink}
+                  className="bg-[#F27D26]/10 text-[#F27D26] hover:bg-[#F27D26] hover:text-black text-[10px] font-bold px-2.5 py-1 rounded-lg shrink-0 transition-all cursor-pointer"
+                >
+                  {copiedLink ? 'COPIED' : 'COPY'}
+                </button>
               </div>
 
-              <div className="space-y-2">
-                <p className="text-xs text-gray-500 font-bold uppercase">Your Code</p>
-                <div className="bg-black border border-white/5 p-3 rounded-xl flex justify-between items-center">
-                  <span className="text-sm text-gray-400 font-mono">{user?.referralCode}</span>
-                  <button
-                    onClick={copyReferralCode}
-                    className="text-[#F27D26] text-xs font-bold hover:underline shrink-0 cursor-pointer"
-                  >
-                    {copiedCode ? 'COPIED' : 'COPY'}
-                  </button>
+              <div className="bg-[#1A1A1A] border border-white/5 p-2.5 rounded-xl flex items-center justify-between">
+                <div className="min-w-0 pr-2">
+                  <span className="text-[9px] text-gray-400 font-bold uppercase block">Referral Code</span>
+                  <span className="text-xs text-white font-mono font-bold block">{user?.referralCode}</span>
                 </div>
+                <button
+                  onClick={copyReferralCode}
+                  className="bg-[#F27D26]/10 text-[#F27D26] hover:bg-[#F27D26] hover:text-black text-[10px] font-bold px-2.5 py-1 rounded-lg shrink-0 transition-all cursor-pointer"
+                >
+                  {copiedCode ? 'COPIED' : 'COPY'}
+                </button>
               </div>
             </div>
           </div>
 
-          <div className="mt-8 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-gray-400">
-            <span>Direct instant wallet credit</span>
-            <Link to="/referrals" className="text-[#F27D26] hover:underline flex items-center gap-1">
-              <span>View Analytics</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+          <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] font-medium text-gray-400">
+            <span>Instant payouts on verified referrals</span>
+            <Link to="/referrals" className="text-[#F27D26] hover:underline flex items-center gap-1 font-bold">
+              <span>Analytics</span>
+              <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
 
-        {/* Quick Tasks Box */}
-        <div className="bg-[#141414] border border-white/5 rounded-3xl p-6 flex flex-col justify-between">
+        {/* Quick Tasks Widget */}
+        <div className="bg-[#141414] border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-white text-base flex items-center gap-2">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-white text-sm flex items-center gap-1.5">
                 <CheckSquare className="w-4 h-4 text-[#F27D26]" />
-                Daily Tasks
+                <span>Daily Tasks</span>
               </h3>
-              <Link to="/tasks" className="text-xs font-bold text-[#F27D26] hover:underline">
+              <Link to="/tasks" className="text-[11px] font-bold text-[#F27D26] hover:underline">
                 View All
               </Link>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               {tasks.length === 0 ? (
-                <p className="text-xs text-gray-500 py-4 text-center">Loading tasks...</p>
+                <p className="text-xs text-gray-500 py-3 text-center">Loading tasks...</p>
               ) : (
                 tasks.map((task) => (
                   <div
                     key={task.id}
-                    className="p-3 bg-black/40 rounded-2xl border border-white/5 flex items-center justify-between"
+                    className="p-2.5 bg-[#1A1A1A] rounded-xl border border-white/5 flex items-center justify-between"
                   >
-                    <div>
-                      <p className="text-xs font-bold text-white max-w-[130px] truncate">{task.title}</p>
-                      <p className="text-[11px] text-[#F27D26] font-bold">+₦{task.rewardAmount}</p>
+                    <div className="min-w-0 pr-2">
+                      <p className="text-xs font-semibold text-white truncate">{task.title}</p>
+                      <p className="text-[10px] text-[#F27D26] font-bold">+₦{task.rewardAmount}</p>
                     </div>
                     {task.completed ? (
-                      <span className="text-[10px] font-bold text-green-500 bg-green-500/10 px-2.5 py-1 rounded-full border border-green-500/20">
-                        Claimed
+                      <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shrink-0">
+                        Done
                       </span>
                     ) : (
                       <Link
                         to="/tasks"
-                        className="text-[10px] font-bold bg-[#F27D26] hover:bg-[#E6721F] text-black px-3 py-1.5 rounded-xl"
+                        className="text-[10px] font-bold bg-[#F27D26] hover:bg-[#E6721F] text-black px-2.5 py-1 rounded-lg shrink-0"
                       >
                         Start
                       </Link>
@@ -239,59 +330,59 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-white/5 text-center">
-            <Link to="/tasks" className="text-xs font-bold text-gray-400 hover:text-white">
-              Earn more rewards with daily tasks ➔
+          <div className="mt-3 pt-2 border-t border-white/5 text-center">
+            <Link to="/tasks" className="text-[11px] font-semibold text-gray-400 hover:text-white">
+              Complete tasks & earn daily rewards ➔
             </Link>
           </div>
         </div>
       </div>
 
       {/* Recent Activity List */}
-      <div className="bg-[#141414] border border-white/5 rounded-[32px] p-6">
-        <div className="flex items-center justify-between mb-6 px-2">
-          <h3 className="text-lg font-bold text-white">Recent Activity</h3>
-          <Link to="/history" className="text-xs font-bold text-[#F27D26] hover:underline">
-            View Full History
+      <div className="bg-[#141414] border border-white/5 rounded-2xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-bold text-white">Recent Activity</h3>
+          <Link to="/history" className="text-[11px] font-bold text-[#F27D26] hover:underline">
+            View All
           </Link>
         </div>
 
         {transactions.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 text-xs">No activity recorded yet.</div>
+          <div className="text-center py-6 text-gray-500 text-xs">No activity recorded yet.</div>
         ) : (
-          <div className="overflow-x-auto px-2">
+          <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-white/5 text-gray-500 font-bold uppercase text-[10px]">
-                  <th className="py-3 px-3">Type</th>
-                  <th className="py-3 px-3">Description</th>
-                  <th className="py-3 px-3">Amount</th>
-                  <th className="py-3 px-3">Status</th>
-                  <th className="py-3 px-3">Date</th>
+                <tr className="border-b border-white/5 text-gray-400 font-bold uppercase text-[9px]">
+                  <th className="py-2 px-2">Type</th>
+                  <th className="py-2 px-2">Description</th>
+                  <th className="py-2 px-2">Amount</th>
+                  <th className="py-2 px-2">Status</th>
+                  <th className="py-2 px-2">Date</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-medium text-gray-300">
                 {transactions.map((tx) => (
                   <tr key={tx.id} className="hover:bg-white/5 transition-colors">
-                    <td className="py-3.5 px-3 uppercase text-[10px] font-bold text-[#F27D26]">
+                    <td className="py-2.5 px-2 uppercase text-[9px] font-bold text-[#F27D26]">
                       {tx.type.replace('_', ' ')}
                     </td>
-                    <td className="py-3.5 px-3 font-semibold text-white">{tx.description}</td>
-                    <td className="py-3.5 px-3 font-bold text-white">₦{tx.amount.toLocaleString()}</td>
-                    <td className="py-3.5 px-3">
+                    <td className="py-2.5 px-2 font-medium text-white truncate max-w-[150px]">{tx.description}</td>
+                    <td className="py-2.5 px-2 font-bold text-white">₦{tx.amount.toLocaleString()}</td>
+                    <td className="py-2.5 px-2">
                       <span
-                        className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                        className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                           tx.status === 'completed' || tx.status === 'approved'
-                            ? 'bg-green-500/10 text-green-500 border border-green-500/20'
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                             : tx.status === 'pending'
                             ? 'bg-[#F27D26]/10 text-[#F27D26] border border-[#F27D26]/20'
-                            : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                            : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
                         }`}
                       >
                         {tx.status}
                       </span>
                     </td>
-                    <td className="py-3.5 px-3 text-gray-500 text-[11px]">
+                    <td className="py-2.5 px-2 text-gray-400 text-[10px]">
                       {new Date(tx.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
@@ -306,3 +397,4 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
     </div>
   );
 };
+

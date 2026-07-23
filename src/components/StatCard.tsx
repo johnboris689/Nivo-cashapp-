@@ -25,36 +25,37 @@ export const StatCard: React.FC<StatCardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`p-6 rounded-3xl border transition-all duration-200 relative overflow-hidden ${
-        onClick ? 'cursor-pointer hover:border-white/20 hover:scale-[1.01]' : ''
+      className={`p-4 sm:p-4.5 rounded-2xl border transition-all duration-200 relative overflow-hidden ${
+        onClick ? 'cursor-pointer hover:border-[#F27D26]/40 hover:scale-[1.02] active:scale-95' : ''
       } ${
         highlight
-          ? 'bg-gradient-to-br from-[#181818] via-[#141414] to-[#101010] border-[#F27D26]/30 shadow-xl shadow-orange-950/20'
-          : 'bg-[#141414] border-white/5'
+          ? 'bg-gradient-to-br from-[#1A1A1A] via-[#141414] to-[#101010] border-[#F27D26]/30 shadow-lg shadow-orange-950/20'
+          : 'bg-[#141414] border-white/5 hover:border-white/10'
       }`}
     >
       <div className="flex items-center justify-between">
-        <span className="text-gray-500 text-xs uppercase font-bold tracking-wider">{title}</span>
+        <span className="text-gray-400 text-[11px] font-medium tracking-tight truncate pr-1">{title}</span>
         <div
-          className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold ${
-            highlight ? 'bg-[#F27D26] text-black shadow-md shadow-orange-950/30' : 'bg-[#F27D26]/10 text-[#F27D26]'
+          className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+            highlight ? 'bg-[#F27D26] text-black shadow-sm' : 'bg-[#F27D26]/10 text-[#F27D26]'
           }`}
         >
-          <Icon className="w-5 h-5" />
+          <Icon className="w-4 h-4" />
         </div>
       </div>
 
-      <div className="mt-3">
-        <h3 className="text-2xl font-bold text-white tracking-tight">{value}</h3>
-        {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
+      <div className="mt-2">
+        <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight truncate">{value}</h3>
+        {subtitle && <p className="text-[11px] text-gray-400 mt-0.5 truncate">{subtitle}</p>}
       </div>
 
       {trend && (
-        <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center gap-1.5 text-xs font-semibold">
-          <span className={trendUp ? 'text-green-500' : 'text-red-400'}>{trend}</span>
+        <div className="mt-2 pt-2 border-t border-white/5 flex items-center gap-1 text-[11px] font-medium">
+          <span className={trendUp ? 'text-emerald-400' : 'text-rose-400'}>{trend}</span>
           <span className="text-gray-500">vs last week</span>
         </div>
       )}
     </div>
   );
 };
+

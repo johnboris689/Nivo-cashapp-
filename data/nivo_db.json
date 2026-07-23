@@ -67,6 +67,29 @@
       "activationPaid": false,
       "activationPaidAt": null,
       "passwordHash": "$2b$10$EXPhEXqMGBBgDxNFYJv7vuMqT3iV2A55X38Wsl/GxV1sc0K9H7Wzq"
+    },
+    {
+      "id": "2d0c57d2-5b17-4085-9158-29bdb06ed0e5",
+      "fullName": "John y",
+      "username": "johnboris689",
+      "email": "johnborix689@gmail.com",
+      "phone": "09130892957",
+      "walletBalance": 0,
+      "referralCode": "NIVO6CTPJ",
+      "referralLink": "http://nivo-cashapp.onrender.com/register?ref=NIVO6CTPJ",
+      "referrerId": null,
+      "createdAt": "2026-07-23T03:58:01.508Z",
+      "lastLogin": "2026-07-23T03:58:01.508Z",
+      "status": "active",
+      "totalReferrals": 0,
+      "referralCount": 0,
+      "totalReferralBonus": 0,
+      "totalEarnings": 0,
+      "emailVerified": true,
+      "isAdmin": false,
+      "activationPaid": false,
+      "activationPaidAt": null,
+      "passwordHash": "$2b$10$HCYLW4wRGR8PGCOnYWTwCuv7xJLJZTfh1WZcNHbwBfQNlrgWRE88e"
     }
   ],
   "transactions": [
