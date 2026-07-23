@@ -6,21 +6,21 @@
       "username": "admin",
       "email": "talkdavidjohn@gmail.com",
       "phone": "+2348000000000",
-      "walletBalance": 251200,
+      "walletBalance": 252400,
       "referralCode": "NIVOADMIN",
       "referralLink": "",
       "referrerId": null,
       "createdAt": "2026-07-22T10:54:05.069Z",
-      "lastLogin": "2026-07-22T10:59:28.437Z",
+      "lastLogin": "2026-07-23T04:42:17.551Z",
       "status": "active",
-      "totalReferrals": 16,
-      "totalReferralBonus": 19200,
-      "totalEarnings": 251200,
+      "totalReferrals": 17,
+      "totalReferralBonus": 20400,
+      "totalEarnings": 252400,
       "emailVerified": true,
       "isAdmin": true,
       "activationPaid": true,
       "activationPaidAt": "2026-07-22T10:54:05.069Z",
-      "passwordHash": "$2b$10$.lJUKHgY80kSRh9bGznG/ekpeUpDCZ4X163/pU8oW8ykBWwrsAlDS"
+      "passwordHash": "$2b$10$a0GDUahjtXYBnp66v2xbv.n9MDZ80uYK640a2QPjQrniXU4qaBQgO"
     },
     {
       "id": "1887d4cd-bdb0-4a0c-b918-598d004fc920",
@@ -90,9 +90,69 @@
       "activationPaid": false,
       "activationPaidAt": null,
       "passwordHash": "$2b$10$HCYLW4wRGR8PGCOnYWTwCuv7xJLJZTfh1WZcNHbwBfQNlrgWRE88e"
+    },
+    {
+      "id": "9860ad43-548a-4804-87e9-531e25642fb8",
+      "fullName": "Musa danladi",
+      "username": "johnandi",
+      "email": "josephjoshuajj689@gmail.com",
+      "phone": "08064197503",
+      "walletBalance": 0,
+      "referralCode": "NIVOPWMFF",
+      "referralLink": "https://nivocash.app/register?ref=NIVOPWMFF",
+      "referrerId": null,
+      "createdAt": "2026-07-21T17:30:01.177911Z",
+      "lastLogin": "2026-07-21T17:30:27.434331Z",
+      "status": "active",
+      "totalReferrals": 0,
+      "referralCount": 0,
+      "totalReferralBonus": 0,
+      "totalEarnings": 0,
+      "emailVerified": true,
+      "isAdmin": false,
+      "activationPaid": false,
+      "activationPaidAt": null,
+      "passwordHash": "$2b$10$nZiNcZXbbo26Y/e8jmHmq.rgXa6pWKx8n.9Z.84UGeoY6f8jsdWa."
+    },
+    {
+      "id": "dc39ba6f-85e9-43d2-a852-87e6624938dc",
+      "fullName": "Supabase User",
+      "username": "user_1784781737555",
+      "email": "user_1784781737555@test.com",
+      "phone": "+2348123456789",
+      "walletBalance": 0,
+      "referralCode": "NIVOME9MC",
+      "referralLink": "https://ais-dev-fkgbvdctfqqjpexkmckbiq-560222299408.europe-west2.run.app/register?ref=NIVOME9MC",
+      "referrerId": "admin-0000-0000-0000-000000000000",
+      "createdAt": "2026-07-23T04:42:17.669Z",
+      "lastLogin": "2026-07-23T04:42:17.809Z",
+      "status": "active",
+      "totalReferrals": 0,
+      "referralCount": 0,
+      "totalReferralBonus": 0,
+      "totalEarnings": 0,
+      "emailVerified": true,
+      "isAdmin": false,
+      "activationPaid": false,
+      "activationPaidAt": null,
+      "passwordHash": "$2b$10$3vhq.bDFGESvm1eaTYYk9eg1Fe2TZD.lOSQG0K9eu15ja29RTQAeO"
     }
   ],
   "transactions": [
+    {
+      "id": "c9bd0e1a-fbb2-4af6-922f-2b94acd819e5",
+      "userId": "admin-0000-0000-0000-000000000000",
+      "type": "referral_bonus",
+      "amount": 1200,
+      "description": "Referral bonus for inviting @user_1784781737555",
+      "status": "completed",
+      "reference": "REF-1784781737669-4785",
+      "createdAt": "2026-07-23T04:42:17.669Z",
+      "details": {
+        "referredUser": "user_1784781737555",
+        "referredUserId": "dc39ba6f-85e9-43d2-a852-87e6624938dc"
+      }
+    },
     {
       "id": "879ae5dd-09a5-4864-ad08-04905a40f329",
       "userId": "admin-0000-0000-0000-000000000000",
@@ -171,6 +231,16 @@
   "taskCompletions": [],
   "referrals": [
     {
+      "id": "09b9b120-a4ad-4aee-928a-424cb70db832",
+      "referrerId": "admin-0000-0000-0000-000000000000",
+      "referredUserId": "dc39ba6f-85e9-43d2-a852-87e6624938dc",
+      "referredUserName": "Supabase User",
+      "referredUserEmail": "user_1784781737555@test.com",
+      "bonusAmount": 1200,
+      "status": "successful",
+      "createdAt": "2026-07-23T04:42:17.669Z"
+    },
+    {
       "id": "e6c6a7e3-af22-4fc6-a42c-60ac8c67d9ae",
       "referrerId": "admin-0000-0000-0000-000000000000",
       "referredUserId": "852885fd-940c-4b82-b9b3-533641163c5f",
@@ -182,6 +252,15 @@
     }
   ],
   "notifications": [
+    {
+      "id": "bbc014ea-1fdb-46f8-befc-535edede7a94",
+      "userId": "admin-0000-0000-0000-000000000000",
+      "title": "🎉 Referral Reward Received!",
+      "message": "Congratulations! You just earned ₦1,200 because Supabase User (@user_1784781737555) joined using your referral link.",
+      "type": "success",
+      "read": false,
+      "createdAt": "2026-07-23T04:42:17.685Z"
+    },
     {
       "id": "e558519b-9730-456b-aea9-9059d451b7b8",
       "userId": "admin-0000-0000-0000-000000000000",

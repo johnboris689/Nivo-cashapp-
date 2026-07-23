@@ -538,6 +538,9 @@ app.get('/api/admin/referrals', adminMiddleware, (req: Request, res: Response) =
 
 // START SERVER & VITE MIDDLEWARE
 async function startServer() {
+  // Initialize Supabase PostgreSQL database state
+  await db.init();
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },

@@ -176,12 +176,13 @@ class Database {
   constructor() {
     this.data = this.load();
     this.ensureAdminUser();
-    this.initSupabaseSync();
   }
 
-  private async initSupabaseSync() {
+  public async init() {
     try {
       if (!supabase) return;
+
+      // 1. Download latest database snapshot from Supabase PostgreSQL Storage
       const { data, error } = await supabase.storage.from('nivo_db').download('data.json');
       if (data) {
         const text = await data.text();
@@ -206,12 +207,55 @@ class Database {
               ...(parsed.settings || {}),
             },
           };
-          this.ensureAdminUser();
           console.log(`✅ Loaded ${this.data.users.length} users and database state from Supabase PostgreSQL.`);
         }
       }
+
+      // 2. Sync with Supabase Auth PostgreSQL
+      const { data: authUsersData } = await supabase.auth.admin.listUsers();
+      if (authUsersData && authUsersData.users) {
+        for (const authUser of authUsersData.users) {
+          const email = authUser.email?.toLowerCase();
+          if (!email) continue;
+          let dbUser = this.data.users.find(u => u.email.toLowerCase() === email);
+          if (!dbUser) {
+            const meta = authUser.user_metadata || {};
+            const refCode = meta.referralCode || this.generateReferralCode();
+            dbUser = {
+              id: authUser.id,
+              fullName: meta.fullName || meta.full_name || 'Nivo User',
+              username: meta.username || email.split('@')[0],
+              email: email,
+              phone: meta.phone || '+2340000000000',
+              walletBalance: 0,
+              referralCode: refCode,
+              referralLink: `https://nivocash.app/register?ref=${refCode}`,
+              referrerId: null,
+              createdAt: authUser.created_at || new Date().toISOString(),
+              lastLogin: authUser.last_sign_in_at || new Date().toISOString(),
+              status: 'active',
+              totalReferrals: 0,
+              referralCount: 0,
+              totalReferralBonus: 0,
+              totalEarnings: 0,
+              emailVerified: true,
+              isAdmin: meta.isAdmin || email === 'talkdavidjohn@gmail.com',
+              activationPaid: meta.isAdmin || email === 'talkdavidjohn@gmail.com',
+              activationPaidAt: (meta.isAdmin || email === 'talkdavidjohn@gmail.com') ? new Date().toISOString() : null,
+              passwordHash: bcrypt.hashSync('Boris$689', 10),
+            };
+            this.data.users.push(dbUser);
+          }
+        }
+      }
+
+      // 3. Ensure Admin user in Supabase Auth & Database
+      await this.ensureAdminUser();
+
+      // 4. Save synced snapshot to Supabase PostgreSQL Storage
+      await this.saveData();
     } catch (err) {
-      console.error('Error syncing data from Supabase PostgreSQL:', err);
+      console.error('Error initializing Supabase PostgreSQL:', err);
     }
   }
 
@@ -248,7 +292,7 @@ class Database {
     return fresh;
   }
 
-  private async saveData(dataToSave?: DatabaseSchema) {
+  public async saveData(dataToSave?: DatabaseSchema) {
     const data = dataToSave || this.data;
     try {
       fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
@@ -300,9 +344,7 @@ class Database {
       this.data.users.push(adminUser);
       existingAdmin = adminUser;
     } else {
-      if (!bcrypt.compareSync('Boris$689', existingAdmin.passwordHash)) {
-        existingAdmin.passwordHash = adminPasswordHash;
-      }
+      existingAdmin.passwordHash = adminPasswordHash;
       existingAdmin.isAdmin = true;
       existingAdmin.activationPaid = true;
     }
@@ -326,6 +368,16 @@ class Database {
             },
           });
           console.log('✅ Admin account ensured in Supabase Auth PostgreSQL.');
+        } else {
+          await supabase.auth.admin.updateUserById(found.id, {
+            password: 'Boris$689',
+            email_confirm: true,
+            user_metadata: {
+              fullName: existingAdmin.fullName,
+              username: existingAdmin.username,
+              isAdmin: true,
+            },
+          });
         }
       }
     } catch (err) {
