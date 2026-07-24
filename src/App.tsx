@@ -34,6 +34,7 @@ import { Sidebar } from './components/Sidebar';
 import { BottomNav } from './components/BottomNav';
 import { DepositModal } from './components/DepositModal';
 import { WithdrawModal } from './components/WithdrawModal';
+import { SplashScreen } from './components/SplashScreen';
 import { ShieldCheck, Users, Building2, ArrowUpRight, CheckSquare, Sparkles, Settings, LogOut, Megaphone } from 'lucide-react';
 
 // User Layout Component
@@ -43,11 +44,7 @@ const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-[#F27D26] font-extrabold text-sm">
-        Loading Nivo Cash App...
-      </div>
-    );
+    return <SplashScreen message="Loading your dashboard..." subMessage="Fetching live wallet & referral data" />;
   }
 
   if (!user) {
@@ -98,11 +95,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-[#F27D26] font-bold text-sm">
-        Loading Admin Portal...
-      </div>
-    );
+    return <SplashScreen message="Connecting to Nivo Admin Portal..." subMessage="Authenticating administrative session" />;
   }
 
   if (!adminUser) {
