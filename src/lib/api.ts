@@ -1,4 +1,4 @@
-import { User, Transaction, DepositRequest, WithdrawalRequest, ActivationRequest, Task, NotificationItem, BankDetails, SiteSettings, AdminStats, ReferralRecord } from '../types';
+import { User, Transaction, DepositRequest, WithdrawalRequest, ActivationRequest, Task, NotificationItem, BankDetails, SiteSettings, AdminStats, ReferralRecord, TaskSubmission, TaskSubmissionStatus } from '../types';
 
 const TOKEN_KEY = 'nivo_auth_token';
 const ADMIN_TOKEN_KEY = 'nivo_admin_token';
@@ -106,12 +106,23 @@ export const api = {
     }>('/api/referrals/stats'),
 
   // --- Tasks ---
-  getTasks: () => request<(Task & { completed: boolean })[]>('/api/tasks'),
+  getTasks: () => request<(Task & { userStatus: TaskSubmissionStatus; submission: TaskSubmission | null; completed: boolean })[]>('/api/tasks'),
 
-  completeTask: (taskId: string) =>
-    request<{ message: string; result: { rewardAmount: number; taskTitle: string } }>('/api/tasks/complete', {
+  startTask: (taskId: string) =>
+    request<{ message: string; submission: TaskSubmission }>(`/api/tasks/${taskId}/start`, {
       method: 'POST',
-      body: JSON.stringify({ taskId }),
+    }),
+
+  submitTaskProof: (taskId: string, proofText?: string, proofUrl?: string) =>
+    request<{ message: string; submission: TaskSubmission; credited?: boolean }>(`/api/tasks/${taskId}/submit`, {
+      method: 'POST',
+      body: JSON.stringify({ proofText, proofUrl }),
+    }),
+
+  completeTask: (taskId: string, proofText?: string, proofUrl?: string) =>
+    request<{ message: string; submission: TaskSubmission; credited?: boolean }>('/api/tasks/complete', {
+      method: 'POST',
+      body: JSON.stringify({ taskId, proofText, proofUrl }),
     }),
 
   // --- Notifications ---
@@ -186,6 +197,20 @@ export const api = {
     }, true),
 
   getAdminTasks: () => request<Task[]>('/api/admin/tasks', {}, true),
+
+  getAdminTaskSubmissions: () => request<TaskSubmission[]>('/api/admin/tasks/submissions', {}, true),
+
+  approveTaskSubmission: (submissionId: string, adminNote?: string) =>
+    request<{ message: string; submission: TaskSubmission }>(`/api/admin/tasks/submissions/${submissionId}/approve`, {
+      method: 'POST',
+      body: JSON.stringify({ adminNote }),
+    }, true),
+
+  rejectTaskSubmission: (submissionId: string, adminNote?: string) =>
+    request<{ message: string; submission: TaskSubmission }>(`/api/admin/tasks/submissions/${submissionId}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({ adminNote }),
+    }, true),
 
   createTask: (task: Omit<Task, 'id' | 'createdAt' | 'completionCount'>) =>
     request<Task>('/api/admin/tasks', {

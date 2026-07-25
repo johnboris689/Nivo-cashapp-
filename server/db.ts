@@ -11,6 +11,8 @@ import {
   ActivationRequest,
   Task,
   TaskCompletion,
+  TaskSubmission,
+  TaskSubmissionStatus,
   ReferralRecord,
   NotificationItem,
   BankDetails,
@@ -31,6 +33,7 @@ interface DatabaseSchema {
   activations: ActivationRequest[];
   tasks: Task[];
   taskCompletions: TaskCompletion[];
+  taskSubmissions: TaskSubmission[];
   referrals: ReferralRecord[];
   notifications: NotificationItem[];
   bankDetails: BankDetails;
@@ -78,7 +81,9 @@ function getInitialDb(): DatabaseSchema {
       description: 'Follow our official X handle @NivoCashApp for real-time updates and daily giveaway announcements.',
       rewardAmount: 500,
       category: 'social',
-      actionUrl: 'https://x.com',
+      actionUrl: 'https://x.com/NivoCashApp',
+      verificationType: 'proof',
+      proofInstructions: 'Enter your X @username or profile link.',
       enabled: true,
       createdAt: new Date().toISOString(),
       completionCount: 142,
@@ -89,18 +94,22 @@ function getInitialDb(): DatabaseSchema {
       description: 'Join over 25,000 active members in our official VIP Telegram group.',
       rewardAmount: 600,
       category: 'social',
-      actionUrl: 'https://telegram.org',
+      actionUrl: 'https://t.me/NivoCashOfficial',
+      verificationType: 'proof',
+      proofInstructions: 'Enter your Telegram @username used to join the group.',
       enabled: true,
       createdAt: new Date().toISOString(),
       completionCount: 289,
     },
     {
       id: 'task-3',
-      title: 'Daily Check-In Streak',
-      description: 'Log into Nivo Cash App daily to claim your free daily login bonus.',
+      title: 'Daily Check-In & Visit Partner Site',
+      description: 'Log in and visit our featured partner page for 30 seconds to claim your daily reward.',
       rewardAmount: 300,
       category: 'daily',
-      actionUrl: '#',
+      actionUrl: 'https://nivocash.app',
+      verificationType: 'timer',
+      timerSeconds: 30,
       enabled: true,
       createdAt: new Date().toISOString(),
       completionCount: 512,
@@ -108,21 +117,25 @@ function getInitialDb(): DatabaseSchema {
     {
       id: 'task-4',
       title: 'Subscribe to Nivo Cash YouTube Channel',
-      description: 'Subscribe and click the notification bell on our YouTube tutorials channel.',
+      description: 'Subscribe, hit the notification bell, and watch our intro video for 45 seconds.',
       rewardAmount: 500,
       category: 'social',
-      actionUrl: 'https://youtube.com',
+      actionUrl: 'https://youtube.com/@NivoCashApp',
+      verificationType: 'timer',
+      timerSeconds: 45,
       enabled: true,
       createdAt: new Date().toISOString(),
       completionCount: 98,
     },
     {
       id: 'task-5',
-      title: 'Download Nivo Cash Android & iOS App',
-      description: 'Download and rate our high-performance mobile app 5 stars on the app store.',
+      title: 'Download & Rate Nivo Cash Mobile App',
+      description: 'Download our Android/iOS app and submit your registered account email or app store review handle.',
       rewardAmount: 1000,
       category: 'download',
-      actionUrl: '#',
+      actionUrl: 'https://nivocash.app/download',
+      verificationType: 'proof',
+      proofInstructions: 'Enter your App Store/Google Play review username or email.',
       enabled: true,
       createdAt: new Date().toISOString(),
       completionCount: 310,
@@ -163,6 +176,7 @@ function getInitialDb(): DatabaseSchema {
     activations: [],
     tasks: sampleTasks,
     taskCompletions: [],
+    taskSubmissions: [],
     referrals: [],
     notifications: [],
     bankDetails: initialBank,
@@ -197,8 +211,12 @@ class Database {
             deposits: parsed.deposits || [],
             withdrawals: parsed.withdrawals || [],
             activations: parsed.activations || [],
-            tasks: parsed.tasks || [],
+            tasks: (parsed.tasks || []).map((t: any) => ({
+              ...t,
+              verificationType: t.verificationType || 'timer',
+            })),
             taskCompletions: parsed.taskCompletions || [],
+            taskSubmissions: parsed.taskSubmissions || [],
             referrals: parsed.referrals || [],
             notifications: parsed.notifications || [],
             bankDetails: parsed.bankDetails || getInitialDb().bankDetails,
@@ -273,8 +291,12 @@ class Database {
           deposits: parsed.deposits || [],
           withdrawals: parsed.withdrawals || [],
           activations: parsed.activations || [],
-          tasks: parsed.tasks || [],
+          tasks: (parsed.tasks || []).map((t: any) => ({
+            ...t,
+            verificationType: t.verificationType || 'timer',
+          })),
           taskCompletions: parsed.taskCompletions || [],
+          taskSubmissions: parsed.taskSubmissions || [],
           referrals: parsed.referrals || [],
           notifications: parsed.notifications || [],
           bankDetails: parsed.bankDetails || getInitialDb().bankDetails,
@@ -907,15 +929,41 @@ class Database {
     return wth;
   }
 
-  // --- TASKS ---
+  // --- TASKS & SECURE VERIFICATION SYSTEM ---
   public getTasks(): Task[] {
     return this.data.tasks;
+  }
+
+  public getTasksForUser(userId: string) {
+    const userSubmissions = this.data.taskSubmissions.filter(s => s.userId === userId);
+    const completedTaskIds = this.data.taskCompletions.filter(tc => tc.userId === userId).map(tc => tc.taskId);
+
+    return this.data.tasks.filter(t => t.enabled).map(t => {
+      const sub = userSubmissions.find(s => s.taskId === t.id);
+      const isCompletedOld = completedTaskIds.includes(t.id);
+
+      let status: TaskSubmissionStatus = 'not_started';
+      if (sub) {
+        status = sub.status;
+      } else if (isCompletedOld) {
+        status = 'claimed';
+      }
+
+      return {
+        ...t,
+        userStatus: status,
+        submission: sub || null,
+        completed: status === 'claimed',
+      };
+    });
   }
 
   public createTask(taskData: Omit<Task, 'id' | 'createdAt' | 'completionCount'>): Task {
     const newTask: Task = {
       ...taskData,
       id: `task-${Date.now()}`,
+      verificationType: taskData.verificationType || 'timer',
+      timerSeconds: taskData.timerSeconds || 30,
       createdAt: new Date().toISOString(),
       completionCount: 0,
     };
@@ -935,10 +983,11 @@ class Database {
   public deleteTask(taskId: string) {
     this.data.tasks = this.data.tasks.filter(t => t.id !== taskId);
     this.data.taskCompletions = this.data.taskCompletions.filter(tc => tc.taskId !== taskId);
+    this.data.taskSubmissions = this.data.taskSubmissions.filter(ts => ts.taskId !== taskId);
     this.saveData();
   }
 
-  public completeTask(userId: string, taskId: string): { rewardAmount: number; taskTitle: string } {
+  public startTask(userId: string, taskId: string): TaskSubmission {
     const user = this.data.users.find(u => u.id === userId);
     if (!user) throw new Error('User not found.');
 
@@ -946,61 +995,244 @@ class Database {
     if (!task) throw new Error('Task not found.');
     if (!task.enabled) throw new Error('This task is currently disabled.');
 
-    // Check duplicate completion
-    const existing = this.data.taskCompletions.find(
-      tc => tc.userId === userId && tc.taskId === taskId
-    );
-    if (existing) {
-      throw new Error('You have already completed this task.');
+    let sub = this.data.taskSubmissions.find(s => s.userId === userId && s.taskId === taskId);
+
+    if (sub) {
+      if (sub.status === 'claimed') {
+        throw new Error('You have already claimed the reward for this task.');
+      }
+      if (sub.status === 'pending_verification') {
+        throw new Error('Your proof submission for this task is currently under admin review.');
+      }
+      if (sub.status === 'in_progress') {
+        return sub;
+      }
+      // If rejected, allow restarting
+      sub.status = 'in_progress';
+      sub.startedAt = new Date().toISOString();
+      sub.completedAt = undefined;
+      sub.claimedAt = undefined;
+    } else {
+      sub = {
+        id: crypto.randomUUID(),
+        userId: user.id,
+        userName: user.fullName,
+        userEmail: user.email,
+        taskId: task.id,
+        taskTitle: task.title,
+        rewardAmount: task.rewardAmount,
+        verificationType: task.verificationType || 'timer',
+        status: 'in_progress',
+        startedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+      };
+      this.data.taskSubmissions.unshift(sub);
     }
 
-    // Record completion
-    const completion: TaskCompletion = {
-      id: crypto.randomUUID(),
-      userId: user.id,
-      taskId: task.id,
-      taskTitle: task.title,
-      rewardAmount: task.rewardAmount,
-      completedAt: new Date().toISOString(),
-    };
-    this.data.taskCompletions.unshift(completion);
-
-    // Update task completion count
-    task.completionCount += 1;
-
-    // Credit user wallet balance
-    user.walletBalance += task.rewardAmount;
-    user.totalEarnings += task.rewardAmount;
-
-    // Log transaction
-    this.data.transactions.unshift({
-      id: crypto.randomUUID(),
-      userId: user.id,
-      type: 'task_reward',
-      amount: task.rewardAmount,
-      description: `Reward for completing task: ${task.title}`,
-      status: 'completed',
-      reference: `TSK-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-    });
-
-    // Send notification
-    this.data.notifications.unshift({
-      id: crypto.randomUUID(),
-      userId: user.id,
-      title: '🎯 Task Reward Claimed!',
-      message: `You earned ₦${task.rewardAmount.toLocaleString()} for completing "${task.title}".`,
-      type: 'success',
-      read: false,
-      createdAt: new Date().toISOString(),
-    });
-
     this.saveData();
-    return { rewardAmount: task.rewardAmount, taskTitle: task.title };
+    return sub;
+  }
+
+  public submitTaskProof(
+    userId: string,
+    taskId: string,
+    proofText?: string,
+    proofUrl?: string
+  ): { message: string; submission: TaskSubmission; credited?: boolean } {
+    const user = this.data.users.find(u => u.id === userId);
+    if (!user) throw new Error('User not found.');
+
+    const task = this.data.tasks.find(t => t.id === taskId);
+    if (!task) throw new Error('Task not found.');
+
+    let sub = this.data.taskSubmissions.find(s => s.userId === userId && s.taskId === taskId);
+
+    if (!sub) {
+      // Auto start if not started
+      sub = this.startTask(userId, taskId);
+    }
+
+    if (sub.status === 'claimed') {
+      throw new Error('You have already claimed this task reward.');
+    }
+    if (sub.status === 'pending_verification') {
+      throw new Error('Your proof submission for this task is currently under admin review.');
+    }
+
+    const verificationType = task.verificationType || 'timer';
+
+    if (verificationType === 'timer') {
+      const minSeconds = task.timerSeconds || 30;
+      const startedAtTime = sub.startedAt ? new Date(sub.startedAt).getTime() : Date.now();
+      const elapsedSeconds = (Date.now() - startedAtTime) / 1000;
+
+      // Allow 3s grace buffer for clock skew / API flight time
+      if (elapsedSeconds < minSeconds - 3) {
+        const remaining = Math.ceil(minSeconds - elapsedSeconds);
+        throw new Error(`Security Check Failed: Please stay on the task page for at least ${remaining} more seconds before claiming your reward.`);
+      }
+
+      // Timer verified! Approve & claim reward immediately
+      sub.status = 'claimed';
+      sub.completedAt = new Date().toISOString();
+      sub.claimedAt = new Date().toISOString();
+
+      // Credit wallet
+      user.walletBalance += task.rewardAmount;
+      user.totalEarnings += task.rewardAmount;
+
+      task.completionCount += 1;
+
+      // Record completion and transaction
+      this.data.taskCompletions.unshift({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        taskId: task.id,
+        taskTitle: task.title,
+        rewardAmount: task.rewardAmount,
+        completedAt: new Date().toISOString(),
+      });
+
+      this.data.transactions.unshift({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        type: 'task_reward',
+        amount: task.rewardAmount,
+        description: `Verified Reward: ${task.title}`,
+        status: 'completed',
+        reference: `TSK-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+      });
+
+      this.data.notifications.unshift({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        title: '🎯 Task Reward Claimed!',
+        message: `Your visit was verified! You earned ₦${task.rewardAmount.toLocaleString()} for completing "${task.title}".`,
+        type: 'success',
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
+
+      this.saveData();
+      return {
+        message: `Verified! ₦${task.rewardAmount.toLocaleString()} credited to your wallet!`,
+        submission: sub,
+        credited: true,
+      };
+    } else {
+      // Proof-based task (Telegram, WhatsApp, Instagram, TikTok, etc.)
+      if (!proofText || proofText.trim().length < 2) {
+        throw new Error('Please enter valid task completion proof (e.g. your username, transaction ID, or account handle).');
+      }
+
+      sub.status = 'pending_verification';
+      sub.proofText = proofText.trim();
+      if (proofUrl) sub.proofUrl = proofUrl.trim();
+      sub.completedAt = new Date().toISOString();
+
+      this.saveData();
+      return {
+        message: 'Task proof submitted successfully! Your submission is now under review by an administrator.',
+        submission: sub,
+        credited: false,
+      };
+    }
+  }
+
+  public completeTask(userId: string, taskId: string): { rewardAmount: number; taskTitle: string } {
+    const res = this.submitTaskProof(userId, taskId, 'Self-Verified');
+    return { rewardAmount: res.submission.rewardAmount, taskTitle: res.submission.taskTitle };
   }
 
   public getUserTaskCompletions(userId: string): TaskCompletion[] {
     return this.data.taskCompletions.filter(tc => tc.userId === userId);
+  }
+
+  public getPendingTaskSubmissions(): TaskSubmission[] {
+    return this.data.taskSubmissions.filter(s => s.status === 'pending_verification');
+  }
+
+  public getAllTaskSubmissions(): TaskSubmission[] {
+    return this.data.taskSubmissions;
+  }
+
+  public approveTaskSubmission(submissionId: string, adminNote?: string): TaskSubmission {
+    const sub = this.data.taskSubmissions.find(s => s.id === submissionId);
+    if (!sub) throw new Error('Task submission not found.');
+    if (sub.status === 'claimed') throw new Error('Task submission has already been approved and claimed.');
+
+    sub.status = 'claimed';
+    sub.claimedAt = new Date().toISOString();
+    sub.adminNote = adminNote || 'Approved by administrator';
+
+    const user = this.data.users.find(u => u.id === sub.userId);
+    if (user) {
+      user.walletBalance += sub.rewardAmount;
+      user.totalEarnings += sub.rewardAmount;
+
+      const task = this.data.tasks.find(t => t.id === sub.taskId);
+      if (task) {
+        task.completionCount += 1;
+      }
+
+      this.data.taskCompletions.unshift({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        taskId: sub.taskId,
+        taskTitle: sub.taskTitle,
+        rewardAmount: sub.rewardAmount,
+        completedAt: new Date().toISOString(),
+      });
+
+      this.data.transactions.unshift({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        type: 'task_reward',
+        amount: sub.rewardAmount,
+        description: `Task Proof Approved: ${sub.taskTitle}`,
+        status: 'completed',
+        reference: `TSK-APP-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+      });
+
+      this.data.notifications.unshift({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        title: '🎯 Task Proof Approved!',
+        message: `Your proof for "${sub.taskTitle}" was verified and ₦${sub.rewardAmount.toLocaleString()} has been added to your wallet balance.`,
+        type: 'success',
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    this.saveData();
+    return sub;
+  }
+
+  public rejectTaskSubmission(submissionId: string, adminNote?: string): TaskSubmission {
+    const sub = this.data.taskSubmissions.find(s => s.id === submissionId);
+    if (!sub) throw new Error('Task submission not found.');
+
+    sub.status = 'rejected';
+    sub.adminNote = adminNote || 'Proof rejected by administrator';
+
+    const user = this.data.users.find(u => u.id === sub.userId);
+    if (user) {
+      this.data.notifications.unshift({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        title: '❌ Task Proof Rejected',
+        message: `Your proof submission for "${sub.taskTitle}" was rejected. Reason: ${sub.adminNote}. You may retry the task with valid proof.`,
+        type: 'alert',
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    this.saveData();
+    return sub;
   }
 
   // --- REFERRALS ---

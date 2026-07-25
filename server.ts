@@ -217,36 +217,51 @@ app.get('/api/referrals/stats', authMiddleware, (req: Request, res: Response) =>
   }
 });
 
-// --- TASKS ---
+// --- TASKS & VERIFICATION SYSTEM ---
 app.get('/api/tasks', authMiddleware, (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const allTasks = db.getTasks().filter(t => t.enabled);
-    const completions = db.getUserTaskCompletions(userId);
-    const completedTaskIds = completions.map(c => c.taskId);
-
-    const tasksWithCompletion = allTasks.map(t => ({
-      ...t,
-      completed: completedTaskIds.includes(t.id),
-    }));
-
-    res.json(tasksWithCompletion);
+    const tasks = db.getTasksForUser(userId);
+    res.json(tasks);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/tasks/:id/start', authMiddleware, (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const taskId = req.params.id;
+    const submission = db.startTask(userId, taskId);
+    res.json({ message: 'Task timer started.', submission });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/tasks/:id/submit', authMiddleware, (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const taskId = req.params.id;
+    const { proofText, proofUrl } = req.body;
+    const result = db.submitTaskProof(userId, taskId, proofText, proofUrl);
+    res.json(result);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
   }
 });
 
 app.post('/api/tasks/complete', authMiddleware, (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const { taskId } = req.body;
+    const { taskId, proofText, proofUrl } = req.body;
     if (!taskId) {
       res.status(400).json({ error: 'Task ID is required.' });
       return;
     }
 
-    const result = db.completeTask(userId, taskId);
-    res.json({ message: `Successfully claimed ₦${result.rewardAmount.toLocaleString()} reward!`, result });
+    const result = db.submitTaskProof(userId, taskId, proofText, proofUrl);
+    res.json(result);
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
@@ -488,6 +503,37 @@ app.get('/api/admin/tasks', adminMiddleware, (req: Request, res: Response) => {
     res.json(tasks);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/admin/tasks/submissions', adminMiddleware, (req: Request, res: Response) => {
+  try {
+    const submissions = db.getAllTaskSubmissions();
+    res.json(submissions);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/tasks/submissions/:id/approve', adminMiddleware, (req: Request, res: Response) => {
+  try {
+    const submissionId = req.params.id;
+    const { adminNote } = req.body;
+    const approved = db.approveTaskSubmission(submissionId, adminNote);
+    res.json({ message: 'Task submission approved & reward credited!', submission: approved });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/tasks/submissions/:id/reject', adminMiddleware, (req: Request, res: Response) => {
+  try {
+    const submissionId = req.params.id;
+    const { adminNote } = req.body;
+    const rejected = db.rejectTaskSubmission(submissionId, adminNote);
+    res.json({ message: 'Task submission rejected.', submission: rejected });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
   }
 });
 

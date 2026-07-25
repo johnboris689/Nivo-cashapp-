@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { CheckSquare, ExternalLink, Check, Sparkles, AlertCircle, ArrowUpRight } from 'lucide-react';
+import { CheckSquare, Check, Sparkles, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { TaskCard } from '../components/TaskCard';
-import { Task } from '../types';
+import { Task, TaskSubmissionStatus, TaskSubmission } from '../types';
 import { api } from '../lib/api';
+
+type TaskWithSubmission = Task & {
+  userStatus?: TaskSubmissionStatus;
+  submission?: TaskSubmission | null;
+  completed: boolean;
+};
 
 export const TasksPage: React.FC = () => {
   const { refreshUser } = useAuth();
 
-  const [tasks, setTasks] = useState<(Task & { completed: boolean })[]>([]);
+  const [tasks, setTasks] = useState<TaskWithSubmission[]>([]);
   const [loading, setLoading] = useState(true);
-  const [claimingTaskId, setClaimingTaskId] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const fetchTasks = async () => {
@@ -29,36 +34,21 @@ export const TasksPage: React.FC = () => {
     fetchTasks();
   }, []);
 
-  const handleClaim = async (task: Task & { completed: boolean }) => {
-    if (task.completed) return;
+  const handleSuccess = async (message: string) => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#ff6b00', '#f59e0b', '#10b981', '#ffffff'],
+    });
 
-    setClaimingTaskId(task.id);
-    setMsg(null);
+    setMsg({ type: 'success', text: message });
+    await refreshUser();
+    await fetchTasks();
+  };
 
-    // If task has external URL, open it in a new tab first
-    if (task.actionUrl && task.actionUrl !== '#') {
-      window.open(task.actionUrl, '_blank');
-    }
-
-    try {
-      const res = await api.completeTask(task.id);
-
-      // Trigger Confetti Celebration!
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#ff6b00', '#f59e0b', '#10b981', '#ffffff'],
-      });
-
-      setMsg({ type: 'success', text: res.message });
-      await refreshUser();
-      await fetchTasks();
-    } catch (err: any) {
-      setMsg({ type: 'error', text: err.message || 'Failed to claim reward.' });
-    } finally {
-      setClaimingTaskId(null);
-    }
+  const handleError = (errorText: string) => {
+    setMsg({ type: 'error', text: errorText });
   };
 
   const completedCount = tasks.filter((t) => t.completed).length;
@@ -73,10 +63,11 @@ export const TasksPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
             <CheckSquare className="w-6 h-6 text-[#F27D26]" />
-            Daily Tasks & Earnings Wall
+            Verified Task & Reward Hub
           </h1>
-          <p className="text-xs text-gray-400 mt-1">
-            Complete quick tasks and claim instant wallet cash rewards
+          <p className="text-xs text-gray-400 mt-1 flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-green-400" />
+            Backend-verified completion engine prevents double claiming & exploits
           </p>
         </div>
 
@@ -107,7 +98,7 @@ export const TasksPage: React.FC = () => {
         <div className="flex justify-between items-center mb-2">
           <span className="text-xs font-bold text-white">Your Task Progress</span>
           <span className="text-xs font-mono text-[#F27D26] font-bold">
-            {completedCount} of {tasks.length} Completed
+            {completedCount} of {tasks.length} Verified & Claimed
           </span>
         </div>
         <div className="w-full bg-black/40 h-3 rounded-full overflow-hidden border border-white/5">
@@ -120,7 +111,7 @@ export const TasksPage: React.FC = () => {
 
       {/* Tasks Wall */}
       {loading ? (
-        <div className="text-center py-12 text-zinc-500 text-xs">Loading task center...</div>
+        <div className="text-center py-12 text-zinc-500 text-xs">Loading verified task center...</div>
       ) : tasks.length === 0 ? (
         <div className="text-center py-12 text-zinc-500 text-xs">No active tasks available right now. Check back soon!</div>
       ) : (
@@ -129,8 +120,8 @@ export const TasksPage: React.FC = () => {
             <TaskCard
               key={task.id}
               task={task}
-              loading={claimingTaskId === task.id}
-              onClaim={() => handleClaim(task)}
+              onSuccess={handleSuccess}
+              onError={handleError}
             />
           ))}
         </div>

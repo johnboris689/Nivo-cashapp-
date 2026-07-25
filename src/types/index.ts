@@ -85,6 +85,9 @@ export interface WithdrawalRequest {
   adminNote?: string;
 }
 
+export type TaskVerificationType = 'timer' | 'proof';
+export type TaskSubmissionStatus = 'not_started' | 'in_progress' | 'pending_verification' | 'approved' | 'claimed' | 'rejected';
+
 export interface Task {
   id: string;
   title: string;
@@ -92,6 +95,9 @@ export interface Task {
   rewardAmount: number;
   category: 'social' | 'survey' | 'daily' | 'download' | 'special';
   actionUrl: string;
+  verificationType: TaskVerificationType;
+  timerSeconds?: number;
+  proofInstructions?: string;
   enabled: boolean;
   createdAt: string;
   completionCount: number;
@@ -104,6 +110,25 @@ export interface TaskCompletion {
   taskTitle: string;
   rewardAmount: number;
   completedAt: string;
+}
+
+export interface TaskSubmission {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  taskId: string;
+  taskTitle: string;
+  rewardAmount: number;
+  verificationType: TaskVerificationType;
+  status: TaskSubmissionStatus;
+  startedAt?: string;
+  completedAt?: string;
+  claimedAt?: string;
+  proofText?: string;
+  proofUrl?: string;
+  adminNote?: string;
+  createdAt: string;
 }
 
 export interface ReferralRecord {
