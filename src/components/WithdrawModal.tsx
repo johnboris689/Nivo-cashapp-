@@ -3,10 +3,11 @@ import { X, ArrowUpRight, AlertCircle, Lock, Users, CreditCard, ArrowRight, Shie
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
 import { Link, useNavigate } from 'react-router-dom';
+import { WithdrawalSuccessModal, WithdrawalSuccessData } from './WithdrawalSuccessModal';
 
 interface WithdrawModalProps {
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
 export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess }) => {
@@ -19,6 +20,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
   const [accountName, setAccountName] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successData, setSuccessData] = useState<WithdrawalSuccessData | null>(null);
 
   const minWithdrawal = settings?.minWithdrawal || 2000;
   const activationFee = settings?.activationFeeAmount || 520;
@@ -39,6 +41,9 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
     'Moniepoint',
     'Fidelity Bank',
     'Stanbic IBTC',
+    'Wema Bank (ALAT)',
+    'Paycom (OPay)',
+    'Jaiz Bank',
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,7 +67,12 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
     }
 
     if (!bankName || !accountNumber || !accountName) {
-      setError('Please fill in all bank details.');
+      setError('Please fill in all bank details correctly.');
+      return;
+    }
+
+    if (accountNumber.length < 10) {
+      setError('Account number must be 10 digits.');
       return;
     }
 
@@ -70,21 +80,56 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
     setError(null);
 
     try {
-      await api.submitWithdrawal({
+      const res = await api.submitWithdrawal({
         amount: numAmount,
         bankName,
         accountNumber,
         accountName,
       });
+
       await refreshUser();
-      onSuccess();
-      onClose();
+
+      const now = new Date();
+      const reqDate = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const reqTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+      const newBal = (user?.walletBalance || numAmount) - numAmount;
+      const wthId = res?.withdrawal?.id || `WTH-${Date.now()}`;
+
+      setSuccessData({
+        amount: numAmount,
+        recipientName: accountName,
+        bankName: bankName,
+        accountNumber: accountNumber,
+        reference: `WTH-${wthId.slice(0, 8).toUpperCase()}`,
+        transactionId: wthId,
+        requestDate: reqDate,
+        requestTime: reqTime,
+        remainingBalance: newBal > 0 ? newBal : 0,
+      });
+
+      if (typeof onSuccess === 'function') {
+        onSuccess();
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to process withdrawal.');
+      console.error('Withdrawal error:', err);
+      setError(err?.message || 'Failed to process withdrawal request. Please check your bank details.');
     } finally {
       setLoading(false);
     }
   };
+
+  if (successData) {
+    return (
+      <WithdrawalSuccessModal
+        data={successData}
+        onClose={() => {
+          setSuccessData(null);
+          onClose();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">

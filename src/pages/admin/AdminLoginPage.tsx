@@ -7,7 +7,7 @@ export const AdminLoginPage: React.FC = () => {
   const { adminLogin } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('talkdavidjohn@gmail.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +64,7 @@ export const AdminLoginPage: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="talkdavidjohn@gmail.com"
+                placeholder="Enter administrator email"
                 className="w-full bg-[#171b26] border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors"
               />
             </div>
