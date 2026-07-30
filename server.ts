@@ -109,6 +109,21 @@ app.get('/api/auth/me', authMiddleware, (req: Request, res: Response) => {
   res.json({ user: (req as any).user });
 });
 
+app.post('/api/user/avatar', authMiddleware, (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const { avatarUrl } = req.body;
+    if (!avatarUrl) {
+      res.status(400).json({ error: 'Avatar URL is required.' });
+      return;
+    }
+    const updatedUser = db.updateUserAvatar(userId, avatarUrl);
+    res.json({ message: 'Profile avatar updated successfully!', user: updatedUser });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 app.post('/api/auth/forgot-password', (req: Request, res: Response) => {
   try {
     const { email } = req.body;

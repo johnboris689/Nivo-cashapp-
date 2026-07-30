@@ -601,6 +601,15 @@ class Database {
     return cleanUser;
   }
 
+  public updateUserAvatar(userId: string, avatarUrl: string): User {
+    const user = this.data.users.find(u => u.id === userId);
+    if (!user) throw new Error('User not found.');
+    user.avatarUrl = avatarUrl;
+    this.saveData();
+    const { passwordHash: _, ...cleanUser } = user;
+    return cleanUser;
+  }
+
   public listUsers(): User[] {
     return this.data.users.map(({ passwordHash: _, ...user }) => user);
   }

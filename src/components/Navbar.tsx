@@ -117,8 +117,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full bg-[#141414] hover:bg-white/5 border border-white/5 transition-all cursor-pointer"
                 >
-                  <div className="w-7 h-7 rounded-full bg-[#F27D26] text-black font-black text-xs flex items-center justify-center">
-                    {user.fullName.charAt(0).toUpperCase()}
+                  <div className="w-7 h-7 rounded-full bg-[#F27D26] text-black font-black text-xs flex items-center justify-center overflow-hidden border border-[#F27D26]/30">
+                    {user.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.fullName}
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      user.fullName.charAt(0).toUpperCase()
+                    )}
                   </div>
                   <span className="text-xs font-semibold text-gray-200 max-w-[100px] truncate">
                     {user.username}

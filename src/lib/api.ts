@@ -72,6 +72,12 @@ export const api = {
 
   getCurrentUser: () => request<{ user: User }>('/api/auth/me'),
 
+  updateAvatar: (avatarUrl: string) =>
+    request<{ message: string; user: User }>('/api/user/avatar', {
+      method: 'POST',
+      body: JSON.stringify({ avatarUrl }),
+    }),
+
   forgotPassword: (email: string) =>
     request<{ message: string }>('/api/auth/forgot-password', {
       method: 'POST',

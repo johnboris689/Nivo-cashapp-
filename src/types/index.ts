@@ -21,6 +21,7 @@ export interface User {
   isAdmin?: boolean;
   activationPaid: boolean;
   activationPaidAt?: string | null;
+  avatarUrl?: string;
 }
 
 export type TransactionType = 'deposit' | 'withdrawal' | 'referral_bonus' | 'task_reward' | 'admin_credit' | 'admin_debit' | 'activation_fee';
