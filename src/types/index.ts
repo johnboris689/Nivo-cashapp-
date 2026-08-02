@@ -62,13 +62,19 @@ export interface DepositRequest {
   userName: string;
   userEmail: string;
   amount: number;
-  paymentProofRef: string;
-  senderName: string;
+  reference: string;
+  accountNumber: string;
+  accountName: string;
   bankName: string;
+  provider: 'paystack';
+  webhookStatus: 'verified' | 'pending' | 'failed';
   status: TransactionStatus;
   createdAt: string;
   processedAt?: string;
+  paymentProofRef?: string;
+  senderName?: string;
   adminNote?: string;
+  transactionId?: string;
 }
 
 export interface WithdrawalRequest {

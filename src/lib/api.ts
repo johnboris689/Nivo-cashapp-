@@ -84,13 +84,30 @@ export const api = {
       body: JSON.stringify({ email }),
     }),
 
-  // --- Wallet & Transactions ---
+  // --- Wallet & Paystack Automated Deposits ---
   getTransactions: () => request<Transaction[]>('/api/wallet/transactions'),
 
-  submitDeposit: (payload: { amount: number; senderName: string; paymentProofRef: string }) =>
-    request<{ message: string; deposit: DepositRequest }>('/api/wallet/deposit', {
+  initializePaystackVirtualAccount: (amount: number) =>
+    request<{ message: string; deposit: DepositRequest }>('/api/paystack/initialize-virtual-account', {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ amount }),
+    }),
+
+  checkDepositStatus: (reference: string) =>
+    request<{ status: 'pending' | 'approved' | 'completed' | 'failed'; webhookStatus: string; deposit: DepositRequest; userWalletBalance: number }>(
+      `/api/paystack/check-status/${encodeURIComponent(reference)}`
+    ),
+
+  simulatePaystackTransfer: (reference: string) =>
+    request<{ message: string; deposit: DepositRequest; user: User; alreadyProcessed: boolean }>('/api/paystack/simulate-webhook', {
+      method: 'POST',
+      body: JSON.stringify({ reference }),
+    }),
+
+  submitDeposit: (payload: { amount: number; senderName?: string; paymentProofRef?: string }) =>
+    request<{ message: string; deposit: DepositRequest }>('/api/paystack/initialize-virtual-account', {
+      method: 'POST',
+      body: JSON.stringify({ amount: payload.amount }),
     }),
 
   submitWithdrawal: (payload: { amount: number; bankName: string; accountNumber: string; accountName: string }) =>

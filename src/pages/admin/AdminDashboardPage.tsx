@@ -134,13 +134,13 @@ export const AdminDashboardPage: React.FC = () => {
 
         <Link
           to="/admin/deposits"
-          className="bg-[#11141c] hover:bg-[#171b26] p-6 rounded-3xl border border-zinc-800 hover:border-amber-500/40 transition-all space-y-3 group"
+          className="bg-[#11141c] hover:bg-[#171b26] p-6 rounded-3xl border border-zinc-800 hover:border-emerald-500/40 transition-all space-y-3 group"
         >
           <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
             <Building2 className="w-6 h-6" />
           </div>
-          <h3 className="text-lg font-black text-white">Deposit Requests & Bank</h3>
-          <p className="text-xs text-zinc-400">Approve or reject deposit proof requests and update official company bank details.</p>
+          <h3 className="text-lg font-black text-white">Automated Paystack Deposits</h3>
+          <p className="text-xs text-zinc-400">Monitor automated Paystack Dedicated Virtual Account (DVA) deposits & webhook verifications.</p>
         </Link>
 
         <Link

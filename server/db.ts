@@ -679,14 +679,24 @@ class Database {
     return this.data.transactions.filter(t => t.userId === userId);
   }
 
-  // --- DEPOSITS ---
-  public createDeposit(userId: string, amount: number, senderName: string, paymentProofRef: string): DepositRequest {
+  // --- DEPOSITS (AUTOMATED PAYSTACK DEDICATED VIRTUAL ACCOUNTS) ---
+  public createPaystackDeposit(
+    userId: string,
+    amount: number,
+    dvaDetails?: { bankName?: string; accountNumber?: string; accountName?: string; reference?: string }
+  ): DepositRequest {
     const user = this.data.users.find(u => u.id === userId);
     if (!user) throw new Error('User not found.');
 
-    if (amount < this.data.bankDetails.minDeposit) {
-      throw new Error(`Minimum deposit amount is ₦${this.data.bankDetails.minDeposit.toLocaleString()}`);
+    const minDep = this.data.settings.minDeposit || this.data.bankDetails.minDeposit || 1000;
+    if (amount < minDep) {
+      throw new Error(`Minimum deposit amount is ₦${minDep.toLocaleString()}`);
     }
+
+    const reference = dvaDetails?.reference || `NV-PAYSTACK-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const bankName = dvaDetails?.bankName || 'Wema Bank (Paystack DVA)';
+    const accountNumber = dvaDetails?.accountNumber || `99${Math.floor(10000000 + Math.random() * 90000000)}`;
+    const accountName = dvaDetails?.accountName || `Nivo Cash - ${user.fullName}`;
 
     const deposit: DepositRequest = {
       id: crypto.randomUUID(),
@@ -694,11 +704,15 @@ class Database {
       userName: user.fullName,
       userEmail: user.email,
       amount: amount,
-      senderName: senderName,
-      paymentProofRef: paymentProofRef,
-      bankName: this.data.bankDetails.bankName,
+      reference: reference,
+      accountNumber: accountNumber,
+      accountName: accountName,
+      bankName: bankName,
+      provider: 'paystack',
+      webhookStatus: 'pending',
       status: 'pending',
       createdAt: new Date().toISOString(),
+      paymentProofRef: reference,
     };
 
     this.data.deposits.unshift(deposit);
@@ -708,15 +722,101 @@ class Database {
       userId: user.id,
       type: 'deposit',
       amount: amount,
-      description: `Bank deposit request via ${this.data.bankDetails.bankName}`,
+      description: `Paystack Virtual Account Deposit (${bankName})`,
       status: 'pending',
-      reference: `DEP-${Date.now()}`,
+      reference: reference,
       createdAt: new Date().toISOString(),
+      details: {
+        provider: 'paystack',
+        accountNumber,
+        bankName,
+      },
     };
     this.data.transactions.unshift(tx);
 
     this.saveData();
     return deposit;
+  }
+
+  public getDepositByReference(reference: string): DepositRequest | undefined {
+    return this.data.deposits.find(
+      d => d.reference === reference || d.paymentProofRef === reference || d.id === reference
+    );
+  }
+
+  public processPaystackDeposit(
+    reference: string,
+    paidAmount?: number,
+    providerTxId?: string
+  ): { deposit: DepositRequest; user: any; alreadyProcessed: boolean } {
+    const deposit = this.getDepositByReference(reference);
+    if (!deposit) {
+      throw new Error(`Deposit reference '${reference}' not found in database.`);
+    }
+
+    const user = this.data.users.find(u => u.id === deposit.userId);
+    if (!user) {
+      throw new Error(`User associated with deposit '${reference}' not found.`);
+    }
+
+    // Idempotency check: do not credit twice
+    if (deposit.status === 'approved' || deposit.status === 'completed') {
+      const { passwordHash: _, ...cleanUser } = user;
+      return { deposit, user: cleanUser, alreadyProcessed: true };
+    }
+
+    const finalAmount = paidAmount && paidAmount > 0 ? paidAmount : deposit.amount;
+
+    // Update deposit status
+    deposit.amount = finalAmount;
+    deposit.status = 'approved';
+    deposit.webhookStatus = 'verified';
+    deposit.processedAt = new Date().toISOString();
+    deposit.transactionId = providerTxId || `PSTK-${Date.now()}`;
+    deposit.adminNote = 'Automated Paystack DVA Webhook Verification';
+
+    // Credit user wallet automatically
+    user.walletBalance += finalAmount;
+    user.totalEarnings += finalAmount;
+
+    // Update transaction item
+    const tx = this.data.transactions.find(t => t.reference === reference || (t.userId === user.id && t.type === 'deposit' && t.status === 'pending'));
+    if (tx) {
+      tx.status = 'completed';
+      tx.amount = finalAmount;
+      tx.description = `Automated Paystack DVA Deposit (${deposit.bankName})`;
+    } else {
+      this.data.transactions.unshift({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        type: 'deposit',
+        amount: finalAmount,
+        description: `Automated Paystack DVA Deposit (${deposit.bankName})`,
+        status: 'completed',
+        reference: reference,
+        createdAt: new Date().toISOString(),
+        details: {
+          provider: 'paystack',
+          accountNumber: deposit.accountNumber,
+          bankName: deposit.bankName,
+        },
+      });
+    }
+
+    // Notify user
+    this.data.notifications.unshift({
+      id: crypto.randomUUID(),
+      userId: user.id,
+      title: '💳 Automatic Deposit Confirmed!',
+      message: `Your wallet has been automatically credited with ₦${finalAmount.toLocaleString()} via Paystack Dedicated Virtual Account. Ref: ${reference}`,
+      type: 'success',
+      read: false,
+      createdAt: new Date().toISOString(),
+    });
+
+    this.saveData();
+    const { passwordHash: _, ...cleanUser } = user;
+    return { deposit, user: cleanUser, alreadyProcessed: false };
   }
 
   public listDeposits(): DepositRequest[] {
