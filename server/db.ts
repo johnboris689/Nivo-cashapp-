@@ -688,7 +688,7 @@ class Database {
     const user = this.data.users.find(u => u.id === userId);
     if (!user) throw new Error('User not found.');
 
-    const minDep = this.data.settings.minDeposit || this.data.bankDetails.minDeposit || 1000;
+    const minDep = 520;
     if (amount < minDep) {
       throw new Error(`Minimum deposit amount is ₦${minDep.toLocaleString()}`);
     }
@@ -778,6 +778,21 @@ class Database {
     // Credit user wallet automatically
     user.walletBalance += finalAmount;
     user.totalEarnings += finalAmount;
+
+    // Automatic Account Activation on Paystack Deposit of ₦520 or more
+    if (!user.activationPaid && finalAmount >= 520) {
+      user.activationPaid = true;
+      user.activationPaidAt = new Date().toISOString();
+      this.data.notifications.unshift({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        title: '🎉 Account Withdrawal Unlocked!',
+        message: `Your Paystack DVA deposit of ₦${finalAmount.toLocaleString()} has automatically activated your account. Once you complete 5 referrals, instant withdrawals are unlocked!`,
+        type: 'success',
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
+    }
 
     // Update transaction item
     const tx = this.data.transactions.find(t => t.reference === reference || (t.userId === user.id && t.type === 'deposit' && t.status === 'pending'));

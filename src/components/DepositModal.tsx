@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import {
   X,
-  Building2,
   Copy,
   Check,
-  ArrowRight,
-  ShieldCheck,
-  AlertCircle,
-  RefreshCw,
-  Share2,
-  Sparkles,
-  CheckCircle2,
-  Zap,
   Clock,
+  CheckCircle2,
   Wallet,
+  Smartphone,
+  Search,
+  Send,
+  ShieldCheck,
+  RefreshCw,
+  AlertCircle,
+  Share2,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from '../context/AuthContext';
@@ -29,21 +28,22 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
   const { user, refreshUser } = useAuth();
 
   const [step, setStep] = useState<'amount' | 'dva' | 'success'>('amount');
-  const [amount, setAmount] = useState<number>(5000);
-  const [customAmount, setCustomAmount] = useState<string>('5000');
+  const [amount, setAmount] = useState<number>(1000);
+  const [customAmount, setCustomAmount] = useState<string>('1000');
   const [loading, setLoading] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(false);
-  const [simulating, setSimulating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Active DVA Deposit object
+  // Active Deposit object
   const [activeDeposit, setActiveDeposit] = useState<DepositRequest | null>(null);
 
-  // Countdown timer for DVA session (30 minutes)
-  const [timeLeft, setTimeLeft] = useState<number>(1800); // 30 mins
+  // Countdown timer (30 minutes = 1800s)
+  const TOTAL_TIME = 1800;
+  const [timeLeft, setTimeLeft] = useState<number>(TOTAL_TIME);
 
-  const presetAmounts = [1000, 2000, 5000, 10000, 25000, 50000];
+  const presetAmounts = [520, 1000, 2000, 5000, 10000, 25000];
 
   useEffect(() => {
     let timer: any;
@@ -55,10 +55,10 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
     return () => clearInterval(timer);
   }, [step, timeLeft]);
 
-  // Live status polling every 3.5 seconds when on DVA screen
+  // Automated background polling for Paystack webhook confirmation
   useEffect(() => {
     let pollInterval: any;
-    if (step === 'dva' && activeDeposit?.reference) {
+    if (step === 'dva' && activeDeposit?.reference && timeLeft > 0) {
       pollInterval = setInterval(async () => {
         try {
           const res = await api.checkDepositStatus(activeDeposit.reference);
@@ -72,35 +72,41 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
       }, 3500);
     }
     return () => clearInterval(pollInterval);
-  }, [step, activeDeposit?.reference]);
+  }, [step, activeDeposit?.reference, timeLeft]);
 
   const triggerSuccessFlow = async () => {
     confetti({
       particleCount: 100,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#F27D26', '#10b981', '#f59e0b', '#ffffff'],
+      colors: ['#F27D26', '#10b981', '#ffffff'],
     });
     await refreshUser();
     setStep('success');
   };
 
-  const copyToClipboard = (text: string, label: string) => {
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2000);
+  };
+
+  const copyToClipboard = (text: string, fieldKey: string, successLabel: string) => {
     navigator.clipboard.writeText(text);
-    setCopiedField(label);
+    setCopiedField(fieldKey);
+    showToast(successLabel);
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const handleShare = () => {
+  const handleShareAccount = () => {
     if (!activeDeposit) return;
-    const shareText = `Nivo Cash Paystack DVA Deposit\nBank: ${activeDeposit.bankName}\nAccount No: ${activeDeposit.accountNumber}\nAccount Name: ${activeDeposit.accountName}\nAmount: ₦${activeDeposit.amount.toLocaleString()}\nRef: ${activeDeposit.reference}`;
+    const shareText = `Nivo Cash Deposit Transfer Details:\nBank: ${activeDeposit.bankName}\nAccount Number: ${activeDeposit.accountNumber}\nAmount: ₦${activeDeposit.amount.toLocaleString()}\nAccount Name: ${activeDeposit.accountName}`;
     if (navigator.share) {
       navigator.share({
-        title: 'Paystack Virtual Account Deposit',
+        title: 'Nivo Cash Payment Details',
         text: shareText,
       }).catch(() => {});
     } else {
-      copyToClipboard(shareText, 'share');
+      copyToClipboard(shareText, 'share', 'Account details copied for sharing.');
     }
   };
 
@@ -119,8 +125,8 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
 
   const handleInitializeDva = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || amount < 1000) {
-      setError('Minimum deposit amount is ₦1,000.');
+    if (!amount || amount < 520) {
+      setError('Minimum deposit amount is ₦520.');
       return;
     }
 
@@ -130,16 +136,16 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
     try {
       const res = await api.initializePaystackVirtualAccount(amount);
       setActiveDeposit(res.deposit);
-      setTimeLeft(1800); // 30 min timer
+      setTimeLeft(TOTAL_TIME);
       setStep('dva');
     } catch (err: any) {
-      setError(err.message || 'Failed to generate Paystack virtual account.');
+      setError(err.message || 'Failed to generate transfer account.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleManualCheckStatus = async () => {
+  const handleSentMoneyClick = async () => {
     if (!activeDeposit) return;
     setCheckingStatus(true);
     setError(null);
@@ -149,27 +155,12 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
         setActiveDeposit(res.deposit);
         await triggerSuccessFlow();
       } else {
-        setError('Transfer not detected yet. Paystack webhooks automatically process deposits within 5-15 seconds after bank transfer.');
+        showToast('Waiting for Paystack confirmation...');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to check status.');
+      setError(err.message || 'Unable to verify payment status.');
     } finally {
       setCheckingStatus(false);
-    }
-  };
-
-  const handleSimulateInstantTransfer = async () => {
-    if (!activeDeposit) return;
-    setSimulating(true);
-    setError(null);
-    try {
-      const res = await api.simulatePaystackTransfer(activeDeposit.reference);
-      setActiveDeposit(res.deposit);
-      await triggerSuccessFlow();
-    } catch (err: any) {
-      setError(err.message || 'Failed to process instant transfer.');
-    } finally {
-      setSimulating(false);
     }
   };
 
@@ -179,38 +170,39 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const progressPercentage = Math.max(0, Math.min(100, (timeLeft / TOTAL_TIME) * 100));
+
+  // Clean bank name (strip technical parentheses if any)
+  const cleanBankName = activeDeposit?.bankName.replace(/\s*\(.*?\)/g, '') || 'Wema Bank';
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-[#12151c] border border-white/10 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl relative">
-        {/* Top Header */}
-        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-black/40">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#F27D26] to-amber-500 p-0.5 text-black flex items-center justify-center font-bold">
-              <div className="w-full h-full rounded-[14px] bg-[#12151c] flex items-center justify-center text-[#F27D26]">
-                <Building2 className="w-5 h-5" />
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-black text-white text-base">Automatic Paystack Deposit</h3>
-                <span className="bg-emerald-500/10 text-emerald-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/20">
-                  DVA Enabled
-                </span>
-              </div>
-              <p className="text-xs text-zinc-400">Instant Automated Wallet Crediting</p>
-            </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+      <div className="bg-[#12151e] border border-white/10 rounded-3xl w-full max-w-sm sm:max-w-md overflow-hidden shadow-2xl relative transform transition-all">
+        {/* Toast Notification */}
+        {toastMessage && (
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-50 bg-[#F27D26] text-black text-xs font-black px-3.5 py-1.5 rounded-full shadow-2xl flex items-center gap-1.5 animate-fade-in">
+            <Check className="w-3.5 h-3.5 stroke-[3]" />
+            <span>{toastMessage}</span>
+          </div>
+        )}
+
+        {/* Clean Header */}
+        <div className="px-5 py-3.5 border-b border-white/5 flex items-center justify-between">
+          <div>
+            <h3 className="text-base sm:text-lg font-black text-white tracking-tight">Deposit Funds</h3>
+            <p className="text-[11px] sm:text-xs text-zinc-400">Transfer the exact amount below.</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="p-6 max-h-[82vh] overflow-y-auto space-y-5">
+        <div className="p-4 sm:p-5 max-h-[82vh] overflow-y-auto space-y-4">
           {error && (
-            <div className="p-3.5 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-xs flex items-center gap-2.5 font-bold">
+            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs flex items-center gap-2 font-semibold">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -218,21 +210,22 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
 
           {/* STEP 1: SELECT AMOUNT */}
           {step === 'amount' && (
-            <form onSubmit={handleInitializeDva} className="space-y-6">
-              <div>
-                <label className="block text-xs font-bold text-zinc-300 mb-2">
-                  Select Deposit Amount (₦)
+            <form onSubmit={handleInitializeDva} className="space-y-4">
+              <div className="space-y-2.5">
+                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                  Select Deposit Amount
                 </label>
-                <div className="grid grid-cols-3 gap-2.5 mb-3">
+
+                <div className="grid grid-cols-3 gap-2">
                   {presetAmounts.map((val) => (
                     <button
                       key={val}
                       type="button"
                       onClick={() => handlePresetSelect(val)}
-                      className={`py-3 px-3 rounded-2xl text-xs font-black border transition-all cursor-pointer ${
+                      className={`py-2.5 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                         amount === val
-                          ? 'bg-[#F27D26] text-black border-transparent shadow-lg shadow-[#F27D26]/20 scale-[1.02]'
-                          : 'bg-[#181d28] text-zinc-300 border-zinc-800 hover:border-zinc-700 hover:bg-[#1f2636]'
+                          ? 'bg-[#F27D26] text-black border-transparent shadow-md shadow-[#F27D26]/20'
+                          : 'bg-[#181c26] text-zinc-300 border-white/5 hover:border-white/10 hover:bg-[#1f2432]'
                       }`}
                     >
                       ₦{val.toLocaleString()}
@@ -240,248 +233,241 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                   ))}
                 </div>
 
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-black text-base">
+                <div className="relative pt-1">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 font-bold text-sm">
                     ₦
                   </span>
                   <input
                     type="number"
-                    min="1000"
+                    min="520"
                     value={customAmount}
                     onChange={handleCustomChange}
-                    placeholder="Enter custom deposit amount"
-                    className="w-full bg-[#181d28] border border-zinc-800 rounded-2xl pl-9 pr-4 py-3.5 text-white text-base font-black focus:outline-none focus:border-[#F27D26] transition-colors"
+                    placeholder="Enter deposit amount"
+                    className="w-full bg-[#181c26] border border-white/5 rounded-xl pl-8 pr-3 py-3 text-white text-sm font-bold focus:outline-none focus:border-[#F27D26] transition-colors"
                   />
                 </div>
-                <p className="text-[11px] text-zinc-500 mt-1.5 flex items-center justify-between">
-                  <span>Minimum deposit: ₦1,000</span>
-                  <span className="text-emerald-400 font-bold flex items-center gap-1">
-                    <Zap className="w-3 h-3 fill-emerald-400" /> Instant Paystack Verification
+                <p className="text-[11px] text-zinc-500 flex items-center justify-between font-medium">
+                  <span>Minimum deposit: ₦520</span>
+                  <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5" /> Instant Paystack Credit
                   </span>
                 </p>
-              </div>
-
-              {/* Information Card */}
-              <div className="bg-[#181d28] border border-zinc-800 rounded-2xl p-4 space-y-2">
-                <div className="flex items-center gap-2 text-xs font-bold text-white">
-                  <ShieldCheck className="w-4 h-4 text-[#F27D26]" />
-                  <span>How Automated Paystack Deposits Work</span>
-                </div>
-                <ul className="text-xs text-zinc-400 space-y-1.5 list-disc pl-5">
-                  <li>We generate a dedicated Paystack virtual bank account for this deposit.</li>
-                  <li>Transfer the exact amount via your bank app or USSD code.</li>
-                  <li>Paystack automatically detects the payment and credits your Nivo wallet in seconds!</li>
-                  <li>No manual upload of receipts or admin approval required.</li>
-                </ul>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#F27D26] hover:bg-[#e06c19] text-black font-black text-sm py-4 rounded-2xl shadow-xl shadow-[#F27D26]/20 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                className="w-full bg-[#F27D26] hover:bg-[#e06c19] text-black font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-lg shadow-[#F27D26]/15 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Generating Paystack Virtual Account...</span>
+                    <span>Generating Account...</span>
                   </>
                 ) : (
-                  <>
-                    <span>Continue to Generate Account</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
+                  <span>Continue to Payment</span>
                 )}
               </button>
             </form>
           )}
 
-          {/* STEP 2: DEDICATED VIRTUAL ACCOUNT DISPLAY */}
+          {/* STEP 2: MAIN COMPACT PAYMENT CARD */}
           {step === 'dva' && activeDeposit && (
-            <div className="space-y-5 animate-fade-in">
-              {/* Payment Status Live Header */}
-              <div className="bg-[#181d28] border border-[#F27D26]/30 p-4 rounded-2xl flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">
-                    Expected Amount
-                  </span>
-                  <p className="text-2xl font-black text-[#F27D26]">
-                    ₦{activeDeposit.amount.toLocaleString()}
-                  </p>
-                </div>
-
-                <div className="text-right">
-                  <div className="inline-flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full text-amber-400 text-xs font-extrabold animate-pulse">
-                    <span className="w-2 h-2 rounded-full bg-amber-400" />
-                    <span>Waiting for Transfer...</span>
+            <div className="space-y-4 animate-fade-in">
+              {timeLeft <= 0 ? (
+                /* EXPIRED STATE */
+                <div className="bg-[#181c26] border border-red-500/20 rounded-2xl p-6 text-center space-y-3">
+                  <div className="w-10 h-10 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto">
+                    <AlertCircle className="w-5 h-5" />
                   </div>
-                  <div className="text-[11px] text-zinc-400 mt-1 flex items-center justify-end gap-1">
-                    <Clock className="w-3 h-3 text-zinc-500" />
-                    <span>Expires in {formatTimer(timeLeft)}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Dedicated Bank Account Details Card */}
-              <div className="bg-[#181d28] border border-white/10 rounded-2xl p-5 space-y-4 relative overflow-hidden shadow-xl">
-                <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-[#F27D26]/10 text-[#F27D26]">
-                      <Building2 className="w-4 h-4" />
-                    </div>
-                    <span className="text-xs font-bold text-white">{activeDeposit.bankName}</span>
-                  </div>
-                  <span className="text-[10px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full uppercase">
-                    Paystack DVA
-                  </span>
-                </div>
-
-                {/* Account Number Box */}
-                <div className="bg-[#12151c] p-4 rounded-xl border border-zinc-800/80 flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] text-zinc-400 uppercase font-extrabold tracking-wider">
-                      Account Number
-                    </p>
-                    <p className="text-2xl font-mono font-black text-[#F27D26] tracking-widest mt-0.5">
-                      {activeDeposit.accountNumber}
+                    <h4 className="text-sm font-bold text-white">This payment session has expired.</h4>
+                    <p className="text-[11px] text-zinc-400 mt-1">
+                      Please generate a new payment session to complete your wallet deposit.
                     </p>
                   </div>
                   <button
-                    type="button"
-                    onClick={() => copyToClipboard(activeDeposit.accountNumber, 'accNo')}
-                    className="flex items-center gap-1.5 bg-[#F27D26] hover:bg-[#e06c19] text-black text-xs font-black px-4 py-2.5 rounded-xl transition-all cursor-pointer shadow-md"
+                    onClick={() => {
+                      setStep('amount');
+                      setTimeLeft(TOTAL_TIME);
+                    }}
+                    className="w-full bg-[#F27D26] hover:bg-[#e06c19] text-black font-bold text-xs py-3 rounded-xl transition-all cursor-pointer"
                   >
-                    {copiedField === 'accNo' ? (
-                      <>
-                        <Check className="w-4 h-4 stroke-[3]" /> Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4" /> Copy
-                      </>
-                    )}
+                    Generate New Payment Session
                   </button>
                 </div>
+              ) : (
+                <>
+                  {/* Single Main Payment Card */}
+                  <div className="bg-[#181c26] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-xl">
+                    {/* Bank Name */}
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-zinc-500">Bank Name</span>
+                      <span className="font-bold text-white">{cleanBankName}</span>
+                    </div>
 
-                {/* Account Details */}
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between items-center text-zinc-400">
-                    <span>Account Name:</span>
-                    <span className="font-bold text-white">{activeDeposit.accountName}</span>
+                    {/* Account Number Box (Center & Large Display) */}
+                    <div className="space-y-1">
+                      <span className="text-[11px] text-zinc-500">Account Number</span>
+                      <div className="bg-[#12151e] border border-white/5 rounded-xl px-4 py-3 flex items-center justify-between">
+                        <span className="text-xl sm:text-2xl font-mono font-black text-white tracking-widest">
+                          {activeDeposit.accountNumber}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(activeDeposit.accountNumber, 'accNo', 'Account number copied.')}
+                          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-all cursor-pointer"
+                          title="Copy account number"
+                        >
+                          {copiedField === 'accNo' ? (
+                            <Check className="w-4 h-4 text-emerald-400" />
+                          ) : (
+                            <Copy className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Amount */}
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-zinc-500">Amount</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-base font-black text-[#F27D26]">
+                          ₦{activeDeposit.amount.toLocaleString()}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(`₦${activeDeposit.amount}`, 'amtCopy', 'Amount copied.')}
+                          className="p-1 text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                        >
+                          {copiedField === 'amtCopy' ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Account Name */}
+                    <div className="flex justify-between items-center text-xs pt-2 border-t border-white/5">
+                      <span className="text-zinc-500">Account Name</span>
+                      <span className="font-bold text-white text-right truncate max-w-[200px]">
+                        {activeDeposit.accountName || `Nivo Cash - ${user?.fullName}`}
+                      </span>
+                    </div>
+
+                    {/* Countdown Timer */}
+                    <div className="pt-2 border-t border-white/5 space-y-1.5">
+                      <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-zinc-400" />
+                          <span>Payment expires in</span>
+                        </div>
+                        <span className="font-mono font-bold text-white">{formatTimer(timeLeft)}</span>
+                      </div>
+                      <div className="w-full bg-zinc-800 h-1 rounded-full overflow-hidden">
+                        <div
+                          className="bg-[#F27D26] h-full transition-all duration-1000 ease-linear"
+                          style={{ width: `${progressPercentage}%` }}
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center text-zinc-400">
-                    <span>Paystack Reference:</span>
-                    <div className="flex items-center gap-1">
-                      <span className="font-mono text-amber-400 font-bold">{activeDeposit.reference}</span>
+
+                  {/* Payment Instructions Box */}
+                  <div className="bg-[#181c26] border border-white/5 rounded-2xl p-4 space-y-2 text-xs">
+                    <div className="flex items-start gap-2.5 text-zinc-300">
+                      <span className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[11px] font-bold text-[#F27D26] shrink-0 mt-0.5">1</span>
+                      <span>Open your banking app.</span>
+                    </div>
+                    <div className="flex items-start gap-2.5 text-zinc-300">
+                      <span className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[11px] font-bold text-[#F27D26] shrink-0 mt-0.5">2</span>
+                      <span>Transfer exactly the displayed amount.</span>
+                    </div>
+                    <div className="flex items-start gap-2.5 text-zinc-300">
+                      <span className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[11px] font-bold text-[#F27D26] shrink-0 mt-0.5">3</span>
+                      <span>Wait for automatic confirmation.</span>
+                    </div>
+                    <div className="flex items-start gap-2.5 text-zinc-300">
+                      <span className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[11px] font-bold text-emerald-400 shrink-0 mt-0.5">4</span>
+                      <span>Wallet will be credited automatically.</span>
+                    </div>
+                  </div>
+
+                  {/* Bottom Buttons */}
+                  <div className="space-y-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleSentMoneyClick}
+                      disabled={checkingStatus}
+                      className="w-full bg-[#F27D26] hover:bg-[#e06c19] text-black font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-lg shadow-[#F27D26]/15 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                    >
+                      {checkingStatus ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          <span>Checking Payment...</span>
+                        </>
+                      ) : (
+                        <span>I've Sent the Money</span>
+                      )}
+                    </button>
+
+                    <div className="flex gap-2">
                       <button
-                        onClick={() => copyToClipboard(activeDeposit.reference, 'ref')}
-                        className="p-1 text-zinc-500 hover:text-white"
+                        type="button"
+                        onClick={handleShareAccount}
+                        className="flex-1 bg-white/5 hover:bg-white/10 text-zinc-300 font-bold text-xs py-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
                       >
-                        {copiedField === 'ref' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        <Share2 className="w-3.5 h-3.5" />
+                        <span>Share Account</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={onClose}
+                        className="flex-1 bg-transparent hover:bg-white/5 text-zinc-400 hover:text-white font-bold text-xs py-2.5 rounded-xl transition-all cursor-pointer text-center"
+                      >
+                        Cancel Payment
                       </button>
                     </div>
                   </div>
-                </div>
-
-                <div className="bg-white/5 p-3 rounded-xl text-[11px] text-zinc-300 leading-relaxed">
-                  💡 Open your mobile banking app, select <span className="text-white font-bold">{activeDeposit.bankName}</span>, enter account number <span className="text-[#F27D26] font-mono font-bold">{activeDeposit.accountNumber}</span> and transfer exactly <span className="text-white font-bold">₦{activeDeposit.amount.toLocaleString()}</span>.
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={handleShare}
-                  className="bg-[#181d28] hover:bg-[#202738] text-zinc-200 border border-zinc-800 font-bold text-xs py-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
-                >
-                  <Share2 className="w-4 h-4 text-[#F27D26]" />
-                  <span>{copiedField === 'share' ? 'Details Copied!' : 'Share Account'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleManualCheckStatus}
-                  disabled={checkingStatus}
-                  className="bg-[#181d28] hover:bg-[#202738] text-white border border-zinc-800 font-bold text-xs py-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
-                >
-                  <RefreshCw className={`w-4 h-4 text-emerald-400 ${checkingStatus ? 'animate-spin' : ''}`} />
-                  <span>{checkingStatus ? 'Checking...' : 'Refresh Status'}</span>
-                </button>
-              </div>
-
-              {/* Instant Automated Transfer Demo Button */}
-              <div className="pt-2 border-t border-zinc-800">
-                <button
-                  type="button"
-                  onClick={handleSimulateInstantTransfer}
-                  disabled={simulating}
-                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black font-black text-xs py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
-                >
-                  <Zap className="w-4 h-4 fill-black" />
-                  <span>{simulating ? 'Processing Paystack Webhook...' : '⚡ Simulate Instant Transfer (Demo)'}</span>
-                </button>
-                <p className="text-[10px] text-zinc-500 text-center mt-1.5">
-                  Click above to test instant Paystack automated credit in 1 second
-                </p>
-              </div>
+                </>
+              )}
             </div>
           )}
 
-          {/* STEP 3: DEPOSIT SUCCESS ANIMATION & RECEIPT */}
+          {/* STEP 3: DEPOSIT SUCCESS RECEIPT */}
           {step === 'success' && activeDeposit && (
-            <div className="space-y-6 py-4 text-center animate-scale-up">
-              {/* Success Badge */}
-              <div className="w-20 h-20 mx-auto rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shadow-2xl shadow-emerald-500/20 animate-bounce">
-                <CheckCircle2 className="w-10 h-10 stroke-[2.5]" />
+            <div className="space-y-4 py-2 text-center animate-scale-up">
+              <div className="w-14 h-14 mx-auto rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shadow-xl">
+                <CheckCircle2 className="w-8 h-8 stroke-[2.5]" />
               </div>
 
               <div>
-                <h3 className="text-2xl font-black text-white">Deposit Successful!</h3>
-                <p className="text-xs text-zinc-400 mt-1">
-                  Paystack Dedicated Virtual Account payment confirmed automatically
+                <h3 className="text-lg font-black text-white">Payment Confirmed</h3>
+                <p className="text-[11px] text-zinc-400 mt-0.5">
+                  Your deposit has been automatically credited
                 </p>
-                <p className="text-3xl font-black text-emerald-400 mt-3">
+                <p className="text-2xl font-black text-emerald-400 mt-2">
                   +₦{activeDeposit.amount.toLocaleString()}
                 </p>
-                <p className="text-xs text-zinc-400 mt-1 font-bold">Credited to your Nivo wallet balance</p>
               </div>
 
-              {/* Transaction Receipt Box */}
-              <div className="bg-[#181d28] border border-zinc-800 rounded-2xl p-4 text-xs space-y-2.5 text-left">
-                <div className="flex justify-between items-center text-zinc-400 border-b border-zinc-800/60 pb-2">
-                  <span>Payment Provider</span>
-                  <span className="font-bold text-white flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5 text-[#F27D26]" /> Paystack DVA
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center text-zinc-400 border-b border-zinc-800/60 pb-2">
+              <div className="bg-[#181c26] border border-white/5 rounded-2xl p-4 text-xs space-y-2.5 text-left">
+                <div className="flex justify-between items-center text-zinc-400">
                   <span>Bank Name</span>
-                  <span className="font-bold text-white">{activeDeposit.bankName}</span>
-                </div>
-
-                <div className="flex justify-between items-center text-zinc-400 border-b border-zinc-800/60 pb-2">
-                  <span>Account Number</span>
-                  <span className="font-mono font-bold text-amber-400">{activeDeposit.accountNumber}</span>
-                </div>
-
-                <div className="flex justify-between items-center text-zinc-400 border-b border-zinc-800/60 pb-2">
-                  <span>Paystack Reference</span>
-                  <span className="font-mono text-zinc-300 font-bold">{activeDeposit.reference}</span>
-                </div>
-
-                <div className="flex justify-between items-center text-zinc-400 border-b border-zinc-800/60 pb-2">
-                  <span>Transaction ID</span>
-                  <span className="font-mono text-emerald-400 font-bold">
-                    {activeDeposit.transactionId || `PSTK-${Date.now()}`}
-                  </span>
+                  <span className="font-bold text-white">{cleanBankName}</span>
                 </div>
 
                 <div className="flex justify-between items-center text-zinc-400">
-                  <span>Date & Time</span>
-                  <span className="font-medium text-white">
-                    {activeDeposit.processedAt ? new Date(activeDeposit.processedAt).toLocaleString() : new Date().toLocaleString()}
-                  </span>
+                  <span>Account Number</span>
+                  <span className="font-mono font-bold text-white">{activeDeposit.accountNumber}</span>
+                </div>
+
+                <div className="flex justify-between items-center text-zinc-400">
+                  <span>Status</span>
+                  <span className="font-bold text-emerald-400 uppercase">Confirmed</span>
                 </div>
               </div>
 
@@ -491,7 +477,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                   onSuccess();
                   onClose();
                 }}
-                className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black text-sm py-4 rounded-2xl shadow-xl transition-all cursor-pointer flex items-center justify-center gap-2"
+                className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-xl transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 <Wallet className="w-4 h-4" />
                 <span>Continue to Wallet</span>

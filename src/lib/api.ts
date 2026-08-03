@@ -98,16 +98,19 @@ export const api = {
       `/api/paystack/check-status/${encodeURIComponent(reference)}`
     ),
 
-  simulatePaystackTransfer: (reference: string) =>
-    request<{ message: string; deposit: DepositRequest; user: User; alreadyProcessed: boolean }>('/api/paystack/simulate-webhook', {
-      method: 'POST',
-      body: JSON.stringify({ reference }),
-    }),
-
-  submitDeposit: (payload: { amount: number; senderName?: string; paymentProofRef?: string }) =>
+  submitDeposit: (payload: { amount: number }) =>
     request<{ message: string; deposit: DepositRequest }>('/api/paystack/initialize-virtual-account', {
       method: 'POST',
       body: JSON.stringify({ amount: payload.amount }),
+    }),
+
+  getBanks: () =>
+    request<{ name: string; code: string }[]>('/api/paystack/banks'),
+
+  resolveBankAccount: (payload: { accountNumber: string; bankCode: string }) =>
+    request<{ accountNumber: string; accountName: string; status: string }>('/api/paystack/resolve-account', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     }),
 
   submitWithdrawal: (payload: { amount: number; bankName: string; accountNumber: string; accountName: string }) =>

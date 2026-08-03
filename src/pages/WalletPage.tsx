@@ -96,34 +96,27 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
           </div>
         </div>
 
-        {/* Deposit Bank Info */}
+        {/* Automated Paystack Deposit Card */}
         <div className="bg-[#12151c] border border-zinc-800 rounded-3xl p-6 space-y-3 flex flex-col justify-between">
           <div>
             <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Building2 className="w-4 h-4 text-orange-400" />
-              Deposit Bank Account
+              <Building2 className="w-4 h-4 text-[#F27D26]" />
+              Paystack Virtual Account
             </span>
             <div className="mt-3 space-y-1">
-              <p className="text-xs text-zinc-400">Bank Name</p>
-              <p className="text-sm font-bold text-white">{bankDetails?.bankName || 'GTBank'}</p>
+              <p className="text-xs text-zinc-400">Automated Wallet Funding</p>
+              <p className="text-sm font-bold text-white">Dedicated Paystack DVA System</p>
             </div>
-            <div className="mt-2 space-y-1">
-              <p className="text-xs text-zinc-400">Account Number</p>
-              <p className="text-base font-mono font-black text-orange-400 tracking-wider">
-                {bankDetails?.accountNumber || '0123456789'}
-              </p>
-            </div>
-            <div className="mt-2 space-y-1">
-              <p className="text-xs text-zinc-400">Account Name</p>
-              <p className="text-xs font-bold text-zinc-200">{bankDetails?.accountName || 'Nivo Cash App Global'}</p>
-            </div>
+            <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
+              Generate a dedicated virtual account in seconds. Bank transfers are detected and credited automatically via webhook.
+            </p>
           </div>
 
           <button
             onClick={onOpenDeposit}
-            className="w-full text-center py-2.5 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-xl text-xs font-extrabold cursor-pointer transition-all"
+            className="w-full text-center py-3 bg-[#F27D26] hover:bg-[#e06c19] text-black rounded-xl text-xs font-black cursor-pointer transition-all shadow-lg"
           >
-            Make Deposit
+            Fund Wallet via Paystack DVA
           </button>
         </div>
       </div>
