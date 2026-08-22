@@ -84,22 +84,22 @@ export const api = {
       body: JSON.stringify({ email }),
     }),
 
-  // --- Wallet & Kora one-time bank transfer deposits ---
+  // --- Wallet & Paystack Automated Deposits ---
   getTransactions: () => request<Transaction[]>('/api/wallet/transactions'),
 
-  initializeKoraBankTransfer: (amount: number) =>
-    request<{ message: string; deposit: DepositRequest }>('/api/kora/initialize-bank-transfer', {
+  initializePaystackVirtualAccount: (amount: number) =>
+    request<{ message: string; deposit: DepositRequest }>('/api/paystack/initialize-virtual-account', {
       method: 'POST',
       body: JSON.stringify({ amount }),
     }),
 
   checkDepositStatus: (reference: string) =>
-    request<{ status: 'pending' | 'approved' | 'completed' | 'failed'; webhookStatus: string; deposit: DepositRequest; userWalletBalance: number }>(
-      `/api/kora/check-status/${encodeURIComponent(reference)}`
+    request<{ status: 'pending' | 'approved' | 'completed' | 'failed' | 'rejected'; webhookStatus: string; deposit: DepositRequest; userWalletBalance: number }>(
+      `/api/paystack/check-status/${encodeURIComponent(reference)}`
     ),
 
   submitDeposit: (payload: { amount: number }) =>
-    request<{ message: string; deposit: DepositRequest }>('/api/kora/initialize-bank-transfer', {
+    request<{ message: string; deposit: DepositRequest }>('/api/paystack/initialize-virtual-account', {
       method: 'POST',
       body: JSON.stringify({ amount: payload.amount }),
     }),

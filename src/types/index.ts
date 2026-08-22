@@ -66,11 +66,11 @@ export interface DepositRequest {
   accountNumber: string;
   accountName: string;
   bankName: string;
-  provider: 'kora';
+  accountExpiresAt?: string;
+  provider: 'paystack';
   webhookStatus: 'verified' | 'pending' | 'failed';
   status: TransactionStatus;
   createdAt: string;
-  expiresAt?: string;
   processedAt?: string;
   paymentProofRef?: string;
   senderName?: string;

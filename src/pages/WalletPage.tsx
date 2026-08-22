@@ -101,14 +101,14 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
           <div>
             <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
               <Building2 className="w-4 h-4 text-[#F27D26]" />
-              One-Time Bank Account
+              Paystack One-Time Transfer
             </span>
             <div className="mt-3 space-y-1">
               <p className="text-xs text-zinc-400">Automated Wallet Funding</p>
-              <p className="text-sm font-bold text-white">Kora One-Time Deposit System</p>
+              <p className="text-sm font-bold text-white">Temporary Paystack Pay with Transfer</p>
             </div>
             <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
-              Generate a temporary single-use bank account for each deposit. The account expires after the payment window and a new account is generated for your next deposit.
+              Generate a temporary one-time account in seconds. Bank transfers are detected and credited automatically via webhook.
             </p>
           </div>
 
@@ -116,7 +116,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
             onClick={onOpenDeposit}
             className="w-full text-center py-3 bg-[#F27D26] hover:bg-[#e06c19] text-black rounded-xl text-xs font-black cursor-pointer transition-all shadow-lg"
           >
-            Fund Wallet via One-Time Account
+            Fund Wallet via One-Time Paystack Account
           </button>
         </div>
       </div>
