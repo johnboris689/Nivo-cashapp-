@@ -679,11 +679,11 @@ class Database {
     return this.data.transactions.filter(t => t.userId === userId);
   }
 
-  // --- DEPOSITS (AUTOMATED PAYSTACK DEDICATED VIRTUAL ACCOUNTS) ---
-  public createPaystackDeposit(
+  // --- DEPOSITS (KORA ONE-TIME BANK TRANSFER ACCOUNTS) ---
+  public createKoraDeposit(
     userId: string,
     amount: number,
-    dvaDetails?: { bankName?: string; accountNumber?: string; accountName?: string; reference?: string }
+    dvaDetails?: { bankName?: string; accountNumber?: string; accountName?: string; reference?: string; expiresAt?: string }
   ): DepositRequest {
     const user = this.data.users.find(u => u.id === userId);
     if (!user) throw new Error('User not found.');
@@ -693,9 +693,10 @@ class Database {
       throw new Error(`Minimum deposit amount is ₦${minDep.toLocaleString()}`);
     }
 
-    const reference = dvaDetails?.reference || `NV-PAYSTACK-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
-    const bankName = dvaDetails?.bankName || 'Wema Bank (Paystack DVA)';
-    const accountNumber = dvaDetails?.accountNumber || `99${Math.floor(10000000 + Math.random() * 90000000)}`;
+    const reference = dvaDetails?.reference || `NIVO-KORA-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const bankName = dvaDetails?.bankName || 'Kora Bank Transfer';
+    const accountNumber = dvaDetails?.accountNumber || '';
+    const expiresAt = dvaDetails?.expiresAt;
     const accountName = dvaDetails?.accountName || `Nivo Cash - ${user.fullName}`;
 
     const deposit: DepositRequest = {
@@ -708,10 +709,11 @@ class Database {
       accountNumber: accountNumber,
       accountName: accountName,
       bankName: bankName,
-      provider: 'paystack',
+      provider: 'kora',
       webhookStatus: 'pending',
       status: 'pending',
       createdAt: new Date().toISOString(),
+      expiresAt,
       paymentProofRef: reference,
     };
 
@@ -722,14 +724,15 @@ class Database {
       userId: user.id,
       type: 'deposit',
       amount: amount,
-      description: `Paystack Virtual Account Deposit (${bankName})`,
+      description: `Kora One-Time Bank Transfer (${bankName})`,
       status: 'pending',
       reference: reference,
       createdAt: new Date().toISOString(),
       details: {
-        provider: 'paystack',
+        provider: 'kora',
         accountNumber,
         bankName,
+        expiresAt,
       },
     };
     this.data.transactions.unshift(tx);
@@ -744,7 +747,7 @@ class Database {
     );
   }
 
-  public processPaystackDeposit(
+  public processKoraDeposit(
     reference: string,
     paidAmount?: number,
     providerTxId?: string
@@ -773,13 +776,13 @@ class Database {
     deposit.webhookStatus = 'verified';
     deposit.processedAt = new Date().toISOString();
     deposit.transactionId = providerTxId || `PSTK-${Date.now()}`;
-    deposit.adminNote = 'Automated Paystack DVA Webhook Verification';
+    deposit.adminNote = 'Automated Kora one-time bank transfer webhook verification';
 
     // Credit user wallet automatically
     user.walletBalance += finalAmount;
     user.totalEarnings += finalAmount;
 
-    // Automatic Account Activation on Paystack Deposit of ₦520 or more
+    // Automatic Account Activation on Kora deposit of ₦520 or more
     if (!user.activationPaid && finalAmount >= 520) {
       user.activationPaid = true;
       user.activationPaidAt = new Date().toISOString();
@@ -787,7 +790,7 @@ class Database {
         id: crypto.randomUUID(),
         userId: user.id,
         title: '🎉 Account Withdrawal Unlocked!',
-        message: `Your Paystack DVA deposit of ₦${finalAmount.toLocaleString()} has automatically activated your account. Once you complete 5 referrals, instant withdrawals are unlocked!`,
+        message: `Your Kora deposit of ₦${finalAmount.toLocaleString()} has automatically activated your account. Once you complete 5 referrals, instant withdrawals are unlocked!`,
         type: 'success',
         read: false,
         createdAt: new Date().toISOString(),
@@ -799,19 +802,19 @@ class Database {
     if (tx) {
       tx.status = 'completed';
       tx.amount = finalAmount;
-      tx.description = `Automated Paystack DVA Deposit (${deposit.bankName})`;
+      tx.description = `Automated Kora One-Time Deposit (${deposit.bankName})`;
     } else {
       this.data.transactions.unshift({
         id: crypto.randomUUID(),
         userId: user.id,
         type: 'deposit',
         amount: finalAmount,
-        description: `Automated Paystack DVA Deposit (${deposit.bankName})`,
+        description: `Automated Kora One-Time Deposit (${deposit.bankName})`,
         status: 'completed',
         reference: reference,
         createdAt: new Date().toISOString(),
         details: {
-          provider: 'paystack',
+          provider: 'kora',
           accountNumber: deposit.accountNumber,
           bankName: deposit.bankName,
         },
@@ -823,7 +826,7 @@ class Database {
       id: crypto.randomUUID(),
       userId: user.id,
       title: '💳 Automatic Deposit Confirmed!',
-      message: `Your wallet has been automatically credited with ₦${finalAmount.toLocaleString()} via Paystack Dedicated Virtual Account. Ref: ${reference}`,
+      message: `Your wallet has been automatically credited with ₦${finalAmount.toLocaleString()} via Kora one-time bank transfer. Ref: ${reference}`,
       type: 'success',
       read: false,
       createdAt: new Date().toISOString(),

@@ -149,134 +149,113 @@ app.get('/api/wallet/transactions', authMiddleware, (req: Request, res: Response
   }
 });
 
-// --- PAYSTACK DEDICATED VIRTUAL ACCOUNT DEPOSIT SYSTEM ---
-
-// 1. Initialize Paystack Dedicated Virtual Account / Deposit Reference
-app.post('/api/paystack/initialize-virtual-account', authMiddleware, async (req: Request, res: Response) => {
+// --- KORA ONE-TIME BANK TRANSFER DEPOSIT SYSTEM ---
+// Kora's Pay with Bank Transfer API creates a dynamic, temporary, single-use
+// bank account for each transaction. The account expires after the time
+// returned by Kora and a new deposit always gets a new account.
+app.post('/api/kora/initialize-bank-transfer', authMiddleware, async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const { amount } = req.body;
-
     const numAmount = Number(amount);
+
     if (!numAmount || isNaN(numAmount) || numAmount < 520) {
       res.status(400).json({ error: 'Minimum deposit amount is ₦520.' });
       return;
     }
 
-    const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
-    let dvaInfo: { bankName?: string; accountNumber?: string; accountName?: string; reference?: string } | undefined;
-
-    // If real Paystack Secret Key is configured, attempt real Paystack DVA creation
-    if (paystackSecret && paystackSecret.startsWith('sk_')) {
-      try {
-        const reference = `NV-PSTK-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
-
-        // Create or get customer on Paystack
-        const customerResp = await fetch('https://api.paystack.co/customer', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${paystackSecret}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: user.email,
-            first_name: user.fullName.split(' ')[0] || user.fullName,
-            last_name: user.fullName.split(' ')[1] || 'User',
-            phone: user.phone || '+2340000000000',
-          }),
-        });
-        const customerData = await customerResp.json();
-
-        if (customerData.status && customerData.data?.customer_code) {
-          // Assign dedicated virtual account
-          const dvaResp = await fetch('https://api.paystack.co/dedicated_account', {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${paystackSecret}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              customer: customerData.data.customer_code,
-              preferred_bank: 'wema-bank',
-            }),
-          });
-          const dvaData = await dvaResp.json();
-
-          if (dvaData.status && dvaData.data?.account_number) {
-            dvaInfo = {
-              bankName: dvaData.data.bank?.name || 'Wema Bank (Paystack DVA)',
-              accountNumber: dvaData.data.account_number,
-              accountName: dvaData.data.account_name || `Nivo Cash - ${user.fullName}`,
-              reference: reference,
-            };
-          }
-        }
-      } catch (paystackErr) {
-        console.warn('Paystack API call notice:', paystackErr);
-        // Fallback to seamless automated virtual account simulation if Paystack API fails or rate-limited
-      }
+    const koraSecret = process.env.KORAPAY_SECRET_KEY;
+    if (!koraSecret || !koraSecret.startsWith('sk_')) {
+      res.status(503).json({ error: 'Kora payment service is not configured. Add KORAPAY_SECRET_KEY to the server environment.' });
+      return;
     }
 
-    // Default fallback DVA info if Paystack secret is absent or fallback triggered
-    if (!dvaInfo) {
-      const reference = `NV-PSTK-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
-      const bankOptions = ['Wema Bank (Paystack DVA)', 'Sterling Bank (Paystack DVA)', 'Paystack Titan Bank'];
-      const chosenBank = bankOptions[Math.floor(Math.random() * bankOptions.length)];
-      // Generate 10-digit virtual account number
-      const accNum = `99${Math.floor(10000000 + Math.random() * 90000000)}`;
+    const reference = `NIVO-KORA-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const appUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+    const notificationUrl = `${appUrl.replace(/\/$/, '')}/api/kora/webhook`;
 
-      dvaInfo = {
-        bankName: chosenBank,
-        accountNumber: accNum,
-        accountName: `Nivo Cash - ${user.fullName}`,
-        reference: reference,
-      };
+    const koraResp = await fetch('https://api.korapay.com/merchant/api/v1/charges/bank-transfer', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${koraSecret}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        reference,
+        amount: numAmount,
+        currency: 'NGN',
+        notification_url: notificationUrl,
+        customer: {
+          name: user.fullName,
+          email: user.email,
+        },
+        account_name: `Nivo Cash - ${user.fullName}`,
+        merchant_bears_cost: true,
+        narration: `Nivo Cash wallet deposit - ${reference}`,
+      }),
+    });
+
+    const koraData: any = await koraResp.json();
+    if (!koraResp.ok || !koraData.status || !koraData.data?.bank_account?.account_number) {
+      console.error('Kora bank transfer initialization failed:', koraData);
+      res.status(400).json({ error: koraData.message || 'Kora could not generate a one-time account. Please try again.' });
+      return;
     }
 
-    const deposit = db.createPaystackDeposit(user.id, numAmount, dvaInfo);
+    const bankAccount = koraData.data.bank_account;
+    const expiresAt = bankAccount.expiry_date_in_utc || undefined;
+    const deposit = db.createKoraDeposit(user.id, numAmount, {
+      bankName: bankAccount.bank_name || 'Kora Bank',
+      accountNumber: bankAccount.account_number,
+      accountName: bankAccount.account_name || `Nivo Cash - ${user.fullName}`,
+      reference: koraData.data.reference || reference,
+      expiresAt,
+    });
+
     res.status(201).json({
-      message: 'Paystack Dedicated Virtual Account created successfully!',
+      message: 'One-time Kora payment account created successfully.',
       deposit,
     });
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    console.error('Kora initialization error:', err);
+    res.status(400).json({ error: err.message || 'Failed to generate one-time payment account.' });
   }
 });
 
-// Legacy route forwarding for backwards compatibility
-app.post('/api/wallet/deposit', (req: Request, res: Response, next) => {
-  req.url = '/api/paystack/initialize-virtual-account';
-  (app as any).handle(req, res, next);
+// Legacy route kept only so older clients fail gracefully rather than creating
+// a permanent Paystack DVA. New clients must use the Kora route above.
+app.post('/api/paystack/initialize-virtual-account', authMiddleware, (req: Request, res: Response) => {
+  res.status(410).json({ error: 'This deposit method has been replaced with Kora one-time bank transfer accounts. Please refresh the app.' });
 });
 
-// 2. Check Automated Deposit Status (polling / refresh)
-app.get('/api/paystack/check-status/:reference', authMiddleware, async (req: Request, res: Response) => {
+app.post('/api/wallet/deposit', authMiddleware, (req: Request, res: Response) => {
+  res.status(410).json({ error: 'This deposit method has been replaced with Kora one-time bank transfer accounts. Please refresh the app.' });
+});
+
+// Check a Kora deposit by querying Kora's transaction endpoint.
+app.get('/api/kora/check-status/:reference', authMiddleware, async (req: Request, res: Response) => {
   try {
     const { reference } = req.params;
     let deposit = db.getDepositByReference(reference);
-
     if (!deposit) {
       res.status(404).json({ error: 'Deposit reference not found.' });
       return;
     }
 
-    const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
-    // If pending and Paystack secret key exists, query Paystack API
-    if (deposit.status === 'pending' && paystackSecret && paystackSecret.startsWith('sk_')) {
+    const koraSecret = process.env.KORAPAY_SECRET_KEY;
+    if (deposit.status === 'pending' && koraSecret && koraSecret.startsWith('sk_')) {
       try {
-        const verifyResp = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`, {
-          headers: {
-            Authorization: `Bearer ${paystackSecret}`,
-          },
+        const verifyResp = await fetch(`https://api.korapay.com/merchant/api/v1/charges/${encodeURIComponent(reference)}`, {
+          headers: { Authorization: `Bearer ${koraSecret}` },
         });
-        const verifyData = await verifyResp.json();
-        if (verifyData.status && verifyData.data?.status === 'success') {
-          const paidAmount = verifyData.data.amount ? verifyData.data.amount / 100 : deposit.amount;
-          const processed = db.processPaystackDeposit(reference, paidAmount, verifyData.data.id?.toString());
+        const verifyData: any = await verifyResp.json();
+        if (verifyResp.ok && verifyData.status && verifyData.data?.status === 'success') {
+          const paidAmount = Number(verifyData.data.amount_paid ?? verifyData.data.amount ?? deposit.amount);
+          const processed = db.processKoraDeposit(reference, paidAmount, verifyData.data.reference || reference);
           deposit = processed.deposit;
         }
       } catch (err) {
-        console.warn('Verify transaction error:', err);
+        console.warn('Kora transaction query error:', err);
       }
     }
 
@@ -292,47 +271,53 @@ app.get('/api/paystack/check-status/:reference', authMiddleware, async (req: Req
   }
 });
 
-
-// 4. Official Paystack Webhook Endpoint (HMAC SHA512 Signature Verification)
-app.post('/api/paystack/webhook', (req: Request, res: Response) => {
+// Kora webhook: verify the HMAC-SHA256 signature over ONLY req.body.data.
+app.post('/api/kora/webhook', (req: Request, res: Response) => {
   try {
-    const secret = process.env.PAYSTACK_WEBHOOK_SECRET || process.env.PAYSTACK_SECRET_KEY;
-    const signature = req.headers['x-paystack-signature'] as string;
+    const secret = process.env.KORAPAY_WEBHOOK_SECRET || process.env.KORAPAY_SECRET_KEY;
+    const signature = req.headers['x-korapay-signature'] as string;
 
-    // Verify signature if secret key is configured
     if (secret && signature) {
-      const hash = crypto
-        .createHmac('sha512', secret)
-        .update(JSON.stringify(req.body))
-        .digest('hex');
-
+      const hash = crypto.createHmac('sha256', secret).update(JSON.stringify(req.body?.data || {})).digest('hex');
       if (hash !== signature) {
-        console.warn('⚠️ Invalid Paystack webhook signature header');
-        res.status(401).json({ error: 'Invalid Paystack signature signature' });
+        console.warn('Invalid Kora webhook signature.');
+        res.status(401).json({ error: 'Invalid Kora signature.' });
         return;
       }
+    } else if (secret && !signature) {
+      res.status(401).json({ error: 'Missing Kora webhook signature.' });
+      return;
     }
 
     const event = req.body?.event;
     const data = req.body?.data;
+    if (event === 'charge.success' && data?.reference && data?.status === 'success') {
+      const koraSecret = process.env.KORAPAY_SECRET_KEY;
+      let amount = Number(data.amount_paid ?? data.amount);
 
-    if (event === 'charge.success' && data) {
-      const reference = data.reference;
-      const amountInNaira = data.amount ? data.amount / 100 : undefined;
-      const providerTxId = data.id?.toString();
-
-      if (reference) {
-        db.processPaystackDeposit(reference, amountInNaira, providerTxId);
-        console.log(`✅ Paystack Webhook successfully processed deposit ref: ${reference}`);
+      // Requery before crediting, as recommended by Kora.
+      if (koraSecret && koraSecret.startsWith('sk_')) {
+        fetch(`https://api.korapay.com/merchant/api/v1/charges/${encodeURIComponent(data.reference)}`, {
+          headers: { Authorization: `Bearer ${koraSecret}` },
+        }).then(r => r.json()).then((verified: any) => {
+          if (verified?.status && verified?.data?.status === 'success') {
+            const verifiedAmount = Number(verified.data.amount_paid ?? verified.data.amount ?? amount);
+            db.processKoraDeposit(data.reference, verifiedAmount, verified.data.reference || data.reference);
+          }
+        }).catch(err => console.error('Kora webhook verification query failed:', err));
+      } else {
+        db.processKoraDeposit(data.reference, amount, data.reference);
       }
     }
 
-    res.status(200).json({ status: true, message: 'Webhook event received' });
+    res.status(200).json({ status: true, message: 'Kora webhook event received.' });
   } catch (err: any) {
-    console.error('Paystack webhook error:', err);
-    res.status(500).json({ error: 'Webhook processing error' });
+    console.error('Kora webhook error:', err);
+    res.status(500).json({ error: 'Webhook processing error.' });
   }
 });
+
+// --- Paystack bank utilities remain for withdrawal account verification ---
 
 // Paystack Banks List Endpoint
 app.get('/api/paystack/banks', authMiddleware, async (req: Request, res: Response) => {

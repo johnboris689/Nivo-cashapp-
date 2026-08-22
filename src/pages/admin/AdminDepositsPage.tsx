@@ -77,10 +77,10 @@ export const AdminDepositsPage: React.FC = () => {
             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
               <Building2 className="w-6 h-6" />
             </div>
-            <h1 className="text-2xl font-black text-white">Automated Paystack Deposit Logs</h1>
+            <h1 className="text-2xl font-black text-white">Automated Kora Deposit Logs</h1>
           </div>
           <p className="text-xs text-zinc-400 mt-1">
-            Real-time monitoring of Paystack Dedicated Virtual Account (DVA) deposits & webhook verifications
+            Real-time monitoring of Kora one-time bank transfer deposits & webhook verifications
           </p>
         </div>
 
@@ -101,7 +101,7 @@ export const AdminDepositsPage: React.FC = () => {
             <TrendingUp className="w-4 h-4 text-emerald-400" />
           </div>
           <p className="text-2xl font-black text-emerald-400">₦{totalVolume.toLocaleString()}</p>
-          <p className="text-[10px] text-zinc-500 font-bold">Auto-credited via Paystack</p>
+          <p className="text-[10px] text-zinc-500 font-bold">Auto-credited via Kora</p>
         </div>
 
         <div className="bg-[#11141c] p-5 rounded-2xl border border-zinc-800 space-y-2">
@@ -115,7 +115,7 @@ export const AdminDepositsPage: React.FC = () => {
 
         <div className="bg-[#11141c] p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
-            <span className="text-xs font-bold uppercase tracking-wider">Pending DVA Sessions</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Pending One-Time Sessions</span>
             <Clock className="w-4 h-4 text-amber-400" />
           </div>
           <p className="text-2xl font-black text-amber-400">{pendingCount}</p>
@@ -124,7 +124,7 @@ export const AdminDepositsPage: React.FC = () => {
 
         <div className="bg-[#11141c] p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
-            <span className="text-xs font-bold uppercase tracking-wider">Paystack Engine</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Kora Engine</span>
             <Zap className="w-4 h-4 text-emerald-400 fill-emerald-400" />
           </div>
           <p className="text-base font-black text-emerald-400 flex items-center gap-1.5 mt-1">
@@ -191,11 +191,11 @@ export const AdminDepositsPage: React.FC = () => {
         {loading ? (
           <div className="text-center py-12 text-zinc-500 text-xs flex items-center justify-center gap-2">
             <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />
-            <span>Loading Paystack deposit logs...</span>
+            <span>Loading Kora deposit logs...</span>
           </div>
         ) : filteredDeposits.length === 0 ? (
           <div className="text-center py-12 text-zinc-500 text-xs border border-dashed border-zinc-800 rounded-2xl">
-            No Paystack automated deposits found matching your filters.
+            No Kora automated deposits found matching your filters.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -204,8 +204,8 @@ export const AdminDepositsPage: React.FC = () => {
                 <tr className="border-b border-zinc-800 text-zinc-500 font-extrabold uppercase text-[10px]">
                   <th className="py-3.5 px-3">Customer</th>
                   <th className="py-3.5 px-3">Amount</th>
-                  <th className="py-3.5 px-3">Bank & Virtual Account</th>
-                  <th className="py-3.5 px-3">Paystack Reference</th>
+                  <th className="py-3.5 px-3">Bank & One-Time Account</th>
+                  <th className="py-3.5 px-3">Kora Reference</th>
                   <th className="py-3.5 px-3">Webhook Verification</th>
                   <th className="py-3.5 px-3">Status</th>
                   <th className="py-3.5 px-3 text-right">Date & Time</th>
@@ -226,7 +226,7 @@ export const AdminDepositsPage: React.FC = () => {
                       </td>
 
                       <td className="py-3.5 px-3">
-                        <p className="font-bold text-zinc-200">{d.bankName || 'Wema Bank (Paystack DVA)'}</p>
+                        <p className="font-bold text-zinc-200">{d.bankName || 'Kora Bank Transfer'}</p>
                         <p className="text-[10px] font-mono text-amber-400">
                           {d.accountNumber || 'DVA Generated'}
                         </p>

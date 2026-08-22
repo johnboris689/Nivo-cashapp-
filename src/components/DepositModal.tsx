@@ -39,8 +39,8 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
   // Active Deposit object
   const [activeDeposit, setActiveDeposit] = useState<DepositRequest | null>(null);
 
-  // Countdown timer (30 minutes = 1800s)
-  const TOTAL_TIME = 1800;
+  // Countdown timer. Kora returns the exact expiry for the generated one-time account.
+  const TOTAL_TIME = 14 * 60;
   const [timeLeft, setTimeLeft] = useState<number>(TOTAL_TIME);
 
   const presetAmounts = [520, 1000, 2000, 5000, 10000, 25000];
@@ -55,7 +55,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
     return () => clearInterval(timer);
   }, [step, timeLeft]);
 
-  // Automated background polling for Paystack webhook confirmation
+  // Automated background polling for Kora payment confirmation
   useEffect(() => {
     let pollInterval: any;
     if (step === 'dva' && activeDeposit?.reference && timeLeft > 0) {
@@ -134,9 +134,10 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
     setError(null);
 
     try {
-      const res = await api.initializePaystackVirtualAccount(amount);
+      const res = await api.initializeKoraBankTransfer(amount);
       setActiveDeposit(res.deposit);
-      setTimeLeft(TOTAL_TIME);
+      const expiry = res.deposit.expiresAt ? new Date(res.deposit.expiresAt).getTime() : Date.now() + TOTAL_TIME * 1000;
+      setTimeLeft(Math.max(0, Math.ceil((expiry - Date.now()) / 1000)));
       setStep('dva');
     } catch (err: any) {
       setError(err.message || 'Failed to generate transfer account.');
@@ -155,7 +156,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
         setActiveDeposit(res.deposit);
         await triggerSuccessFlow();
       } else {
-        showToast('Waiting for Paystack confirmation...');
+        showToast('Waiting for Kora confirmation...');
       }
     } catch (err: any) {
       setError(err.message || 'Unable to verify payment status.');
@@ -190,7 +191,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
         <div className="px-5 py-3.5 border-b border-white/5 flex items-center justify-between">
           <div>
             <h3 className="text-base sm:text-lg font-black text-white tracking-tight">Deposit Funds</h3>
-            <p className="text-[11px] sm:text-xs text-zinc-400">Transfer the exact amount below.</p>
+            <p className="text-[11px] sm:text-xs text-zinc-400">Generate a one-time bank account for this deposit.</p>
           </div>
           <button
             onClick={onClose}
@@ -213,7 +214,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
             <form onSubmit={handleInitializeDva} className="space-y-4">
               <div className="space-y-2.5">
                 <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                  Select Deposit Amount
+                  Choose Deposit Amount
                 </label>
 
                 <div className="grid grid-cols-3 gap-2">
@@ -249,7 +250,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                 <p className="text-[11px] text-zinc-500 flex items-center justify-between font-medium">
                   <span>Minimum deposit: ₦520</span>
                   <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" /> Instant Paystack Credit
+                    <ShieldCheck className="w-3.5 h-3.5" /> Instant Kora Credit
                   </span>
                 </p>
               </div>
@@ -262,10 +263,10 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                 {loading ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Generating Account...</span>
+                    <span>Generating One-Time Account...</span>
                   </>
                 ) : (
-                  <span>Continue to Payment</span>
+                  <span>Generate One-Time Account</span>
                 )}
               </button>
             </form>
@@ -283,7 +284,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                   <div>
                     <h4 className="text-sm font-bold text-white">This payment session has expired.</h4>
                     <p className="text-[11px] text-zinc-400 mt-1">
-                      Please generate a new payment session to complete your wallet deposit.
+                      Please generate a new one-time account to complete your wallet deposit.
                     </p>
                   </div>
                   <button
@@ -293,7 +294,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                     }}
                     className="w-full bg-[#F27D26] hover:bg-[#e06c19] text-black font-bold text-xs py-3 rounded-xl transition-all cursor-pointer"
                   >
-                    Generate New Payment Session
+                    Generate New Account
                   </button>
                 </div>
               ) : (
@@ -362,7 +363,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                       <div className="flex items-center justify-between text-[11px] text-zinc-400">
                         <div className="flex items-center gap-1">
                           <Clock className="w-3 h-3 text-zinc-400" />
-                          <span>Payment expires in</span>
+                          <span>Account expires in</span>
                         </div>
                         <span className="font-mono font-bold text-white">{formatTimer(timeLeft)}</span>
                       </div>
@@ -387,7 +388,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                     </div>
                     <div className="flex items-start gap-2.5 text-zinc-300">
                       <span className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[11px] font-bold text-[#F27D26] shrink-0 mt-0.5">3</span>
-                      <span>Wait for automatic confirmation.</span>
+                      <span>Complete the transfer before the timer ends.</span>
                     </div>
                     <div className="flex items-start gap-2.5 text-zinc-300">
                       <span className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[11px] font-bold text-emerald-400 shrink-0 mt-0.5">4</span>
@@ -456,12 +457,12 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
 
               <div className="bg-[#181c26] border border-white/5 rounded-2xl p-4 text-xs space-y-2.5 text-left">
                 <div className="flex justify-between items-center text-zinc-400">
-                  <span>Bank Name</span>
+                  <span>Receiving Bank</span>
                   <span className="font-bold text-white">{cleanBankName}</span>
                 </div>
 
                 <div className="flex justify-between items-center text-zinc-400">
-                  <span>Account Number</span>
+                  <span>One-Time Account Number</span>
                   <span className="font-mono font-bold text-white">{activeDeposit.accountNumber}</span>
                 </div>
 
