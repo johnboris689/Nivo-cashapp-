@@ -20,7 +20,7 @@
       "isAdmin": true,
       "activationPaid": true,
       "activationPaidAt": "2026-07-22T10:54:05.069Z",
-      "passwordHash": "$2b$10$8cJLToOmRSOj2tvINEc9LeNvKA9XtWv5KYTaCw6RRXoPKSuBjRsqq"
+      "passwordHash": "$2b$10$U6gBR792nMSpGfjt64yM6ekhhO2b8jFQ8F1GoJHG/hVnVNRBtz5a."
     },
     {
       "id": "dc39ba6f-85e9-43d2-a852-87e6624938dc",
@@ -255,6 +255,39 @@
   ],
   "transactions": [
     {
+      "id": "bbd64770-bf39-4c2c-9281-604ce027aee9",
+      "userId": "ec1b1361-3a9b-4f35-a6ae-b80a9f933042",
+      "type": "deposit",
+      "amount": 520,
+      "description": "Automated Virtual Account Deposit (Wema Bank (Virtual Account))",
+      "status": "pending",
+      "reference": "NV-KORA-1789114264767-4624",
+      "createdAt": "2026-09-11T08:11:04.767Z",
+      "details": {
+        "provider": "korapay",
+        "accountNumber": "9934621023",
+        "bankName": "Wema Bank (Virtual Account)"
+      }
+    },
+    {
+      "id": "bc4555f4-3ec1-4a28-b250-cd6e5b08de23",
+      "userId": "ec1b1361-3a9b-4f35-a6ae-b80a9f933042",
+      "type": "deposit",
+      "amount": 1000,
+      "description": "Paystack One-Time Transfer Deposit (Test Bank)",
+      "status": "pending",
+      "reference": "T943607325380071",
+      "createdAt": "2026-08-22T12:31:48.648Z",
+      "details": {
+        "provider": "paystack",
+        "channel": "bank_transfer",
+        "accountNumber": "1231464217",
+        "accountName": "PAYSTACK CHECKOUT",
+        "bankName": "Test Bank",
+        "accountExpiresAt": "2026-08-22T13:01:47.000Z"
+      }
+    },
+    {
       "id": "1f8dc73e-e03b-4731-b82a-9cea9575ea19",
       "userId": "990ed27a-c401-4601-8917-bac0a209f08f",
       "type": "withdrawal",
@@ -475,6 +508,39 @@
   ],
   "deposits": [
     {
+      "id": "98fe7735-0b02-4ae6-9b51-b134513e34c8",
+      "userId": "ec1b1361-3a9b-4f35-a6ae-b80a9f933042",
+      "userName": "John Boris",
+      "userEmail": "johnborix689@gmail.com",
+      "amount": 520,
+      "reference": "NV-KORA-1789114264767-4624",
+      "accountNumber": "9934621023",
+      "accountName": "Nivo Cash - John Boris",
+      "bankName": "Wema Bank (Virtual Account)",
+      "provider": "korapay",
+      "webhookStatus": "pending",
+      "status": "pending",
+      "createdAt": "2026-09-11T08:11:04.767Z",
+      "paymentProofRef": "NV-KORA-1789114264767-4624"
+    },
+    {
+      "id": "3be0d116-d2e8-4edd-af9d-547dbe76025f",
+      "userId": "ec1b1361-3a9b-4f35-a6ae-b80a9f933042",
+      "userName": "John Boris",
+      "userEmail": "johnborix689@gmail.com",
+      "amount": 1000,
+      "reference": "T943607325380071",
+      "accountNumber": "1231464217",
+      "accountName": "PAYSTACK CHECKOUT",
+      "bankName": "Test Bank",
+      "accountExpiresAt": "2026-08-22T13:01:47.000Z",
+      "provider": "paystack",
+      "webhookStatus": "pending",
+      "status": "pending",
+      "createdAt": "2026-08-22T12:31:48.648Z",
+      "paymentProofRef": "T943607325380071"
+    },
+    {
       "id": "0ea2bc04-6320-4388-b00a-6f2a0f799ee6",
       "userId": "990ed27a-c401-4601-8917-bac0a209f08f",
       "userName": "Fintech User",
@@ -585,7 +651,8 @@
       "actionUrl": "https://x.com",
       "enabled": true,
       "createdAt": "2026-07-22T10:54:05.069Z",
-      "completionCount": 143
+      "completionCount": 143,
+      "verificationType": "timer"
     },
     {
       "id": "task-2",
@@ -596,7 +663,8 @@
       "actionUrl": "https://telegram.org",
       "enabled": true,
       "createdAt": "2026-07-22T10:54:05.069Z",
-      "completionCount": 290
+      "completionCount": 290,
+      "verificationType": "timer"
     },
     {
       "id": "task-3",
@@ -607,7 +675,8 @@
       "actionUrl": "#",
       "enabled": true,
       "createdAt": "2026-07-22T10:54:05.069Z",
-      "completionCount": 513
+      "completionCount": 513,
+      "verificationType": "timer"
     },
     {
       "id": "task-4",
@@ -618,7 +687,8 @@
       "actionUrl": "https://youtube.com",
       "enabled": true,
       "createdAt": "2026-07-22T10:54:05.069Z",
-      "completionCount": 99
+      "completionCount": 99,
+      "verificationType": "timer"
     },
     {
       "id": "task-5",
@@ -629,7 +699,8 @@
       "actionUrl": "#",
       "enabled": true,
       "createdAt": "2026-07-22T10:54:05.069Z",
-      "completionCount": 311
+      "completionCount": 311,
+      "verificationType": "timer"
     }
   ],
   "taskCompletions": [
@@ -674,6 +745,7 @@
       "completedAt": "2026-07-25T22:36:53.407Z"
     }
   ],
+  "taskSubmissions": [],
   "referrals": [
     {
       "id": "0e817124-0e4b-4054-8c18-61a7f4e600a2",

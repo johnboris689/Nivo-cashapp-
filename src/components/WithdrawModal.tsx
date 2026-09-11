@@ -206,30 +206,30 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
   const amountToReceive = Math.max(0, numAmount - withdrawalFee);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-[#12151e] border border-white/10 rounded-3xl w-full max-w-sm sm:max-w-md overflow-hidden shadow-2xl relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+      <div className="bg-[#1A080E] border border-[#8F1D3A]/20 rounded-3xl w-full max-w-sm sm:max-w-md overflow-hidden shadow-2xl relative">
         {/* Header */}
-        <div className="px-5 py-3.5 border-b border-white/5 flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between bg-[#1A080E]">
           <div className="flex items-center gap-2">
             {step === 2 && (
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="p-1 text-zinc-400 hover:text-white mr-1 cursor-pointer"
+                className="p-1 text-slate-400 hover:text-white mr-1 cursor-pointer"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
             )}
             <div>
               <h3 className="text-base sm:text-lg font-black text-white tracking-tight">Withdraw Earnings</h3>
-              <p className="text-[11px] sm:text-xs text-zinc-400">
+              <p className="text-[11px] sm:text-xs text-slate-400">
                 {step === 1 ? 'Step 1: Bank Account Verification' : 'Step 2: Enter Amount & Confirm'}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -237,14 +237,14 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
 
         <div className="p-4 sm:p-5 max-h-[80vh] overflow-y-auto space-y-4">
           {/* Balance info banner */}
-          <div className="bg-[#181c26] border border-white/5 p-3.5 rounded-2xl flex justify-between items-center">
+          <div className="bg-[#240A12] border border-[#8F1D3A]/20 p-3.5 rounded-2xl flex justify-between items-center">
             <div>
-              <p className="text-[11px] text-zinc-400 font-medium">Available Balance</p>
-              <p className="text-base sm:text-lg font-black text-[#F27D26]">
+              <p className="text-[11px] text-slate-400 font-medium">Available Balance</p>
+              <p className="text-base sm:text-lg font-black text-[#C13A5A]">
                 ₦{user?.walletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
               </p>
             </div>
-            <span className="text-[10px] text-zinc-400 bg-white/5 px-2.5 py-1 rounded-full border border-white/5 font-bold">
+            <span className="text-[10px] text-slate-300 bg-white/5 px-2.5 py-1 rounded-full border border-white/10 font-bold">
               Min: ₦{minWithdrawal.toLocaleString()}
             </span>
           </div>
@@ -259,15 +259,15 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                   <p className="text-[11px] text-amber-200/90 mt-0.5 leading-relaxed">
                     {currentRefs < 5
                       ? 'You need 5 successful referrals before account activation.'
-                      : 'Complete your first wallet deposit of ₦520 via Paystack to activate instant withdrawals.'}
+                      : 'Complete your first wallet deposit of ₦520 via Automated Virtual Account to activate instant withdrawals.'}
                   </p>
                 </div>
               </div>
 
               {currentRefs < 5 ? (
                 <div className="space-y-2">
-                  <div className="bg-[#181c26] p-3 rounded-xl border border-zinc-800 text-xs flex items-center justify-between">
-                    <span className="text-zinc-300 font-medium">Referral Goal</span>
+                  <div className="bg-[#240A12] p-3 rounded-xl border border-white/10 text-xs flex items-center justify-between">
+                    <span className="text-slate-300 font-medium">Referral Goal</span>
                     <span className="font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">
                       {currentRefs} / 5 Done
                     </span>
@@ -277,7 +277,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                       onClose();
                       navigate('/referrals');
                     }}
-                    className="w-full bg-[#F27D26] hover:bg-[#e06c19] text-black font-extrabold text-xs py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-extrabold text-xs py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Users className="w-4 h-4" />
                     <span>Invite Friends ({currentRefs}/5)</span>
@@ -291,7 +291,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                       onClose();
                       navigate('/activation');
                     }}
-                    className="w-full bg-[#F27D26] hover:bg-[#e06c19] text-black font-black text-xs py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-black text-xs py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <CreditCard className="w-4 h-4" />
                     <span>Deposit ₦520 to Activate</span>
@@ -314,18 +314,18 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                 <form onSubmit={handleStep1Submit} className="space-y-4">
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                         Select Bank *
                       </label>
                       <select
                         required
                         value={bankName}
                         onChange={handleBankSelect}
-                        className="w-full bg-[#181c26] border border-white/5 rounded-xl px-3.5 py-3 text-white text-xs font-medium focus:outline-none focus:border-[#F27D26] transition-colors"
+                        className="w-full bg-[#240A12] border border-[#8F1D3A]/20 rounded-xl px-3.5 py-3 text-white text-xs font-medium focus:outline-none focus:border-[#C13A5A] transition-colors"
                       >
-                        <option value="" className="bg-[#12151e] text-white">Select your bank</option>
+                        <option value="" className="bg-[#1A080E] text-white">Select your bank</option>
                         {bankOptions.map((b) => (
-                          <option key={b.code + b.name} value={b.name} className="bg-[#12151e] text-white">
+                          <option key={b.code + b.name} value={b.name} className="bg-[#1A080E] text-white">
                             {b.name}
                           </option>
                         ))}
@@ -333,7 +333,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                         Account Number *
                       </label>
                       <input
@@ -343,21 +343,21 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                         value={accountNumber}
                         onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
                         placeholder="Enter 10-digit account number"
-                        className="w-full bg-[#181c26] border border-white/5 rounded-xl px-3.5 py-3 text-white text-sm font-mono tracking-widest focus:outline-none focus:border-[#F27D26] transition-colors"
+                        className="w-full bg-[#240A12] border border-[#8F1D3A]/20 rounded-xl px-3.5 py-3 text-white text-sm font-mono tracking-widest focus:outline-none focus:border-[#C13A5A] transition-colors"
                       />
                     </div>
 
                     {/* ACCOUNT RESOLUTION STATUS FEEDBACK */}
                     {resolving && (
-                      <div className="p-3 bg-white/5 border border-white/5 rounded-xl text-xs text-zinc-300 flex items-center gap-2 animate-pulse">
-                        <RefreshCw className="w-4 h-4 text-[#F27D26] animate-spin" />
-                        <span>Verifying bank account details via Paystack...</span>
+                      <div className="p-3 bg-white/5 border border-white/10 rounded-xl text-xs text-slate-300 flex items-center gap-2 animate-pulse">
+                        <RefreshCw className="w-4 h-4 text-[#C13A5A] animate-spin" />
+                        <span>Verifying bank account details...</span>
                       </div>
                     )}
 
                     {isVerified && accountName && (
-                      <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-xs space-y-0.5 animate-fade-in">
-                        <div className="flex items-center gap-1.5 font-bold text-emerald-400">
+                      <div className="p-3 bg-[#8F1D3A]/10 border border-[#8F1D3A]/30 rounded-xl text-xs space-y-0.5 animate-fade-in">
+                        <div className="flex items-center gap-1.5 font-bold text-[#A52A4A]">
                           <CheckCircle2 className="w-4 h-4" />
                           <span>Account Verified</span>
                         </div>
@@ -369,7 +369,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                   <button
                     type="submit"
                     disabled={!isVerified || resolving}
-                    className="w-full bg-[#F27D26] hover:bg-[#e06c19] text-black font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-lg shadow-[#F27D26]/15 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40"
+                    className="w-full bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-lg shadow-[#7A1831]/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40"
                   >
                     <span>Continue to Amount</span>
                     <ArrowRight className="w-4 h-4" />
@@ -382,7 +382,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                 <form onSubmit={handleFinalWithdrawal} className="space-y-4 animate-fade-in">
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                         Withdrawal Amount (₦) *
                       </label>
                       <input
@@ -393,35 +393,35 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder={`Min ₦${minWithdrawal.toLocaleString()}`}
-                        className="w-full bg-[#181c26] border border-white/5 rounded-xl px-3.5 py-3 text-white text-base font-bold focus:outline-none focus:border-[#F27D26] transition-colors"
+                        className="w-full bg-[#240A12] border border-[#8F1D3A]/20 rounded-xl px-3.5 py-3 text-white text-base font-bold focus:outline-none focus:border-[#C13A5A] transition-colors"
                       />
                     </div>
 
                     {/* Breakdown Box */}
-                    <div className="bg-[#181c26] border border-white/5 rounded-2xl p-4 text-xs space-y-2 text-zinc-300">
-                      <div className="flex justify-between items-center text-zinc-400">
+                    <div className="bg-[#240A12] border border-white/10 rounded-2xl p-4 text-xs space-y-2 text-slate-300">
+                      <div className="flex justify-between items-center text-slate-400">
                         <span>Available Balance</span>
                         <span className="font-bold text-white">₦{user?.walletBalance.toLocaleString()}</span>
                       </div>
 
-                      <div className="flex justify-between items-center text-zinc-400">
+                      <div className="flex justify-between items-center text-slate-400">
                         <span>Withdrawal Fee</span>
-                        <span className="font-bold text-emerald-400">₦0.00</span>
+                        <span className="font-bold text-[#A52A4A]">₦0.00</span>
                       </div>
 
-                      <div className="flex justify-between items-center text-zinc-400 border-t border-white/5 pt-2">
+                      <div className="flex justify-between items-center text-slate-400 border-t border-white/10 pt-2">
                         <span>Verified Account</span>
                         <span className="font-bold text-white truncate max-w-[180px]">{accountName}</span>
                       </div>
 
-                      <div className="flex justify-between items-center text-zinc-400">
+                      <div className="flex justify-between items-center text-slate-400">
                         <span>Destination Bank</span>
                         <span className="font-bold text-white">{bankName}</span>
                       </div>
 
-                      <div className="flex justify-between items-center border-t border-white/5 pt-2 text-sm">
+                      <div className="flex justify-between items-center border-t border-white/10 pt-2 text-sm">
                         <span className="font-bold text-white">Amount to Receive</span>
-                        <span className="font-black text-[#F27D26] text-base">
+                        <span className="font-black text-[#C13A5A] text-base">
                           ₦{amountToReceive > 0 ? amountToReceive.toLocaleString() : '0'}
                         </span>
                       </div>
@@ -431,7 +431,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                   <button
                     type="submit"
                     disabled={loading || numAmount < minWithdrawal || (user?.walletBalance || 0) < numAmount}
-                    className="w-full bg-[#F27D26] hover:bg-[#e06c19] text-black font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-lg shadow-[#F27D26]/15 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40"
+                    className="w-full bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-lg shadow-[#7A1831]/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40"
                   >
                     {loading ? (
                       <>

@@ -69,12 +69,12 @@ export const AdminDepositsPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in pb-16">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#11141c] p-6 rounded-3xl border border-emerald-500/20 shadow-xl relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#16090D] p-6 rounded-3xl border border-[#8F1D3A]/20 shadow-xl relative overflow-hidden">
+        <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-[#8F1D3A]/5 rounded-full blur-2xl pointer-events-none" />
 
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+            <div className="p-2 rounded-xl bg-[#8F1D3A]/10 text-[#A52A4A]">
               <Building2 className="w-6 h-6" />
             </div>
             <h1 className="text-2xl font-black text-white">Automated Paystack Deposit Logs</h1>
@@ -86,7 +86,7 @@ export const AdminDepositsPage: React.FC = () => {
 
         <button
           onClick={fetchDeposits}
-          className="flex items-center gap-1.5 bg-[#171b26] hover:bg-[#1f2536] text-emerald-400 text-xs font-bold px-4 py-2.5 rounded-xl border border-emerald-500/30 transition-all cursor-pointer shrink-0"
+          className="flex items-center gap-1.5 bg-[#1C0B12] hover:bg-[#1f2536] text-[#A52A4A] text-xs font-bold px-4 py-2.5 rounded-xl border border-[#8F1D3A]/30 transition-all cursor-pointer shrink-0"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh Live Logs</span>
@@ -95,25 +95,25 @@ export const AdminDepositsPage: React.FC = () => {
 
       {/* Analytics Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-[#11141c] p-5 rounded-2xl border border-zinc-800 space-y-2">
+        <div className="bg-[#16090D] p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
             <span className="text-xs font-bold uppercase tracking-wider">Total Deposit Volume</span>
-            <TrendingUp className="w-4 h-4 text-emerald-400" />
+            <TrendingUp className="w-4 h-4 text-[#A52A4A]" />
           </div>
-          <p className="text-2xl font-black text-emerald-400">₦{totalVolume.toLocaleString()}</p>
+          <p className="text-2xl font-black text-[#A52A4A]">₦{totalVolume.toLocaleString()}</p>
           <p className="text-[10px] text-zinc-500 font-bold">Auto-credited via Paystack</p>
         </div>
 
-        <div className="bg-[#11141c] p-5 rounded-2xl border border-zinc-800 space-y-2">
+        <div className="bg-[#16090D] p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
             <span className="text-xs font-bold uppercase tracking-wider">Successful Transactions</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <CheckCircle2 className="w-4 h-4 text-[#A52A4A]" />
           </div>
           <p className="text-2xl font-black text-white">{successfulCount}</p>
-          <p className="text-[10px] text-emerald-400 font-bold">100% Webhook Verified</p>
+          <p className="text-[10px] text-[#A52A4A] font-bold">100% Webhook Verified</p>
         </div>
 
-        <div className="bg-[#11141c] p-5 rounded-2xl border border-zinc-800 space-y-2">
+        <div className="bg-[#16090D] p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
             <span className="text-xs font-bold uppercase tracking-wider">Pending One-Time Sessions</span>
             <Clock className="w-4 h-4 text-amber-400" />
@@ -122,13 +122,13 @@ export const AdminDepositsPage: React.FC = () => {
           <p className="text-[10px] text-zinc-500 font-bold">Awaiting User Transfer</p>
         </div>
 
-        <div className="bg-[#11141c] p-5 rounded-2xl border border-zinc-800 space-y-2">
+        <div className="bg-[#16090D] p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
             <span className="text-xs font-bold uppercase tracking-wider">Paystack Engine</span>
-            <Zap className="w-4 h-4 text-emerald-400 fill-emerald-400" />
+            <Zap className="w-4 h-4 text-[#A52A4A] fill-[#A52A4A]" />
           </div>
-          <p className="text-base font-black text-emerald-400 flex items-center gap-1.5 mt-1">
-            <ShieldCheck className="w-5 h-5 text-emerald-400" />
+          <p className="text-base font-black text-[#A52A4A] flex items-center gap-1.5 mt-1">
+            <ShieldCheck className="w-5 h-5 text-[#A52A4A]" />
             <span>Automated Active</span>
           </p>
           <p className="text-[10px] text-zinc-500 font-bold">Zero Manual Approval Required</p>
@@ -136,7 +136,7 @@ export const AdminDepositsPage: React.FC = () => {
       </div>
 
       {/* Main Monitoring Table Panel */}
-      <div className="bg-[#11141c] border border-zinc-800 rounded-3xl p-6 space-y-4">
+      <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-6 space-y-4">
         {/* Search & Filter Header */}
         <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
           <div className="relative flex-1 max-w-md">
@@ -146,18 +146,18 @@ export const AdminDepositsPage: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by customer, email, bank, or ref..."
-              className="w-full bg-[#171b26] border border-zinc-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 font-bold focus:outline-none focus:border-emerald-500"
+              className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 font-bold focus:outline-none focus:border-[#8F1D3A]"
             />
           </div>
 
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-zinc-400" />
-            <div className="flex bg-[#171b26] p-1 rounded-xl border border-zinc-800 text-xs">
+            <div className="flex bg-[#1C0B12] p-1 rounded-xl border border-zinc-800 text-xs">
               <button
                 onClick={() => setStatusFilter('all')}
                 className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                   statusFilter === 'all'
-                    ? 'bg-emerald-500 text-black'
+                    ? 'bg-[#8F1D3A] text-black'
                     : 'text-zinc-400 hover:text-white'
                 }`}
               >
@@ -167,7 +167,7 @@ export const AdminDepositsPage: React.FC = () => {
                 onClick={() => setStatusFilter('approved')}
                 className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                   statusFilter === 'approved'
-                    ? 'bg-emerald-500 text-black'
+                    ? 'bg-[#8F1D3A] text-black'
                     : 'text-zinc-400 hover:text-white'
                 }`}
               >
@@ -177,7 +177,7 @@ export const AdminDepositsPage: React.FC = () => {
                 onClick={() => setStatusFilter('pending')}
                 className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                   statusFilter === 'pending'
-                    ? 'bg-emerald-500 text-black'
+                    ? 'bg-[#8F1D3A] text-black'
                     : 'text-zinc-400 hover:text-white'
                 }`}
               >
@@ -190,7 +190,7 @@ export const AdminDepositsPage: React.FC = () => {
         {/* Deposits Table */}
         {loading ? (
           <div className="text-center py-12 text-zinc-500 text-xs flex items-center justify-center gap-2">
-            <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />
+            <RefreshCw className="w-4 h-4 animate-spin text-[#A52A4A]" />
             <span>Loading Paystack deposit logs...</span>
           </div>
         ) : filteredDeposits.length === 0 ? (
@@ -215,13 +215,13 @@ export const AdminDepositsPage: React.FC = () => {
                 {filteredDeposits.map((d) => {
                   const isApproved = d.status === 'approved' || d.status === 'completed';
                   return (
-                    <tr key={d.id} className="hover:bg-[#171b26] transition-colors">
+                    <tr key={d.id} className="hover:bg-[#1C0B12] transition-colors">
                       <td className="py-3.5 px-3">
                         <p className="font-bold text-white">{d.userName}</p>
                         <p className="text-[10px] text-zinc-500 font-mono">{d.userEmail}</p>
                       </td>
 
-                      <td className="py-3.5 px-3 font-black text-emerald-400 text-sm">
+                      <td className="py-3.5 px-3 font-black text-[#A52A4A] text-sm">
                         ₦{d.amount.toLocaleString()}
                       </td>
 
@@ -238,8 +238,8 @@ export const AdminDepositsPage: React.FC = () => {
 
                       <td className="py-3.5 px-3">
                         {isApproved ? (
-                          <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold">
-                            <Sparkles className="w-3 h-3 text-emerald-400" />
+                          <span className="inline-flex items-center gap-1 bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold">
+                            <Sparkles className="w-3 h-3 text-[#A52A4A]" />
                             Verified & Credited
                           </span>
                         ) : (
@@ -254,7 +254,7 @@ export const AdminDepositsPage: React.FC = () => {
                         <span
                           className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
                             isApproved
-                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                              ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border-[#8F1D3A]/20'
                               : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                           }`}
                         >

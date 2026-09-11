@@ -25,37 +25,38 @@ export const StatCard: React.FC<StatCardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`p-4 sm:p-4.5 rounded-2xl border transition-all duration-200 relative overflow-hidden ${
-        onClick ? 'cursor-pointer hover:border-[#F27D26]/40 hover:scale-[1.02] active:scale-95' : ''
+      className={`p-4 sm:p-5 rounded-2xl border transition-all duration-200 relative overflow-hidden ${
+        onClick ? 'cursor-pointer hover:border-[#C13A5A]/40 hover:scale-[1.01] active:scale-[0.99]' : ''
       } ${
         highlight
-          ? 'bg-gradient-to-br from-[#1A1A1A] via-[#141414] to-[#101010] border-[#F27D26]/30 shadow-lg shadow-orange-950/20'
-          : 'bg-[#141414] border-white/5 hover:border-white/10'
+          ? 'bg-gradient-to-br from-[#121E38] via-[#0E172C] to-[#0A1020] border-[#A52A4A]/30 shadow-xl shadow-[#7A1831]/10'
+          : 'bg-[#240A12]/80 backdrop-blur-md border-white/10 hover:border-[#8F1D3A]/30'
       }`}
     >
       <div className="flex items-center justify-between">
-        <span className="text-gray-400 text-[11px] font-medium tracking-tight truncate pr-1">{title}</span>
+        <span className="text-slate-400 text-[11px] font-semibold tracking-tight truncate pr-1 uppercase">{title}</span>
         <div
-          className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-            highlight ? 'bg-[#F27D26] text-black shadow-sm' : 'bg-[#F27D26]/10 text-[#F27D26]'
+          className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+            highlight 
+              ? 'bg-gradient-to-tr from-[#7A1831] to-[#C13A5A] text-white shadow-md shadow-[#C13A5A]/20' 
+              : 'bg-[#8F1D3A]/10 text-[#C13A5A] border border-[#8F1D3A]/20'
           }`}
         >
           <Icon className="w-4 h-4" />
         </div>
       </div>
 
-      <div className="mt-2">
+      <div className="mt-2.5">
         <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight truncate">{value}</h3>
-        {subtitle && <p className="text-[11px] text-gray-400 mt-0.5 truncate">{subtitle}</p>}
+        {subtitle && <p className="text-[11px] text-slate-400 mt-0.5 truncate">{subtitle}</p>}
       </div>
 
       {trend && (
-        <div className="mt-2 pt-2 border-t border-white/5 flex items-center gap-1 text-[11px] font-medium">
-          <span className={trendUp ? 'text-emerald-400' : 'text-rose-400'}>{trend}</span>
-          <span className="text-gray-500">vs last week</span>
+        <div className="mt-2.5 pt-2 border-t border-white/10 flex items-center gap-1 text-[11px] font-medium">
+          <span className={trendUp ? 'text-[#A52A4A]' : 'text-rose-400'}>{trend}</span>
+          <span className="text-slate-500">vs last week</span>
         </div>
       )}
     </div>
   );
 };
-

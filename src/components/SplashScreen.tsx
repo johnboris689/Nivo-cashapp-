@@ -47,7 +47,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="w-96 h-96 bg-[#F27D26] rounded-full blur-[110px]"
+          className="w-96 h-96 bg-[#8F1D3A] rounded-full blur-[110px]"
         />
 
         {/* Ambient Secondary Ring */}
@@ -70,7 +70,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
 
       {/* Top Header Security Tag */}
       <div className="relative z-10 pt-4 flex items-center gap-1.5 text-gray-500 text-[10px] font-extrabold uppercase tracking-widest bg-white/[0.03] border border-white/5 px-3 py-1.5 rounded-full backdrop-blur-md">
-        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+        <ShieldCheck className="w-3.5 h-3.5 text-[#A52A4A]" />
         <span>Bank-Grade Encryption</span>
       </div>
 
@@ -99,11 +99,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
               repeat: Infinity,
               ease: 'easeInOut',
             }}
-            className="absolute -inset-2 bg-gradient-to-r from-[#F27D26] to-[#E6721F] rounded-3xl blur-lg"
+            className="absolute -inset-2 bg-gradient-to-r from-[#8F1D3A] to-[#7A1831] rounded-3xl blur-lg"
           />
 
           {/* Logo Icon Box */}
-          <div className="relative w-20 h-20 bg-gradient-to-br from-[#F27D26] via-[#E86C15] to-[#C94F00] rounded-2xl flex items-center justify-center shadow-2xl shadow-orange-950/50 border border-white/20">
+          <div className="relative w-20 h-20 bg-gradient-to-br from-[#8F1D3A] via-[#E86C15] to-[#C94F00] rounded-2xl flex items-center justify-center shadow-2xl shadow-[#240A12]/50 border border-white/20">
             <span className="text-white font-black text-4xl tracking-tighter drop-shadow-md">N</span>
             <div className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-white/90 animate-pulse" />
           </div>
@@ -112,7 +112,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
         {/* Brand Name */}
         <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-1.5">
           <span>NIVO</span>
-          <span className="text-[#F27D26]">CASH</span>
+          <span className="text-[#8F1D3A]">CASH</span>
         </h1>
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.25em] mt-1 mb-8">
           Mobile Financial Platform
@@ -129,7 +129,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
               repeat: Infinity,
               ease: 'easeInOut',
             }}
-            className="w-1/2 h-full bg-gradient-to-r from-transparent via-[#F27D26] to-transparent rounded-full shadow-sm shadow-orange-500"
+            className="w-1/2 h-full bg-gradient-to-r from-transparent via-[#8F1D3A] to-transparent rounded-full shadow-sm shadow-[#8F1D3A]"
           />
         </div>
 

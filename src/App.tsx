@@ -52,10 +52,10 @@ const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col font-sans selection:bg-[#F27D26] selection:text-black">
+    <div className="min-h-screen bg-[#090506] text-white flex flex-col font-sans selection:bg-[#8F1D3A] selection:text-black">
       {/* Announcement Banner */}
       {settings?.announcementBanner && (
-        <div className="bg-gradient-to-r from-[#F27D26] via-[#E6721F] to-[#F27D26] text-black font-extrabold text-xs py-2 px-4 text-center flex items-center justify-center gap-2 shadow-md">
+        <div className="bg-gradient-to-r from-[#8F1D3A] via-[#7A1831] to-[#8F1D3A] text-black font-extrabold text-xs py-2 px-4 text-center flex items-center justify-center gap-2 shadow-md">
           <Megaphone className="w-3.5 h-3.5 shrink-0" />
           <span className="truncate">{settings.announcementBanner}</span>
         </div>
@@ -114,16 +114,16 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col font-sans">
+    <div className="min-h-screen bg-[#090506] text-white flex flex-col font-sans">
       {/* Admin Top Header */}
-      <header className="bg-[#111111] border-b border-white/5 sticky top-0 z-40">
+      <header className="bg-[#16090D] border-b border-white/5 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link to="/admin" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-[#F27D26] text-black flex items-center justify-center font-black">
+            <div className="w-8 h-8 rounded-xl bg-[#8F1D3A] text-black flex items-center justify-center font-black">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <span className="font-extrabold text-base tracking-tight text-white">
-              NIVO <span className="text-[#F27D26]">ADMIN</span>
+              NIVO <span className="text-[#8F1D3A]">ADMIN</span>
             </span>
           </Link>
 
@@ -144,8 +144,8 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
       <div className="flex-1 flex max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
         {/* Admin Navigation Sidebar */}
-        <aside className="hidden lg:block w-60 shrink-0 bg-[#111111] border border-white/5 rounded-3xl p-4 h-fit sticky top-22">
-          <p className="text-[10px] font-extrabold text-[#F27D26] uppercase tracking-wider px-3 mb-3">
+        <aside className="hidden lg:block w-60 shrink-0 bg-[#16090D] border border-white/5 rounded-3xl p-4 h-fit sticky top-22">
+          <p className="text-[10px] font-extrabold text-[#8F1D3A] uppercase tracking-wider px-3 mb-3">
             Admin Management
           </p>
           <nav className="space-y-1">
@@ -158,7 +158,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   to={item.path}
                   className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all ${
                     isActive
-                      ? 'bg-[#F27D26] text-black shadow-md shadow-orange-950/30 font-extrabold'
+                      ? 'bg-[#8F1D3A] text-black shadow-md shadow-[#240A12]/30 font-extrabold'
                       : 'text-gray-400 hover:text-white hover:bg-white/5'
                   }`}
                 >

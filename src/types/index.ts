@@ -198,3 +198,17 @@ export interface AdminStats {
   totalWalletBalances: number;
   totalTasksCompleted: number;
 }
+
+export interface PasswordResetRequest {
+  id: string;
+  userId: string;
+  email: string;
+  otpHash: string;
+  createdAt: string;
+  expiresAt: string;
+  attempts: number;
+  verifiedAt?: string | null;
+  resetTokenHash?: string | null;
+  resetTokenExpiresAt?: string | null;
+  usedAt?: string | null;
+}

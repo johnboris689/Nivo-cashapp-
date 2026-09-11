@@ -38,7 +38,7 @@ export const AdminDashboardPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#11141c] p-6 rounded-3xl border border-amber-500/20">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#16090D] p-6 rounded-3xl border border-amber-500/20">
         <div>
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-6 h-6 text-amber-400" />
@@ -49,7 +49,7 @@ export const AdminDashboardPage: React.FC = () => {
 
         <button
           onClick={fetchStats}
-          className="flex items-center gap-1.5 bg-[#171b26] hover:bg-[#1f2536] text-amber-400 text-xs font-bold px-4 py-2.5 rounded-xl border border-amber-500/30 transition-all cursor-pointer shrink-0"
+          className="flex items-center gap-1.5 bg-[#1C0B12] hover:bg-[#1f2536] text-amber-400 text-xs font-bold px-4 py-2.5 rounded-xl border border-amber-500/30 transition-all cursor-pointer shrink-0"
         >
           <RefreshCw className="w-4 h-4" />
           <span>Refresh Metrics</span>
@@ -61,21 +61,21 @@ export const AdminDashboardPage: React.FC = () => {
         <div className="text-center py-10 text-zinc-500 text-xs">Loading analytics data...</div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-[#11141c] p-5 rounded-2xl border border-zinc-800">
+          <div className="bg-[#16090D] p-5 rounded-2xl border border-zinc-800">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-zinc-400 uppercase">Total Users</span>
-              <Users className="w-5 h-5 text-orange-400" />
+              <Users className="w-5 h-5 text-[#A52A4A]" />
             </div>
             <p className="text-2xl font-black text-white mt-2">{stats?.totalUsers || 0}</p>
-            <p className="text-[10px] text-emerald-400 font-bold mt-1">{stats?.activeUsers || 0} Active Accounts</p>
+            <p className="text-[10px] text-[#A52A4A] font-bold mt-1">{stats?.activeUsers || 0} Active Accounts</p>
           </div>
 
-          <div className="bg-[#11141c] p-5 rounded-2xl border border-zinc-800">
+          <div className="bg-[#16090D] p-5 rounded-2xl border border-zinc-800">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-zinc-400 uppercase">Approved Deposits</span>
-              <Building2 className="w-5 h-5 text-emerald-400" />
+              <Building2 className="w-5 h-5 text-[#A52A4A]" />
             </div>
-            <p className="text-2xl font-black text-emerald-400 mt-2">
+            <p className="text-2xl font-black text-[#A52A4A] mt-2">
               ₦{(stats?.totalDepositsAmount || 0).toLocaleString()}
             </p>
             {stats?.pendingDepositsCount ? (
@@ -88,7 +88,7 @@ export const AdminDashboardPage: React.FC = () => {
             )}
           </div>
 
-          <div className="bg-[#11141c] p-5 rounded-2xl border border-zinc-800">
+          <div className="bg-[#16090D] p-5 rounded-2xl border border-zinc-800">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-zinc-400 uppercase">Total Withdrawals</span>
               <ArrowUpRight className="w-5 h-5 text-amber-400" />
@@ -106,10 +106,10 @@ export const AdminDashboardPage: React.FC = () => {
             )}
           </div>
 
-          <div className="bg-[#11141c] p-5 rounded-2xl border border-zinc-800">
+          <div className="bg-[#16090D] p-5 rounded-2xl border border-zinc-800">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-zinc-400 uppercase">User Wallet Balances</span>
-              <Wallet className="w-5 h-5 text-blue-400" />
+              <Wallet className="w-5 h-5 text-[#A52A4A]" />
             </div>
             <p className="text-2xl font-black text-white mt-2">
               ₦{(stats?.totalWalletBalances || 0).toLocaleString()}
@@ -123,9 +123,9 @@ export const AdminDashboardPage: React.FC = () => {
       <div className="grid md:grid-cols-3 gap-6">
         <Link
           to="/admin/users"
-          className="bg-[#11141c] hover:bg-[#171b26] p-6 rounded-3xl border border-zinc-800 hover:border-amber-500/40 transition-all space-y-3 group"
+          className="bg-[#16090D] hover:bg-[#1C0B12] p-6 rounded-3xl border border-zinc-800 hover:border-amber-500/40 transition-all space-y-3 group"
         >
-          <div className="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 rounded-2xl bg-[#8F1D3A]/10 text-[#A52A4A] flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
             <Users className="w-6 h-6" />
           </div>
           <h3 className="text-lg font-black text-white">Users & Wallet Controls</h3>
@@ -134,9 +134,9 @@ export const AdminDashboardPage: React.FC = () => {
 
         <Link
           to="/admin/deposits"
-          className="bg-[#11141c] hover:bg-[#171b26] p-6 rounded-3xl border border-zinc-800 hover:border-emerald-500/40 transition-all space-y-3 group"
+          className="bg-[#16090D] hover:bg-[#1C0B12] p-6 rounded-3xl border border-zinc-800 hover:border-[#8F1D3A]/40 transition-all space-y-3 group"
         >
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 rounded-2xl bg-[#8F1D3A]/10 text-[#A52A4A] flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
             <Building2 className="w-6 h-6" />
           </div>
           <h3 className="text-lg font-black text-white">Automated Paystack Deposits</h3>
@@ -145,7 +145,7 @@ export const AdminDashboardPage: React.FC = () => {
 
         <Link
           to="/admin/withdrawals"
-          className="bg-[#11141c] hover:bg-[#171b26] p-6 rounded-3xl border border-zinc-800 hover:border-amber-500/40 transition-all space-y-3 group"
+          className="bg-[#16090D] hover:bg-[#1C0B12] p-6 rounded-3xl border border-zinc-800 hover:border-amber-500/40 transition-all space-y-3 group"
         >
           <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
             <ArrowUpRight className="w-6 h-6" />
@@ -156,9 +156,9 @@ export const AdminDashboardPage: React.FC = () => {
 
         <Link
           to="/admin/tasks"
-          className="bg-[#11141c] hover:bg-[#171b26] p-6 rounded-3xl border border-zinc-800 hover:border-amber-500/40 transition-all space-y-3 group"
+          className="bg-[#16090D] hover:bg-[#1C0B12] p-6 rounded-3xl border border-zinc-800 hover:border-amber-500/40 transition-all space-y-3 group"
         >
-          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 rounded-2xl bg-[#8F1D3A]/10 text-[#A52A4A] flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
             <CheckSquare className="w-6 h-6" />
           </div>
           <h3 className="text-lg font-black text-white">Tasks Management</h3>
@@ -167,7 +167,7 @@ export const AdminDashboardPage: React.FC = () => {
 
         <Link
           to="/admin/referrals"
-          className="bg-[#11141c] hover:bg-[#171b26] p-6 rounded-3xl border border-zinc-800 hover:border-amber-500/40 transition-all space-y-3 group"
+          className="bg-[#16090D] hover:bg-[#1C0B12] p-6 rounded-3xl border border-zinc-800 hover:border-amber-500/40 transition-all space-y-3 group"
         >
           <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
             <Sparkles className="w-6 h-6" />
@@ -178,7 +178,7 @@ export const AdminDashboardPage: React.FC = () => {
 
         <Link
           to="/admin/settings"
-          className="bg-[#11141c] hover:bg-[#171b26] p-6 rounded-3xl border border-zinc-800 hover:border-amber-500/40 transition-all space-y-3 group"
+          className="bg-[#16090D] hover:bg-[#1C0B12] p-6 rounded-3xl border border-zinc-800 hover:border-amber-500/40 transition-all space-y-3 group"
         >
           <div className="w-12 h-12 rounded-2xl bg-zinc-800 text-zinc-300 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
             <Settings className="w-6 h-6" />

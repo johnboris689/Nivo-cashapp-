@@ -24,7 +24,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw }) => {
-  const { user, logout, settings } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -55,28 +55,28 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-[#0A0A0A]/90 backdrop-blur-md border-b border-white/5">
+      <header className="sticky top-0 z-40 bg-[#090506]/90 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Brand Logo */}
           <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 bg-[#F27D26] rounded-lg flex items-center justify-center font-bold text-black shadow-lg shadow-orange-950/20 group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 bg-gradient-to-tr from-[#7A1831] via-[#8F1D3A] to-[#C13A5A] rounded-xl flex items-center justify-center font-extrabold text-white shadow-lg shadow-[#8F1D3A]/25 group-hover:scale-105 transition-all">
               N
             </div>
             <div className="flex flex-col">
-              <span className="font-extrabold text-xl tracking-tight text-white flex items-center gap-1">
-                NIVO <span className="text-[#F27D26]">CASH</span>
+              <span className="font-black text-xl tracking-tight text-white flex items-center gap-1.5">
+                NIVO <span className="bg-gradient-to-r from-[#A52A4A] to-[#C13A5A] bg-clip-text text-transparent">CASH</span>
               </span>
             </div>
           </Link>
 
           {/* Desktop Nav Actions */}
           {user ? (
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-3.5">
               {/* Wallet Chip */}
-              <div className="flex items-center gap-2 bg-[#141414] hover:bg-white/5 border border-white/5 rounded-full px-4 py-1.5 transition-all">
-                <Wallet className="w-4 h-4 text-[#F27D26]" />
-                <span className="text-xs text-gray-400 font-medium">Balance:</span>
-                <span className="text-sm font-bold text-white tracking-wide">
+              <div className="flex items-center gap-2 bg-[#240A12] hover:bg-[#240A12] border border-[#8F1D3A]/20 rounded-full px-4 py-1.5 transition-all shadow-inner">
+                <Wallet className="w-4 h-4 text-[#C13A5A]" />
+                <span className="text-xs text-slate-400 font-medium">Balance:</span>
+                <span className="text-sm font-black text-white tracking-wide">
                   ₦{user.walletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -84,7 +84,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
               {/* Quick Deposit & Withdraw Buttons */}
               <button
                 onClick={onOpenDeposit}
-                className="flex items-center gap-1.5 bg-[#F27D26] hover:bg-[#E6721F] text-black font-bold text-xs px-4 py-2 rounded-xl transition-all hover:scale-105 cursor-pointer"
+                className="flex items-center gap-1.5 bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-md shadow-[#7A1831]/20 hover:scale-[1.02] cursor-pointer"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
                 Deposit
@@ -92,20 +92,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
 
               <button
                 onClick={onOpenWithdraw}
-                className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 text-gray-200 border border-white/5 font-semibold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer"
+                className="flex items-center gap-1.5 bg-[#240A12] hover:bg-[#1A2540] text-slate-200 border border-[#8F1D3A]/20 font-semibold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer"
               >
-                <ArrowUpRight className="w-3.5 h-3.5 text-[#F27D26]" />
+                <ArrowUpRight className="w-3.5 h-3.5 text-[#C13A5A]" />
                 Withdraw
               </button>
 
               {/* Notification Bell */}
               <button
                 onClick={() => setShowNotifications(true)}
-                className="relative p-2 rounded-xl bg-[#141414] hover:bg-white/5 border border-white/5 text-gray-300 hover:text-white transition-all cursor-pointer"
+                className="relative p-2 rounded-xl bg-[#240A12] hover:bg-[#1A2540] border border-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#F27D26] text-black text-[10px] font-black flex items-center justify-center border-2 border-[#0A0A0A] animate-pulse">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#C13A5A] text-slate-950 text-[10px] font-black flex items-center justify-center border-2 border-[#090506] animate-pulse">
                     {unreadCount}
                   </span>
                 )}
@@ -115,9 +115,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
               <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full bg-[#141414] hover:bg-white/5 border border-white/5 transition-all cursor-pointer"
+                  className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full bg-[#240A12] hover:bg-[#1A2540] border border-[#8F1D3A]/20 transition-all cursor-pointer"
                 >
-                  <div className="w-7 h-7 rounded-full bg-[#F27D26] text-black font-black text-xs flex items-center justify-center overflow-hidden border border-[#F27D26]/30">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#8F1D3A] to-[#C13A5A] text-white font-black text-xs flex items-center justify-center overflow-hidden border border-[#C13A5A]/30">
                     {user.avatarUrl ? (
                       <img
                         src={user.avatarUrl}
@@ -129,17 +129,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                       user.fullName.charAt(0).toUpperCase()
                     )}
                   </div>
-                  <span className="text-xs font-semibold text-gray-200 max-w-[100px] truncate">
+                  <span className="text-xs font-semibold text-slate-200 max-w-[100px] truncate">
                     {user.username}
                   </span>
                 </button>
 
                 {showProfileMenu && (
-                  <div className="absolute right-0 mt-2 w-56 bg-[#141414] border border-white/10 rounded-2xl shadow-2xl py-2 z-50 divide-y divide-white/5">
+                  <div className="absolute right-0 mt-2 w-56 bg-[#240A12] border border-[#8F1D3A]/20 rounded-2xl shadow-2xl py-2 z-50 divide-y divide-white/10 backdrop-blur-xl">
                     <div className="px-4 py-2.5">
                       <p className="text-xs font-bold text-white truncate">{user.fullName}</p>
-                      <p className="text-[11px] text-gray-400 truncate">@{user.username}</p>
-                      <p className="text-[10px] text-[#F27D26] font-mono mt-1">
+                      <p className="text-[11px] text-slate-400 truncate">@{user.username}</p>
+                      <p className="text-[10px] text-[#C13A5A] font-mono mt-1">
                         Code: {user.referralCode}
                       </p>
                     </div>
@@ -148,24 +148,24 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                       <Link
                         to="/profile"
                         onClick={() => setShowProfileMenu(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-xs text-gray-300 hover:text-white hover:bg-white/5"
+                        className="flex items-center gap-2 px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-white/5"
                       >
-                        <UserIcon className="w-4 h-4 text-[#F27D26]" />
+                        <UserIcon className="w-4 h-4 text-[#C13A5A]" />
                         My Account
                       </Link>
                       <Link
                         to="/referrals"
                         onClick={() => setShowProfileMenu(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-xs text-gray-300 hover:text-white hover:bg-white/5"
+                        className="flex items-center gap-2 px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-white/5"
                       >
-                        <Sparkles className="w-4 h-4 text-[#F27D26]" />
+                        <Sparkles className="w-4 h-4 text-[#A52A4A]" />
                         Refer & Earn (₦1,200)
                       </Link>
                       {user.isAdmin && (
                         <Link
                           to="/admin"
                           onClick={() => setShowProfileMenu(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-xs text-[#F27D26] hover:bg-[#F27D26]/10 font-bold"
+                          className="flex items-center gap-2 px-4 py-2 text-xs text-[#C13A5A] hover:bg-[#A52A4A]/10 font-bold"
                         >
                           <ShieldCheck className="w-4 h-4" />
                           Admin Portal
@@ -194,13 +194,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
             <div className="hidden md:flex items-center gap-3">
               <Link
                 to="/login"
-                className="text-xs font-semibold text-gray-300 hover:text-white px-4 py-2 rounded-lg transition-all"
+                className="text-xs font-semibold text-slate-300 hover:text-white px-4 py-2 rounded-lg transition-all"
               >
                 Sign In
               </Link>
               <Link
                 to="/register"
-                className="bg-[#F27D26] hover:bg-[#E6721F] text-black font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-lg shadow-orange-950/20 transition-all hover:scale-105"
+                className="bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-lg shadow-[#7A1831]/20 transition-all hover:scale-105"
               >
                 Create Account
               </Link>
@@ -210,7 +210,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
           {/* Mobile menu trigger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg bg-[#141414] border border-white/5 text-gray-300 hover:text-white cursor-pointer"
+            className="md:hidden p-2 rounded-xl bg-[#240A12] border border-[#8F1D3A]/20 text-slate-300 hover:text-white cursor-pointer"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -218,12 +218,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
 
         {/* Mobile menu drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-[#111111] border-b border-white/5 px-4 py-4 space-y-3">
+          <div className="md:hidden bg-[#1A080E] border-b border-[#8F1D3A]/20 px-4 py-4 space-y-3 shadow-2xl">
             {user ? (
               <>
-                <div className="bg-[#141414] rounded-xl p-3 border border-white/5 flex items-center justify-between">
+                <div className="bg-[#240A12] rounded-xl p-3.5 border border-[#8F1D3A]/20 flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-gray-400">Wallet Balance</p>
+                    <p className="text-xs text-slate-400">Wallet Balance</p>
                     <p className="text-lg font-black text-white">
                       ₦{user.walletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
                     </p>
@@ -234,7 +234,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                         setMobileMenuOpen(false);
                         onOpenDeposit?.();
                       }}
-                      className="bg-[#F27D26] text-black font-bold text-xs px-3 py-1.5 rounded-lg"
+                      className="bg-gradient-to-r from-[#7A1831] to-[#A52A4A] text-white font-bold text-xs px-3.5 py-2 rounded-xl"
                     >
                       Deposit
                     </button>
@@ -243,7 +243,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                         setMobileMenuOpen(false);
                         onOpenWithdraw?.();
                       }}
-                      className="bg-white/10 text-white font-bold text-xs px-3 py-1.5 rounded-lg"
+                      className="bg-white/10 text-white font-bold text-xs px-3.5 py-2 rounded-xl border border-white/10"
                     >
                       Withdraw
                     </button>
@@ -254,28 +254,28 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                   <Link
                     to="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-2.5 rounded-xl bg-[#141414] border border-white/5 text-gray-200 text-xs font-semibold text-center"
+                    className="p-3 rounded-xl bg-[#240A12] border border-white/10 text-slate-200 text-xs font-semibold text-center hover:border-[#8F1D3A]/30"
                   >
                     Dashboard
                   </Link>
                   <Link
                     to="/wallet"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-2.5 rounded-xl bg-[#141414] border border-white/5 text-gray-200 text-xs font-semibold text-center"
+                    className="p-3 rounded-xl bg-[#240A12] border border-white/10 text-slate-200 text-xs font-semibold text-center hover:border-[#8F1D3A]/30"
                   >
                     Wallet
                   </Link>
                   <Link
                     to="/referrals"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-2.5 rounded-xl bg-[#F27D26]/10 text-[#F27D26] text-xs font-bold text-center border border-[#F27D26]/20"
+                    className="p-3 rounded-xl bg-[#8F1D3A]/10 text-[#C13A5A] text-xs font-bold text-center border border-[#8F1D3A]/30"
                   >
                     Referrals (₦1,200)
                   </Link>
                   <Link
                     to="/tasks"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-2.5 rounded-xl bg-[#141414] border border-white/5 text-gray-200 text-xs font-semibold text-center"
+                    className="p-3 rounded-xl bg-[#240A12] border border-white/10 text-slate-200 text-xs font-semibold text-center hover:border-[#8F1D3A]/30"
                   >
                     Tasks
                   </Link>
@@ -285,7 +285,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                   <Link
                     to="/admin"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full py-2.5 text-center text-xs font-bold text-[#F27D26] bg-[#F27D26]/10 border border-[#F27D26]/20 rounded-xl"
+                    className="block w-full py-2.5 text-center text-xs font-bold text-[#C13A5A] bg-[#A52A4A]/10 border border-[#A52A4A]/30 rounded-xl"
                   >
                     🛡️ Admin Control Panel
                   </Link>
@@ -297,7 +297,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                     logout();
                     navigate('/login');
                   }}
-                  className="w-full py-2.5 text-center text-xs font-bold text-red-400 bg-red-500/10 rounded-xl"
+                  className="w-full py-2.5 text-center text-xs font-bold text-red-400 bg-red-500/10 rounded-xl border border-red-500/20"
                 >
                   Log Out
                 </button>
@@ -307,14 +307,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 bg-[#141414] text-white rounded-xl font-semibold text-sm border border-white/5"
+                  className="w-full text-center py-2.5 bg-[#240A12] text-white rounded-xl font-semibold text-sm border border-white/10"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 bg-[#F27D26] text-black rounded-xl font-black text-sm"
+                  className="w-full text-center py-2.5 bg-gradient-to-r from-[#7A1831] to-[#A52A4A] text-white rounded-xl font-black text-sm"
                 >
                   Create Account
                 </Link>

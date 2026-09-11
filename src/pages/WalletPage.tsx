@@ -53,7 +53,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-white flex items-center gap-2">
-            <Wallet className="w-6 h-6 text-orange-400" />
+            <Wallet className="w-6 h-6 text-[#A52A4A]" />
             Wallet & Bank Overview
           </h1>
           <p className="text-xs text-zinc-400 mt-1">Manage deposits, withdrawals, and bank details</p>
@@ -62,7 +62,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
         <div className="flex gap-2">
           <button
             onClick={onOpenDeposit}
-            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-black font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-md shadow-orange-500/20 cursor-pointer transition-all"
+            className="flex items-center gap-2 bg-[#8F1D3A] hover:bg-[#7A1831] text-black font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-md shadow-[#8F1D3A]/20 cursor-pointer transition-all"
           >
             <PlusCircle className="w-4 h-4" />
             Deposit
@@ -71,7 +71,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
             onClick={onOpenWithdraw}
             className="flex items-center gap-2 bg-[#1f2533] hover:bg-[#283042] text-white border border-zinc-700 font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer transition-all"
           >
-            <ArrowUpRight className="w-4 h-4 text-orange-400" />
+            <ArrowUpRight className="w-4 h-4 text-[#A52A4A]" />
             Withdraw
           </button>
         </div>
@@ -79,7 +79,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
 
       {/* Main Balance Banner */}
       <div className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-gradient-to-br from-[#181d28] via-[#12151c] to-[#0a0c10] border border-orange-500/30 rounded-3xl p-6 relative overflow-hidden shadow-xl flex flex-col justify-between">
+        <div className="md:col-span-2 bg-gradient-to-br from-[#1C0B12] via-[#16090D] to-[#0a0c10] border border-[#8F1D3A]/30 rounded-3xl p-6 relative overflow-hidden shadow-xl flex flex-col justify-between">
           <div>
             <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Available Wallet Balance</span>
             <h2 className="text-4xl font-black text-white mt-2">
@@ -91,16 +91,16 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
           </div>
 
           <div className="mt-6 pt-4 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-400">
-            <span>Account Status: <strong className="text-emerald-400">Active & Verified</strong></span>
+            <span>Account Status: <strong className="text-[#A52A4A]">Active & Verified</strong></span>
             <span>Ref Code: <strong className="text-amber-400 font-mono">{user?.referralCode}</strong></span>
           </div>
         </div>
 
         {/* Automated Paystack Deposit Card */}
-        <div className="bg-[#12151c] border border-zinc-800 rounded-3xl p-6 space-y-3 flex flex-col justify-between">
+        <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-6 space-y-3 flex flex-col justify-between">
           <div>
             <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Building2 className="w-4 h-4 text-[#F27D26]" />
+              <Building2 className="w-4 h-4 text-[#8F1D3A]" />
               Paystack One-Time Transfer
             </span>
             <div className="mt-3 space-y-1">
@@ -114,7 +114,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
 
           <button
             onClick={onOpenDeposit}
-            className="w-full text-center py-3 bg-[#F27D26] hover:bg-[#e06c19] text-black rounded-xl text-xs font-black cursor-pointer transition-all shadow-lg"
+            className="w-full text-center py-3 bg-[#8F1D3A] hover:bg-[#7A1831] text-black rounded-xl text-xs font-black cursor-pointer transition-all shadow-lg"
           >
             Fund Wallet via One-Time Paystack Account
           </button>
@@ -122,16 +122,16 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
       </div>
 
       {/* Transaction Feed */}
-      <div className="bg-[#12151c] border border-zinc-800 rounded-3xl p-6">
+      <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <h3 className="font-extrabold text-white text-base">Wallet Activity Logs</h3>
 
           {/* Filter Tabs */}
-          <div className="flex bg-[#181d28] p-1 rounded-xl border border-zinc-800">
+          <div className="flex bg-[#1C0B12] p-1 rounded-xl border border-zinc-800">
             <button
               onClick={() => setActiveTab('all')}
               className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                activeTab === 'all' ? 'bg-orange-500 text-black shadow-md' : 'text-zinc-400 hover:text-white'
+                activeTab === 'all' ? 'bg-[#8F1D3A] text-black shadow-md' : 'text-zinc-400 hover:text-white'
               }`}
             >
               All
@@ -139,7 +139,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
             <button
               onClick={() => setActiveTab('deposits')}
               className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                activeTab === 'deposits' ? 'bg-orange-500 text-black shadow-md' : 'text-zinc-400 hover:text-white'
+                activeTab === 'deposits' ? 'bg-[#8F1D3A] text-black shadow-md' : 'text-zinc-400 hover:text-white'
               }`}
             >
               Deposits
@@ -147,7 +147,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
             <button
               onClick={() => setActiveTab('withdrawals')}
               className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                activeTab === 'withdrawals' ? 'bg-orange-500 text-black shadow-md' : 'text-zinc-400 hover:text-white'
+                activeTab === 'withdrawals' ? 'bg-[#8F1D3A] text-black shadow-md' : 'text-zinc-400 hover:text-white'
               }`}
             >
               Withdrawals
@@ -164,13 +164,13 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
             {filteredTx.map((tx) => (
               <div
                 key={tx.id}
-                className="p-4 bg-[#181d28] rounded-2xl border border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-zinc-700 transition-all"
+                className="p-4 bg-[#1C0B12] rounded-2xl border border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-zinc-700 transition-all"
               >
                 <div className="flex items-center gap-3">
                   <div
                     className={`p-2.5 rounded-xl ${
                       tx.type.includes('deposit') || tx.type.includes('credit') || tx.type.includes('reward') || tx.type.includes('bonus')
-                        ? 'bg-emerald-500/10 text-emerald-400'
+                        ? 'bg-[#8F1D3A]/10 text-[#A52A4A]'
                         : 'bg-red-500/10 text-red-400'
                     }`}
                   >
@@ -193,7 +193,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
                   <span
                     className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full mt-1 ${
                       tx.status === 'completed' || tx.status === 'approved'
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20'
                         : tx.status === 'pending'
                         ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                         : 'bg-red-500/10 text-red-400 border border-red-500/20'

@@ -3,6 +3,7 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 import { db } from './server/db.js';
 
 dotenv.config();
@@ -38,7 +39,7 @@ function adminMiddleware(req: Request, res: Response, next: NextFunction) {
   }
   const token = authHeader.split(' ')[1];
   const user = db.getUserById(token);
-  if (!user || (!user.isAdmin && user.email.toLowerCase() !== 'talkdavidjohn@gmail.com')) {
+  if (!user || !user.isAdmin) {
     res.status(403).json({ error: 'Access denied. Administrator privileges required.' });
     return;
   }
@@ -125,16 +126,185 @@ app.post('/api/user/avatar', authMiddleware, (req: Request, res: Response) => {
   }
 });
 
-app.post('/api/auth/forgot-password', (req: Request, res: Response) => {
+app.post('/api/auth/forgot-password', async (req: Request, res: Response) => {
   try {
-    const { email } = req.body;
-    if (!email) {
-      res.status(400).json({ error: 'Please enter your email address.' });
+    const email = String(req.body?.email || '').trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      res.status(400).json({ error: 'Please enter a valid email address.' });
       return;
     }
-    res.json({ message: 'Password reset code sent to your email. Check inbox or spam folder.' });
+
+    const genericMessage = 'If an account exists for this email, a verification code has been sent.';
+    const user = db.findUserByEmail(email);
+
+    // Never reveal whether an account exists.
+    if (!user) {
+      res.json({ message: genericMessage });
+      return;
+    }
+
+    const existing = db.getLatestPasswordResetRequest(email);
+    if (existing && Date.now() - new Date(existing.createdAt).getTime() < 60_000) {
+      res.json({ message: genericMessage });
+      return;
+    }
+
+    const resendKey = process.env.RESEND_API_KEY;
+    const from = process.env.RESEND_FROM_EMAIL;
+    if (!resendKey || !from) {
+      console.error('Password reset email service is not configured.');
+      res.status(503).json({ error: 'Password reset email service is temporarily unavailable. Please try again later.' });
+      return;
+    }
+
+    const otp = crypto.randomInt(100000, 1000000).toString();
+    const otpHash = crypto.createHash('sha256').update(otp).digest('hex');
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+    db.createPasswordResetRequest(user.id, email, otpHash, expiresAt);
+
+    const emailResp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${resendKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from,
+        to: [email],
+        subject: 'Your Nivo Cash password reset code',
+        html: `
+          <div style="font-family:Arial,sans-serif;background:#100709;padding:32px;color:#fff">
+            <div style="max-width:560px;margin:auto;background:#240A12;border:1px solid #65152A;border-radius:20px;padding:32px">
+              <h2 style="margin:0 0 12px;color:#fff">NIVO CASH</h2>
+              <p style="color:#E6D5DA">Use the verification code below to reset your password.</p>
+              <div style="font-size:34px;font-weight:800;letter-spacing:10px;color:#C13A5A;background:#100709;border:1px solid #7A1831;border-radius:14px;padding:18px;text-align:center">${otp}</div>
+              <p style="color:#B99BA3">This code expires in 10 minutes. If you did not request a password reset, you can safely ignore this email.</p>
+            </div>
+          </div>
+        `,
+      }),
+    });
+
+    if (!emailResp.ok) {
+      const body = await emailResp.text();
+      console.error('Password reset email provider error:', body);
+      res.status(502).json({ error: 'Unable to send the verification email. Please try again later.' });
+      return;
+    }
+
+    res.json({ message: genericMessage });
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    console.error('Forgot password error:', err);
+    res.status(500).json({ error: 'Unable to process password reset request.' });
+  }
+});
+
+app.post('/api/auth/verify-reset-otp', (req: Request, res: Response) => {
+  try {
+    const email = String(req.body?.email || '').trim().toLowerCase();
+    const otp = String(req.body?.otp || '').trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\d{6}$/.test(otp)) {
+      res.status(400).json({ error: 'Enter the 6-digit verification code.' });
+      return;
+    }
+
+    const request = db.getLatestPasswordResetRequest(email);
+    if (!request || new Date(request.expiresAt).getTime() < Date.now()) {
+      res.status(400).json({ error: 'This verification code is invalid or expired. Please request a new code.' });
+      return;
+    }
+    if (request.attempts >= 5) {
+      res.status(429).json({ error: 'Too many incorrect attempts. Please request a new code.' });
+      return;
+    }
+
+    const providedHash = crypto.createHash('sha256').update(otp).digest('hex');
+    const expected = Buffer.from(request.otpHash, 'hex');
+    const provided = Buffer.from(providedHash, 'hex');
+    const valid = expected.length === provided.length && crypto.timingSafeEqual(expected, provided);
+    if (!valid) {
+      db.incrementPasswordResetAttempts(request.id);
+      res.status(400).json({ error: 'Incorrect verification code.' });
+      return;
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const resetTokenExpiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+    db.verifyPasswordResetOtp(request.id, resetTokenHash, resetTokenExpiresAt);
+
+    res.json({ message: 'Code verified successfully.', resetToken });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message || 'Unable to verify code.' });
+  }
+});
+
+app.post('/api/auth/reset-password', async (req: Request, res: Response) => {
+  try {
+    const email = String(req.body?.email || '').trim().toLowerCase();
+    const resetToken = String(req.body?.resetToken || '');
+    const newPassword = String(req.body?.newPassword || '');
+    const confirmPassword = String(req.body?.confirmPassword || '');
+
+    if (!email || !resetToken) {
+      res.status(400).json({ error: 'Your reset session is invalid. Please start again.' });
+      return;
+    }
+    if (newPassword.length < 8) {
+      res.status(400).json({ error: 'Password must be at least 8 characters long.' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      res.status(400).json({ error: 'Passwords do not match.' });
+      return;
+    }
+
+    const request = db.getLatestPasswordResetRequest(email);
+    if (!request || request.email !== email || !request.verifiedAt || !request.resetTokenHash || !request.resetTokenExpiresAt ||
+        new Date(request.resetTokenExpiresAt).getTime() < Date.now()) {
+      res.status(400).json({ error: 'Your reset session is invalid or expired. Please start again.' });
+      return;
+    }
+
+    const providedHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const expected = Buffer.from(request.resetTokenHash, 'hex');
+    const provided = Buffer.from(providedHash, 'hex');
+    if (expected.length !== provided.length || !crypto.timingSafeEqual(expected, provided)) {
+      res.status(400).json({ error: 'Your reset session is invalid or expired. Please start again.' });
+      return;
+    }
+
+    const passwordHash = bcrypt.hashSync(newPassword, 12);
+    const user = db.completePasswordReset(request.id, passwordHash);
+
+    // Best-effort sync for accounts that also exist in Supabase Auth.
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseUrl = process.env.VITE_SUPABASE_URL;
+    if (serviceKey && supabaseUrl) {
+      try {
+        const listResp = await fetch(`${supabaseUrl}/auth/v1/admin/users?per_page=1000`, {
+          headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+        });
+        if (listResp.ok) {
+          const listData = await listResp.json();
+          const authUser = listData?.users?.find((u: any) => u.email?.toLowerCase() === email);
+          if (authUser?.id) {
+            await fetch(`${supabaseUrl}/auth/v1/admin/users/${authUser.id}`, {
+              method: 'PUT',
+              headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ password: newPassword }),
+            });
+          }
+        }
+      } catch (syncErr) {
+        console.warn('Supabase Auth password sync failed:', syncErr);
+      }
+    }
+
+    res.json({ message: 'Your password has been changed successfully.', user });
+  } catch (err: any) {
+    console.error('Reset password error:', err);
+    res.status(400).json({ error: err.message || 'Unable to reset password.' });
   }
 });
 

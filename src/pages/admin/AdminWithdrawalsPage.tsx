@@ -59,7 +59,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+              ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
               : 'bg-red-500/10 border-red-500/30 text-red-400'
           }`}
         >
@@ -69,7 +69,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
       )}
 
       {/* Table */}
-      <div className="bg-[#11141c] border border-zinc-800 rounded-3xl p-6">
+      <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-6">
         {loading ? (
           <div className="text-center py-10 text-zinc-500 text-xs">Loading withdrawal applications...</div>
         ) : withdrawals.length === 0 ? (
@@ -89,7 +89,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-zinc-800/60 font-medium text-zinc-300">
                 {withdrawals.map((w) => (
-                  <tr key={w.id} className="hover:bg-[#171b26] transition-colors">
+                  <tr key={w.id} className="hover:bg-[#1C0B12] transition-colors">
                     <td className="py-3 px-3">
                       <p className="font-bold text-white">{w.userName}</p>
                       <p className="text-[10px] text-zinc-500">{w.userEmail}</p>
@@ -99,7 +99,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
 
                     <td className="py-3 px-3">
                       <p className="font-bold text-white">{w.bankName}</p>
-                      <p className="text-orange-400 font-mono font-bold">{w.accountNumber}</p>
+                      <p className="text-[#A52A4A] font-mono font-bold">{w.accountNumber}</p>
                       <p className="text-[10px] text-zinc-400">{w.accountName}</p>
                     </td>
 
@@ -107,7 +107,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
                       <span
                         className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                           w.status === 'approved'
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20'
                             : w.status === 'pending'
                             ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                             : 'bg-red-500/10 text-red-400 border border-red-500/20'
@@ -126,7 +126,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
                         <>
                           <button
                             onClick={() => handleApprove(w.id)}
-                            className="bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold text-[10px] px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+                            className="bg-[#8F1D3A] hover:bg-[#7A1831] text-black font-extrabold text-[10px] px-3 py-1.5 rounded-lg transition-all cursor-pointer"
                           >
                             Approve & Pay
                           </button>

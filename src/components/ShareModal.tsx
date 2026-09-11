@@ -57,16 +57,16 @@ export const ShareModal: React.FC<ShareModalProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-[#141414] border border-white/10 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
-        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+      <div className="bg-[#1A080E] border border-[#8F1D3A]/30 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#1A080E]">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#F27D26]" />
+            <Sparkles className="w-5 h-5 text-[#C13A5A]" />
             <h3 className="font-bold text-white text-base">Share & Earn ₦{bonusAmount.toLocaleString()}</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 cursor-pointer"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -74,36 +74,36 @@ export const ShareModal: React.FC<ShareModalProps> = ({ onClose }) => {
 
         <div className="p-6 space-y-5">
           <div className="text-center space-y-1">
-            <p className="text-xs text-gray-400">Your Exclusive Referral Link</p>
+            <p className="text-xs text-slate-400">Your Exclusive Referral Link</p>
             <p className="text-sm font-bold text-white">Earn ₦{bonusAmount.toLocaleString()} per friend who signs up!</p>
           </div>
 
           {/* Code Box */}
-          <div className="bg-black/40 border border-white/5 p-3 rounded-xl flex items-center justify-between">
+          <div className="bg-[#240A12] border border-[#8F1D3A]/20 p-3.5 rounded-2xl flex items-center justify-between">
             <div>
-              <p className="text-[10px] text-gray-500 uppercase font-bold">Referral Code</p>
-              <p className="text-base font-mono font-bold text-[#F27D26]">{referralCode}</p>
+              <p className="text-[10px] text-slate-400 uppercase font-bold">Referral Code</p>
+              <p className="text-base font-mono font-bold text-[#C13A5A]">{referralCode}</p>
             </div>
             <button
               onClick={copyCode}
-              className="flex items-center gap-1.5 bg-[#F27D26]/10 text-[#F27D26] hover:bg-[#F27D26]/20 font-bold text-xs px-3 py-2 rounded-lg transition-all cursor-pointer border border-[#F27D26]/20"
+              className="flex items-center gap-1.5 bg-[#A52A4A]/10 text-[#C13A5A] hover:bg-[#A52A4A]/20 font-bold text-xs px-3.5 py-2 rounded-xl transition-all cursor-pointer border border-[#A52A4A]/30"
             >
-              {copiedCode ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+              {copiedCode ? <Check className="w-4 h-4 text-[#A52A4A]" /> : <Copy className="w-4 h-4" />}
               <span>{copiedCode ? 'Copied' : 'Copy Code'}</span>
             </button>
           </div>
 
           {/* Link Box */}
-          <div className="bg-black/40 border border-white/5 p-3 rounded-xl space-y-2">
-            <p className="text-[10px] text-gray-500 uppercase font-bold">Referral Link</p>
-            <p className="text-xs font-mono text-gray-300 break-all bg-black p-2.5 rounded-lg border border-white/5">
+          <div className="bg-[#240A12] border border-white/10 p-3.5 rounded-2xl space-y-2">
+            <p className="text-[10px] text-slate-400 uppercase font-bold">Referral Link</p>
+            <p className="text-xs font-mono text-slate-300 break-all bg-[#090506] p-2.5 rounded-xl border border-white/10">
               {referralLink}
             </p>
             <button
               onClick={copyLink}
-              className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-bold text-xs py-2.5 rounded-lg border border-white/5 transition-all cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-bold text-xs py-2.5 rounded-xl border border-white/10 transition-all cursor-pointer"
             >
-              {copiedLink ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-[#F27D26]" />}
+              {copiedLink ? <Check className="w-4 h-4 text-[#A52A4A]" /> : <Copy className="w-4 h-4 text-[#C13A5A]" />}
               <span>{copiedLink ? 'Link Copied to Clipboard!' : 'Copy Full Link'}</span>
             </button>
           </div>
@@ -112,21 +112,21 @@ export const ShareModal: React.FC<ShareModalProps> = ({ onClose }) => {
           <div className="grid grid-cols-3 gap-2">
             <button
               onClick={shareWhatsApp}
-              className="flex flex-col items-center justify-center p-3 bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 rounded-2xl text-green-500 text-xs font-bold transition-all cursor-pointer"
+              className="flex flex-col items-center justify-center p-3 bg-[#8F1D3A]/10 hover:bg-[#8F1D3A]/20 border border-[#8F1D3A]/20 rounded-2xl text-[#A52A4A] text-xs font-bold transition-all cursor-pointer"
             >
               <MessageCircle className="w-5 h-5 mb-1" />
               WhatsApp
             </button>
             <button
               onClick={shareTelegram}
-              className="flex flex-col items-center justify-center p-3 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-2xl text-blue-400 text-xs font-bold transition-all cursor-pointer"
+              className="flex flex-col items-center justify-center p-3 bg-[#8F1D3A]/10 hover:bg-[#8F1D3A]/20 border border-[#8F1D3A]/20 rounded-2xl text-[#A52A4A] text-xs font-bold transition-all cursor-pointer"
             >
               <Send className="w-5 h-5 mb-1" />
               Telegram
             </button>
             <button
               onClick={handleNativeShare}
-              className="flex flex-col items-center justify-center p-3 bg-[#F27D26]/10 hover:bg-[#F27D26]/20 border border-[#F27D26]/20 rounded-2xl text-[#F27D26] text-xs font-bold transition-all cursor-pointer"
+              className="flex flex-col items-center justify-center p-3 bg-[#A52A4A]/10 hover:bg-[#A52A4A]/20 border border-[#A52A4A]/20 rounded-2xl text-[#C13A5A] text-xs font-bold transition-all cursor-pointer"
             >
               <Share2 className="w-5 h-5 mb-1" />
               More Share

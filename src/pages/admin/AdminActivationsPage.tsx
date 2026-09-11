@@ -92,7 +92,7 @@ export const AdminActivationsPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+              ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
               : 'bg-red-500/10 border-red-500/30 text-red-400'
           }`}
         >
@@ -102,8 +102,8 @@ export const AdminActivationsPage: React.FC = () => {
       )}
 
       {/* Filters & Search */}
-      <div className="bg-[#11141c] border border-zinc-800 rounded-3xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-1 bg-[#171b26] p-1 rounded-2xl border border-zinc-800 w-full sm:w-auto">
+      <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-1 bg-[#1C0B12] p-1 rounded-2xl border border-zinc-800 w-full sm:w-auto">
           {(['pending', 'all', 'approved', 'rejected'] as const).map((tab) => (
             <button
               key={tab}
@@ -126,13 +126,13 @@ export const AdminActivationsPage: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search user, ref or sender..."
-            className="w-full bg-[#171b26] border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-white text-xs focus:outline-none focus:border-amber-500"
+            className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-white text-xs focus:outline-none focus:border-amber-500"
           />
         </div>
       </div>
 
       {/* Requests Table */}
-      <div className="bg-[#11141c] border border-zinc-800 rounded-3xl p-6">
+      <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-6">
         {loading ? (
           <div className="text-center py-10 text-zinc-500 text-xs">Loading activation requests...</div>
         ) : filtered.length === 0 ? (
@@ -155,7 +155,7 @@ export const AdminActivationsPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-zinc-800/60 font-medium text-zinc-300">
                 {filtered.map((a) => (
-                  <tr key={a.id} className="hover:bg-[#171b26] transition-colors">
+                  <tr key={a.id} className="hover:bg-[#1C0B12] transition-colors">
                     <td className="py-3 px-3">
                       <p className="font-bold text-white">{a.userName}</p>
                       <p className="text-[11px] text-zinc-400">{a.userEmail}</p>
@@ -177,7 +177,7 @@ export const AdminActivationsPage: React.FC = () => {
                       <span
                         className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                           a.status === 'approved'
-                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                            ? 'bg-[#8F1D3A]/20 text-[#A52A4A] border border-[#8F1D3A]/30'
                             : a.status === 'pending'
                             ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                             : 'bg-red-500/20 text-red-400 border border-red-500/30'
@@ -193,7 +193,7 @@ export const AdminActivationsPage: React.FC = () => {
                           <button
                             disabled={actionLoading === a.id}
                             onClick={() => handleApprove(a.id)}
-                            className="bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-black text-[11px] font-black px-3 py-1.5 rounded-xl shadow transition-all cursor-pointer inline-flex items-center gap-1"
+                            className="bg-[#8F1D3A] hover:bg-[#7A1831] disabled:opacity-50 text-black text-[11px] font-black px-3 py-1.5 rounded-xl shadow transition-all cursor-pointer inline-flex items-center gap-1"
                           >
                             <Check className="w-3.5 h-3.5" />
                             <span>Approve</span>

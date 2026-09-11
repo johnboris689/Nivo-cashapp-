@@ -18,12 +18,14 @@ import {
   EyeOff,
   History,
   ArrowDownLeft,
+  CheckCircle2,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { StatCard } from '../components/StatCard';
 import { ShareModal } from '../components/ShareModal';
 import { Transaction, Task } from '../types';
 import { api } from '../lib/api';
+import confetti from 'canvas-confetti';
 
 interface DashboardPageProps {
   onOpenDeposit: () => void;
@@ -31,7 +33,7 @@ interface DashboardPageProps {
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onOpenWithdraw }) => {
-  const { user, settings } = useAuth();
+  const { user, settings, refreshUser } = useAuth();
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [tasks, setTasks] = useState<(Task & { completed: boolean })[]>([]);
@@ -39,6 +41,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [showBalance, setShowBalance] = useState(true);
+  const [paymentNotice, setPaymentNotice] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
 
   const bonusAmount = settings?.referralBonusAmount || 1200;
 
@@ -57,6 +60,49 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
 
   useEffect(() => {
     fetchData();
+
+    // Check for payment callback from Paystack, Flutterwave, or Korapay
+    const searchParams = new URLSearchParams(window.location.search);
+    const ref = searchParams.get('reference') || searchParams.get('trxref') || searchParams.get('tx_ref');
+
+    if (ref) {
+      const verifyCallback = async () => {
+        setPaymentNotice({ type: 'info', message: 'Verifying payment with gateway...' });
+        try {
+          const res = await api.verifyPayment(ref);
+          if (res.status === 'approved') {
+            confetti({
+              particleCount: 120,
+              spread: 80,
+              origin: { y: 0.6 },
+              colors: ['#2563EB', '#06B6D4', '#10B981'],
+            });
+            await refreshUser();
+            await fetchData();
+            setPaymentNotice({
+              type: 'success',
+              message: res.message || 'Payment successfully verified! Your wallet has been credited.',
+            });
+          } else {
+            setPaymentNotice({
+              type: 'info',
+              message: res.message || 'Payment is being processed by the gateway.',
+            });
+          }
+        } catch (err: any) {
+          setPaymentNotice({
+            type: 'error',
+            message: err.message || 'Payment verification could not be completed.',
+          });
+        } finally {
+          // Clean URL without reloading page
+          window.history.replaceState({}, '', window.location.pathname);
+          setTimeout(() => setPaymentNotice(null), 8000);
+        }
+      };
+
+      verifyCallback();
+    }
   }, []);
 
   const copyReferralCode = () => {
@@ -85,83 +131,113 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
   ];
 
   return (
-    <div className="space-y-4 animate-fade-in pb-16">
+    <div className="space-y-4 animate-fade-in pb-20">
       {/* Greeting Banner */}
-      <div className="flex items-center justify-between bg-[#141414] px-4 py-3 rounded-2xl border border-white/5">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-full bg-[#F27D26]/20 text-[#F27D26] flex items-center justify-center font-bold text-sm border border-[#F27D26]/30">
+      <div className="flex items-center justify-between bg-[#240A12]/80 backdrop-blur-md px-4 py-3.5 rounded-2xl border border-white/10 shadow-lg">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#7A1831] to-[#C13A5A] text-white flex items-center justify-center font-black text-sm shadow-md shadow-[#8F1D3A]/20 border border-[#C13A5A]/30">
             {user?.fullName?.charAt(0) || 'U'}
           </div>
           <div>
-            <h1 className="text-sm font-bold text-white flex items-center gap-1.5">
+            <h1 className="text-sm font-extrabold text-white flex items-center gap-1.5">
               <span>Hi, {user?.fullName?.split(' ')[0]}</span> 👋
             </h1>
-            <p className="text-[10px] text-gray-400">Welcome to Nivo Cash</p>
+            <p className="text-[11px] text-slate-400">Welcome to Nivo Cash</p>
           </div>
         </div>
-        <span className="bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold px-2.5 py-0.5 rounded-full border border-emerald-500/20 flex items-center gap-1">
-          <ShieldCheck className="w-3 h-3" />
+        <span className="bg-[#8F1D3A]/10 text-[#A52A4A] text-[10px] font-bold px-3 py-1 rounded-full border border-[#8F1D3A]/20 flex items-center gap-1.5 shadow-sm">
+          <ShieldCheck className="w-3.5 h-3.5" />
           Verified
         </span>
       </div>
 
-      {/* Redesigned Compact Wallet Balance Card (OPay-Inspired) */}
-      <div className="bg-gradient-to-br from-[#F27D26] via-[#E86C15] to-[#D95B00] rounded-[24px] p-5 text-black shadow-xl shadow-orange-950/20 relative overflow-hidden">
-        {/* Card Decorative Elements */}
-        <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/10 blur-xl pointer-events-none" />
+      {/* Payment Callback Notification Banner */}
+      {paymentNotice && (
+        <div
+          className={`p-4 rounded-2xl border flex items-center justify-between text-xs font-bold animate-fade-in shadow-xl ${
+            paymentNotice.type === 'success'
+              ? 'bg-[#8F1D3A]/15 border-[#8F1D3A]/30 text-[#C13A5A]'
+              : paymentNotice.type === 'error'
+              ? 'bg-red-500/15 border-red-500/30 text-red-300'
+              : 'bg-[#8F1D3A]/15 border-[#8F1D3A]/30 text-[#D46A83]'
+          }`}
+        >
+          <div className="flex items-center gap-2.5">
+            {paymentNotice.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-[#A52A4A] shrink-0" />
+            ) : (
+              <ShieldCheck className="w-4 h-4 text-[#C13A5A] shrink-0" />
+            )}
+            <span>{paymentNotice.message}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setPaymentNotice(null)}
+            className="text-slate-400 hover:text-white transition-colors"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] font-bold text-black/70 uppercase tracking-wider">
-            Available Balance
+      {/* Redesigned Wallet Balance Card (Visual Centerpiece - Electric Blue / Cyan Gradient) */}
+      <div className="bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#0284C7] rounded-[28px] p-5 sm:p-6 text-white shadow-2xl shadow-[#7A1831]/30 relative overflow-hidden border border-[#C13A5A]/30">
+        {/* Card Decorative Blurs & Accents */}
+        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-[#C13A5A]/20 blur-2xl pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-32 h-32 rounded-full bg-[#A52A4A]/20 blur-xl pointer-events-none" />
+
+        <div className="flex items-center justify-between relative z-10">
+          <span className="text-[11px] font-bold text-[#D46A83]/90 uppercase tracking-wider">
+            Wallet Balance
           </span>
           <button
             onClick={() => setShowBalance(!showBalance)}
-            className="flex items-center gap-1 bg-black/15 hover:bg-black/25 text-black text-[11px] font-bold px-2.5 py-1 rounded-full backdrop-blur-sm transition-all cursor-pointer"
+            className="flex items-center gap-1.5 bg-black/20 hover:bg-black/30 text-white text-[11px] font-bold px-3 py-1 rounded-full backdrop-blur-md transition-all cursor-pointer border border-white/10"
           >
-            {showBalance ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+            {showBalance ? <EyeOff className="w-3.5 h-3.5 text-[#D46A83]" /> : <Eye className="w-3.5 h-3.5 text-[#D46A83]" />}
             <span>{showBalance ? 'Hide' : 'Show'}</span>
           </button>
         </div>
 
-        <div className="my-3 flex items-baseline justify-between flex-wrap gap-2">
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight font-mono">
+        <div className="my-4 flex items-baseline justify-between flex-wrap gap-2 relative z-10">
+          <h2 className="text-3xl sm:text-4xl font-black tracking-tight font-mono drop-shadow-md">
             {showBalance
               ? `₦${user?.walletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 }) || '0.00'}`
               : '••••••••'}
           </h2>
-          <div className="text-right">
-            <span className="text-[10px] font-bold text-black/60 uppercase block">Total Earned</span>
-            <span className="text-xs font-black">
+          <div className="text-right bg-black/15 px-3 py-1.5 rounded-xl border border-white/10">
+            <span className="text-[10px] font-bold text-[#D46A83] uppercase block">Total Earned</span>
+            <span className="text-xs font-black text-white">
               ₦{user?.totalEarnings.toLocaleString() || '0.00'}
             </span>
           </div>
         </div>
 
-        {/* Compact Deposit & Withdraw Pill Buttons */}
-        <div className="flex items-center gap-3 mt-4 pt-3 border-t border-black/10">
+        {/* Action Pill Buttons */}
+        <div className="flex items-center gap-3 mt-5 pt-4 border-t border-white/15 relative z-10">
           <button
             onClick={onOpenDeposit}
-            className="flex-1 bg-black text-white hover:bg-zinc-900 active:scale-95 transition-all text-xs font-extrabold h-11 rounded-full flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
+            className="flex-1 bg-white text-slate-950 hover:bg-slate-100 active:scale-95 transition-all text-xs font-black h-11 rounded-2xl flex items-center justify-center gap-2 shadow-lg cursor-pointer"
           >
-            <PlusCircle className="w-4 h-4 text-[#F27D26]" />
+            <PlusCircle className="w-4 h-4 text-[#7A1831]" />
             <span>Deposit</span>
           </button>
           <button
             onClick={onOpenWithdraw}
-            className="flex-1 bg-white/20 hover:bg-white/30 active:scale-95 text-black transition-all text-xs font-extrabold h-11 rounded-full flex items-center justify-center gap-1.5 backdrop-blur-md cursor-pointer"
+            className="flex-1 bg-black/30 hover:bg-black/40 border border-white/20 active:scale-95 text-white transition-all text-xs font-black h-11 rounded-2xl flex items-center justify-center gap-2 backdrop-blur-md cursor-pointer"
           >
-            <ArrowUpRight className="w-4 h-4" />
+            <ArrowUpRight className="w-4 h-4 text-[#D46A83]" />
             <span>Withdraw</span>
           </button>
         </div>
       </div>
 
-      {/* Quick Actions Grid (OPay-Inspired Compact Grid) */}
-      <div className="bg-[#141414] border border-white/5 rounded-2xl p-4">
-        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">
+      {/* Quick Actions Grid (Evenly Spaced 6-Column) */}
+      <div className="bg-[#240A12]/80 backdrop-blur-md border border-white/10 rounded-3xl p-4 sm:p-5 shadow-xl">
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3.5 px-1">
           Quick Actions
         </p>
-        <div className="grid grid-cols-6 gap-2">
+        <div className="grid grid-cols-6 gap-2 sm:gap-3">
           {quickActions.map((action, idx) => {
             const Icon = action.icon;
             if (action.isButton) {
@@ -169,12 +245,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
                 <button
                   key={idx}
                   onClick={action.action}
-                  className="flex flex-col items-center gap-1.5 group cursor-pointer"
+                  className="flex flex-col items-center gap-2 group cursor-pointer"
                 >
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#1D1D1D] border border-white/5 flex items-center justify-center text-[#F27D26] group-hover:border-[#F27D26]/50 group-hover:bg-[#F27D26]/10 group-active:scale-95 transition-all shadow-sm">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#240A12] border border-[#8F1D3A]/20 flex items-center justify-center text-[#C13A5A] group-hover:border-[#C13A5A]/50 group-hover:bg-[#7A1831]/20 group-hover:text-white group-active:scale-95 transition-all shadow-md">
                     <Icon className="w-5 h-5" />
                   </div>
-                  <span className="text-[10px] font-semibold text-gray-300 group-hover:text-white truncate max-w-full">
+                  <span className="text-[10px] font-semibold text-slate-300 group-hover:text-white truncate max-w-full">
                     {action.label}
                   </span>
                 </button>
@@ -184,12 +260,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
                 <Link
                   key={idx}
                   to={action.path!}
-                  className="flex flex-col items-center gap-1.5 group cursor-pointer"
+                  className="flex flex-col items-center gap-2 group cursor-pointer"
                 >
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#1D1D1D] border border-white/5 flex items-center justify-center text-[#F27D26] group-hover:border-[#F27D26]/50 group-hover:bg-[#F27D26]/10 group-active:scale-95 transition-all shadow-sm">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#240A12] border border-[#8F1D3A]/20 flex items-center justify-center text-[#C13A5A] group-hover:border-[#C13A5A]/50 group-hover:bg-[#7A1831]/20 group-hover:text-white group-active:scale-95 transition-all shadow-md">
                     <Icon className="w-5 h-5" />
                   </div>
-                  <span className="text-[10px] font-semibold text-gray-300 group-hover:text-white truncate max-w-full">
+                  <span className="text-[10px] font-semibold text-slate-300 group-hover:text-white truncate max-w-full">
                     {action.label}
                   </span>
                 </Link>
@@ -199,7 +275,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
         </div>
       </div>
 
-      {/* Dashboard Statistics (Compact 2-Column Responsive Grid) */}
+      {/* Dashboard Statistics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard
           title="Total Earnings"
@@ -232,44 +308,44 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
       {/* Referral Card & Daily Tasks Grid */}
       <div className="grid lg:grid-cols-3 gap-4">
         {/* Referral Program Compact Card */}
-        <div className="lg:col-span-2 bg-[#141414] border border-white/5 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+        <div className="lg:col-span-2 bg-[#240A12]/80 backdrop-blur-md border border-white/10 rounded-3xl p-5 flex flex-col justify-between space-y-4 shadow-xl">
           <div>
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Zap className="w-4 h-4 text-[#F27D26]" />
+            <div className="flex justify-between items-center mb-3.5">
+              <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+                <Zap className="w-4 h-4 text-[#C13A5A]" />
                 <span>Referral Earnings</span>
               </h3>
-              <span className="text-[#F27D26] text-[10px] font-extrabold bg-[#F27D26]/10 px-2.5 py-0.5 rounded-full border border-[#F27D26]/20">
+              <span className="text-[#C13A5A] text-[10px] font-black bg-[#A52A4A]/10 px-3 py-1 rounded-full border border-[#A52A4A]/30">
                 ₦{bonusAmount.toLocaleString()} / REGISTRATION
               </span>
             </div>
 
-            <p className="text-[11px] text-gray-400 mb-3">
-              Share your link or referral code to earn instant cash directly into your wallet.
+            <p className="text-[11px] text-slate-400 mb-3.5 leading-relaxed">
+              Share your link or referral code to earn instant cash directly into your wallet upon signup.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div className="bg-[#1A1A1A] border border-white/5 p-2.5 rounded-xl flex items-center justify-between">
+              <div className="bg-[#240A12] border border-[#8F1D3A]/20 p-3 rounded-2xl flex items-center justify-between">
                 <div className="min-w-0 pr-2">
-                  <span className="text-[9px] text-gray-400 font-bold uppercase block">Referral Link</span>
+                  <span className="text-[9px] text-slate-400 font-bold uppercase block">Referral Link</span>
                   <span className="text-xs text-white truncate block">{user?.referralLink}</span>
                 </div>
                 <button
                   onClick={copyReferralLink}
-                  className="bg-[#F27D26]/10 text-[#F27D26] hover:bg-[#F27D26] hover:text-black text-[10px] font-bold px-2.5 py-1 rounded-lg shrink-0 transition-all cursor-pointer"
+                  className="bg-[#A52A4A]/10 text-[#C13A5A] hover:bg-[#C13A5A] hover:text-slate-950 text-[10px] font-black px-3 py-1.5 rounded-xl shrink-0 transition-all cursor-pointer border border-[#A52A4A]/20"
                 >
                   {copiedLink ? 'COPIED' : 'COPY'}
                 </button>
               </div>
 
-              <div className="bg-[#1A1A1A] border border-white/5 p-2.5 rounded-xl flex items-center justify-between">
+              <div className="bg-[#240A12] border border-[#8F1D3A]/20 p-3 rounded-2xl flex items-center justify-between">
                 <div className="min-w-0 pr-2">
-                  <span className="text-[9px] text-gray-400 font-bold uppercase block">Referral Code</span>
+                  <span className="text-[9px] text-slate-400 font-bold uppercase block">Referral Code</span>
                   <span className="text-xs text-white font-mono font-bold block">{user?.referralCode}</span>
                 </div>
                 <button
                   onClick={copyReferralCode}
-                  className="bg-[#F27D26]/10 text-[#F27D26] hover:bg-[#F27D26] hover:text-black text-[10px] font-bold px-2.5 py-1 rounded-lg shrink-0 transition-all cursor-pointer"
+                  className="bg-[#A52A4A]/10 text-[#C13A5A] hover:bg-[#C13A5A] hover:text-slate-950 text-[10px] font-black px-3 py-1.5 rounded-xl shrink-0 transition-all cursor-pointer border border-[#A52A4A]/20"
                 >
                   {copiedCode ? 'COPIED' : 'COPY'}
                 </button>
@@ -277,9 +353,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
             </div>
           </div>
 
-          <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] font-medium text-gray-400">
+          <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-medium text-slate-400">
             <span>Instant payouts on verified referrals</span>
-            <Link to="/referrals" className="text-[#F27D26] hover:underline flex items-center gap-1 font-bold">
+            <Link to="/referrals" className="text-[#C13A5A] hover:underline flex items-center gap-1 font-bold">
               <span>Analytics</span>
               <ArrowRight className="w-3 h-3" />
             </Link>
@@ -287,39 +363,39 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
         </div>
 
         {/* Quick Tasks Widget */}
-        <div className="bg-[#141414] border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
+        <div className="bg-[#240A12]/80 backdrop-blur-md border border-white/10 rounded-3xl p-5 flex flex-col justify-between shadow-xl">
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-white text-sm flex items-center gap-1.5">
-                <CheckSquare className="w-4 h-4 text-[#F27D26]" />
+            <div className="flex items-center justify-between mb-3.5">
+              <h3 className="font-extrabold text-white text-sm flex items-center gap-1.5">
+                <CheckSquare className="w-4 h-4 text-[#C13A5A]" />
                 <span>Daily Tasks</span>
               </h3>
-              <Link to="/tasks" className="text-[11px] font-bold text-[#F27D26] hover:underline">
+              <Link to="/tasks" className="text-[11px] font-bold text-[#C13A5A] hover:underline">
                 View All
               </Link>
             </div>
 
             <div className="space-y-2">
               {tasks.length === 0 ? (
-                <p className="text-xs text-gray-500 py-3 text-center">Loading tasks...</p>
+                <p className="text-xs text-slate-500 py-3 text-center">Loading tasks...</p>
               ) : (
                 tasks.map((task) => (
                   <div
                     key={task.id}
-                    className="p-2.5 bg-[#1A1A1A] rounded-xl border border-white/5 flex items-center justify-between"
+                    className="p-3 bg-[#240A12] rounded-2xl border border-white/10 flex items-center justify-between"
                   >
                     <div className="min-w-0 pr-2">
-                      <p className="text-xs font-semibold text-white truncate">{task.title}</p>
-                      <p className="text-[10px] text-[#F27D26] font-bold">+₦{task.rewardAmount}</p>
+                      <p className="text-xs font-bold text-white truncate">{task.title}</p>
+                      <p className="text-[10px] text-[#C13A5A] font-black">+₦{task.rewardAmount}</p>
                     </div>
                     {task.completed ? (
-                      <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shrink-0">
+                      <span className="text-[9px] font-bold text-[#A52A4A] bg-[#8F1D3A]/10 px-2.5 py-1 rounded-full border border-[#8F1D3A]/20 shrink-0">
                         Done
                       </span>
                     ) : (
                       <Link
                         to="/tasks"
-                        className="text-[10px] font-bold bg-[#F27D26] hover:bg-[#E6721F] text-black px-2.5 py-1 rounded-lg shrink-0"
+                        className="text-[10px] font-black bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white px-3 py-1.5 rounded-xl shrink-0"
                       >
                         Start
                       </Link>
@@ -330,8 +406,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
             </div>
           </div>
 
-          <div className="mt-3 pt-2 border-t border-white/5 text-center">
-            <Link to="/tasks" className="text-[11px] font-semibold text-gray-400 hover:text-white">
+          <div className="mt-4 pt-3 border-t border-white/10 text-center">
+            <Link to="/tasks" className="text-[11px] font-semibold text-slate-400 hover:text-white">
               Complete tasks & earn daily rewards ➔
             </Link>
           </div>
@@ -339,56 +415,61 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
       </div>
 
       {/* Recent Activity List */}
-      <div className="bg-[#141414] border border-white/5 rounded-2xl p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-bold text-white">Recent Activity</h3>
-          <Link to="/history" className="text-[11px] font-bold text-[#F27D26] hover:underline">
+      <div className="bg-[#240A12]/80 backdrop-blur-md border border-white/10 rounded-3xl p-5 shadow-xl">
+        <div className="flex items-center justify-between mb-3.5">
+          <h3 className="text-sm font-extrabold text-white">Recent Transactions</h3>
+          <Link to="/history" className="text-[11px] font-bold text-[#C13A5A] hover:underline">
             View All
           </Link>
         </div>
 
         {transactions.length === 0 ? (
-          <div className="text-center py-6 text-gray-500 text-xs">No activity recorded yet.</div>
+          <div className="text-center py-6 text-slate-500 text-xs">No activity recorded yet.</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-white/5 text-gray-400 font-bold uppercase text-[9px]">
-                  <th className="py-2 px-2">Type</th>
-                  <th className="py-2 px-2">Description</th>
-                  <th className="py-2 px-2">Amount</th>
-                  <th className="py-2 px-2">Status</th>
-                  <th className="py-2 px-2">Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5 font-medium text-gray-300">
-                {transactions.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-white/5 transition-colors">
-                    <td className="py-2.5 px-2 uppercase text-[9px] font-bold text-[#F27D26]">
-                      {tx.type.replace('_', ' ')}
-                    </td>
-                    <td className="py-2.5 px-2 font-medium text-white truncate max-w-[150px]">{tx.description}</td>
-                    <td className="py-2.5 px-2 font-bold text-white">₦{tx.amount.toLocaleString()}</td>
-                    <td className="py-2.5 px-2">
-                      <span
-                        className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                          tx.status === 'completed' || tx.status === 'approved'
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : tx.status === 'pending'
-                            ? 'bg-[#F27D26]/10 text-[#F27D26] border border-[#F27D26]/20'
-                            : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                        }`}
-                      >
-                        {tx.status}
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-2 text-gray-400 text-[10px]">
+          <div className="space-y-2.5">
+            {transactions.map((tx) => (
+              <div
+                key={tx.id}
+                className="p-3.5 rounded-2xl bg-[#240A12] border border-white/5 flex items-center justify-between hover:border-[#8F1D3A]/30 transition-all"
+              >
+                <div className="flex items-center gap-3 min-w-0 pr-2">
+                  <div
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                      tx.type.includes('deposit') || tx.type.includes('bonus') || tx.type.includes('reward')
+                        ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20'
+                        : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                    }`}
+                  >
+                    {tx.type.includes('deposit') || tx.type.includes('bonus') || tx.type.includes('reward') ? (
+                      <ArrowDownLeft className="w-4 h-4" />
+                    ) : (
+                      <ArrowUpRight className="w-4 h-4" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-extrabold text-white truncate">{tx.description}</p>
+                    <p className="text-[10px] text-slate-400 font-medium">
                       {new Date(tx.createdAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="text-right shrink-0">
+                  <p className="text-xs font-black text-white">₦{tx.amount.toLocaleString()}</p>
+                  <span
+                    className={`text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mt-0.5 ${
+                      tx.status === 'completed' || tx.status === 'approved'
+                        ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20'
+                        : tx.status === 'pending'
+                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                        : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                    }`}
+                  >
+                    {tx.status}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -397,4 +478,3 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
     </div>
   );
 };
-

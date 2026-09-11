@@ -1,13 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Save, Check, AlertCircle, ShieldAlert } from 'lucide-react';
-import { SiteSettings } from '../../types';
+import {
+  Settings,
+  Save,
+  Check,
+  AlertCircle,
+  ShieldAlert,
+  CreditCard,
+  Copy,
+  CheckCircle2,
+  RefreshCw,
+  Zap,
+} from 'lucide-react';
+import { SiteSettings, PaymentOverviewResponse } from '../../types';
 import { api } from '../../lib/api';
 
 export const AdminSettingsPage: React.FC = () => {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [paymentOverview, setPaymentOverview] = useState<PaymentOverviewResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshingPayments, setRefreshingPayments] = useState(false);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
   // Editable state
   const [appName, setAppName] = useState('Nivo Cash App');
@@ -16,21 +30,31 @@ export const AdminSettingsPage: React.FC = () => {
   const [minDeposit, setMinDeposit] = useState('1000');
   const [minWithdrawal, setMinWithdrawal] = useState('2000');
   const [activationFeeAmount, setActivationFeeAmount] = useState('520');
+  const [paymentProvider, setPaymentProvider] = useState<'auto' | 'paystack' | 'flutterwave' | 'korapay'>('auto');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [announcementBanner, setAnnouncementBanner] = useState('');
 
   const fetchSettings = async () => {
     try {
-      const data = await api.getAdminSettings();
-      setSettings(data);
-      setAppName(data.appName);
-      setSupportEmail(data.supportEmail);
-      setTelegramChannel(data.telegramChannel);
-      setMinDeposit(data.minDeposit.toString());
-      setMinWithdrawal(data.minWithdrawal.toString());
-      setActivationFeeAmount((data.activationFeeAmount || 520).toString());
-      setMaintenanceMode(data.maintenanceMode);
-      setAnnouncementBanner(data.announcementBanner || '');
+      const [settingsData, paymentsData] = await Promise.all([
+        api.getAdminSettings(),
+        api.getAdminPaymentOverview().catch(() => null),
+      ]);
+
+      setSettings(settingsData);
+      setAppName(settingsData.appName);
+      setSupportEmail(settingsData.supportEmail);
+      setTelegramChannel(settingsData.telegramChannel);
+      setMinDeposit(settingsData.minDeposit.toString());
+      setMinWithdrawal(settingsData.minWithdrawal.toString());
+      setActivationFeeAmount((settingsData.activationFeeAmount || 520).toString());
+      setPaymentProvider(settingsData.paymentProvider || 'auto');
+      setMaintenanceMode(settingsData.maintenanceMode);
+      setAnnouncementBanner(settingsData.announcementBanner || '');
+
+      if (paymentsData) {
+        setPaymentOverview(paymentsData);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -41,6 +65,25 @@ export const AdminSettingsPage: React.FC = () => {
   useEffect(() => {
     fetchSettings();
   }, []);
+
+  const handleRefreshPaymentStatus = async () => {
+    setRefreshingPayments(true);
+    try {
+      const paymentsData = await api.getAdminPaymentOverview();
+      setPaymentOverview(paymentsData);
+      setMsg({ type: 'success', text: 'Payment provider statuses refreshed.' });
+    } catch (e: any) {
+      setMsg({ type: 'error', text: 'Could not refresh payment providers.' });
+    } finally {
+      setRefreshingPayments(false);
+    }
+  };
+
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedUrl(id);
+    setTimeout(() => setCopiedUrl(null), 2000);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +96,7 @@ export const AdminSettingsPage: React.FC = () => {
         minDeposit: Number(minDeposit),
         minWithdrawal: Number(minWithdrawal),
         activationFeeAmount: Number(activationFeeAmount),
+        paymentProvider,
         maintenanceMode,
         announcementBanner,
       });
@@ -72,14 +116,16 @@ export const AdminSettingsPage: React.FC = () => {
           <Settings className="w-6 h-6 text-zinc-300" />
           Global Platform Settings
         </h1>
-        <p className="text-xs text-zinc-400 mt-1">Configure limits, announcement notice, support channels, and system maintenance</p>
+        <p className="text-xs text-zinc-400 mt-1">
+          Configure payment gateways, deposit limits, announcement notice, and platform operations.
+        </p>
       </div>
 
       {msg && (
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+              ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
               : 'bg-red-500/10 border-red-500/30 text-red-400'
           }`}
         >
@@ -89,41 +135,158 @@ export const AdminSettingsPage: React.FC = () => {
       )}
 
       {loading ? (
-        <div className="text-center py-10 text-zinc-500 text-xs">Loading configuration...</div>
+        <div className="p-8 text-center text-zinc-400 text-xs">Loading platform configuration...</div>
       ) : (
-        <form onSubmit={handleSubmit} className="bg-[#11141c] border border-zinc-800 rounded-3xl p-6 space-y-6">
-          <div className="grid sm:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* PAYMENT GATEWAY MANAGEMENT SECTION */}
+          <div className="p-5 sm:p-6 bg-[#1C0B12] border border-[#8F1D3A]/30 rounded-3xl space-y-5 shadow-2xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#8F1D3A]/20 text-[#A52A4A] flex items-center justify-center">
+                  <CreditCard className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-white">Payment Gateway Infrastructure</h3>
+                  <p className="text-[11px] text-zinc-400">
+                    Supports Paystack, Flutterwave, and Korapay without hardcoded secrets.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleRefreshPaymentStatus}
+                disabled={refreshingPayments}
+                className="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer self-start sm:self-auto"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${refreshingPayments ? 'animate-spin' : ''}`} />
+                <span>Test Gateway Status</span>
+              </button>
+            </div>
+
+            {/* Active Provider Selector */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-zinc-300">
+                Active Payment Provider Routing
+              </label>
+              <select
+                value={paymentProvider}
+                onChange={(e) => setPaymentProvider(e.target.value as any)}
+                className="w-full bg-[#12151f] border border-zinc-700 rounded-xl px-4 py-3 text-white text-xs font-bold focus:outline-none focus:border-amber-500 transition-colors cursor-pointer"
+              >
+                <option value="auto">Auto-Detect (Prioritizes first configured provider with valid credentials)</option>
+                <option value="paystack">Force Paystack Gateway</option>
+                <option value="flutterwave">Force Flutterwave Gateway</option>
+                <option value="korapay">Force Korapay Gateway</option>
+              </select>
+              <p className="text-[11px] text-zinc-400">
+                Current active provider resolved by backend:{' '}
+                <span className="font-bold text-amber-400 uppercase">
+                  {paymentOverview?.activeProvider || 'None Configured'}
+                </span>
+              </p>
+            </div>
+
+            {/* Provider Grid Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+              {paymentOverview?.providers.map((prov) => {
+                const webhookUrl = `${window.location.origin}/api/payments/webhook/${prov.id}`;
+                return (
+                  <div
+                    key={prov.id}
+                    className={`p-4 rounded-2xl border transition-all ${
+                      prov.isConfigured
+                        ? 'bg-[#121622] border-[#8F1D3A]/30'
+                        : 'bg-[#121622] border-zinc-800'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-black text-sm text-white">{prov.name}</span>
+                      {prov.isConfigured ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#8F1D3A]/20 text-[#A52A4A] border border-[#8F1D3A]/30 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" /> Ready
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                          Missing Keys
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="mt-3 space-y-2 text-[11px]">
+                      {prov.isConfigured ? (
+                        <p className="text-[#A52A4A]/90 font-medium">
+                          ✓ Secret key configured in environment. Available for deposits.
+                        </p>
+                      ) : (
+                        <div className="text-zinc-400 space-y-1">
+                          <p className="text-amber-400/90 font-semibold">Missing environment variables:</p>
+                          <ul className="list-disc list-inside text-[10px] font-mono text-zinc-300">
+                            {prov.missingVariables.map((v) => (
+                              <li key={v}>{v}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      <div className="pt-2 border-t border-zinc-800 space-y-1">
+                        <span className="text-[10px] text-zinc-400 uppercase tracking-wider block">
+                          Webhook URL
+                        </span>
+                        <div className="flex items-center gap-1 bg-black/40 px-2 py-1.5 rounded-lg font-mono text-[10px] text-zinc-300">
+                          <span className="truncate flex-1">{webhookUrl}</span>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard(webhookUrl, prov.id)}
+                            className="text-zinc-400 hover:text-white transition-colors"
+                            title="Copy Webhook URL"
+                          >
+                            {copiedUrl === prov.id ? (
+                              <Check className="w-3 h-3 text-[#A52A4A]" />
+                            ) : (
+                              <Copy className="w-3 h-3" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* GENERAL PLATFORM SETTINGS */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-zinc-300 mb-1">Application Branding Name</label>
+              <label className="block text-xs font-bold text-zinc-300 mb-1">Platform Brand Name</label>
               <input
                 type="text"
                 required
                 value={appName}
                 onChange={(e) => setAppName(e.target.value)}
-                className="w-full bg-[#171b26] border border-zinc-800 rounded-xl px-4 py-3 text-white text-xs font-bold focus:outline-none focus:border-amber-500"
+                className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-amber-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-zinc-300 mb-1">Official Support Email</label>
+              <label className="block text-xs font-bold text-zinc-300 mb-1">Support Email</label>
               <input
                 type="email"
                 required
                 value={supportEmail}
                 onChange={(e) => setSupportEmail(e.target.value)}
-                className="w-full bg-[#171b26] border border-zinc-800 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-amber-500"
+                className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-amber-500"
               />
             </div>
-          </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-xs font-bold text-zinc-300 mb-1">Telegram Community Link</label>
               <input
                 type="text"
                 value={telegramChannel}
                 onChange={(e) => setTelegramChannel(e.target.value)}
-                className="w-full bg-[#171b26] border border-zinc-800 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-amber-500"
+                className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-amber-500"
               />
             </div>
 
@@ -134,7 +297,7 @@ export const AdminSettingsPage: React.FC = () => {
                 required
                 value={minDeposit}
                 onChange={(e) => setMinDeposit(e.target.value)}
-                className="w-full bg-[#171b26] border border-zinc-800 rounded-xl px-4 py-3 text-amber-400 font-bold text-xs focus:outline-none focus:border-amber-500"
+                className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl px-4 py-3 text-amber-400 font-bold text-xs focus:outline-none focus:border-amber-500"
               />
             </div>
 
@@ -145,7 +308,7 @@ export const AdminSettingsPage: React.FC = () => {
                 required
                 value={minWithdrawal}
                 onChange={(e) => setMinWithdrawal(e.target.value)}
-                className="w-full bg-[#171b26] border border-zinc-800 rounded-xl px-4 py-3 text-amber-400 font-bold text-xs focus:outline-none focus:border-amber-500"
+                className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl px-4 py-3 text-amber-400 font-bold text-xs focus:outline-none focus:border-amber-500"
               />
             </div>
 
@@ -156,7 +319,7 @@ export const AdminSettingsPage: React.FC = () => {
                 required
                 value={activationFeeAmount}
                 onChange={(e) => setActivationFeeAmount(e.target.value)}
-                className="w-full bg-[#171b26] border border-zinc-800 rounded-xl px-4 py-3 text-amber-400 font-bold text-xs focus:outline-none focus:border-amber-500"
+                className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl px-4 py-3 text-amber-400 font-bold text-xs focus:outline-none focus:border-amber-500"
               />
             </div>
           </div>
@@ -168,11 +331,11 @@ export const AdminSettingsPage: React.FC = () => {
               value={announcementBanner}
               onChange={(e) => setAnnouncementBanner(e.target.value)}
               placeholder="e.g. Welcome to Nivo Cash App! Refer friends and earn ₦1,200 per user!"
-              className="w-full bg-[#171b26] border border-zinc-800 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-amber-500"
+              className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-amber-500"
             />
           </div>
 
-          <div className="p-4 bg-[#171b26] border border-zinc-800 rounded-2xl flex items-center justify-between">
+          <div className="p-4 bg-[#1C0B12] border border-zinc-800 rounded-2xl flex items-center justify-between">
             <div>
               <p className="text-xs font-bold text-white flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 text-amber-400" />

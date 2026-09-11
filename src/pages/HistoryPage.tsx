@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { History, Search, Filter, ArrowUpRight, PlusCircle, Sparkles } from 'lucide-react';
+import { History, Search, ArrowDownLeft, ArrowUpRight, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { Transaction } from '../types';
 import { api } from '../lib/api';
 
@@ -32,25 +32,27 @@ export const HistoryPage: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6 animate-fade-in pb-12">
+    <div className="space-y-5 animate-fade-in pb-20">
       <div>
-        <h1 className="text-2xl font-black text-white flex items-center gap-2">
-          <History className="w-6 h-6 text-orange-400" />
+        <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+          <History className="w-6 h-6 text-[#C13A5A]" />
           Full Transaction History
         </h1>
-        <p className="text-xs text-zinc-400 mt-1">Audit log of all deposits, withdrawals, task rewards, and referral bonuses</p>
+        <p className="text-xs text-slate-400 mt-1">
+          Audit log of all deposits, withdrawals, task rewards, and referral bonuses
+        </p>
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="bg-[#12151c] border border-zinc-800 rounded-3xl p-4 flex flex-col md:flex-row gap-3 justify-between items-center">
-        <div className="relative w-full md:w-72">
-          <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+      <div className="bg-[#240A12]/80 backdrop-blur-md border border-white/10 rounded-3xl p-4 flex flex-col md:flex-row gap-3 justify-between items-center shadow-xl">
+        <div className="relative w-full md:w-80">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by reference or note..."
-            className="w-full bg-[#181d28] border border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-white text-xs focus:outline-none focus:border-orange-500"
+            className="w-full bg-[#240A12] border border-[#8F1D3A]/20 rounded-2xl pl-10 pr-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#C13A5A] transition-colors"
           />
         </div>
 
@@ -59,10 +61,10 @@ export const HistoryPage: React.FC = () => {
             <button
               key={type}
               onClick={() => setFilterType(type)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer ${
                 filterType === type
-                  ? 'bg-orange-500 text-black shadow-md'
-                  : 'bg-[#181d28] text-zinc-400 hover:text-white border border-zinc-800'
+                  ? 'bg-gradient-to-r from-[#7A1831] to-[#A52A4A] text-white shadow-lg shadow-[#7A1831]/25'
+                  : 'bg-[#240A12] text-slate-400 hover:text-white border border-white/10'
               }`}
             >
               {type === 'all' ? 'All Types' : type.replace('_', ' ').toUpperCase()}
@@ -71,54 +73,83 @@ export const HistoryPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Transactions Table */}
-      <div className="bg-[#12151c] border border-zinc-800 rounded-3xl p-6">
+      {/* Transactions List */}
+      <div className="bg-[#240A12]/80 backdrop-blur-md border border-white/10 rounded-3xl p-5 shadow-xl">
         {loading ? (
-          <div className="text-center py-10 text-zinc-500 text-xs">Loading history...</div>
+          <div className="text-center py-12 text-slate-500 text-xs font-semibold">
+            Loading transaction history...
+          </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-10 text-zinc-500 text-xs">No matching transaction records found.</div>
+          <div className="text-center py-12 text-slate-500 text-xs font-semibold">
+            No matching transaction records found.
+          </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-zinc-800 text-zinc-500 font-bold uppercase text-[10px]">
-                  <th className="py-3 px-3">Reference</th>
-                  <th className="py-3 px-3">Type</th>
-                  <th className="py-3 px-3">Description</th>
-                  <th className="py-3 px-3">Amount</th>
-                  <th className="py-3 px-3">Status</th>
-                  <th className="py-3 px-3">Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800/60 font-medium text-zinc-300">
-                {filtered.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-[#181d28] transition-colors">
-                    <td className="py-3 px-3 font-mono text-[11px] font-bold text-zinc-400">{tx.reference}</td>
-                    <td className="py-3 px-3 uppercase text-[10px] font-bold text-amber-400">
-                      {tx.type.replace('_', ' ')}
-                    </td>
-                    <td className="py-3 px-3 font-semibold text-white">{tx.description}</td>
-                    <td className="py-3 px-3 font-black text-amber-400">₦{tx.amount.toLocaleString()}</td>
-                    <td className="py-3 px-3">
-                      <span
-                        className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
-                          tx.status === 'completed' || tx.status === 'approved'
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : tx.status === 'pending'
-                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                            : 'bg-red-500/10 text-red-400 border border-red-500/20'
-                        }`}
-                      >
-                        {tx.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-3 text-zinc-500 text-[11px]">
-                      {new Date(tx.createdAt).toLocaleString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="space-y-3">
+            {filtered.map((tx) => {
+              const isCredit =
+                tx.type.includes('deposit') ||
+                tx.type.includes('bonus') ||
+                tx.type.includes('reward');
+
+              return (
+                <div
+                  key={tx.id}
+                  className="p-4 rounded-2xl bg-[#240A12] border border-white/5 hover:border-[#8F1D3A]/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div
+                      className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
+                        isCredit
+                          ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20'
+                          : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                      }`}
+                    >
+                      {isCredit ? (
+                        <ArrowDownLeft className="w-5 h-5" />
+                      ) : (
+                        <ArrowUpRight className="w-5 h-5" />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-black uppercase text-[#C13A5A] bg-[#A52A4A]/10 border border-[#A52A4A]/20 px-2 py-0.5 rounded-full">
+                          {tx.type.replace('_', ' ')}
+                        </span>
+                        <span className="font-mono text-[10px] text-slate-400 font-bold">{tx.reference}</span>
+                      </div>
+                      <p className="text-xs font-bold text-white mt-1 truncate">{tx.description}</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">
+                        {new Date(tx.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-white/5">
+                    <span className="text-sm font-black text-white font-mono">
+                      {isCredit ? '+' : '-'}₦{tx.amount.toLocaleString()}
+                    </span>
+                    <span
+                      className={`text-[9px] font-bold px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 mt-0.5 ${
+                        tx.status === 'completed' || tx.status === 'approved'
+                          ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20'
+                          : tx.status === 'pending'
+                          ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                          : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                      }`}
+                    >
+                      {tx.status === 'completed' || tx.status === 'approved' ? (
+                        <CheckCircle2 className="w-3 h-3" />
+                      ) : tx.status === 'pending' ? (
+                        <Clock className="w-3 h-3" />
+                      ) : (
+                        <XCircle className="w-3 h-3" />
+                      )}
+                      <span>{tx.status}</span>
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

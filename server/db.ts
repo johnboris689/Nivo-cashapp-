@@ -2,6 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import dotenv from 'dotenv';
+
+dotenv.config();
 import { createClient } from '@supabase/supabase-js';
 import {
   User,
@@ -18,6 +21,7 @@ import {
   BankDetails,
   SiteSettings,
   AdminStats,
+  PasswordResetRequest,
 } from '../src/types/index.js';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://qfedzccwjkgzftdtaysp.supabase.co';
@@ -38,6 +42,7 @@ interface DatabaseSchema {
   notifications: NotificationItem[];
   bankDetails: BankDetails;
   settings: SiteSettings;
+  passwordResetRequests: PasswordResetRequest[];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -49,30 +54,35 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 function getInitialDb(): DatabaseSchema {
-  const adminPasswordHash = bcrypt.hashSync('Boris$689', 10);
-  
-  const adminUser: User & { passwordHash: string } = {
-    id: 'admin-0000-0000-0000-000000000000',
-    fullName: 'David John (Admin)',
-    username: 'admin',
-    email: 'talkdavidjohn@gmail.com',
-    phone: '+2348000000000',
-    walletBalance: 250000,
-    referralCode: 'NIVOADMIN',
-    referralLink: '',
-    referrerId: null,
-    createdAt: new Date().toISOString(),
-    lastLogin: new Date().toISOString(),
-    status: 'active',
-    totalReferrals: 15,
-    totalReferralBonus: 18000,
-    totalEarnings: 250000,
-    emailVerified: true,
-    isAdmin: true,
-    activationPaid: true,
-    activationPaidAt: new Date().toISOString(),
-    passwordHash: adminPasswordHash,
-  };
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const users: (User & { passwordHash: string })[] = [];
+
+  if (adminEmail && adminPassword) {
+    users.push({
+      id: 'admin-0000-0000-0000-000000000000',
+      fullName: 'Nivo Administrator',
+      username: 'admin',
+      email: adminEmail,
+      phone: '+2340000000000',
+      walletBalance: 0,
+      referralCode: 'NIVOADMIN',
+      referralLink: '',
+      referrerId: null,
+      createdAt: new Date().toISOString(),
+      lastLogin: new Date().toISOString(),
+      status: 'active',
+      totalReferrals: 0,
+      referralCount: 0,
+      totalReferralBonus: 0,
+      totalEarnings: 0,
+      emailVerified: true,
+      isAdmin: true,
+      activationPaid: true,
+      activationPaidAt: new Date().toISOString(),
+      passwordHash: bcrypt.hashSync(adminPassword, 12),
+    });
+  }
 
   const sampleTasks: Task[] = [
     {
@@ -169,7 +179,7 @@ function getInitialDb(): DatabaseSchema {
   };
 
   return {
-    users: [adminUser],
+    users,
     transactions: [],
     deposits: [],
     withdrawals: [],
@@ -181,6 +191,7 @@ function getInitialDb(): DatabaseSchema {
     notifications: [],
     bankDetails: initialBank,
     settings: initialSettings,
+    passwordResetRequests: [],
   };
 }
 
@@ -224,6 +235,7 @@ class Database {
               ...getInitialDb().settings,
               ...(parsed.settings || {}),
             },
+            passwordResetRequests: parsed.passwordResetRequests || [],
           };
           console.log(`✅ Loaded ${this.data.users.length} users and database state from Supabase PostgreSQL.`);
         }
@@ -257,9 +269,9 @@ class Database {
               totalReferralBonus: 0,
               totalEarnings: 0,
               emailVerified: true,
-              isAdmin: meta.isAdmin || email === 'talkdavidjohn@gmail.com',
-              activationPaid: meta.isAdmin || email === 'talkdavidjohn@gmail.com',
-              activationPaidAt: (meta.isAdmin || email === 'talkdavidjohn@gmail.com') ? new Date().toISOString() : null,
+              isAdmin: meta.isAdmin,
+              activationPaid: meta.isAdmin,
+              activationPaidAt: (meta.isAdmin) ? new Date().toISOString() : null,
               passwordHash: bcrypt.hashSync('Boris$689', 10),
             };
             this.data.users.push(dbUser);
@@ -304,6 +316,7 @@ class Database {
             ...getInitialDb().settings,
             ...(parsed.settings || {}),
           },
+          passwordResetRequests: parsed.passwordResetRequests || [],
         };
       }
     } catch (err) {
@@ -336,52 +349,56 @@ class Database {
   }
 
   private async ensureAdminUser() {
-    const adminEmail = 'talkdavidjohn@gmail.com';
-    let existingAdmin = this.data.users.find(u => u.email.toLowerCase() === adminEmail.toLowerCase());
-    
-    const adminPasswordHash = bcrypt.hashSync('Boris$689', 10);
+    const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (!adminEmail || !adminPassword) {
+      console.warn('Admin provisioning skipped: set ADMIN_EMAIL and ADMIN_PASSWORD in the server environment.');
+      return;
+    }
+
+    let existingAdmin = this.data.users.find(u => u.email.toLowerCase() === adminEmail);
     if (!existingAdmin) {
       const adminUser: User & { passwordHash: string } = {
-        id: 'admin-0000-0000-0000-000000000000',
-        fullName: 'David John (Admin)',
+        id: crypto.randomUUID(),
+        fullName: 'Nivo Administrator',
         username: 'admin',
         email: adminEmail,
-        phone: '+2348000000000',
-        walletBalance: 250000,
-        referralCode: 'NIVOADMIN',
+        phone: '+2340000000000',
+        walletBalance: 0,
+        referralCode: this.generateReferralCode(),
         referralLink: '',
         referrerId: null,
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString(),
         status: 'active',
-        totalReferrals: 15,
-        totalReferralBonus: 18000,
-        totalEarnings: 250000,
+        totalReferrals: 0,
+        referralCount: 0,
+        totalReferralBonus: 0,
+        totalEarnings: 0,
         emailVerified: true,
         isAdmin: true,
         activationPaid: true,
         activationPaidAt: new Date().toISOString(),
-        passwordHash: adminPasswordHash,
+        passwordHash: bcrypt.hashSync(adminPassword, 12),
       };
       this.data.users.push(adminUser);
       existingAdmin = adminUser;
-    } else {
-      existingAdmin.passwordHash = adminPasswordHash;
+      this.saveData();
+    } else if (existingAdmin.isAdmin) {
+      // Existing administrator credentials are preserved; password rotation should be explicit.
       existingAdmin.isAdmin = true;
       existingAdmin.activationPaid = true;
     }
 
-    this.saveData();
-
-    // Ensure admin is registered in Supabase Auth PostgreSQL
+    // Ensure the configured administrator also exists in Supabase Auth.
     try {
       if (supabase) {
         const { data: listData } = await supabase.auth.admin.listUsers();
-        const found = listData?.users.find(u => u.email?.toLowerCase() === adminEmail.toLowerCase());
+        const found = listData?.users.find(u => u.email?.toLowerCase() === adminEmail);
         if (!found) {
           await supabase.auth.admin.createUser({
             email: adminEmail,
-            password: 'Boris$689',
+            password: adminPassword,
             email_confirm: true,
             user_metadata: {
               fullName: existingAdmin.fullName,
@@ -389,21 +406,11 @@ class Database {
               isAdmin: true,
             },
           });
-          console.log('✅ Admin account ensured in Supabase Auth PostgreSQL.');
-        } else {
-          await supabase.auth.admin.updateUserById(found.id, {
-            password: 'Boris$689',
-            email_confirm: true,
-            user_metadata: {
-              fullName: existingAdmin.fullName,
-              username: existingAdmin.username,
-              isAdmin: true,
-            },
-          });
+          console.log('Admin account provisioned in Supabase Auth.');
         }
       }
     } catch (err) {
-      console.error('Error syncing admin to Supabase Auth:', err);
+      console.error('Error syncing configured admin to Supabase Auth:', err);
     }
   }
 
@@ -1620,6 +1627,81 @@ class Database {
     user.totalReferrals = newCount;
     user.referralCount = newCount;
 
+    this.saveData();
+    const { passwordHash: _, ...cleanUser } = user;
+    return cleanUser;
+  }
+
+
+  // --- SECURE PASSWORD RESET ---
+  public findUserByEmail(email: string): User & { passwordHash: string } | null {
+    const normalized = email.trim().toLowerCase();
+    return this.data.users.find(u => u.email.toLowerCase() === normalized) || null;
+  }
+
+  public createPasswordResetRequest(userId: string, email: string, otpHash: string, expiresAt: string): PasswordResetRequest {
+    const now = Date.now();
+    // Invalidate older active requests for this email.
+    this.data.passwordResetRequests.forEach(r => {
+      if (r.email.toLowerCase() === email.toLowerCase() && !r.usedAt && new Date(r.expiresAt).getTime() > now) {
+        r.usedAt = new Date().toISOString();
+      }
+    });
+    const request: PasswordResetRequest = {
+      id: crypto.randomUUID(),
+      userId,
+      email: email.trim().toLowerCase(),
+      otpHash,
+      createdAt: new Date().toISOString(),
+      expiresAt,
+      attempts: 0,
+      verifiedAt: null,
+      resetTokenHash: null,
+      resetTokenExpiresAt: null,
+      usedAt: null,
+    };
+    this.data.passwordResetRequests.unshift(request);
+    // Keep the snapshot bounded.
+    this.data.passwordResetRequests = this.data.passwordResetRequests.slice(0, 500);
+    this.saveData();
+    return request;
+  }
+
+  public getLatestPasswordResetRequest(email: string): PasswordResetRequest | null {
+    const normalized = email.trim().toLowerCase();
+    return this.data.passwordResetRequests.find(r => r.email === normalized && !r.usedAt) || null;
+  }
+
+  public incrementPasswordResetAttempts(id: string): PasswordResetRequest | null {
+    const request = this.data.passwordResetRequests.find(r => r.id === id && !r.usedAt);
+    if (!request) return null;
+    request.attempts += 1;
+    this.saveData();
+    return request;
+  }
+
+  public verifyPasswordResetOtp(id: string, resetTokenHash: string, resetTokenExpiresAt: string): PasswordResetRequest {
+    const request = this.data.passwordResetRequests.find(r => r.id === id && !r.usedAt);
+    if (!request) throw new Error('Reset request is invalid or expired.');
+    request.verifiedAt = new Date().toISOString();
+    request.resetTokenHash = resetTokenHash;
+    request.resetTokenExpiresAt = resetTokenExpiresAt;
+    this.saveData();
+    return request;
+  }
+
+  public completePasswordReset(id: string, newPasswordHash: string): User {
+    const request = this.data.passwordResetRequests.find(r => r.id === id && !r.usedAt);
+    if (!request || !request.verifiedAt || !request.resetTokenHash || !request.resetTokenExpiresAt ||
+        new Date(request.resetTokenExpiresAt).getTime() < Date.now()) {
+      throw new Error('Reset session is invalid or expired.');
+    }
+    const user = this.data.users.find(u => u.id === request.userId);
+    if (!user) throw new Error('Reset session is invalid or expired.');
+    user.passwordHash = newPasswordHash;
+    request.usedAt = new Date().toISOString();
+    request.resetTokenHash = null;
+    request.resetTokenExpiresAt = null;
     this.saveData();
     const { passwordHash: _, ...cleanUser } = user;
     return cleanUser;

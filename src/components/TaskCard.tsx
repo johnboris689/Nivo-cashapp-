@@ -106,11 +106,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
   const getCategoryIcon = () => {
     switch (task.category) {
       case 'download':
-        return <Smartphone className="w-5 h-5 text-[#F27D26]" />;
+        return <Smartphone className="w-5 h-5 text-[#C13A5A]" />;
       case 'daily':
-        return <Calendar className="w-5 h-5 text-[#F27D26]" />;
+        return <Calendar className="w-5 h-5 text-[#C13A5A]" />;
       default:
-        return <Share2 className="w-5 h-5 text-[#F27D26]" />;
+        return <Share2 className="w-5 h-5 text-[#C13A5A]" />;
     }
   };
 
@@ -120,48 +120,48 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
     <div
       className={`p-6 rounded-3xl border transition-all duration-200 flex flex-col justify-between ${
         status === 'claimed'
-          ? 'bg-[#141414]/60 border-white/5 opacity-80'
+          ? 'bg-[#240A12]/50 border-white/5 opacity-85'
           : status === 'pending_verification'
-          ? 'bg-[#141414] border-amber-500/20 shadow-lg shadow-amber-500/5'
+          ? 'bg-[#240A12] border-amber-500/30 shadow-lg shadow-amber-500/5'
           : status === 'rejected'
-          ? 'bg-[#141414] border-red-500/20'
-          : 'bg-[#141414] border-white/5 hover:border-white/10'
+          ? 'bg-[#240A12] border-red-500/30'
+          : 'bg-[#240A12] border-[#8F1D3A]/20 hover:border-[#8F1D3A]/40 shadow-xl'
       }`}
     >
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <div className="p-2.5 rounded-2xl bg-black/40 border border-white/5 flex items-center gap-2">
+        <div className="flex items-center justify-between mb-3.5">
+          <div className="p-2.5 rounded-2xl bg-black/40 border border-[#8F1D3A]/20 flex items-center gap-2">
             {getCategoryIcon()}
-            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300">
               {verificationType === 'timer' ? `${timerDuration}s Timer` : 'Proof Required'}
             </span>
           </div>
-          <span className="text-sm font-bold text-[#F27D26] bg-[#F27D26]/10 px-3 py-1 rounded-full border border-[#F27D26]/20">
+          <span className="text-sm font-black text-[#C13A5A] bg-[#A52A4A]/10 px-3.5 py-1 rounded-full border border-[#A52A4A]/30 shadow-sm">
             +₦{task.rewardAmount.toLocaleString()}
           </span>
         </div>
 
-        <h3 className="font-bold text-white text-base leading-snug">{task.title}</h3>
-        <p className="text-xs text-gray-400 mt-2 leading-relaxed">{task.description}</p>
+        <h3 className="font-extrabold text-white text-base leading-snug">{task.title}</h3>
+        <p className="text-xs text-slate-400 mt-2 leading-relaxed">{task.description}</p>
 
         {/* Proof Instructions */}
         {verificationType === 'proof' && task.proofInstructions && status !== 'claimed' && (
-          <div className="mt-3 p-3 rounded-2xl bg-black/30 border border-white/5 text-[11px] text-zinc-300">
-            <span className="font-bold text-[#F27D26]">Instructions: </span>
+          <div className="mt-3.5 p-3 rounded-2xl bg-black/40 border border-white/10 text-[11px] text-slate-300">
+            <span className="font-bold text-[#C13A5A]">Instructions: </span>
             {task.proofInstructions}
           </div>
         )}
       </div>
 
       {/* Interactive Controls & Verification Area */}
-      <div className="mt-6 pt-4 border-t border-white/5 space-y-3">
+      <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
         {/* STATUS: CLAIMED */}
         {status === 'claimed' && (
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
               Verified & Earned
             </span>
-            <span className="flex items-center gap-1.5 bg-green-500/10 text-green-500 text-xs font-bold px-3.5 py-2 rounded-xl border border-green-500/20">
+            <span className="flex items-center gap-1.5 bg-[#8F1D3A]/10 text-[#A52A4A] text-xs font-bold px-3.5 py-2 rounded-xl border border-[#8F1D3A]/30">
               <Check className="w-4 h-4" />
               Reward Claimed
             </span>
@@ -170,13 +170,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
 
         {/* STATUS: PENDING VERIFICATION */}
         {status === 'pending_verification' && (
-          <div className="bg-amber-500/10 border border-amber-500/20 p-3.5 rounded-2xl space-y-1.5">
+          <div className="bg-amber-500/10 border border-amber-500/30 p-3.5 rounded-2xl space-y-1.5">
             <div className="flex items-center justify-between text-amber-400 font-bold text-xs">
               <span className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4 animate-spin text-amber-400" />
                 Under Admin Review
               </span>
-              <span className="text-[10px] bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/30">
+              <span className="text-[10px] bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/30">
                 Pending
               </span>
             </div>
@@ -184,7 +184,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
               Your submission proof is being verified. Reward will be added to your balance upon approval.
             </p>
             {submission?.proofText && (
-              <p className="text-[10px] text-zinc-400 font-mono bg-black/40 p-2 rounded-xl border border-white/5 truncate">
+              <p className="text-[10px] text-slate-300 font-mono bg-black/50 p-2 rounded-xl border border-white/10 truncate">
                 Submitted Proof: {submission.proofText}
               </p>
             )}
@@ -193,7 +193,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
 
         {/* STATUS: REJECTED */}
         {status === 'rejected' && (
-          <div className="bg-red-500/10 border border-red-500/20 p-3.5 rounded-2xl space-y-2">
+          <div className="bg-red-500/10 border border-red-500/30 p-3.5 rounded-2xl space-y-2">
             <div className="flex items-center justify-between text-red-400 font-bold text-xs">
               <span className="flex items-center gap-1.5">
                 <AlertTriangle className="w-4 h-4" />
@@ -206,7 +206,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
             <button
               onClick={handleStartTask}
               disabled={isStarting}
-              className="w-full mt-2 flex items-center justify-center gap-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 font-bold text-xs py-2 rounded-xl border border-red-500/30 transition-all cursor-pointer"
+              className="w-full mt-2 flex items-center justify-center gap-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 font-bold text-xs py-2.5 rounded-xl border border-red-500/30 transition-all cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               Retry Task Submission
@@ -217,13 +217,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
         {/* STATUS: NOT STARTED */}
         {status === 'not_started' && (
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
               {task.completionCount} Completed
             </span>
             <button
               onClick={handleStartTask}
               disabled={isStarting}
-              className="flex items-center gap-1.5 bg-[#F27D26] hover:bg-[#E6721F] disabled:opacity-50 text-black font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer"
+              className="flex items-center gap-1.5 bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] disabled:opacity-50 text-white font-bold text-xs px-4.5 py-2.5 rounded-xl shadow-md shadow-[#7A1831]/20 transition-all cursor-pointer"
             >
               {isStarting ? (
                 'Opening Link...'
@@ -244,18 +244,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
               <div className="space-y-2.5">
                 {/* Countdown Progress Bar */}
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-zinc-400 font-medium flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-[#F27D26] animate-pulse" />
+                  <span className="text-slate-400 font-medium flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-[#C13A5A] animate-pulse" />
                     Visit Duration Verification:
                   </span>
-                  <span className="font-mono font-bold text-[#F27D26]">
+                  <span className="font-mono font-bold text-[#C13A5A]">
                     {secondsLeft > 0 ? `${secondsLeft}s remaining` : 'Ready to Claim!'}
                   </span>
                 </div>
 
-                <div className="w-full bg-black/60 h-2 rounded-full overflow-hidden border border-white/5">
+                <div className="w-full bg-black/60 h-2 rounded-full overflow-hidden border border-white/10">
                   <div
-                    className="bg-[#F27D26] h-full transition-all duration-1000"
+                    className="bg-gradient-to-r from-[#8F1D3A] to-[#C13A5A] h-full transition-all duration-1000"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
@@ -265,8 +265,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
                   disabled={isSubmitting || secondsLeft > 0}
                   className={`w-full flex items-center justify-center gap-2 font-bold text-xs py-3 rounded-xl transition-all ${
                     secondsLeft > 0
-                      ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-white/5'
-                      : 'bg-green-500 hover:bg-green-600 text-black shadow-lg shadow-green-500/20 cursor-pointer animate-pulse'
+                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-white/10'
+                      : 'bg-[#8F1D3A] hover:bg-[#A52A4A] text-slate-950 font-black shadow-lg shadow-[#8F1D3A]/20 cursor-pointer animate-pulse'
                   }`}
                 >
                   {isSubmitting ? (
@@ -284,7 +284,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
             ) : (
               /* Proof input for proof-based tasks */
               <div className="space-y-2.5">
-                <label className="text-[11px] font-bold text-zinc-300 block">
+                <label className="text-[11px] font-bold text-slate-300 block">
                   Submit Proof of Completion:
                 </label>
                 <input
@@ -292,12 +292,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
                   value={proofText}
                   onChange={(e) => setProofText(e.target.value)}
                   placeholder="e.g. @your_username or profile handle"
-                  className="w-full bg-black/50 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#F27D26]"
+                  className="w-full bg-black/50 border border-[#8F1D3A]/30 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C13A5A]"
                 />
                 <button
                   onClick={handleSubmitProof}
                   disabled={isSubmitting || !proofText.trim()}
-                  className="w-full flex items-center justify-center gap-2 bg-[#F27D26] hover:bg-[#E6721F] disabled:opacity-50 text-black font-bold text-xs py-2.5 rounded-xl transition-all cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] disabled:opacity-50 text-white font-bold text-xs py-2.5 rounded-xl shadow-md transition-all cursor-pointer"
                 >
                   {isSubmitting ? (
                     'Submitting Proof...'
@@ -316,4 +316,3 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
     </div>
   );
 };
-
