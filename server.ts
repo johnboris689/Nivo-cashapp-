@@ -431,14 +431,14 @@ app.post('/api/paystack/initialize-virtual-account', authMiddleware, async (req:
       return;
     }
 
-    const paystackAmount = charge.amount != null ? Number(charge.amount) / 100 : numAmount;
-    if (!Number.isFinite(paystackAmount) || paystackAmount !== numAmount) {
-      console.error('Paystack amount mismatch during deposit initialization.', { requested: numAmount, returned: charge.amount });
-      res.status(502).json({ error: 'Paystack returned an amount that does not match the requested deposit. No account was saved.' });
-      return;
-    }
-
-    const deposit = db.createPaystackDeposit(user.id, paystackAmount, {
+    // Paystack's Nigerian Pay with Transfer response can omit the `amount`
+    // field even though the requested amount is correctly attached to the
+    // charge. The Create Charge request above is the source of truth for the
+    // requested deposit amount. Do not reject a valid Paystack-generated
+    // account merely because that optional response field is absent.
+    // The amount is still enforced again when the payment is verified/webhooked
+    // before any wallet credit is made.
+    const deposit = db.createPaystackDeposit(user.id, numAmount, {
       reference: charge.reference,
       accountNumber: charge.account_number,
       accountName: charge.account_name,

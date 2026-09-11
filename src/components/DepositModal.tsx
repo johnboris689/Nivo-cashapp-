@@ -203,7 +203,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
         <div className="px-5 py-4 sm:px-7 sm:py-5 border-b border-white/5 flex items-center justify-between shrink-0">
           <div>
             <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">Deposit Funds</h3>
-            <p className="text-[11px] sm:text-xs text-zinc-400">Choose your amount first. Paystack creates the temporary account only after you continue.</p>
+            <p className="text-[11px] sm:text-xs text-zinc-400">Choose your deposit amount to continue.</p>
           </div>
           <button
             onClick={onClose}
@@ -265,11 +265,6 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                     <ShieldCheck className="w-3.5 h-3.5" /> Instant Paystack Credit
                   </span>
                 </p>
-              </div>
-
-              <div className="nivo-glass-surface border border-white/5 rounded-2xl p-4 text-xs text-zinc-400 flex items-start gap-3">
-                <ShieldCheck className="w-5 h-5 text-[#A52A4A] shrink-0 mt-0.5" />
-                <p>After you tap Continue, Nivo Cash will securely request a new Paystack Pay with Transfer account for this exact amount. Nivo Cash does not generate or invent the account number.</p>
               </div>
 
               <button
