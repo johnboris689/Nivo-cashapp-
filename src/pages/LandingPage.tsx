@@ -32,7 +32,7 @@ export const LandingPage: React.FC = () => {
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#7A1831]/10 rounded-full blur-[150px] pointer-events-none" />
 
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 bg-[#240A12] border border-[#C13A5A]/30 px-4 py-1.5 rounded-full text-xs font-bold text-[#C13A5A] mb-8 shadow-lg shadow-[#C13A5A]/10">
+          <div className="inline-flex items-center gap-2 nivo-glass-surface border border-[#C13A5A]/30 px-4 py-1.5 rounded-full text-xs font-bold text-[#C13A5A] mb-8 shadow-lg shadow-[#C13A5A]/10">
             <Sparkles className="w-4 h-4 text-[#C13A5A]" />
             <span>Premier Digital Earnings & Wallet App</span>
           </div>
@@ -76,19 +76,19 @@ export const LandingPage: React.FC = () => {
 
           {/* Live Metrics Ticker */}
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-8 border-t border-white/10">
-            <div className="bg-[#240A12]/80 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-xl">
+            <div className="nivo-glass-surface p-6 rounded-3xl border border-white/10 shadow-xl">
               <p className="text-2xl font-black text-white font-mono">₦12.5M+</p>
               <p className="text-xs text-slate-400 mt-1">Total Paid Out</p>
             </div>
-            <div className="bg-[#240A12]/80 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-xl">
+            <div className="nivo-glass-surface p-6 rounded-3xl border border-white/10 shadow-xl">
               <p className="text-2xl font-black text-[#C13A5A] font-mono">₦1,200</p>
               <p className="text-xs text-slate-400 mt-1">Per Referral Bonus</p>
             </div>
-            <div className="bg-[#240A12]/80 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-xl">
+            <div className="nivo-glass-surface p-6 rounded-3xl border border-white/10 shadow-xl">
               <p className="text-2xl font-black text-white font-mono">48,000+</p>
               <p className="text-xs text-slate-400 mt-1">Active Members</p>
             </div>
-            <div className="bg-[#240A12]/80 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-xl">
+            <div className="nivo-glass-surface p-6 rounded-3xl border border-white/10 shadow-xl">
               <p className="text-2xl font-black text-[#A52A4A] font-mono">Instant</p>
               <p className="text-xs text-slate-400 mt-1">Bank Payouts</p>
             </div>
@@ -133,7 +133,7 @@ export const LandingPage: React.FC = () => {
                 </ul>
               </div>
 
-              <div className="bg-[#240A12] p-6 rounded-2xl border border-[#8F1D3A]/20 space-y-4">
+              <div className="nivo-glass-surface p-6 rounded-2xl border border-[#8F1D3A]/20 space-y-4">
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <span className="text-xs text-slate-400 font-bold uppercase">Sample Referral Link</span>
                   <span className="text-xs text-[#C13A5A] font-bold">Live Backend</span>
@@ -166,7 +166,7 @@ export const LandingPage: React.FC = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-[#240A12]/80 backdrop-blur-md p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#8F1D3A]/40 transition-all">
+          <div className="nivo-glass-surface p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#8F1D3A]/40 transition-all">
             <div className="w-12 h-12 rounded-xl bg-[#8F1D3A]/10 text-[#C13A5A] flex items-center justify-center font-bold">
               <Wallet className="w-6 h-6" />
             </div>
@@ -176,7 +176,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-[#240A12]/80 backdrop-blur-md p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#8F1D3A]/40 transition-all">
+          <div className="nivo-glass-surface p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#8F1D3A]/40 transition-all">
             <div className="w-12 h-12 rounded-xl bg-[#A52A4A]/10 text-[#C13A5A] flex items-center justify-center font-bold">
               <TrendingUp className="w-6 h-6" />
             </div>
@@ -186,7 +186,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-[#240A12]/80 backdrop-blur-md p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#8F1D3A]/40 transition-all">
+          <div className="nivo-glass-surface p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#8F1D3A]/40 transition-all">
             <div className="w-12 h-12 rounded-xl bg-[#8F1D3A]/10 text-[#A52A4A] flex items-center justify-center font-bold">
               <ShieldCheck className="w-6 h-6" />
             </div>
@@ -211,10 +211,6 @@ export const LandingPage: React.FC = () => {
           <p className="text-xs text-slate-400">
             © {new Date().getFullYear()} Nivo Cash App. All rights reserved. Premium Digital Fintech Platform.
           </p>
-
-          <Link to="/admin/login" className="text-xs text-slate-500 hover:text-[#C13A5A] transition-colors font-medium">
-            Admin Portal
-          </Link>
         </div>
       </footer>
     </div>

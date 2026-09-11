@@ -79,7 +79,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                 className={`pt-3 first:pt-0 p-3 rounded-2xl transition-all cursor-pointer ${
                   n.read
                     ? 'bg-transparent opacity-75'
-                    : 'bg-[#240A12] border border-[#8F1D3A]/20 shadow-md'
+                    : 'nivo-glass-surface border border-[#8F1D3A]/20 shadow-md'
                 }`}
               >
                 <div className="flex gap-3">
@@ -87,7 +87,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                     {n.type === 'success' ? (
                       <CheckCircle2 className="w-5 h-5 text-[#A52A4A]" />
                     ) : n.type === 'alert' || n.type === 'warning' ? (
-                      <AlertCircle className="w-5 h-5 text-amber-400" />
+                      <AlertCircle className="w-5 h-5 text-[#C13A5A]" />
                     ) : (
                       <Info className="w-5 h-5 text-[#C13A5A]" />
                     )}

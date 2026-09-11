@@ -158,7 +158,7 @@ Support: support@nivocash.app
           </div>
 
           {/* Detailed Transaction Card */}
-          <div className="bg-[#240A12] border border-white/10 rounded-2xl p-4 text-left space-y-2.5 text-xs">
+          <div className="nivo-glass-surface border border-white/10 rounded-2xl p-4 text-left space-y-2.5 text-xs">
             <div className="flex justify-between items-center py-1 border-b border-white/10">
               <span className="text-slate-400 font-medium">Recipient Name</span>
               <span className="font-bold text-white text-right">{data.recipientName}</span>
@@ -198,7 +198,7 @@ Support: support@nivocash.app
 
             <div className="flex justify-between items-center py-1 border-b border-white/10">
               <span className="text-slate-400 font-medium">Status</span>
-              <span className="font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded text-[10px] border border-amber-500/20">
+              <span className="font-bold text-[#C13A5A] bg-[#8F1D3A]/10 px-2 py-0.5 rounded text-[10px] border border-[#8F1D3A]/20">
                 Processing / Pending
               </span>
             </div>

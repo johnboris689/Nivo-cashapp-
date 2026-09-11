@@ -159,7 +159,7 @@ export const AdminUsersPage: React.FC = () => {
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
               ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
-              : 'bg-red-500/10 border-red-500/30 text-red-400'
+              : 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#C13A5A]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -168,7 +168,7 @@ export const AdminUsersPage: React.FC = () => {
       )}
 
       {/* Search Bar */}
-      <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-4">
+      <div className="nivo-glass-surface border border-zinc-800 rounded-3xl p-4">
         <div className="relative max-w-md">
           <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -176,13 +176,13 @@ export const AdminUsersPage: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, @username, email, or phone..."
-            className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-white text-xs focus:outline-none focus:border-amber-500"
+            className="w-full nivo-glass-surface border border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#8F1D3A]"
           />
         </div>
       </div>
 
       {/* Users Table */}
-      <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-6">
+      <div className="nivo-glass-surface border border-zinc-800 rounded-3xl p-6">
         {loading ? (
           <div className="text-center py-10 text-zinc-500 text-xs">Loading user accounts...</div>
         ) : filteredUsers.length === 0 ? (
@@ -203,12 +203,12 @@ export const AdminUsersPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-zinc-800/60 font-medium text-zinc-300">
                 {filteredUsers.map((u) => (
-                  <tr key={u.id} className="hover:bg-[#1C0B12] transition-colors">
+                  <tr key={u.id} className="hover:bg-[#240A12] transition-colors">
                     <td className="py-3 px-3">
                       <p className="font-bold text-white flex items-center gap-1.5">
                         {u.fullName}
                         {u.isAdmin && (
-                          <span className="text-[9px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30">
+                          <span className="text-[9px] bg-[#8F1D3A]/20 text-[#C13A5A] px-1.5 py-0.5 rounded border border-[#8F1D3A]/30">
                             ADMIN
                           </span>
                         )}
@@ -222,13 +222,13 @@ export const AdminUsersPage: React.FC = () => {
                     </td>
 
                     <td className="py-3 px-3">
-                      <p className="font-black text-amber-400">₦{u.walletBalance.toLocaleString()}</p>
+                      <p className="font-black text-[#C13A5A]">₦{u.walletBalance.toLocaleString()}</p>
                       <p className="text-[10px] text-zinc-500">Earnings: ₦{u.totalEarnings.toLocaleString()}</p>
                     </td>
 
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-2">
-                        <span className={`font-bold ${u.totalReferrals >= 5 ? 'text-[#A52A4A]' : 'text-amber-400'}`}>
+                        <span className={`font-bold ${u.totalReferrals >= 5 ? 'text-[#A52A4A]' : 'text-[#C13A5A]'}`}>
                           {u.totalReferrals} / 5
                         </span>
                         <button
@@ -250,7 +250,7 @@ export const AdminUsersPage: React.FC = () => {
                         className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border transition-all cursor-pointer ${
                           u.activationPaid
                             ? 'bg-[#8F1D3A]/20 text-[#A52A4A] border-[#8F1D3A]/30 hover:bg-[#8F1D3A]/30'
-                            : 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'
+                            : 'bg-[#8F1D3A]/20 text-[#C13A5A] border-[#8F1D3A]/30 hover:bg-[#8F1D3A]/30'
                         }`}
                         title="Click to toggle activation status"
                       >
@@ -263,7 +263,7 @@ export const AdminUsersPage: React.FC = () => {
                         className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                           u.status === 'active'
                             ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20'
-                            : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                            : 'bg-[#8F1D3A]/10 text-[#C13A5A] border border-[#8F1D3A]/20'
                         }`}
                       >
                         {u.status}
@@ -276,7 +276,7 @@ export const AdminUsersPage: React.FC = () => {
                           setSelectedUser(u);
                           setAdjustModalOpen(true);
                         }}
-                        className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-bold px-2 py-1 rounded-lg transition-all cursor-pointer"
+                        className="bg-[#8F1D3A]/10 hover:bg-[#8F1D3A]/20 text-[#C13A5A] border border-[#8F1D3A]/30 text-[10px] font-bold px-2 py-1 rounded-lg transition-all cursor-pointer"
                       >
                         Adjust Balance
                       </button>
@@ -285,7 +285,7 @@ export const AdminUsersPage: React.FC = () => {
                         onClick={() => handleToggleStatus(u)}
                         className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-all cursor-pointer ${
                           u.status === 'active'
-                            ? 'bg-red-500/10 text-red-400 border-red-500/30 hover:bg-red-500/20'
+                            ? 'bg-[#8F1D3A]/10 text-[#C13A5A] border-[#8F1D3A]/30 hover:bg-[#8F1D3A]/20'
                             : 'bg-[#8F1D3A]/10 text-[#A52A4A] border-[#8F1D3A]/30 hover:bg-[#8F1D3A]/20'
                         }`}
                       >
@@ -295,7 +295,7 @@ export const AdminUsersPage: React.FC = () => {
                       {!u.isAdmin && (
                         <button
                           onClick={() => handleDeleteUser(u.id, u.username)}
-                          className="p-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg transition-all cursor-pointer inline-block align-middle"
+                          className="p-1 bg-[#8F1D3A]/10 hover:bg-[#8F1D3A]/20 text-[#C13A5A] border border-[#8F1D3A]/30 rounded-lg transition-all cursor-pointer inline-block align-middle"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -312,7 +312,7 @@ export const AdminUsersPage: React.FC = () => {
       {/* Balance Adjust Modal */}
       {adjustModalOpen && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#16090D] border border-amber-500/30 rounded-3xl w-full max-w-md p-6 space-y-4">
+          <div className="nivo-glass-surface border border-[#8F1D3A]/30 rounded-3xl w-full max-w-md p-6 space-y-4">
             <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
               <div>
                 <h3 className="font-extrabold text-white text-base">Adjust Wallet Balance</h3>
@@ -327,9 +327,9 @@ export const AdminUsersPage: React.FC = () => {
             </div>
 
             <form onSubmit={handleAdjustSubmit} className="space-y-4">
-              <div className="bg-[#1C0B12] p-3 rounded-xl border border-zinc-800">
+              <div className="nivo-glass-surface p-3 rounded-xl border border-zinc-800">
                 <p className="text-xs text-zinc-400">Current Wallet Balance</p>
-                <p className="text-lg font-black text-amber-400">₦{selectedUser.walletBalance.toLocaleString()}</p>
+                <p className="text-lg font-black text-[#C13A5A]">₦{selectedUser.walletBalance.toLocaleString()}</p>
               </div>
 
               <div>
@@ -341,7 +341,7 @@ export const AdminUsersPage: React.FC = () => {
                     className={`py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
                       adjustType === 'credit'
                         ? 'bg-[#8F1D3A] text-black border-[#A52A4A]'
-                        : 'bg-[#1C0B12] text-zinc-400 border-zinc-800'
+                        : 'nivo-glass-surface text-zinc-400 border-zinc-800'
                     }`}
                   >
                     Credit (+)
@@ -351,8 +351,8 @@ export const AdminUsersPage: React.FC = () => {
                     onClick={() => setAdjustType('debit')}
                     className={`py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
                       adjustType === 'debit'
-                        ? 'bg-red-500 text-white border-red-400'
-                        : 'bg-[#1C0B12] text-zinc-400 border-zinc-800'
+                        ? 'bg-[#8F1D3A] text-white border-[#C13A5A]'
+                        : 'nivo-glass-surface text-zinc-400 border-zinc-800'
                     }`}
                   >
                     Debit (-)
@@ -369,7 +369,7 @@ export const AdminUsersPage: React.FC = () => {
                   value={adjustAmount}
                   onChange={(e) => setAdjustAmount(e.target.value)}
                   placeholder="Enter amount"
-                  className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl px-4 py-3 text-white text-sm font-bold focus:outline-none focus:border-amber-500"
+                  className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-white text-sm font-bold focus:outline-none focus:border-[#8F1D3A]"
                 />
               </div>
 
@@ -381,14 +381,14 @@ export const AdminUsersPage: React.FC = () => {
                   value={adjustReason}
                   onChange={(e) => setAdjustReason(e.target.value)}
                   placeholder="e.g. Manual task bonus correction"
-                  className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500"
+                  className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#8F1D3A]"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={actionLoading}
-                className="w-full bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-black font-extrabold text-xs py-3.5 rounded-xl transition-all cursor-pointer"
+                className="w-full bg-[#8F1D3A] hover:bg-[#A52A4A] disabled:opacity-50 text-black font-extrabold text-xs py-3.5 rounded-xl transition-all cursor-pointer"
               >
                 {actionLoading ? 'Processing...' : 'Apply Wallet Adjustment'}
               </button>
@@ -399,7 +399,7 @@ export const AdminUsersPage: React.FC = () => {
       {/* Referral Count Modal */}
       {refModalOpen && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#16090D] border border-amber-500/30 rounded-3xl w-full max-w-md p-6 space-y-4">
+          <div className="nivo-glass-surface border border-[#8F1D3A]/30 rounded-3xl w-full max-w-md p-6 space-y-4">
             <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
               <div>
                 <h3 className="font-extrabold text-white text-base">Modify Referral Count</h3>
@@ -414,13 +414,13 @@ export const AdminUsersPage: React.FC = () => {
             </div>
 
             <form onSubmit={handleSetReferrals} className="space-y-4">
-              <div className="bg-[#1C0B12] p-3.5 rounded-xl border border-zinc-800 flex justify-between items-center">
+              <div className="nivo-glass-surface p-3.5 rounded-xl border border-zinc-800 flex justify-between items-center">
                 <div>
                   <p className="text-xs text-zinc-400">Current Referrals</p>
-                  <p className="text-base font-black text-amber-400">{selectedUser.totalReferrals || 0} / 5</p>
+                  <p className="text-base font-black text-[#C13A5A]">{selectedUser.totalReferrals || 0} / 5</p>
                 </div>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                  (selectedUser.totalReferrals || 0) >= 5 ? 'bg-[#8F1D3A]/20 text-[#A52A4A]' : 'bg-amber-500/20 text-amber-400'
+                  (selectedUser.totalReferrals || 0) >= 5 ? 'bg-[#8F1D3A]/20 text-[#A52A4A]' : 'bg-[#8F1D3A]/20 text-[#C13A5A]'
                 }`}>
                   {(selectedUser.totalReferrals || 0) >= 5 ? 'Requirement Met ✅' : 'Below Threshold ❌'}
                 </span>
@@ -435,7 +435,7 @@ export const AdminUsersPage: React.FC = () => {
                   value={newRefCount}
                   onChange={(e) => setNewRefCount(e.target.value)}
                   placeholder="Enter total referrals count"
-                  className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl px-4 py-3 text-white text-sm font-bold focus:outline-none focus:border-amber-500"
+                  className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-white text-sm font-bold focus:outline-none focus:border-[#8F1D3A]"
                 />
               </div>
 
@@ -443,7 +443,7 @@ export const AdminUsersPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setNewRefCount('5')}
-                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-amber-400 font-bold text-xs py-2 rounded-xl border border-zinc-700 cursor-pointer"
+                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-[#C13A5A] font-bold text-xs py-2 rounded-xl border border-zinc-700 cursor-pointer"
                 >
                   Quick Set: 5 Referrals
                 </button>
@@ -452,7 +452,7 @@ export const AdminUsersPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={actionLoading}
-                className="w-full bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-black font-extrabold text-xs py-3.5 rounded-xl transition-all cursor-pointer"
+                className="w-full bg-[#8F1D3A] hover:bg-[#A52A4A] disabled:opacity-50 text-black font-extrabold text-xs py-3.5 rounded-xl transition-all cursor-pointer"
               >
                 {actionLoading ? 'Saving...' : 'Update Referral Count'}
               </button>

@@ -38,7 +38,7 @@ export const LoginPage: React.FC = () => {
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#7A1831]/10 rounded-full blur-[140px] pointer-events-none"></div>
 
-      <div className="w-full max-w-md bg-[#240A12]/90 backdrop-blur-xl border border-[#8F1D3A]/30 rounded-3xl p-8 shadow-2xl relative z-10">
+      <div className="w-full max-w-md nivo-glass-strong border border-[#8F1D3A]/30 rounded-3xl p-8 shadow-2xl relative z-10">
         {/* Logo Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2.5 mb-2">
@@ -54,8 +54,8 @@ export const LoginPage: React.FC = () => {
         </div>
 
         {error && (
-          <div className="mb-6 p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs flex items-center gap-2.5 font-semibold">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+          <div className="mb-6 p-3.5 bg-[#8F1D3A]/10 border border-[#8F1D3A]/30 rounded-xl text-[#C13A5A] text-xs flex items-center gap-2.5 font-semibold">
+            <AlertCircle className="w-4 h-4 shrink-0 text-[#C13A5A]" />
             <span>{error}</span>
           </div>
         )}
@@ -73,7 +73,7 @@ export const LoginPage: React.FC = () => {
                 value={emailOrUsername}
                 onChange={(e) => setEmailOrUsername(e.target.value)}
                 placeholder="email@example.com or username"
-                className="w-full bg-[#240A12] border border-[#8F1D3A]/20 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#C13A5A] transition-colors"
+                className="w-full nivo-glass-surface border border-[#8F1D3A]/20 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#C13A5A] transition-colors"
               />
             </div>
           </div>
@@ -93,7 +93,7 @@ export const LoginPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-[#240A12] border border-[#8F1D3A]/20 rounded-xl pl-10 pr-10 py-3 text-white text-sm focus:outline-none focus:border-[#C13A5A] transition-colors"
+                className="w-full nivo-glass-surface border border-[#8F1D3A]/20 rounded-xl pl-10 pr-10 py-3 text-white text-sm focus:outline-none focus:border-[#C13A5A] transition-colors"
               />
               <button
                 type="button"

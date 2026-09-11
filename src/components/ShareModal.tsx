@@ -79,7 +79,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ onClose }) => {
           </div>
 
           {/* Code Box */}
-          <div className="bg-[#240A12] border border-[#8F1D3A]/20 p-3.5 rounded-2xl flex items-center justify-between">
+          <div className="nivo-glass-surface border border-[#8F1D3A]/20 p-3.5 rounded-2xl flex items-center justify-between">
             <div>
               <p className="text-[10px] text-slate-400 uppercase font-bold">Referral Code</p>
               <p className="text-base font-mono font-bold text-[#C13A5A]">{referralCode}</p>
@@ -94,7 +94,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ onClose }) => {
           </div>
 
           {/* Link Box */}
-          <div className="bg-[#240A12] border border-white/10 p-3.5 rounded-2xl space-y-2">
+          <div className="nivo-glass-surface border border-white/10 p-3.5 rounded-2xl space-y-2">
             <p className="text-[10px] text-slate-400 uppercase font-bold">Referral Link</p>
             <p className="text-xs font-mono text-slate-300 break-all bg-[#090506] p-2.5 rounded-xl border border-white/10">
               {referralLink}

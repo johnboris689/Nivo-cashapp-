@@ -49,7 +49,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
     <div className="space-y-6 animate-fade-in pb-12">
       <div>
         <h1 className="text-2xl font-black text-white flex items-center gap-2">
-          <ArrowUpRight className="w-6 h-6 text-amber-400" />
+          <ArrowUpRight className="w-6 h-6 text-[#C13A5A]" />
           Withdrawal Requests Management
         </h1>
         <p className="text-xs text-zinc-400 mt-1">Review bank payout requests, approve or decline with auto-refund</p>
@@ -60,7 +60,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
               ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
-              : 'bg-red-500/10 border-red-500/30 text-red-400'
+              : 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#C13A5A]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -69,7 +69,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
       )}
 
       {/* Table */}
-      <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-6">
+      <div className="nivo-glass-surface border border-zinc-800 rounded-3xl p-6">
         {loading ? (
           <div className="text-center py-10 text-zinc-500 text-xs">Loading withdrawal applications...</div>
         ) : withdrawals.length === 0 ? (
@@ -89,13 +89,13 @@ export const AdminWithdrawalsPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-zinc-800/60 font-medium text-zinc-300">
                 {withdrawals.map((w) => (
-                  <tr key={w.id} className="hover:bg-[#1C0B12] transition-colors">
+                  <tr key={w.id} className="hover:bg-[#240A12] transition-colors">
                     <td className="py-3 px-3">
                       <p className="font-bold text-white">{w.userName}</p>
                       <p className="text-[10px] text-zinc-500">{w.userEmail}</p>
                     </td>
 
-                    <td className="py-3 px-3 font-black text-amber-400">₦{w.amount.toLocaleString()}</td>
+                    <td className="py-3 px-3 font-black text-[#C13A5A]">₦{w.amount.toLocaleString()}</td>
 
                     <td className="py-3 px-3">
                       <p className="font-bold text-white">{w.bankName}</p>
@@ -109,8 +109,8 @@ export const AdminWithdrawalsPage: React.FC = () => {
                           w.status === 'approved'
                             ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20'
                             : w.status === 'pending'
-                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                            : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                            ? 'bg-[#8F1D3A]/10 text-[#C13A5A] border border-[#8F1D3A]/20'
+                            : 'bg-[#8F1D3A]/10 text-[#C13A5A] border border-[#8F1D3A]/20'
                         }`}
                       >
                         {w.status}
@@ -132,7 +132,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
                           </button>
                           <button
                             onClick={() => handleReject(w.id)}
-                            className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-bold text-[10px] px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+                            className="bg-[#8F1D3A]/10 hover:bg-[#8F1D3A]/20 text-[#C13A5A] border border-[#8F1D3A]/30 font-bold text-[10px] px-3 py-1.5 rounded-lg transition-all cursor-pointer"
                           >
                             Decline & Refund
                           </button>

@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     try {
       const res = await api.getCurrentUser();
-      if (res.user.isAdmin || res.user.email.toLowerCase() === 'talkdavidjohn@gmail.com') {
+      if (res.user.isAdmin) {
         setAdminUser(res.user);
       } else {
         removeAdminToken();

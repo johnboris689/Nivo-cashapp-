@@ -184,6 +184,23 @@ export interface SiteSettings {
   supportEmail: string;
   telegramChannel?: string;
   telegramGroupUrl: string;
+  paymentProvider?: 'auto' | 'paystack' | 'flutterwave' | 'korapay';
+}
+
+export interface PaymentProviderStatus {
+  id: 'paystack' | 'flutterwave' | 'korapay';
+  name: string;
+  isConfigured: boolean;
+  missingVariables: string[];
+  requiredEnvVars: string[];
+  isDefault: boolean;
+  webhookUrl: string;
+}
+
+export interface PaymentOverviewResponse {
+  providers: PaymentProviderStatus[];
+  activeProvider: 'paystack' | 'flutterwave' | 'korapay' | null;
+  hasAnyConfigured: boolean;
 }
 
 export interface AdminStats {

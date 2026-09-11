@@ -74,14 +74,14 @@ export const AdminActivationsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-white flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-amber-500" />
+            <ShieldCheck className="w-6 h-6 text-[#8F1D3A]" />
             Activation Fee Verification
           </h1>
           <p className="text-xs text-zinc-400 mt-1">Review and approve user ₦520 activation fee bank payments</p>
         </div>
 
         {pendingCount > 0 && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 font-extrabold text-xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#8F1D3A]/20 border border-[#8F1D3A]/30 text-[#C13A5A] font-extrabold text-xs">
             <Clock className="w-3.5 h-3.5 animate-spin" />
             {pendingCount} Pending Approvals
           </span>
@@ -93,7 +93,7 @@ export const AdminActivationsPage: React.FC = () => {
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
               ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
-              : 'bg-red-500/10 border-red-500/30 text-red-400'
+              : 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#C13A5A]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -102,15 +102,15 @@ export const AdminActivationsPage: React.FC = () => {
       )}
 
       {/* Filters & Search */}
-      <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-1 bg-[#1C0B12] p-1 rounded-2xl border border-zinc-800 w-full sm:w-auto">
+      <div className="nivo-glass-surface border border-zinc-800 rounded-3xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-1 nivo-glass-surface p-1 rounded-2xl border border-zinc-800 w-full sm:w-auto">
           {(['pending', 'all', 'approved', 'rejected'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setFilter(tab)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all cursor-pointer ${
                 filter === tab
-                  ? 'bg-amber-500 text-black shadow-md'
+                  ? 'bg-[#8F1D3A] text-black shadow-md'
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
@@ -126,13 +126,13 @@ export const AdminActivationsPage: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search user, ref or sender..."
-            className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-white text-xs focus:outline-none focus:border-amber-500"
+            className="w-full nivo-glass-surface border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-white text-xs focus:outline-none focus:border-[#8F1D3A]"
           />
         </div>
       </div>
 
       {/* Requests Table */}
-      <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-6">
+      <div className="nivo-glass-surface border border-zinc-800 rounded-3xl p-6">
         {loading ? (
           <div className="text-center py-10 text-zinc-500 text-xs">Loading activation requests...</div>
         ) : filtered.length === 0 ? (
@@ -155,19 +155,19 @@ export const AdminActivationsPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-zinc-800/60 font-medium text-zinc-300">
                 {filtered.map((a) => (
-                  <tr key={a.id} className="hover:bg-[#1C0B12] transition-colors">
+                  <tr key={a.id} className="hover:bg-[#240A12] transition-colors">
                     <td className="py-3 px-3">
                       <p className="font-bold text-white">{a.userName}</p>
                       <p className="text-[11px] text-zinc-400">{a.userEmail}</p>
                     </td>
 
                     <td className="py-3 px-3">
-                      <span className="font-black text-amber-400">₦{a.amount.toLocaleString()}</span>
+                      <span className="font-black text-[#C13A5A]">₦{a.amount.toLocaleString()}</span>
                     </td>
 
                     <td className="py-3 px-3 font-bold text-white">{a.senderName}</td>
 
-                    <td className="py-3 px-3 font-mono font-bold text-amber-300">{a.paymentProofRef}</td>
+                    <td className="py-3 px-3 font-mono font-bold text-[#D46A83]">{a.paymentProofRef}</td>
 
                     <td className="py-3 px-3 text-zinc-400 text-[11px]">
                       {new Date(a.createdAt).toLocaleString()}
@@ -179,8 +179,8 @@ export const AdminActivationsPage: React.FC = () => {
                           a.status === 'approved'
                             ? 'bg-[#8F1D3A]/20 text-[#A52A4A] border border-[#8F1D3A]/30'
                             : a.status === 'pending'
-                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                            : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                            ? 'bg-[#8F1D3A]/20 text-[#C13A5A] border border-[#8F1D3A]/30'
+                            : 'bg-[#8F1D3A]/20 text-[#C13A5A] border border-[#8F1D3A]/30'
                         }`}
                       >
                         {a.status.toUpperCase()}
@@ -202,7 +202,7 @@ export const AdminActivationsPage: React.FC = () => {
                           <button
                             disabled={actionLoading === a.id}
                             onClick={() => handleReject(a.id)}
-                            className="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer inline-flex items-center gap-1"
+                            className="bg-[#8F1D3A]/20 hover:bg-[#8F1D3A]/30 text-[#C13A5A] border border-[#8F1D3A]/30 text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer inline-flex items-center gap-1"
                           >
                             <X className="w-3.5 h-3.5" />
                             <span>Reject</span>

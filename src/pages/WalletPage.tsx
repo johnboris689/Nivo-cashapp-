@@ -69,7 +69,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
           </button>
           <button
             onClick={onOpenWithdraw}
-            className="flex items-center gap-2 bg-[#1f2533] hover:bg-[#283042] text-white border border-zinc-700 font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer transition-all"
+            className="flex items-center gap-2 nivo-glass-surface hover:bg-[#240A12] text-white border border-zinc-700 font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer transition-all"
           >
             <ArrowUpRight className="w-4 h-4 text-[#A52A4A]" />
             Withdraw
@@ -85,21 +85,21 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
             <h2 className="text-4xl font-black text-white mt-2">
               ₦{user?.walletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
             </h2>
-            <p className="text-xs text-amber-400 font-semibold mt-2">
+            <p className="text-xs text-[#C13A5A] font-semibold mt-2">
               Lifetime Earnings: ₦{user?.totalEarnings.toLocaleString()}
             </p>
           </div>
 
           <div className="mt-6 pt-4 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-400">
             <span>Account Status: <strong className="text-[#A52A4A]">Active & Verified</strong></span>
-            <span>Ref Code: <strong className="text-amber-400 font-mono">{user?.referralCode}</strong></span>
+            <span>Ref Code: <strong className="text-[#C13A5A] font-mono">{user?.referralCode}</strong></span>
           </div>
         </div>
 
         {/* Automated Paystack Deposit Card */}
-        <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-6 space-y-3 flex flex-col justify-between">
+        <div className="nivo-glass-surface border border-zinc-800 rounded-3xl p-6 space-y-3 flex flex-col justify-between">
           <div>
-            <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span className="text-xs font-bold text-[#C13A5A] uppercase tracking-wider flex items-center gap-1.5">
               <Building2 className="w-4 h-4 text-[#8F1D3A]" />
               Paystack One-Time Transfer
             </span>
@@ -122,12 +122,12 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
       </div>
 
       {/* Transaction Feed */}
-      <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-6">
+      <div className="nivo-glass-surface border border-zinc-800 rounded-3xl p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <h3 className="font-extrabold text-white text-base">Wallet Activity Logs</h3>
 
           {/* Filter Tabs */}
-          <div className="flex bg-[#1C0B12] p-1 rounded-xl border border-zinc-800">
+          <div className="flex nivo-glass-surface p-1 rounded-xl border border-zinc-800">
             <button
               onClick={() => setActiveTab('all')}
               className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
@@ -164,14 +164,14 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
             {filteredTx.map((tx) => (
               <div
                 key={tx.id}
-                className="p-4 bg-[#1C0B12] rounded-2xl border border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-zinc-700 transition-all"
+                className="p-4 nivo-glass-surface rounded-2xl border border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-zinc-700 transition-all"
               >
                 <div className="flex items-center gap-3">
                   <div
                     className={`p-2.5 rounded-xl ${
                       tx.type.includes('deposit') || tx.type.includes('credit') || tx.type.includes('reward') || tx.type.includes('bonus')
                         ? 'bg-[#8F1D3A]/10 text-[#A52A4A]'
-                        : 'bg-red-500/10 text-red-400'
+                        : 'bg-[#8F1D3A]/10 text-[#C13A5A]'
                     }`}
                   >
                     {tx.type.includes('deposit') || tx.type.includes('credit') ? (
@@ -189,14 +189,14 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
                 </div>
 
                 <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center">
-                  <span className="text-sm font-black text-amber-400">₦{tx.amount.toLocaleString()}</span>
+                  <span className="text-sm font-black text-[#C13A5A]">₦{tx.amount.toLocaleString()}</span>
                   <span
                     className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full mt-1 ${
                       tx.status === 'completed' || tx.status === 'approved'
                         ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20'
                         : tx.status === 'pending'
-                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                        : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                        ? 'bg-[#8F1D3A]/10 text-[#C13A5A] border border-[#8F1D3A]/20'
+                        : 'bg-[#8F1D3A]/10 text-[#C13A5A] border border-[#8F1D3A]/20'
                     }`}
                   >
                     {tx.status}

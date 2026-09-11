@@ -116,7 +116,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="min-h-screen bg-[#090506] text-white flex flex-col font-sans">
       {/* Admin Top Header */}
-      <header className="bg-[#16090D] border-b border-white/5 sticky top-0 z-40">
+      <header className="nivo-glass-surface border-b border-white/5 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link to="/admin" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-[#8F1D3A] text-black flex items-center justify-center font-black">
@@ -133,7 +133,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </span>
             <button
               onClick={adminLogout}
-              className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all"
+              className="bg-[#8F1D3A]/10 hover:bg-[#8F1D3A]/20 text-[#C13A5A] border border-[#8F1D3A]/20 text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Logout</span>
@@ -144,7 +144,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
       <div className="flex-1 flex max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
         {/* Admin Navigation Sidebar */}
-        <aside className="hidden lg:block w-60 shrink-0 bg-[#16090D] border border-white/5 rounded-3xl p-4 h-fit sticky top-22">
+        <aside className="hidden lg:block w-60 shrink-0 nivo-glass-surface border border-white/5 rounded-3xl p-4 h-fit sticky top-22">
           <p className="text-[10px] font-extrabold text-[#8F1D3A] uppercase tracking-wider px-3 mb-3">
             Admin Management
           </p>

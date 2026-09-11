@@ -181,7 +181,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-[#12151e] border border-white/10 rounded-3xl w-full max-w-sm sm:max-w-md overflow-hidden shadow-2xl relative transform transition-all">
+      <div className="bg-[#16090D] border border-white/10 rounded-3xl w-full max-w-sm sm:max-w-md overflow-hidden shadow-2xl relative transform transition-all">
         {/* Toast Notification */}
         {toastMessage && (
           <div className="absolute top-3 left-1/2 -translate-x-1/2 z-50 bg-[#8F1D3A] text-black text-xs font-black px-3.5 py-1.5 rounded-full shadow-2xl flex items-center gap-1.5 animate-fade-in">
@@ -206,7 +206,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
 
         <div className="p-4 sm:p-5 max-h-[82vh] overflow-y-auto space-y-4">
           {error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs flex items-center gap-2 font-semibold">
+            <div className="p-3 bg-[#8F1D3A]/10 border border-[#8F1D3A]/20 rounded-xl text-[#C13A5A] text-xs flex items-center gap-2 font-semibold">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -229,7 +229,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                       className={`py-2.5 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                         amount === val
                           ? 'bg-[#8F1D3A] text-black border-transparent shadow-md shadow-[#8F1D3A]/20'
-                          : 'bg-[#1C0B12] text-zinc-300 border-white/5 hover:border-white/10 hover:bg-[#1f2432]'
+                          : 'nivo-glass-surface text-zinc-300 border-white/5 hover:border-white/10 hover:bg-[#240A12]'
                       }`}
                     >
                       ₦{val.toLocaleString()}
@@ -247,7 +247,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                     value={customAmount}
                     onChange={handleCustomChange}
                     placeholder="Enter deposit amount"
-                    className="w-full bg-[#1C0B12] border border-white/5 rounded-xl pl-8 pr-3 py-3 text-white text-sm font-bold focus:outline-none focus:border-[#8F1D3A] transition-colors"
+                    className="w-full nivo-glass-surface border border-white/5 rounded-xl pl-8 pr-3 py-3 text-white text-sm font-bold focus:outline-none focus:border-[#8F1D3A] transition-colors"
                   />
                 </div>
                 <p className="text-[11px] text-zinc-500 flex items-center justify-between font-medium">
@@ -280,8 +280,8 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
             <div className="space-y-4 animate-fade-in">
               {timeLeft <= 0 ? (
                 /* EXPIRED STATE */
-                <div className="bg-[#1C0B12] border border-red-500/20 rounded-2xl p-6 text-center space-y-3">
-                  <div className="w-10 h-10 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto">
+                <div className="nivo-glass-surface border border-[#8F1D3A]/20 rounded-2xl p-6 text-center space-y-3">
+                  <div className="w-10 h-10 bg-[#8F1D3A]/20 text-[#C13A5A] rounded-full flex items-center justify-center mx-auto">
                     <AlertCircle className="w-5 h-5" />
                   </div>
                   <div>
@@ -303,7 +303,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
               ) : (
                 <>
                   {/* Single Main Payment Card */}
-                  <div className="bg-[#1C0B12] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-xl">
+                  <div className="nivo-glass-surface border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-xl">
                     {/* Bank Name */}
                     <div className="flex justify-between items-center text-xs">
                       <span className="text-zinc-500">Receiving Bank</span>
@@ -313,7 +313,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                     {/* Account Number Box (Center & Large Display) */}
                     <div className="space-y-1">
                       <span className="text-[11px] text-zinc-500">Account Number</span>
-                      <div className="bg-[#12151e] border border-white/5 rounded-xl px-4 py-3 flex items-center justify-between">
+                      <div className="bg-[#16090D] border border-white/5 rounded-xl px-4 py-3 flex items-center justify-between">
                         <span className="text-xl sm:text-2xl font-mono font-black text-white tracking-widest">
                           {activeDeposit.accountNumber}
                         </span>
@@ -380,7 +380,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                   </div>
 
                   {/* Payment Instructions Box */}
-                  <div className="bg-[#1C0B12] border border-white/5 rounded-2xl p-4 space-y-2 text-xs">
+                  <div className="nivo-glass-surface border border-white/5 rounded-2xl p-4 space-y-2 text-xs">
                     <div className="flex items-start gap-2.5 text-zinc-300">
                       <span className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[11px] font-bold text-[#8F1D3A] shrink-0 mt-0.5">1</span>
                       <span>Open your banking app.</span>
@@ -458,7 +458,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                 </p>
               </div>
 
-              <div className="bg-[#1C0B12] border border-white/5 rounded-2xl p-4 text-xs space-y-2.5 text-left">
+              <div className="nivo-glass-surface border border-white/5 rounded-2xl p-4 text-xs space-y-2.5 text-left">
                 <div className="flex justify-between items-center text-zinc-400">
                   <span>Bank Name</span>
                   <span className="font-bold text-white">{cleanBankName}</span>

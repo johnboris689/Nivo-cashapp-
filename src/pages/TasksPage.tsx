@@ -39,7 +39,7 @@ export const TasksPage: React.FC = () => {
       particleCount: 100,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#2563eb', '#06b6d4', '#8F1D3A', '#ffffff'],
+      colors: ['#5A1024', '#7A1831', '#A52A4A', '#C13A5A', '#ffffff'],
     });
 
     setMsg({ type: 'success', text: message });
@@ -71,7 +71,7 @@ export const TasksPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="bg-[#240A12]/80 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-2xl flex items-center gap-3 shadow-lg shrink-0">
+        <div className="nivo-glass-surface border border-white/10 px-4 py-2.5 rounded-2xl flex items-center gap-3 shadow-lg shrink-0">
           <div>
             <p className="text-[10px] text-slate-400 font-bold uppercase">Claimable Cash</p>
             <p className="text-base font-black text-[#C13A5A]">₦{totalAvailableRewards.toLocaleString()}</p>
@@ -85,7 +85,7 @@ export const TasksPage: React.FC = () => {
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
               ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
-              : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+              : 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#C13A5A]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -94,7 +94,7 @@ export const TasksPage: React.FC = () => {
       )}
 
       {/* Progress Card */}
-      <div className="bg-[#240A12]/80 backdrop-blur-md border border-white/10 rounded-3xl p-5 shadow-xl">
+      <div className="nivo-glass-surface border border-white/10 rounded-3xl p-5 shadow-xl">
         <div className="flex justify-between items-center mb-2.5">
           <span className="text-xs font-bold text-white">Your Task Progress</span>
           <span className="text-xs font-mono text-[#C13A5A] font-bold">

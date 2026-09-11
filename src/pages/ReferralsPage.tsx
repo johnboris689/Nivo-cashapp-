@@ -93,7 +93,7 @@ export const ReferralsPage: React.FC = () => {
       {/* Referral Link & Code Cards Grid */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* Referral Code Box */}
-        <div className="bg-[#240A12]/80 backdrop-blur-md border border-[#8F1D3A]/30 rounded-3xl p-5 sm:p-6 relative overflow-hidden flex flex-col justify-between shadow-xl">
+        <div className="nivo-glass-surface border border-[#8F1D3A]/30 rounded-3xl p-5 sm:p-6 relative overflow-hidden flex flex-col justify-between shadow-xl">
           <div>
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-extrabold text-[#C13A5A] uppercase tracking-wider flex items-center gap-1.5">
@@ -105,7 +105,7 @@ export const ReferralsPage: React.FC = () => {
               </span>
             </div>
 
-            <div className="bg-[#240A12] border border-white/10 p-4 rounded-2xl flex items-center justify-between mt-2">
+            <div className="nivo-glass-surface border border-white/10 p-4 rounded-2xl flex items-center justify-between mt-2">
               <span className="text-2xl font-mono font-black text-white tracking-widest">
                 {user?.referralCode || 'NIVO123'}
               </span>
@@ -125,7 +125,7 @@ export const ReferralsPage: React.FC = () => {
         </div>
 
         {/* Referral Link Box */}
-        <div className="bg-[#240A12]/80 backdrop-blur-md border border-[#8F1D3A]/30 rounded-3xl p-5 sm:p-6 relative overflow-hidden flex flex-col justify-between shadow-xl">
+        <div className="nivo-glass-surface border border-[#8F1D3A]/30 rounded-3xl p-5 sm:p-6 relative overflow-hidden flex flex-col justify-between shadow-xl">
           <div>
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-extrabold text-[#C13A5A] uppercase tracking-wider flex items-center gap-1.5">
@@ -137,7 +137,7 @@ export const ReferralsPage: React.FC = () => {
               </span>
             </div>
 
-            <div className="bg-[#240A12] border border-white/10 p-3.5 rounded-2xl space-y-2 mt-2">
+            <div className="nivo-glass-surface border border-white/10 p-3.5 rounded-2xl space-y-2 mt-2">
               <p className="text-xs font-mono text-slate-300 truncate bg-[#090506] p-2 rounded-xl border border-white/10">
                 {user?.referralLink}
               </p>
@@ -151,7 +151,7 @@ export const ReferralsPage: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setShowShareModal(true)}
-                  className="flex items-center justify-center gap-1.5 bg-[#240A12] hover:bg-[#202E4C] text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-white/10 transition-all cursor-pointer"
+                  className="flex items-center justify-center gap-1.5 bg-[#240A12] hover:bg-[#350D18] text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-white/10 transition-all cursor-pointer"
                 >
                   <Share2 className="w-4 h-4 text-[#C13A5A]" />
                   <span>Share</span>
@@ -168,7 +168,7 @@ export const ReferralsPage: React.FC = () => {
 
       {/* Referral Statistics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-[#240A12]/80 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/10 shadow-lg">
+        <div className="nivo-glass-surface p-4 sm:p-5 rounded-2xl border border-white/10 shadow-lg">
           <p className="text-xs font-bold text-slate-400 uppercase">Total Earnings</p>
           <p className="text-2xl font-black text-[#C13A5A] mt-1">
             ₦{(stats?.totalReferralBonus || user?.totalReferralBonus || 0).toLocaleString()}
@@ -176,7 +176,7 @@ export const ReferralsPage: React.FC = () => {
           <p className="text-[10px] text-slate-500 mt-1">Lifetime referral payouts</p>
         </div>
 
-        <div className="bg-[#240A12]/80 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/10 shadow-lg">
+        <div className="nivo-glass-surface p-4 sm:p-5 rounded-2xl border border-white/10 shadow-lg">
           <p className="text-xs font-bold text-slate-400 uppercase">Total Referrals</p>
           <p className="text-2xl font-black text-white mt-1">
             {stats?.totalReferrals || user?.totalReferrals || 0}
@@ -184,7 +184,7 @@ export const ReferralsPage: React.FC = () => {
           <p className="text-[10px] text-slate-500 mt-1">Total referred members</p>
         </div>
 
-        <div className="bg-[#240A12]/80 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/10 shadow-lg">
+        <div className="nivo-glass-surface p-4 sm:p-5 rounded-2xl border border-white/10 shadow-lg">
           <p className="text-xs font-bold text-slate-400 uppercase">Successful</p>
           <p className="text-2xl font-black text-[#A52A4A] mt-1">
             {stats?.successfulReferrals || stats?.totalReferrals || user?.totalReferrals || 0}
@@ -192,7 +192,7 @@ export const ReferralsPage: React.FC = () => {
           <p className="text-[10px] text-slate-500 mt-1">Credited & active</p>
         </div>
 
-        <div className="bg-[#240A12]/80 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/10 shadow-lg">
+        <div className="nivo-glass-surface p-4 sm:p-5 rounded-2xl border border-white/10 shadow-lg">
           <p className="text-xs font-bold text-slate-400 uppercase">Pending</p>
           <p className="text-2xl font-black text-slate-400 mt-1">
             {stats?.pendingReferrals || 0}
@@ -202,7 +202,7 @@ export const ReferralsPage: React.FC = () => {
       </div>
 
       {/* Referred Users History List */}
-      <div className="bg-[#240A12]/80 backdrop-blur-md border border-white/10 rounded-3xl p-5 shadow-xl">
+      <div className="nivo-glass-surface border border-white/10 rounded-3xl p-5 shadow-xl">
         <h3 className="font-extrabold text-white text-base mb-4 flex items-center gap-2">
           <UserCheck className="w-5 h-5 text-[#C13A5A]" />
           Referred Users History
@@ -229,7 +229,7 @@ export const ReferralsPage: React.FC = () => {
             {stats.referralsList.map((ref) => (
               <div
                 key={ref.id}
-                className="p-3.5 rounded-2xl bg-[#240A12] border border-white/5 flex items-center justify-between"
+                className="p-3.5 rounded-2xl nivo-glass-surface border border-white/5 flex items-center justify-between"
               >
                 <div>
                   <p className="text-xs font-extrabold text-white">{ref.referredUserName}</p>

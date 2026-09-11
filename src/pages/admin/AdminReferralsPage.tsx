@@ -59,7 +59,7 @@ export const AdminReferralsPage: React.FC = () => {
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
               ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
-              : 'bg-red-500/10 border-red-500/30 text-red-400'
+              : 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#C13A5A]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -68,7 +68,7 @@ export const AdminReferralsPage: React.FC = () => {
       )}
 
       {/* Bonus Amount Configuration Form */}
-      <div className="bg-[#16090D] border border-amber-500/30 rounded-3xl p-6">
+      <div className="nivo-glass-surface border border-[#8F1D3A]/30 rounded-3xl p-6">
         <h2 className="text-base font-extrabold text-white mb-2">Global Referral Bonus Configuration</h2>
         <p className="text-xs text-zinc-400 mb-4">
           This amount is automatically credited to referrers when a new user registers using their code or link.
@@ -83,14 +83,14 @@ export const AdminReferralsPage: React.FC = () => {
               min={100}
               value={referralBonusAmount}
               onChange={(e) => setReferralBonusAmount(e.target.value)}
-              className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl px-4 py-3 text-amber-400 font-mono font-black text-base focus:outline-none focus:border-amber-500"
+              className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-[#C13A5A] font-mono font-black text-base focus:outline-none focus:border-[#8F1D3A]"
             />
           </div>
 
           <button
             type="submit"
             disabled={saving}
-            className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-black font-extrabold text-xs px-6 py-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+            className="bg-[#8F1D3A] hover:bg-[#A52A4A] disabled:opacity-50 text-black font-extrabold text-xs px-6 py-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
           >
             <Save className="w-4 h-4" />
             <span>{saving ? 'Updating...' : 'Save New Reward Amount'}</span>
@@ -99,7 +99,7 @@ export const AdminReferralsPage: React.FC = () => {
       </div>
 
       {/* System Referral Audit Table */}
-      <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-6">
+      <div className="nivo-glass-surface border border-zinc-800 rounded-3xl p-6">
         <h2 className="text-base font-extrabold text-white mb-4">Referral Activity Log</h2>
 
         {loading ? (
@@ -120,7 +120,7 @@ export const AdminReferralsPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-zinc-800/60 font-medium text-zinc-300">
                 {referrals.map((r) => (
-                  <tr key={r.id} className="hover:bg-[#1C0B12] transition-colors">
+                  <tr key={r.id} className="hover:bg-[#240A12] transition-colors">
                     <td className="py-3 px-3 font-bold text-white">
                       ID: {r.referrerId.slice(0, 8)}...
                     </td>
@@ -130,7 +130,7 @@ export const AdminReferralsPage: React.FC = () => {
                       <p className="text-[10px] text-zinc-500">{r.referredUserEmail}</p>
                     </td>
 
-                    <td className="py-3 px-3 font-black text-amber-400">₦{r.bonusAmount.toLocaleString()}</td>
+                    <td className="py-3 px-3 font-black text-[#C13A5A]">₦{r.bonusAmount.toLocaleString()}</td>
 
                     <td className="py-3 px-3">
                       <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20">

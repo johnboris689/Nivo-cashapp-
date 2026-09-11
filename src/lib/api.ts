@@ -1,4 +1,4 @@
-import { User, Transaction, DepositRequest, WithdrawalRequest, ActivationRequest, Task, NotificationItem, BankDetails, SiteSettings, AdminStats, ReferralRecord, TaskSubmission, TaskSubmissionStatus } from '../types';
+import { User, Transaction, DepositRequest, WithdrawalRequest, ActivationRequest, Task, NotificationItem, BankDetails, SiteSettings, AdminStats, ReferralRecord, TaskSubmission, TaskSubmissionStatus, PaymentOverviewResponse } from '../types';
 
 const TOKEN_KEY = 'nivo_auth_token';
 const ADMIN_TOKEN_KEY = 'nivo_admin_token';
@@ -82,6 +82,21 @@ export const api = {
     request<{ message: string }>('/api/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
+    }),
+
+  verifyPayment: (reference: string) =>
+    request<{ status: string; message?: string; reference?: string }>(`/api/payments/verify/${encodeURIComponent(reference)}`),
+
+  verifyResetOtp: (payload: { email: string; otp: string }) =>
+    request<{ message: string; resetToken: string }>('/api/auth/verify-reset-otp', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  resetPassword: (payload: { email: string; resetToken: string; newPassword: string; confirmPassword: string }) =>
+    request<{ message: string }>('/api/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     }),
 
   // --- Wallet & Paystack Automated Deposits ---
@@ -168,6 +183,8 @@ export const api = {
     }),
 
   getAdminStats: () => request<AdminStats>('/api/admin/stats', {}, true),
+
+  getAdminPaymentOverview: () => request<PaymentOverviewResponse>('/api/admin/payment-overview', {}, true),
 
   getAdminUsers: () => request<User[]>('/api/admin/users', {}, true),
 

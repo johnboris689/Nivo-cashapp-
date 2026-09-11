@@ -122,10 +122,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
         status === 'claimed'
           ? 'bg-[#240A12]/50 border-white/5 opacity-85'
           : status === 'pending_verification'
-          ? 'bg-[#240A12] border-amber-500/30 shadow-lg shadow-amber-500/5'
+          ? 'nivo-glass-surface border-[#8F1D3A]/30 shadow-lg shadow-[#8F1D3A]/5'
           : status === 'rejected'
-          ? 'bg-[#240A12] border-red-500/30'
-          : 'bg-[#240A12] border-[#8F1D3A]/20 hover:border-[#8F1D3A]/40 shadow-xl'
+          ? 'nivo-glass-surface border-[#8F1D3A]/30'
+          : 'nivo-glass-surface border-[#8F1D3A]/20 hover:border-[#8F1D3A]/40 shadow-xl'
       }`}
     >
       <div>
@@ -170,17 +170,17 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
 
         {/* STATUS: PENDING VERIFICATION */}
         {status === 'pending_verification' && (
-          <div className="bg-amber-500/10 border border-amber-500/30 p-3.5 rounded-2xl space-y-1.5">
-            <div className="flex items-center justify-between text-amber-400 font-bold text-xs">
+          <div className="bg-[#8F1D3A]/10 border border-[#8F1D3A]/30 p-3.5 rounded-2xl space-y-1.5">
+            <div className="flex items-center justify-between text-[#C13A5A] font-bold text-xs">
               <span className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 animate-spin text-amber-400" />
+                <Clock className="w-4 h-4 animate-spin text-[#C13A5A]" />
                 Under Admin Review
               </span>
-              <span className="text-[10px] bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/30">
+              <span className="text-[10px] bg-[#8F1D3A]/20 px-2.5 py-0.5 rounded-full border border-[#8F1D3A]/30">
                 Pending
               </span>
             </div>
-            <p className="text-[11px] text-amber-200/80 leading-relaxed">
+            <p className="text-[11px] text-[#E6B8C3]/80 leading-relaxed">
               Your submission proof is being verified. Reward will be added to your balance upon approval.
             </p>
             {submission?.proofText && (
@@ -193,20 +193,20 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onSuccess, onError }) 
 
         {/* STATUS: REJECTED */}
         {status === 'rejected' && (
-          <div className="bg-red-500/10 border border-red-500/30 p-3.5 rounded-2xl space-y-2">
-            <div className="flex items-center justify-between text-red-400 font-bold text-xs">
+          <div className="bg-[#8F1D3A]/10 border border-[#8F1D3A]/30 p-3.5 rounded-2xl space-y-2">
+            <div className="flex items-center justify-between text-[#C13A5A] font-bold text-xs">
               <span className="flex items-center gap-1.5">
                 <AlertTriangle className="w-4 h-4" />
                 Proof Rejected
               </span>
             </div>
-            <p className="text-[11px] text-red-200/80">
+            <p className="text-[11px] text-[#E6B8C3]/80">
               Reason: {submission?.adminNote || 'Invalid or unverified proof.'}
             </p>
             <button
               onClick={handleStartTask}
               disabled={isStarting}
-              className="w-full mt-2 flex items-center justify-center gap-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 font-bold text-xs py-2.5 rounded-xl border border-red-500/30 transition-all cursor-pointer"
+              className="w-full mt-2 flex items-center justify-center gap-2 bg-[#8F1D3A]/20 hover:bg-[#8F1D3A]/30 text-[#D46A83] font-bold text-xs py-2.5 rounded-xl border border-[#8F1D3A]/30 transition-all cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               Retry Task Submission

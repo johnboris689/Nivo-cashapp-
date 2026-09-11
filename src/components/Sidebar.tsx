@@ -7,15 +7,11 @@ import {
   CheckSquare,
   History,
   User,
-  ShieldCheck,
   Zap,
   Gift,
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 
 export const Sidebar: React.FC = () => {
-  const { user } = useAuth();
-
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Wallet & Bank', path: '/wallet', icon: Wallet },
@@ -84,28 +80,6 @@ export const Sidebar: React.FC = () => {
           );
         })}
       </div>
-
-      {/* Admin Link if Admin */}
-      {user?.isAdmin && (
-        <div className="pt-4 border-t border-white/10">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#C13A5A] px-3 mb-2">
-            Administration
-          </p>
-          <NavLink
-            to="/admin"
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all border ${
-                isActive
-                  ? 'bg-[#A52A4A] text-slate-950 border-transparent shadow-lg shadow-[#A52A4A]/20'
-                  : 'bg-[#A52A4A]/10 text-[#C13A5A] border-[#A52A4A]/30 hover:bg-[#A52A4A]/20'
-              }`
-            }
-          >
-            <ShieldCheck className="w-5 h-5" />
-            <span>Admin Control Panel</span>
-          </NavLink>
-        </div>
-      )}
 
       {/* Footer Info */}
       <div className="mt-auto pt-4 border-t border-white/10 text-center">

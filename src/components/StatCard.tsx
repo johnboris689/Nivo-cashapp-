@@ -29,8 +29,8 @@ export const StatCard: React.FC<StatCardProps> = ({
         onClick ? 'cursor-pointer hover:border-[#C13A5A]/40 hover:scale-[1.01] active:scale-[0.99]' : ''
       } ${
         highlight
-          ? 'bg-gradient-to-br from-[#121E38] via-[#0E172C] to-[#0A1020] border-[#A52A4A]/30 shadow-xl shadow-[#7A1831]/10'
-          : 'bg-[#240A12]/80 backdrop-blur-md border-white/10 hover:border-[#8F1D3A]/30'
+          ? 'bg-gradient-to-br from-[#240A12] via-[#16090D] to-[#100709] border-[#A52A4A]/30 shadow-xl shadow-[#7A1831]/10'
+          : 'nivo-glass-surface border-white/10 hover:border-[#8F1D3A]/30'
       }`}
     >
       <div className="flex items-center justify-between">
@@ -53,7 +53,7 @@ export const StatCard: React.FC<StatCardProps> = ({
 
       {trend && (
         <div className="mt-2.5 pt-2 border-t border-white/10 flex items-center gap-1 text-[11px] font-medium">
-          <span className={trendUp ? 'text-[#A52A4A]' : 'text-rose-400'}>{trend}</span>
+          <span className={trendUp ? 'text-[#A52A4A]' : 'text-[#C13A5A]'}>{trend}</span>
           <span className="text-slate-500">vs last week</span>
         </div>
       )}

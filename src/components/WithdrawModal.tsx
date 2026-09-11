@@ -237,7 +237,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
 
         <div className="p-4 sm:p-5 max-h-[80vh] overflow-y-auto space-y-4">
           {/* Balance info banner */}
-          <div className="bg-[#240A12] border border-[#8F1D3A]/20 p-3.5 rounded-2xl flex justify-between items-center">
+          <div className="nivo-glass-surface border border-[#8F1D3A]/20 p-3.5 rounded-2xl flex justify-between items-center">
             <div>
               <p className="text-[11px] text-slate-400 font-medium">Available Balance</p>
               <p className="text-base sm:text-lg font-black text-[#C13A5A]">
@@ -251,12 +251,12 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
 
           {/* WITHDRAWAL LOCKED WARNING BOX */}
           {isWithdrawalLocked ? (
-            <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 space-y-3">
+            <div className="bg-[#8F1D3A]/10 border border-[#8F1D3A]/30 rounded-2xl p-4 space-y-3">
               <div className="flex items-start gap-2.5">
-                <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                <ShieldAlert className="w-5 h-5 text-[#C13A5A] shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-xs font-bold text-amber-400">Withdrawal Locked</h4>
-                  <p className="text-[11px] text-amber-200/90 mt-0.5 leading-relaxed">
+                  <h4 className="text-xs font-bold text-[#C13A5A]">Withdrawal Locked</h4>
+                  <p className="text-[11px] text-[#E6B8C3]/90 mt-0.5 leading-relaxed">
                     {currentRefs < 5
                       ? 'You need 5 successful referrals before account activation.'
                       : 'Complete your first wallet deposit of ₦520 via Automated Virtual Account to activate instant withdrawals.'}
@@ -266,9 +266,9 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
 
               {currentRefs < 5 ? (
                 <div className="space-y-2">
-                  <div className="bg-[#240A12] p-3 rounded-xl border border-white/10 text-xs flex items-center justify-between">
+                  <div className="nivo-glass-surface p-3 rounded-xl border border-white/10 text-xs flex items-center justify-between">
                     <span className="text-slate-300 font-medium">Referral Goal</span>
-                    <span className="font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">
+                    <span className="font-bold px-2 py-0.5 rounded bg-[#8F1D3A]/20 text-[#C13A5A]">
                       {currentRefs} / 5 Done
                     </span>
                   </div>
@@ -303,7 +303,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
           ) : (
             <>
               {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs flex items-center gap-2 font-semibold">
+                <div className="p-3 bg-[#8F1D3A]/10 border border-[#8F1D3A]/20 rounded-xl text-[#C13A5A] text-xs flex items-center gap-2 font-semibold">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </div>
@@ -321,7 +321,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                         required
                         value={bankName}
                         onChange={handleBankSelect}
-                        className="w-full bg-[#240A12] border border-[#8F1D3A]/20 rounded-xl px-3.5 py-3 text-white text-xs font-medium focus:outline-none focus:border-[#C13A5A] transition-colors"
+                        className="w-full nivo-glass-surface border border-[#8F1D3A]/20 rounded-xl px-3.5 py-3 text-white text-xs font-medium focus:outline-none focus:border-[#C13A5A] transition-colors"
                       >
                         <option value="" className="bg-[#1A080E] text-white">Select your bank</option>
                         {bankOptions.map((b) => (
@@ -343,7 +343,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                         value={accountNumber}
                         onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
                         placeholder="Enter 10-digit account number"
-                        className="w-full bg-[#240A12] border border-[#8F1D3A]/20 rounded-xl px-3.5 py-3 text-white text-sm font-mono tracking-widest focus:outline-none focus:border-[#C13A5A] transition-colors"
+                        className="w-full nivo-glass-surface border border-[#8F1D3A]/20 rounded-xl px-3.5 py-3 text-white text-sm font-mono tracking-widest focus:outline-none focus:border-[#C13A5A] transition-colors"
                       />
                     </div>
 
@@ -393,12 +393,12 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder={`Min ₦${minWithdrawal.toLocaleString()}`}
-                        className="w-full bg-[#240A12] border border-[#8F1D3A]/20 rounded-xl px-3.5 py-3 text-white text-base font-bold focus:outline-none focus:border-[#C13A5A] transition-colors"
+                        className="w-full nivo-glass-surface border border-[#8F1D3A]/20 rounded-xl px-3.5 py-3 text-white text-base font-bold focus:outline-none focus:border-[#C13A5A] transition-colors"
                       />
                     </div>
 
                     {/* Breakdown Box */}
-                    <div className="bg-[#240A12] border border-white/10 rounded-2xl p-4 text-xs space-y-2 text-slate-300">
+                    <div className="nivo-glass-surface border border-white/10 rounded-2xl p-4 text-xs space-y-2 text-slate-300">
                       <div className="flex justify-between items-center text-slate-400">
                         <span>Available Balance</span>
                         <span className="font-bold text-white">₦{user?.walletBalance.toLocaleString()}</span>

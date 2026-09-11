@@ -16,12 +16,12 @@ export const ActivationPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12 animate-fade-in">
       {/* Header Banner */}
-      <div className="bg-gradient-to-br from-[#181d2a] via-[#16090D] to-[#0d0f17] border border-amber-500/20 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="bg-gradient-to-br from-[#240A12] via-[#16090D] to-[#16090D] border border-[#8F1D3A]/20 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#8F1D3A]/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8F1D3A]/10 border border-[#8F1D3A]/30 text-[#C13A5A] text-xs font-bold uppercase tracking-wider">
               <ShieldCheck className="w-3.5 h-3.5" />
               Account Verification & Activation
             </div>
@@ -45,13 +45,13 @@ export const ActivationPage: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-3 text-amber-400">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center font-black">
-                  <Lock className="w-5 h-5 text-amber-400" />
+              <div className="flex items-center gap-3 text-[#C13A5A]">
+                <div className="w-10 h-10 rounded-xl bg-[#8F1D3A]/20 border border-[#8F1D3A]/30 flex items-center justify-center font-black">
+                  <Lock className="w-5 h-5 text-[#C13A5A]" />
                 </div>
                 <div>
                   <p className="text-xs font-black text-white">WITHDRAWAL LOCKED</p>
-                  <p className="text-[11px] text-amber-400/90">
+                  <p className="text-[11px] text-[#C13A5A]/90">
                     {currentRefs < 5 ? '5 Referrals Required' : '₦520 Deposit Required'}
                   </p>
                 </div>
@@ -63,13 +63,13 @@ export const ActivationPage: React.FC = () => {
 
       {/* STATE 1: REFERRALS INCOMPLETE (< 5) */}
       {currentRefs < 5 && (
-        <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-6 sm:p-8 text-center space-y-6 shadow-xl">
-          <div className="w-16 h-16 rounded-3xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto shadow-lg">
+        <div className="nivo-glass-surface border border-zinc-800 rounded-3xl p-6 sm:p-8 text-center space-y-6 shadow-xl">
+          <div className="w-16 h-16 rounded-3xl bg-[#8F1D3A]/10 border border-[#8F1D3A]/20 text-[#C13A5A] flex items-center justify-center mx-auto shadow-lg">
             <Users className="w-8 h-8" />
           </div>
 
           <div className="space-y-2 max-w-lg mx-auto">
-            <span className="text-xs font-extrabold text-amber-400 uppercase tracking-widest bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
+            <span className="text-xs font-extrabold text-[#C13A5A] uppercase tracking-widest bg-[#8F1D3A]/10 border border-[#8F1D3A]/20 px-3 py-1 rounded-full">
               Referral Requirement Pending ({currentRefs} / 5)
             </span>
             <h2 className="text-xl sm:text-2xl font-black text-white pt-2">
@@ -81,14 +81,14 @@ export const ActivationPage: React.FC = () => {
           </div>
 
           {/* Referral Counter Progress Bar */}
-          <div className="max-w-md mx-auto bg-[#1C0B12] p-4 rounded-2xl border border-zinc-800 space-y-2">
+          <div className="max-w-md mx-auto nivo-glass-surface p-4 rounded-2xl border border-zinc-800 space-y-2">
             <div className="flex justify-between items-center text-xs font-bold">
               <span className="text-zinc-400">Referral Progress</span>
-              <span className="text-amber-400 font-mono font-black">{currentRefs} / 5</span>
+              <span className="text-[#C13A5A] font-mono font-black">{currentRefs} / 5</span>
             </div>
             <div className="w-full bg-zinc-800 h-3 rounded-full overflow-hidden p-0.5">
               <div
-                className="bg-gradient-to-r from-amber-500 to-[#8F1D3A] h-full rounded-full transition-all duration-500"
+                className="bg-gradient-to-r from-[#8F1D3A] to-[#8F1D3A] h-full rounded-full transition-all duration-500"
                 style={{ width: `${Math.min((currentRefs / 5) * 100, 100)}%` }}
               />
             </div>
@@ -110,7 +110,7 @@ export const ActivationPage: React.FC = () => {
 
       {/* STATE 2: REFERRALS COMPLETED (>= 5), BUT DEPOSIT PENDING (!isActivated) */}
       {currentRefs >= 5 && !isActivated && (
-        <div className="bg-[#16090D] border border-amber-500/30 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-fade-in">
+        <div className="nivo-glass-surface border border-[#8F1D3A]/30 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl animate-fade-in">
           <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
             <div className="w-12 h-12 rounded-2xl bg-[#8F1D3A]/20 text-[#A52A4A] border border-[#8F1D3A]/30 flex items-center justify-center font-black text-xl shrink-0">
               ✓
@@ -123,8 +123,8 @@ export const ActivationPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-[#1C0B12] border border-amber-500/20 rounded-2xl p-5 space-y-3">
-            <div className="flex items-center gap-2 text-amber-400 font-extrabold text-sm">
+          <div className="nivo-glass-surface border border-[#8F1D3A]/20 rounded-2xl p-5 space-y-3">
+            <div className="flex items-center gap-2 text-[#C13A5A] font-extrabold text-sm">
               <Sparkles className="w-4 h-4" />
               <span>Final Step: First Wallet Deposit (₦520 Minimum)</span>
             </div>

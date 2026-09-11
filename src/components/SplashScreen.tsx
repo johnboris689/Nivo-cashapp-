@@ -32,7 +32,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4 }}
-      className="fixed inset-0 z-50 bg-[#0B0B0B] flex flex-col items-center justify-between p-6 overflow-hidden select-none"
+      className="fixed inset-0 z-50 bg-[#090506] flex flex-col items-center justify-between p-6 overflow-hidden select-none"
     >
       {/* Background Radial Glow & Ambient Particles */}
       <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
@@ -61,7 +61,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="w-72 h-72 bg-[#FF9D42] rounded-full blur-[80px]"
+          className="w-72 h-72 bg-[#7A1831] rounded-full blur-[80px]"
         />
 
         {/* Subtle Geometric Overlay */}
@@ -103,7 +103,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
           />
 
           {/* Logo Icon Box */}
-          <div className="relative w-20 h-20 bg-gradient-to-br from-[#8F1D3A] via-[#E86C15] to-[#C94F00] rounded-2xl flex items-center justify-center shadow-2xl shadow-[#240A12]/50 border border-white/20">
+          <div className="relative w-20 h-20 bg-gradient-to-br from-[#8F1D3A] via-[#8F1D3A] to-[#5A1024] rounded-2xl flex items-center justify-center shadow-2xl shadow-[#240A12]/50 border border-white/20">
             <span className="text-white font-black text-4xl tracking-tighter drop-shadow-md">N</span>
             <div className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-white/90 animate-pulse" />
           </div>

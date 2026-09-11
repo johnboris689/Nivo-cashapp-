@@ -44,7 +44,7 @@ export const HistoryPage: React.FC = () => {
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="bg-[#240A12]/80 backdrop-blur-md border border-white/10 rounded-3xl p-4 flex flex-col md:flex-row gap-3 justify-between items-center shadow-xl">
+      <div className="nivo-glass-surface border border-white/10 rounded-3xl p-4 flex flex-col md:flex-row gap-3 justify-between items-center shadow-xl">
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -52,7 +52,7 @@ export const HistoryPage: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by reference or note..."
-            className="w-full bg-[#240A12] border border-[#8F1D3A]/20 rounded-2xl pl-10 pr-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#C13A5A] transition-colors"
+            className="w-full nivo-glass-surface border border-[#8F1D3A]/20 rounded-2xl pl-10 pr-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#C13A5A] transition-colors"
           />
         </div>
 
@@ -74,7 +74,7 @@ export const HistoryPage: React.FC = () => {
       </div>
 
       {/* Transactions List */}
-      <div className="bg-[#240A12]/80 backdrop-blur-md border border-white/10 rounded-3xl p-5 shadow-xl">
+      <div className="nivo-glass-surface border border-white/10 rounded-3xl p-5 shadow-xl">
         {loading ? (
           <div className="text-center py-12 text-slate-500 text-xs font-semibold">
             Loading transaction history...
@@ -94,14 +94,14 @@ export const HistoryPage: React.FC = () => {
               return (
                 <div
                   key={tx.id}
-                  className="p-4 rounded-2xl bg-[#240A12] border border-white/5 hover:border-[#8F1D3A]/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  className="p-4 rounded-2xl nivo-glass-surface border border-white/5 hover:border-[#8F1D3A]/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
                     <div
                       className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
                         isCredit
                           ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20'
-                          : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                          : 'bg-[#8F1D3A]/10 text-[#C13A5A] border border-[#8F1D3A]/20'
                       }`}
                     >
                       {isCredit ? (
@@ -133,8 +133,8 @@ export const HistoryPage: React.FC = () => {
                         tx.status === 'completed' || tx.status === 'approved'
                           ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20'
                           : tx.status === 'pending'
-                          ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                          : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                          ? 'bg-[#8F1D3A]/10 text-[#C13A5A] border border-[#8F1D3A]/20'
+                          : 'bg-[#8F1D3A]/10 text-[#C13A5A] border border-[#8F1D3A]/20'
                       }`}
                     >
                       {tx.status === 'completed' || tx.status === 'approved' ? (

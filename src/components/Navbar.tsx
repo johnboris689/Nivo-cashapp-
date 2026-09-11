@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Wallet,
   Bell,
   User as UserIcon,
   LogOut,
-  ShieldCheck,
-  Zap,
   Menu,
   X,
   PlusCircle,
@@ -26,7 +24,6 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -73,7 +70,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
           {user ? (
             <div className="hidden md:flex items-center gap-3.5">
               {/* Wallet Chip */}
-              <div className="flex items-center gap-2 bg-[#240A12] hover:bg-[#240A12] border border-[#8F1D3A]/20 rounded-full px-4 py-1.5 transition-all shadow-inner">
+              <div className="flex items-center gap-2 bg-[#240A12] hover:nivo-glass-surface border border-[#8F1D3A]/20 rounded-full px-4 py-1.5 transition-all shadow-inner">
                 <Wallet className="w-4 h-4 text-[#C13A5A]" />
                 <span className="text-xs text-slate-400 font-medium">Balance:</span>
                 <span className="text-sm font-black text-white tracking-wide">
@@ -92,7 +89,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
 
               <button
                 onClick={onOpenWithdraw}
-                className="flex items-center gap-1.5 bg-[#240A12] hover:bg-[#1A2540] text-slate-200 border border-[#8F1D3A]/20 font-semibold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer"
+                className="flex items-center gap-1.5 bg-[#240A12] hover:bg-[#350D18] text-slate-200 border border-[#8F1D3A]/20 font-semibold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer"
               >
                 <ArrowUpRight className="w-3.5 h-3.5 text-[#C13A5A]" />
                 Withdraw
@@ -101,7 +98,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
               {/* Notification Bell */}
               <button
                 onClick={() => setShowNotifications(true)}
-                className="relative p-2 rounded-xl bg-[#240A12] hover:bg-[#1A2540] border border-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
+                className="relative p-2 rounded-xl bg-[#240A12] hover:bg-[#350D18] border border-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
@@ -115,7 +112,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
               <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full bg-[#240A12] hover:bg-[#1A2540] border border-[#8F1D3A]/20 transition-all cursor-pointer"
+                  className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full bg-[#240A12] hover:bg-[#350D18] border border-[#8F1D3A]/20 transition-all cursor-pointer"
                 >
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#8F1D3A] to-[#C13A5A] text-white font-black text-xs flex items-center justify-center overflow-hidden border border-[#C13A5A]/30">
                     {user.avatarUrl ? (
@@ -135,7 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                 </button>
 
                 {showProfileMenu && (
-                  <div className="absolute right-0 mt-2 w-56 bg-[#240A12] border border-[#8F1D3A]/20 rounded-2xl shadow-2xl py-2 z-50 divide-y divide-white/10 backdrop-blur-xl">
+                  <div className="absolute right-0 mt-2 w-56 nivo-glass-surface border border-[#8F1D3A]/20 rounded-2xl shadow-2xl py-2 z-50 divide-y divide-white/10 backdrop-blur-xl">
                     <div className="px-4 py-2.5">
                       <p className="text-xs font-bold text-white truncate">{user.fullName}</p>
                       <p className="text-[11px] text-slate-400 truncate">@{user.username}</p>
@@ -161,16 +158,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                         <Sparkles className="w-4 h-4 text-[#A52A4A]" />
                         Refer & Earn (₦1,200)
                       </Link>
-                      {user.isAdmin && (
-                        <Link
-                          to="/admin"
-                          onClick={() => setShowProfileMenu(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-xs text-[#C13A5A] hover:bg-[#A52A4A]/10 font-bold"
-                        >
-                          <ShieldCheck className="w-4 h-4" />
-                          Admin Portal
-                        </Link>
-                      )}
                     </div>
 
                     <div className="py-1">
@@ -180,7 +167,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                           logout();
                           navigate('/login');
                         }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
+                        className="w-full flex items-center gap-2 px-4 py-2 text-xs text-[#C13A5A] hover:text-[#D46A83] hover:bg-[#8F1D3A]/10 cursor-pointer"
                       >
                         <LogOut className="w-4 h-4" />
                         Sign Out
@@ -210,7 +197,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
           {/* Mobile menu trigger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl bg-[#240A12] border border-[#8F1D3A]/20 text-slate-300 hover:text-white cursor-pointer"
+            className="md:hidden p-2 rounded-xl nivo-glass-surface border border-[#8F1D3A]/20 text-slate-300 hover:text-white cursor-pointer"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -221,7 +208,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
           <div className="md:hidden bg-[#1A080E] border-b border-[#8F1D3A]/20 px-4 py-4 space-y-3 shadow-2xl">
             {user ? (
               <>
-                <div className="bg-[#240A12] rounded-xl p-3.5 border border-[#8F1D3A]/20 flex items-center justify-between">
+                <div className="nivo-glass-surface rounded-xl p-3.5 border border-[#8F1D3A]/20 flex items-center justify-between">
                   <div>
                     <p className="text-xs text-slate-400">Wallet Balance</p>
                     <p className="text-lg font-black text-white">
@@ -254,14 +241,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                   <Link
                     to="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-3 rounded-xl bg-[#240A12] border border-white/10 text-slate-200 text-xs font-semibold text-center hover:border-[#8F1D3A]/30"
+                    className="p-3 rounded-xl nivo-glass-surface border border-white/10 text-slate-200 text-xs font-semibold text-center hover:border-[#8F1D3A]/30"
                   >
                     Dashboard
                   </Link>
                   <Link
                     to="/wallet"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-3 rounded-xl bg-[#240A12] border border-white/10 text-slate-200 text-xs font-semibold text-center hover:border-[#8F1D3A]/30"
+                    className="p-3 rounded-xl nivo-glass-surface border border-white/10 text-slate-200 text-xs font-semibold text-center hover:border-[#8F1D3A]/30"
                   >
                     Wallet
                   </Link>
@@ -275,21 +262,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                   <Link
                     to="/tasks"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-3 rounded-xl bg-[#240A12] border border-white/10 text-slate-200 text-xs font-semibold text-center hover:border-[#8F1D3A]/30"
+                    className="p-3 rounded-xl nivo-glass-surface border border-white/10 text-slate-200 text-xs font-semibold text-center hover:border-[#8F1D3A]/30"
                   >
                     Tasks
                   </Link>
                 </div>
 
-                {user.isAdmin && (
-                  <Link
-                    to="/admin"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full py-2.5 text-center text-xs font-bold text-[#C13A5A] bg-[#A52A4A]/10 border border-[#A52A4A]/30 rounded-xl"
-                  >
-                    🛡️ Admin Control Panel
-                  </Link>
-                )}
 
                 <button
                   onClick={() => {
@@ -297,7 +275,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDeposit, onOpenWithdraw })
                     logout();
                     navigate('/login');
                   }}
-                  className="w-full py-2.5 text-center text-xs font-bold text-red-400 bg-red-500/10 rounded-xl border border-red-500/20"
+                  className="w-full py-2.5 text-center text-xs font-bold text-[#C13A5A] bg-[#8F1D3A]/10 rounded-xl border border-[#8F1D3A]/20"
                 >
                   Log Out
                 </button>

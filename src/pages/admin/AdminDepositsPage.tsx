@@ -69,7 +69,7 @@ export const AdminDepositsPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in pb-16">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#16090D] p-6 rounded-3xl border border-[#8F1D3A]/20 shadow-xl relative overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 nivo-glass-surface p-6 rounded-3xl border border-[#8F1D3A]/20 shadow-xl relative overflow-hidden">
         <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-[#8F1D3A]/5 rounded-full blur-2xl pointer-events-none" />
 
         <div>
@@ -86,7 +86,7 @@ export const AdminDepositsPage: React.FC = () => {
 
         <button
           onClick={fetchDeposits}
-          className="flex items-center gap-1.5 bg-[#1C0B12] hover:bg-[#1f2536] text-[#A52A4A] text-xs font-bold px-4 py-2.5 rounded-xl border border-[#8F1D3A]/30 transition-all cursor-pointer shrink-0"
+          className="flex items-center gap-1.5 nivo-glass-surface hover:bg-[#240A12] text-[#A52A4A] text-xs font-bold px-4 py-2.5 rounded-xl border border-[#8F1D3A]/30 transition-all cursor-pointer shrink-0"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh Live Logs</span>
@@ -95,7 +95,7 @@ export const AdminDepositsPage: React.FC = () => {
 
       {/* Analytics Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-[#16090D] p-5 rounded-2xl border border-zinc-800 space-y-2">
+        <div className="nivo-glass-surface p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
             <span className="text-xs font-bold uppercase tracking-wider">Total Deposit Volume</span>
             <TrendingUp className="w-4 h-4 text-[#A52A4A]" />
@@ -104,7 +104,7 @@ export const AdminDepositsPage: React.FC = () => {
           <p className="text-[10px] text-zinc-500 font-bold">Auto-credited via Paystack</p>
         </div>
 
-        <div className="bg-[#16090D] p-5 rounded-2xl border border-zinc-800 space-y-2">
+        <div className="nivo-glass-surface p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
             <span className="text-xs font-bold uppercase tracking-wider">Successful Transactions</span>
             <CheckCircle2 className="w-4 h-4 text-[#A52A4A]" />
@@ -113,16 +113,16 @@ export const AdminDepositsPage: React.FC = () => {
           <p className="text-[10px] text-[#A52A4A] font-bold">100% Webhook Verified</p>
         </div>
 
-        <div className="bg-[#16090D] p-5 rounded-2xl border border-zinc-800 space-y-2">
+        <div className="nivo-glass-surface p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
             <span className="text-xs font-bold uppercase tracking-wider">Pending One-Time Sessions</span>
-            <Clock className="w-4 h-4 text-amber-400" />
+            <Clock className="w-4 h-4 text-[#C13A5A]" />
           </div>
-          <p className="text-2xl font-black text-amber-400">{pendingCount}</p>
+          <p className="text-2xl font-black text-[#C13A5A]">{pendingCount}</p>
           <p className="text-[10px] text-zinc-500 font-bold">Awaiting User Transfer</p>
         </div>
 
-        <div className="bg-[#16090D] p-5 rounded-2xl border border-zinc-800 space-y-2">
+        <div className="nivo-glass-surface p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
             <span className="text-xs font-bold uppercase tracking-wider">Paystack Engine</span>
             <Zap className="w-4 h-4 text-[#A52A4A] fill-[#A52A4A]" />
@@ -136,7 +136,7 @@ export const AdminDepositsPage: React.FC = () => {
       </div>
 
       {/* Main Monitoring Table Panel */}
-      <div className="bg-[#16090D] border border-zinc-800 rounded-3xl p-6 space-y-4">
+      <div className="nivo-glass-surface border border-zinc-800 rounded-3xl p-6 space-y-4">
         {/* Search & Filter Header */}
         <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
           <div className="relative flex-1 max-w-md">
@@ -146,13 +146,13 @@ export const AdminDepositsPage: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by customer, email, bank, or ref..."
-              className="w-full bg-[#1C0B12] border border-zinc-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 font-bold focus:outline-none focus:border-[#8F1D3A]"
+              className="w-full nivo-glass-surface border border-zinc-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 font-bold focus:outline-none focus:border-[#8F1D3A]"
             />
           </div>
 
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-zinc-400" />
-            <div className="flex bg-[#1C0B12] p-1 rounded-xl border border-zinc-800 text-xs">
+            <div className="flex nivo-glass-surface p-1 rounded-xl border border-zinc-800 text-xs">
               <button
                 onClick={() => setStatusFilter('all')}
                 className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
@@ -215,7 +215,7 @@ export const AdminDepositsPage: React.FC = () => {
                 {filteredDeposits.map((d) => {
                   const isApproved = d.status === 'approved' || d.status === 'completed';
                   return (
-                    <tr key={d.id} className="hover:bg-[#1C0B12] transition-colors">
+                    <tr key={d.id} className="hover:bg-[#240A12] transition-colors">
                       <td className="py-3.5 px-3">
                         <p className="font-bold text-white">{d.userName}</p>
                         <p className="text-[10px] text-zinc-500 font-mono">{d.userEmail}</p>
@@ -227,7 +227,7 @@ export const AdminDepositsPage: React.FC = () => {
 
                       <td className="py-3.5 px-3">
                         <p className="font-bold text-zinc-200">{d.bankName || 'Wema Bank (Paystack One-Time Transfer)'}</p>
-                        <p className="text-[10px] font-mono text-amber-400">
+                        <p className="text-[10px] font-mono text-[#C13A5A]">
                           {d.accountNumber || 'Account Generated'}
                         </p>
                       </td>
@@ -243,7 +243,7 @@ export const AdminDepositsPage: React.FC = () => {
                             Verified & Credited
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold">
+                          <span className="inline-flex items-center gap-1 bg-[#8F1D3A]/10 text-[#C13A5A] border border-[#8F1D3A]/20 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold">
                             <Clock className="w-3 h-3" />
                             Awaiting Webhook
                           </span>
@@ -255,7 +255,7 @@ export const AdminDepositsPage: React.FC = () => {
                           className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
                             isApproved
                               ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border-[#8F1D3A]/20'
-                              : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                              : 'bg-[#8F1D3A]/10 text-[#C13A5A] border-[#8F1D3A]/20'
                           }`}
                         >
                           {isApproved ? 'SUCCESSFUL' : 'PENDING'}

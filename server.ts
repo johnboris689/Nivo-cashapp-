@@ -5,11 +5,14 @@ import dotenv from 'dotenv';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { db } from './server/db.js';
+import { PaystackProvider } from './server/payments/providers/paystack.js';
+import { PaymentManager } from './server/payments/index.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = 3000;
+const paymentManager = new PaymentManager();
 
 app.use(express.json({ verify: (req: Request, _res, buf) => { (req as any).rawBody = Buffer.from(buf); } }));
 
@@ -46,6 +49,50 @@ function adminMiddleware(req: Request, res: Response, next: NextFunction) {
   (req as any).user = user;
   next();
 }
+
+// Verify a legacy Paystack checkout reference and, when it matches a locally-created
+// pending deposit, process the exact amount. Current one-time Paystack deposits use
+// /api/paystack/check-status/:reference as their primary verification path.
+app.get('/api/payments/verify/:reference', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const reference = String(req.params.reference || '').trim();
+    if (!reference) {
+      res.status(400).json({ error: 'Payment reference is required.' });
+      return;
+    }
+
+    const deposit = db.getDepositByReference(reference);
+    const currentUser = (req as any).user;
+    if (deposit && deposit.userId !== currentUser.id) {
+      res.status(403).json({ error: 'You are not allowed to verify this payment.' });
+      return;
+    }
+
+    const provider = new PaystackProvider();
+    const result = await provider.verifyPayment(reference);
+
+    if (result.status === 'successful' && deposit && deposit.status === 'pending' &&
+        result.amount === deposit.amount && result.currency === 'NGN') {
+      const processed = db.processPaystackDeposit(reference, result.amount, result.providerReference);
+      res.json({
+        status: 'approved',
+        message: 'Payment successfully verified! Your wallet has been credited.',
+        deposit: processed.deposit,
+      });
+      return;
+    }
+
+    res.json({
+      status: result.status === 'successful' ? 'approved' : result.status,
+      message: result.status === 'successful'
+        ? 'Payment successfully verified.'
+        : 'Payment is being processed by the gateway.',
+      reference: result.reference,
+    });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message || 'Payment verification failed.' });
+  }
+});
 
 // --- PUBLIC SITE SETTINGS & BANK DETAILS ---
 app.get('/api/settings', (req: Request, res: Response) => {
@@ -765,6 +812,23 @@ app.post('/api/admin/login', (req: Request, res: Response) => {
     res.json(result);
   } catch (err: any) {
     res.status(401).json({ error: err.message || 'Invalid administrator credentials.' });
+  }
+});
+
+app.get('/api/admin/payment-overview', adminMiddleware, (req: Request, res: Response) => {
+  try {
+    const appUrl = `${req.protocol}://${req.get('host')}`;
+    const overview = paymentManager.getProviderStatusList(appUrl, db.getSiteSettings().paymentProvider);
+    res.json({
+      providers: overview.providers.map((provider) => ({
+        ...provider,
+        missingVariables: provider.missingCredentials,
+      })),
+      activeProvider: overview.activeProvider,
+      hasAnyConfigured: overview.hasAnyConfigured,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Unable to load payment provider status.' });
   }
 });
 

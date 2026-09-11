@@ -34,7 +34,7 @@ export const ProfilePage: React.FC = () => {
         particleCount: 80,
         spread: 60,
         origin: { y: 0.6 },
-        colors: ['#2563eb', '#06b6d4', '#8F1D3A', '#ffffff'],
+        colors: ['#5A1024', '#7A1831', '#A52A4A', '#C13A5A', '#ffffff'],
       });
 
       setMsg({ type: 'success', text: `Avatar updated to "${avatar.name}"!` });
@@ -63,7 +63,7 @@ export const ProfilePage: React.FC = () => {
           className={`p-4 rounded-2xl flex items-center gap-3 text-xs font-bold border transition-all ${
             msg.type === 'success'
               ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border-[#8F1D3A]/20'
-              : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+              : 'bg-[#8F1D3A]/10 text-[#C13A5A] border-[#8F1D3A]/20'
           }`}
         >
           <Sparkles className="w-4 h-4 shrink-0" />
@@ -72,7 +72,7 @@ export const ProfilePage: React.FC = () => {
       )}
 
       {/* Main Account Card */}
-      <div className="bg-[#240A12]/80 backdrop-blur-md border border-white/10 rounded-3xl p-5 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
+      <div className="nivo-glass-surface border border-white/10 rounded-3xl p-5 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
         <div className="absolute -right-16 -top-16 w-64 h-64 bg-[#A52A4A]/5 rounded-full blur-3xl pointer-events-none" />
 
         {/* User Card Header */}
@@ -94,7 +94,7 @@ export const ProfilePage: React.FC = () => {
                   )}
                 </div>
               </div>
-              <div className="absolute -bottom-1 -right-1 bg-[#240A12] p-1 rounded-full border border-white/10 text-[#C13A5A]">
+              <div className="absolute -bottom-1 -right-1 nivo-glass-surface p-1 rounded-full border border-white/10 text-[#C13A5A]">
                 <Camera className="w-3.5 h-3.5" />
               </div>
             </div>
@@ -140,7 +140,7 @@ export const ProfilePage: React.FC = () => {
                 <div
                   key={av.id}
                   onClick={() => handleSelectAvatar(av)}
-                  className={`group relative bg-[#240A12] rounded-2xl border p-3 flex flex-col items-center text-center transition-all cursor-pointer hover:scale-[1.02] ${
+                  className={`group relative nivo-glass-surface rounded-2xl border p-3 flex flex-col items-center text-center transition-all cursor-pointer hover:scale-[1.02] ${
                     isSelected
                       ? 'border-[#C13A5A] bg-[#A52A4A]/10 shadow-lg shadow-[#C13A5A]/20'
                       : 'border-white/10 hover:border-[#8F1D3A]/30'
@@ -185,7 +185,7 @@ export const ProfilePage: React.FC = () => {
 
         {/* Profile Details Grid */}
         <div className="grid sm:grid-cols-2 gap-3 pt-4 border-t border-white/10">
-          <div className="bg-[#240A12] p-4 rounded-2xl border border-white/10 space-y-1">
+          <div className="nivo-glass-surface p-4 rounded-2xl border border-white/10 space-y-1">
             <span className="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1">
               <Mail className="w-3.5 h-3.5 text-[#C13A5A]" />
               Email Address
@@ -193,7 +193,7 @@ export const ProfilePage: React.FC = () => {
             <p className="text-sm font-bold text-white truncate">{user?.email}</p>
           </div>
 
-          <div className="bg-[#240A12] p-4 rounded-2xl border border-white/10 space-y-1">
+          <div className="nivo-glass-surface p-4 rounded-2xl border border-white/10 space-y-1">
             <span className="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1">
               <Phone className="w-3.5 h-3.5 text-[#C13A5A]" />
               Phone Number
@@ -201,7 +201,7 @@ export const ProfilePage: React.FC = () => {
             <p className="text-sm font-bold text-white">{user?.phone || 'Not provided'}</p>
           </div>
 
-          <div className="bg-[#240A12] p-4 rounded-2xl border border-white/10 space-y-1">
+          <div className="nivo-glass-surface p-4 rounded-2xl border border-white/10 space-y-1">
             <span className="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5 text-[#C13A5A]" />
               Referral Code
@@ -218,7 +218,7 @@ export const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-[#240A12] p-4 rounded-2xl border border-white/10 space-y-1">
+          <div className="nivo-glass-surface p-4 rounded-2xl border border-white/10 space-y-1">
             <span className="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5 text-[#C13A5A]" />
               Member Since
@@ -241,7 +241,7 @@ export const ProfilePage: React.FC = () => {
               logout();
               navigate('/login');
             }}
-            className="w-full sm:w-auto bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-extrabold text-xs px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-full sm:w-auto bg-[#8F1D3A]/10 hover:bg-[#8F1D3A]/20 text-[#C13A5A] border border-[#8F1D3A]/30 font-extrabold text-xs px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             Sign Out of Account

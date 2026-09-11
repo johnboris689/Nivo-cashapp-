@@ -11,7 +11,7 @@ import { PaystackProvider } from './providers/paystack';
 import { FlutterwaveProvider } from './providers/flutterwave';
 import { KorapayProvider } from './providers/korapay';
 
-class PaymentManager {
+export class PaymentManager {
   private providers: Map<PaymentProviderType, IPaymentProvider> = new Map();
 
   constructor() {
