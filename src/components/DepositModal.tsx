@@ -28,8 +28,8 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
   const { user, refreshUser } = useAuth();
 
   const [step, setStep] = useState<'amount' | 'transfer' | 'success'>('amount');
-  const [amount, setAmount] = useState<number>(1000);
-  const [customAmount, setCustomAmount] = useState<string>('1000');
+  const [amount, setAmount] = useState<number>(520);
+  const [customAmount, setCustomAmount] = useState<string>('520');
   const [loading, setLoading] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -128,8 +128,14 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
 
   const handleInitializeTransfer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || amount < 520) {
+    const requestedAmount = Number(amount);
+    if (!Number.isFinite(requestedAmount) || requestedAmount < 520) {
       setError('Minimum deposit amount is ₦520.');
+      return;
+    }
+
+    if (Math.round(requestedAmount * 100) !== requestedAmount * 100) {
+      setError('Please enter an amount with no more than 2 decimal places.');
       return;
     }
 
@@ -137,13 +143,16 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
     setError(null);
 
     try {
-      const res = await api.initializePaystackVirtualAccount(amount);
+      // The frontend never creates or guesses an account number. This request
+      // reaches our backend, which calls Paystack's /charge API with the
+      // server-side PAYSTACK_SECRET_KEY. Paystack returns the temporary account.
+      const res = await api.initializePaystackVirtualAccount(requestedAmount);
       setActiveDeposit(res.deposit);
       const expiry = res.deposit.accountExpiresAt ? new Date(res.deposit.accountExpiresAt).getTime() : Date.now() + FALLBACK_TIME * 1000;
       setTimeLeft(Math.max(0, Math.ceil((expiry - Date.now()) / 1000)));
       setStep('transfer');
     } catch (err: any) {
-      setError(err.message || 'Failed to generate transfer account.');
+      setError(err.message || 'Paystack could not create a temporary transfer account.');
     } finally {
       setLoading(false);
     }
@@ -180,8 +189,8 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
   const cleanBankName = activeDeposit?.bankName.replace(/\s*\(.*?\)/g, '') || 'Wema Bank';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-[#16090D] border border-white/10 rounded-3xl w-full max-w-sm sm:max-w-md overflow-hidden shadow-2xl relative transform transition-all">
+    <div className="fixed inset-0 z-50 flex items-stretch justify-center bg-black/90 backdrop-blur-sm animate-fade-in">
+      <div className="bg-[#16090D] border-0 sm:border sm:border-white/10 rounded-none sm:rounded-3xl w-full h-full sm:h-[94vh] sm:max-w-2xl overflow-hidden shadow-2xl relative transform transition-all flex flex-col">
         {/* Toast Notification */}
         {toastMessage && (
           <div className="absolute top-3 left-1/2 -translate-x-1/2 z-50 bg-[#8F1D3A] text-black text-xs font-black px-3.5 py-1.5 rounded-full shadow-2xl flex items-center gap-1.5 animate-fade-in">
@@ -191,10 +200,10 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
         )}
 
         {/* Clean Header */}
-        <div className="px-5 py-3.5 border-b border-white/5 flex items-center justify-between">
+        <div className="px-5 py-4 sm:px-7 sm:py-5 border-b border-white/5 flex items-center justify-between shrink-0">
           <div>
-            <h3 className="text-base sm:text-lg font-black text-white tracking-tight">Deposit Funds</h3>
-            <p className="text-[11px] sm:text-xs text-zinc-400">Use the temporary Paystack account below before it expires.</p>
+            <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">Deposit Funds</h3>
+            <p className="text-[11px] sm:text-xs text-zinc-400">Choose your amount first. Paystack creates the temporary account only after you continue.</p>
           </div>
           <button
             onClick={onClose}
@@ -204,7 +213,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
           </button>
         </div>
 
-        <div className="p-4 sm:p-5 max-h-[82vh] overflow-y-auto space-y-4">
+        <div className="flex-1 overflow-y-auto p-5 sm:p-7 space-y-5">
           {error && (
             <div className="p-3 bg-[#8F1D3A]/10 border border-[#8F1D3A]/20 rounded-xl text-[#C13A5A] text-xs flex items-center gap-2 font-semibold">
               <AlertCircle className="w-4 h-4 shrink-0" />
@@ -214,10 +223,10 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
 
           {/* STEP 1: SELECT AMOUNT */}
           {step === 'amount' && (
-            <form onSubmit={handleInitializeTransfer} className="space-y-4">
+            <form onSubmit={handleInitializeTransfer} className="max-w-xl mx-auto space-y-6 pt-2 sm:pt-8">
               <div className="space-y-2.5">
                 <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                  Select Deposit Amount
+                  How much would you like to deposit?
                 </label>
 
                 <div className="grid grid-cols-3 gap-2">
@@ -258,18 +267,23 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
                 </p>
               </div>
 
+              <div className="nivo-glass-surface border border-white/5 rounded-2xl p-4 text-xs text-zinc-400 flex items-start gap-3">
+                <ShieldCheck className="w-5 h-5 text-[#A52A4A] shrink-0 mt-0.5" />
+                <p>After you tap Continue, Nivo Cash will securely request a new Paystack Pay with Transfer account for this exact amount. Nivo Cash does not generate or invent the account number.</p>
+              </div>
+
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#8F1D3A] hover:bg-[#7A1831] text-black font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-lg shadow-[#8F1D3A]/15 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                className="w-full bg-[#8F1D3A] hover:bg-[#7A1831] text-black font-black text-sm sm:text-base py-4 rounded-xl shadow-lg shadow-[#8F1D3A]/15 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Generating One-Time Account...</span>
+                    <span>Requesting Account from Paystack...</span>
                   </>
                 ) : (
-                  <span>Generate One-Time Account</span>
+                  <span>Continue &amp; Get Paystack Account</span>
                 )}
               </button>
             </form>
@@ -277,7 +291,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose, onSuccess }
 
           {/* STEP 2: MAIN COMPACT PAYMENT CARD */}
           {step === 'transfer' && activeDeposit && (
-            <div className="space-y-4 animate-fade-in">
+            <div className="max-w-xl mx-auto space-y-4 animate-fade-in pt-2 sm:pt-4">
               {timeLeft <= 0 ? (
                 /* EXPIRED STATE */
                 <div className="nivo-glass-surface border border-[#8F1D3A]/20 rounded-2xl p-6 text-center space-y-3">

@@ -422,12 +422,23 @@ app.post('/api/paystack/initialize-virtual-account', authMiddleware, async (req:
     }
 
     const charge = chargeData.data;
+
+    // Security/consistency checks: the account must come directly from the
+    // Paystack response for this charge. There is deliberately no local/random
+    // account-number generator or fallback here.
     if (charge.status !== 'pending_bank_transfer' || !charge.reference || !charge.account_number || !charge.account_name || !charge.bank?.name) {
       res.status(400).json({ error: charge.display_text || 'Paystack did not return a valid one-time bank transfer account.' });
       return;
     }
 
-    const deposit = db.createPaystackDeposit(user.id, numAmount, {
+    const paystackAmount = charge.amount != null ? Number(charge.amount) / 100 : numAmount;
+    if (!Number.isFinite(paystackAmount) || paystackAmount !== numAmount) {
+      console.error('Paystack amount mismatch during deposit initialization.', { requested: numAmount, returned: charge.amount });
+      res.status(502).json({ error: 'Paystack returned an amount that does not match the requested deposit. No account was saved.' });
+      return;
+    }
+
+    const deposit = db.createPaystackDeposit(user.id, paystackAmount, {
       reference: charge.reference,
       accountNumber: charge.account_number,
       accountName: charge.account_name,
@@ -436,12 +447,12 @@ app.post('/api/paystack/initialize-virtual-account', authMiddleware, async (req:
     });
 
     res.status(201).json({
-      message: 'Paystack one-time bank transfer account created successfully.',
+      message: 'Paystack generated the temporary bank transfer account for this deposit.',
       deposit,
     });
   } catch (err: any) {
     console.error('Paystack one-time deposit initialization error:', err);
-    res.status(500).json({ error: err.message || 'Failed to generate one-time payment account.' });
+    res.status(500).json({ error: err.message || 'Failed to request a temporary Paystack payment account.' });
   }
 });
 
