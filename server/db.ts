@@ -787,7 +787,11 @@ class Database {
       return { deposit, user: cleanUser, alreadyProcessed: true };
     }
 
-    const finalAmount = paidAmount && paidAmount > 0 ? paidAmount : deposit.amount;
+    if (paidAmount !== undefined && (!Number.isFinite(paidAmount) || paidAmount !== deposit.amount)) {
+      throw new Error(`Paystack payment amount does not match deposit '${reference}'.`);
+    }
+
+    const finalAmount = deposit.amount;
 
     // Update deposit status
     deposit.amount = finalAmount;

@@ -47,7 +47,7 @@ export const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in pb-20">
+    <div className="w-full max-w-4xl mx-auto space-y-6 animate-fade-in pb-20">
       {/* Title */}
       <div>
         <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">

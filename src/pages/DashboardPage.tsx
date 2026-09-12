@@ -180,11 +180,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
         </div>
       )}
 
-      {/* Redesigned Wallet Balance Card (Visual Centerpiece - Electric Blue / Cyan Gradient) */}
-      <div className="bg-gradient-to-br from-[#350D18] via-[#7A1831] to-[#8F1D3A] rounded-[28px] p-5 sm:p-6 text-white shadow-2xl shadow-[#7A1831]/30 relative overflow-hidden border border-[#C13A5A]/30">
+      {/* Nivo Wallet Balance Card — compact glass fintech presentation */}
+      <div className="nivo-glass-strong w-full rounded-[24px] p-4 sm:p-5 text-white shadow-2xl relative overflow-hidden border border-[#C13A5A]/25">
         {/* Card Decorative Blurs & Accents */}
-        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-[#C13A5A]/20 blur-2xl pointer-events-none" />
-        <div className="absolute top-0 right-1/4 w-32 h-32 rounded-full bg-[#A52A4A]/20 blur-xl pointer-events-none" />
+        <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-[#C13A5A]/12 blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-36 h-36 rounded-full bg-[#A52A4A]/10 blur-2xl pointer-events-none" />
 
         <div className="flex items-center justify-between relative z-10">
           <span className="text-[11px] font-bold text-[#D46A83]/90 uppercase tracking-wider">
@@ -199,13 +199,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
           </button>
         </div>
 
-        <div className="my-4 flex items-baseline justify-between flex-wrap gap-2 relative z-10">
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight font-mono drop-shadow-md">
+        <div className="my-3.5 flex items-center justify-between flex-wrap gap-3 relative z-10">
+          <h2 className="text-2xl sm:text-3xl font-black tracking-tight font-mono drop-shadow-md">
             {showBalance
               ? `₦${user?.walletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 }) || '0.00'}`
               : '••••••••'}
           </h2>
-          <div className="text-right bg-black/15 px-3 py-1.5 rounded-xl border border-white/10">
+          <div className="text-right bg-black/20 px-3 py-1.5 rounded-xl border border-white/10 shrink-0">
             <span className="text-[10px] font-bold text-[#D46A83] uppercase block">Total Earned</span>
             <span className="text-xs font-black text-white">
               ₦{user?.totalEarnings.toLocaleString() || '0.00'}
@@ -214,17 +214,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
         </div>
 
         {/* Action Pill Buttons */}
-        <div className="flex items-center gap-3 mt-5 pt-4 border-t border-white/15 relative z-10">
+        <div className="flex items-center gap-2.5 mt-4 pt-3.5 border-t border-white/10 relative z-10">
           <button
             onClick={onOpenDeposit}
-            className="flex-1 bg-white text-slate-950 hover:bg-slate-100 active:scale-95 transition-all text-xs font-black h-11 rounded-2xl flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+            className="flex-1 bg-white text-slate-950 hover:bg-slate-100 active:scale-95 transition-all text-xs font-black h-10 rounded-xl flex items-center justify-center gap-2 shadow-lg cursor-pointer"
           >
             <PlusCircle className="w-4 h-4 text-[#7A1831]" />
             <span>Deposit</span>
           </button>
           <button
             onClick={onOpenWithdraw}
-            className="flex-1 bg-black/30 hover:bg-black/40 border border-white/20 active:scale-95 text-white transition-all text-xs font-black h-11 rounded-2xl flex items-center justify-center gap-2 backdrop-blur-md cursor-pointer"
+            className="flex-1 bg-black/30 hover:bg-black/40 border border-white/20 active:scale-95 text-white transition-all text-xs font-black h-10 rounded-xl flex items-center justify-center gap-2 backdrop-blur-md cursor-pointer"
           >
             <ArrowUpRight className="w-4 h-4 text-[#D46A83]" />
             <span>Withdraw</span>

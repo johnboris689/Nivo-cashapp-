@@ -14,7 +14,7 @@ export const ActivationPage: React.FC = () => {
   const isFullyUnlocked = currentRefs >= 5 && isActivated;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-12 animate-fade-in">
+    <div className="w-full max-w-4xl mx-auto space-y-6 pb-12 animate-fade-in">
       {/* Header Banner */}
       <div className="bg-gradient-to-br from-[#240A12] via-[#16090D] to-[#16090D] border border-[#8F1D3A]/20 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#8F1D3A]/10 rounded-full blur-3xl pointer-events-none" />

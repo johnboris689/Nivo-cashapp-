@@ -64,7 +64,7 @@ const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {/* Top Navbar */}
       <Navbar onOpenDeposit={() => setShowDepositModal(true)} />
 
-      <div className="flex-1 flex max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
+      <div className="flex-1 flex max-w-7xl w-full mx-auto px-0 sm:px-4 lg:px-6 py-4 sm:py-6 gap-6 min-w-0">
         {/* Left Sidebar for Desktop */}
         <div className="hidden md:block w-64 shrink-0">
           <Sidebar />

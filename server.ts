@@ -492,8 +492,9 @@ app.get('/api/paystack/check-status/:reference', authMiddleware, async (req: Req
         const verified = verifyData?.status && verifyData?.data;
         if (verified && verifyData.data.status === 'success') {
           const paidAmount = Number(verifyData.data.amount || 0) / 100;
+          const currency = String(verifyData.data.currency || 'NGN').toUpperCase();
           const channel = verifyData.data.channel;
-          if (paidAmount === deposit.amount && (!channel || channel === 'bank_transfer')) {
+          if (currency === 'NGN' && channel === 'bank_transfer' && paidAmount === deposit.amount) {
             const processed = db.processPaystackDeposit(reference, paidAmount, verifyData.data.id?.toString());
             deposit = processed.deposit;
           }
@@ -546,10 +547,11 @@ app.post('/api/paystack/webhook', (req: Request, res: Response) => {
     if (event === 'charge.success' && data) {
       const reference = data.reference;
       const amountInNaira = Number(data.amount || 0) / 100;
+      const currency = String(data.currency || 'NGN').toUpperCase();
       const providerTxId = data.id?.toString();
       const channel = data.channel;
 
-      if (reference && amountInNaira > 0 && (!channel || channel === 'bank_transfer')) {
+      if (reference && amountInNaira > 0 && currency === 'NGN' && channel === 'bank_transfer') {
         const deposit = db.getDepositByReference(reference);
 
         // Only credit a deposit that our server created and only when Paystack

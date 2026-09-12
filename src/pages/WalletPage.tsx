@@ -79,7 +79,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
 
       {/* Main Balance Banner */}
       <div className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-gradient-to-br from-[#1C0B12] via-[#16090D] to-[#0a0c10] border border-[#8F1D3A]/30 rounded-3xl p-6 relative overflow-hidden shadow-xl flex flex-col justify-between">
+        <div className="md:col-span-2 nivo-glass-strong border border-[#8F1D3A]/25 rounded-[24px] p-5 sm:p-6 relative overflow-hidden shadow-xl flex flex-col justify-between">
           <div>
             <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Available Wallet Balance</span>
             <h2 className="text-4xl font-black text-white mt-2">
