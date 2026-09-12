@@ -1,6 +1,6 @@
 {
-  "name": "Nivo Cash App",
-  "description": "Nivo Cash App - Premium Fintech, Wallet & Digital Earnings Platform",
+  "name": "SwiftPay",
+  "description": "Mobile-first Nigerian fintech digital wallet with multi-provider Paystack, Flutterwave, and Korapay payment gateways, instant wallet funding, and secure withdrawal system.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

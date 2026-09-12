@@ -1,144 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
-:root {
-  --nivo-bg: #090506;
-  --nivo-bg-soft: #100709;
-  --nivo-surface: rgba(72, 15, 28, 0.42);
-  --nivo-surface-strong: rgba(53, 13, 24, 0.72);
-  --nivo-maroon: #7A1831;
-  --nivo-wine: #8F1D3A;
-  --nivo-accent: #C13A5A;
-  --nivo-border: rgba(193, 58, 90, 0.22);
-  --nivo-text: #F7EDEF;
-  --nivo-muted: #B99BA3;
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
-@layer base {
-  *, *::before, *::after { box-sizing: border-box; }
-  html, body, #root {
-    width: 100%;
-    max-width: 100%;
-    min-height: 100vh;
-    min-height: 100dvh;
-    overflow-x: hidden;
-  }
-  html { background: var(--nivo-bg); }
-  body {
-    margin: 0;
-    background:
-      radial-gradient(circle at 12% 5%, rgba(143,29,58,.18), transparent 28%),
-      radial-gradient(circle at 88% 92%, rgba(90,16,36,.20), transparent 32%),
-      linear-gradient(145deg, #090506 0%, #100709 52%, #16090D 100%);
-    color: var(--nivo-text);
-    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    -webkit-tap-highlight-color: transparent;
-    min-height: 100vh;
-  }
-  ::selection { background: rgba(161,42,74,.65); color: #fff; }
-  input, button, textarea, select { font: inherit; }
+*, ::before, ::after {
+  box-sizing: border-box;
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: rgba(9,5,6,.75); }
-::-webkit-scrollbar-thumb { background: rgba(161,42,74,.42); border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(193,58,90,.68); }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(7px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes scaleUp {
-  from { opacity: 0; transform: scale(.97); }
-  to { opacity: 1; transform: scale(1); }
-}
-@keyframes nivoGlow {
-  0%,100% { box-shadow: 0 0 22px rgba(143,29,58,.16); }
-  50% { box-shadow: 0 0 36px rgba(193,58,90,.30); }
-}
-@keyframes glassShimmer {
-  0% { transform: translateX(-120%); }
-  100% { transform: translateX(120%); }
-}
-.animate-fade-in { animation: fadeIn .25s cubic-bezier(.16,1,.3,1) forwards; }
-.animate-scale-up { animation: scaleUp .25s cubic-bezier(.16,1,.3,1) forwards; }
-.animate-electric-pulse { animation: nivoGlow 3s infinite ease-in-out; }
-
-.maroon-panel,
-.maroon-card {
-  background: linear-gradient(145deg, rgba(72,15,28,.62), rgba(18,7,11,.78));
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid var(--nivo-border);
-  box-shadow: 0 18px 50px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.035);
-}
-.maroon-card-hover {
-  transition: transform .25s cubic-bezier(.16,1,.3,1), border-color .25s, box-shadow .25s;
-}
-.maroon-card-hover:hover {
-  transform: translateY(-2px);
-  border-color: rgba(193,58,90,.40);
-  box-shadow: 0 20px 55px rgba(0,0,0,.38), 0 0 30px rgba(143,29,58,.10);
+html, body, #root {
+  overflow-x: hidden !important;
+  max-width: 100%;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  background-color: #0c0c14;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.glass-card {
-  background: linear-gradient(145deg, rgba(72,15,28,.58), rgba(16,7,9,.78));
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  border: 1px solid rgba(193,58,90,.23);
-  box-shadow: 0 24px 70px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.045);
+/* Safe area padding utilities for mobile notches */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
 }
-.nivo-input {
-  background: rgba(9,5,6,.55);
-  border: 1px solid rgba(193,58,90,.20);
-  color: #F7EDEF;
-  outline: none;
-  transition: border-color .2s, box-shadow .2s, background .2s;
-}
-.nivo-input::placeholder { color: #80636C; }
-.nivo-input:focus {
-  border-color: rgba(193,58,90,.72);
-  background: rgba(36,10,18,.70);
-  box-shadow: 0 0 0 3px rgba(143,29,58,.12), 0 0 25px rgba(143,29,58,.10);
-}
-.nivo-primary {
-  color: #fff;
-  background: linear-gradient(135deg, #5A1024 0%, #7A1831 48%, #A52A4A 100%);
-  border: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 12px 30px rgba(90,16,36,.28), inset 0 1px 0 rgba(255,255,255,.10);
-  transition: transform .2s, filter .2s, box-shadow .2s;
-}
-.nivo-primary:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 15px 34px rgba(90,16,36,.36); }
-.nivo-primary:active { transform: translateY(0) scale(.99); }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-
-/* Nivo Cash unified premium maroon glass surfaces */
-.nivo-glass-surface {
-  background: linear-gradient(145deg, rgba(72,15,28,.54), rgba(18,7,11,.76));
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(193,58,90,.20);
-  box-shadow: 0 18px 50px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.035);
-}
-.nivo-glass-strong {
-  background: linear-gradient(145deg, rgba(90,16,36,.58), rgba(22,9,13,.84));
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(193,58,90,.28);
-  box-shadow: 0 24px 70px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.045);
-}
-.nivo-maroon-button {
-  background: linear-gradient(135deg, #5A1024 0%, #7A1831 50%, #A52A4A 100%);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 12px 30px rgba(90,16,36,.28), inset 0 1px 0 rgba(255,255,255,.10);
+/* Custom glassmorphism helpers */
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
+.glass-panel-dark {
+  background: rgba(15, 12, 30, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
 
-/* Responsive viewport discipline inspired by the reference app. */
-.pt-safe { padding-top: env(safe-area-inset-top, 0px); }
-.pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
-.nivo-edge-content { width: 100%; max-width: 100%; min-width: 0; }
+/* Scrollbar styling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

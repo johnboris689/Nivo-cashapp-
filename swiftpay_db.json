@@ -1,0 +1,56 @@
+{
+  "users": [
+    {
+      "fullname": "Adebayo Samuel",
+      "username": "adebayo_samuel",
+      "email": "user@example.com",
+      "phone": "08034567890",
+      "passwordhash": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+      "balance": 200000,
+      "dailytarget": 50000,
+      "dailyspent": 18400,
+      "pincreated": 1,
+      "pincode": "1234",
+      "biometricenabled": 1,
+      "profilepic": "",
+      "tier": 3,
+      "issuspended": 0,
+      "isfrozen": 0,
+      "registrationdate": "2026-07-14T15:05:23.894Z",
+      "accountstatus": "active",
+      "beneficiaries": [],
+      "phonebeneficiaries": [],
+      "loginhistory": [],
+      "notifications": [],
+      "transactions": []
+    }
+  ],
+  "vouchers": [],
+  "password_resets": [],
+  "admin_settings": {
+    "supportEmail": "support@swiftpay.com",
+    "supportPhone": "+2349162845073",
+    "whatsappNumber": "+2349162845073",
+    "senderName": "SwiftPay",
+    "videoUrl": "",
+    "recoveryEnabled": "true",
+    "smsRecoveryEnabled": "true",
+    "wdvBankName": "PalmPay",
+    "wdvAccountNumber": "8960723295",
+    "wdvAccountName": "pwamunadi ishaku",
+    "wdvVoucherPrice": "6500",
+    "wdvInstructions": "Copy the system account details below. Make a manual bank transfer of the exact locked amount. Return here and click 'I have made this bank Transfer' to trigger operator check.",
+    "wdvMaintenanceNotice": "Wema Bank transfers are temporarily delayed. Please use other supported banks (like PalmPay or GTBank) for instant manual validation."
+  },
+  "logs": [],
+  "admins": [
+    {
+      "email": "talkdavidjohn@gmail.com",
+      "passwordHash": "$2b$10$o57nUH.Mm8BlIIb4Z5HB6.lmMVCGieOqu6ewbsYGRMZ/bTXx4I2i2"
+    },
+    {
+      "email": "admin@swiftpay.com",
+      "passwordHash": "$2b$10$o57nUH.Mm8BlIIb4Z5HB6.lmMVCGieOqu6ewbsYGRMZ/bTXx4I2i2"
+    }
+  ]
+}
