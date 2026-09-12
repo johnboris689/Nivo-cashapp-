@@ -274,7 +274,7 @@ export default function AdminDashboard1To1({
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
 
-          {/* SwiftPay Brand & SOC Title */}
+          {/* Nevo Brand & SOC Title */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveSidebar('overview')}>
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-teal-500 via-indigo-600 to-purple-600 p-0.5 shadow-lg shadow-teal-500/20 flex items-center justify-center">
               <div className="w-full h-full bg-[#080c16] rounded-[14px] flex items-center justify-center font-black text-transparent bg-clip-text bg-gradient-to-tr from-teal-400 to-cyan-200 text-lg">
@@ -284,7 +284,7 @@ export default function AdminDashboard1To1({
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base md:text-lg font-black tracking-tight text-white flex items-center gap-1.5">
-                  {getCachedSettings().websiteName || 'SwiftPay'} SOC
+                  {getCachedSettings().websiteName || 'Nevo'} SOC
                   <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 font-bold uppercase">
                     v2.4
                   </span>
@@ -942,7 +942,7 @@ export default function AdminDashboard1To1({
           </div>
 
           <footer className="flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-slate-500 pt-6 border-t border-white/10 gap-2 pb-4">
-            <div>© 2026 SwiftPay Financial Security Systems. All rights reserved.</div>
+            <div>© 2026 Nevo Financial Security Systems. All rights reserved.</div>
             <div className="flex items-center gap-3">
               <span className="text-teal-400">SOC SECURITY LEVEL 1</span>
               <span>•</span>

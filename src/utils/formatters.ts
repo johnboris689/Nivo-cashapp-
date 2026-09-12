@@ -1,5 +1,5 @@
 /**
- * Reusable currency formatting utility for SwiftPay.
+ * Reusable currency formatting utility for Nevo.
  * Standardizes Nigerian Naira (₦) formatting with exactly two decimal places.
  *
  * Examples:

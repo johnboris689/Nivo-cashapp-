@@ -309,6 +309,27 @@ export default function App() {
     setCurrentScreen(screenName);
   };
   const [activeTab, setActiveTab] = useState<string>('wallet');
+  const [rewardsTab, setRewardsTab] = useState<'tasks' | 'referrals' | 'activation' | 'history'>('tasks');
+  const [typedGreeting, setTypedGreeting] = useState('');
+
+  useEffect(() => {
+    const openDeposit = () => setPaymentModalOpen(true);
+    window.addEventListener('nevo-open-deposit', openDeposit);
+    return () => window.removeEventListener('nevo-open-deposit', openDeposit);
+  }, []);
+
+  useEffect(() => {
+    const name = user?.fullName?.split(' ')[0] || 'there';
+    const text = `Hi, ${name}`;
+    setTypedGreeting('');
+    let i = 0;
+    const timer = window.setInterval(() => {
+      i += 1;
+      setTypedGreeting(text.slice(0, i));
+      if (i >= text.length) window.clearInterval(timer);
+    }, 85);
+    return () => window.clearInterval(timer);
+  }, [user?.fullName, currentScreen, activeTab]);
 
   // Multi-step form values
   const [authMode, setAuthMode] = useState<'signin' | 'signup' | 'forgot'>('signup');
@@ -361,7 +382,7 @@ export default function App() {
     return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
   });
 
-  // Flow specific parameters - WDV Voucher Price is strictly fixed at dynamic configured price
+  // Flow specific parameters - Deposit Configuration Price is strictly fixed at dynamic configured price
   const [wdvConfig, setWdvConfig] = useState<{
     bankName: string;
     accountNumber: string;
@@ -383,10 +404,10 @@ export default function App() {
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
   const [systemSettings, setSystemSettings] = useState<Record<string, string>>({
-    websiteName: "SwiftPay",
-    scrollingAnnouncement: "Welcome to SwiftPay! Fast and secure manual transactions with 24/7 support.",
-    liveFeedText: "Chioma O. just purchased a WDV Voucher code • Yusuf D. withdrew ₦25,000",
-    welcomeMessage: "Welcome to SwiftPay",
+    websiteName: "Nevo",
+    scrollingAnnouncement: "Welcome to Nevo! Fast and secure manual transactions with 24/7 support.",
+    liveFeedText: "Chioma O. just purchased a Deposit code • Yusuf D. withdrew ₦25,000",
+    welcomeMessage: "Welcome to Nevo",
     dashboardBanner: "Get started with fast manual voucher activation & seamless transfers",
     whatsappNumber: "+2349162845073",
     whatsappLink: "https://wa.me/2349162845073",
@@ -598,7 +619,7 @@ export default function App() {
   // Cache for account verifications (Session Cache)
   const verificationCacheRef = useRef<Record<string, { success: boolean; accountName?: string; error?: string }>>({});
 
-  // Mandatory WDV Voucher missing overlay config
+  // Mandatory Deposit requirement missing overlay config
   const [voucherErrorModal, setVoucherErrorModal] = useState<{ open: boolean; message: string } | null>(null);
 
   // Guide Video modal
@@ -606,7 +627,7 @@ export default function App() {
 
   // Support live chat
   const [liveChatMessages, setLiveChatMessages] = useState<Array<{ sender: 'user' | 'agent'; text: string; time: string }>>([
-    { sender: 'agent', text: 'Hello! Welcome to SwiftPay Live Chat. How can we assist you with your wallet, deposits, transfers, or bills today?', time: 'Just now' }
+    { sender: 'agent', text: 'Hello! Welcome to Nevo Live Chat. How can we assist you with your wallet, deposits, transfers, or bills today?', time: 'Just now' }
   ]);
   const [liveChatInput, setLiveChatInput] = useState('');
   const [isAgentTyping, setIsAgentTyping] = useState(false);
@@ -852,7 +873,7 @@ export default function App() {
     };
     const handleOffline = () => {
       setIsOnline(false);
-      showToast('Network connection lost. SwiftPay is running in offline mode.', 'error');
+      showToast('Network connection lost. Nevo is running in offline mode.', 'error');
     };
 
     window.addEventListener('online', handleOnline);
@@ -963,7 +984,7 @@ export default function App() {
         }
       }
 
-      // Fetch user's own active and historic WDV vouchers directly from DB
+      // Fetch user's own active and historic deposits directly from DB
       const vouchersRes = await fetch('/api/vouchers/my-vouchers', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1028,8 +1049,8 @@ export default function App() {
     setSecurityOtp('');
     sendSimulatedEmail(
       emailAddress,
-      'SwiftPay SecurID Authorization Code',
-      `Dear customer,\n\nA sensitive operation was initiated on your SwiftPay mobile application. To confirm it is you, please enter the following 6-digit authorization code:\n\nVerification Code: ${generatedCode}\n\nThis code will expire in 5 minutes. If you did not request this, please change your password immediately or contact live chat support.`
+      'Nevo SecurID Authorization Code',
+      `Dear customer,\n\nA sensitive operation was initiated on your Nevo mobile application. To confirm it is you, please enter the following 6-digit authorization code:\n\nVerification Code: ${generatedCode}\n\nThis code will expire in 5 minutes. If you did not request this, please change your password immediately or contact live chat support.`
     );
     showToast('A secure 2FA code was dispatched to your simulated inbox!', 'info');
   };
@@ -1109,7 +1130,7 @@ export default function App() {
       setHasSetupPin(true);
       setIsPinUnlocked(true);
       setCurrentScreen('dashboard');
-      showToast('Welcome back to SwiftPay!', 'success');
+      showToast('Welcome back to Nevo!', 'success');
     } catch (err) {
       console.error('Login error:', err);
       showToast('Network error during login.', 'error');
@@ -1720,7 +1741,7 @@ export default function App() {
     setIsInitiatingWdv(false);
   };
 
-  // Generate and Download PDF Receipt for WDV Voucher
+  // Generate and Download PDF Receipt for Deposit
   const handleDownloadWdvPdfReceipt = () => {
     if (!generatedWdv) return;
     try {
@@ -1747,12 +1768,12 @@ export default function App() {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(22);
       doc.setTextColor(255, 255, 255);
-      doc.text('SWIFTPAY DIGITAL BANKING', 20, 22);
+      doc.text('NEVO DIGITAL BANKING', 20, 22);
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
       doc.setTextColor(tealAccent[0], tealAccent[1], tealAccent[2]);
-      doc.text('Official WDV Voucher Certificate & Payment Receipt', 20, 31);
+      doc.text('Official Deposit Certificate & Payment Receipt', 20, 31);
 
       // Status Badge
       doc.setFillColor(16, 185, 129);
@@ -1770,7 +1791,7 @@ export default function App() {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
       doc.setTextColor(100, 116, 139);
-      doc.text('WDV VOUCHER CODE (MANDATORY FOR WITHDRAWALS)', 30, 66);
+      doc.text('DEPOSIT CODE (MANDATORY FOR WITHDRAWALS)', 30, 66);
 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(22);
@@ -1809,10 +1830,10 @@ export default function App() {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
       doc.setTextColor(148, 163, 184);
-      doc.text('SwiftPay Security System • Automatically Verified', 105, 170, { align: 'center' });
+      doc.text('Nevo Security System • Automatically Verified', 105, 170, { align: 'center' });
 
-      doc.save(`swiftpay-wdv-voucher-${generatedWdv.code || 'code'}.pdf`);
-      showToast('WDV Voucher PDF Receipt Downloaded!', 'success');
+      doc.save(`swiftpay-deposit-${generatedWdv.code || 'code'}.pdf`);
+      showToast('Deposit PDF Receipt Downloaded!', 'success');
     } catch (err) {
       console.error('Error generating WDV PDF:', err);
       showToast('Failed to generate WDV PDF', 'error');
@@ -1873,16 +1894,6 @@ export default function App() {
     }
 
     const price = parseInt(airtimeAmount);
-    const codeToUse = airtimeWdvCode.trim();
-
-    // MANDATORY WDV Voucher Verification (Point 7)
-    if (!codeToUse) {
-      setVoucherErrorModal({
-        open: true,
-        message: "WDV Voucher Required. If you don't have one, tap Deposit Funds."
-      });
-      return;
-    }
 
     setIsSubmitting(true);
     try {
@@ -1896,7 +1907,6 @@ export default function App() {
           phoneNumber: airtimePhone,
           network: airtimeNetwork,
           amount: price,
-          voucherCode: codeToUse
         })
       });
       const data = await res.json();
@@ -1975,16 +1985,6 @@ export default function App() {
     }
 
     const price = selectedDataPlan.price;
-    const codeToUse = dataWdvCode.trim();
-
-    // MANDATORY WDV Voucher Verification (Point 7)
-    if (!codeToUse) {
-      setVoucherErrorModal({
-        open: true,
-        message: "WDV Voucher Required. If you don't have one, tap Deposit Funds."
-      });
-      return;
-    }
 
     setIsSubmitting(true);
     try {
@@ -1998,7 +1998,6 @@ export default function App() {
           phoneNumber: dataPhone,
           network: dataNetwork,
           bundleId: selectedDataPlan.id,
-          voucherCode: codeToUse
         })
       });
       const data = await res.json();
@@ -2074,16 +2073,6 @@ export default function App() {
     const price = parseInt(transferAmount);
     if (!transferAmount || isNaN(price) || price < 50 || price > 200000) {
       showToast('Transfer amount must be between ₦50 and ₦200,000', 'error');
-      return;
-    }
-    const codeToUse = transferWdvCode.trim();
-
-    // MANDATORY WDV Voucher Verification (Point 7)
-    if (!codeToUse) {
-      setVoucherErrorModal({
-        open: true,
-        message: "WDV Voucher Required. If you don't have one, tap Deposit Funds."
-      });
       return;
     }
 
@@ -2179,16 +2168,6 @@ export default function App() {
     const price = parseInt(withdrawAmount);
     if (!withdrawAmount || isNaN(price) || price < 50 || price > 200000) {
       showToast('Withdrawal amount must be between ₦50 and ₦200,000', 'error');
-      return;
-    }
-    const codeToUse = withdrawWdvCode.trim();
-
-    // MANDATORY WDV Voucher Verification (Point 7)
-    if (!codeToUse) {
-      setVoucherErrorModal({
-        open: true,
-        message: "WDV Voucher Required. If you don't have one, tap Deposit Funds."
-      });
       return;
     }
 
@@ -2292,14 +2271,6 @@ export default function App() {
       showToast('Please enter a valid bill payment amount.', 'error');
       return;
     }
-    const codeToUse = billsWdvCode.trim();
-    if (!codeToUse) {
-      setVoucherErrorModal({
-        open: true,
-        message: "WDV Voucher Required. If you don't have one, tap Deposit Funds."
-      });
-      return;
-    }
 
     setIsSubmitting(true);
     try {
@@ -2314,7 +2285,6 @@ export default function App() {
           provider: billsProvider,
           accountNumber: billsAccountNumber,
           amount: Number(billsAmount),
-          voucherCode: codeToUse
         })
       });
       const data = await res.json();
@@ -2416,13 +2386,13 @@ export default function App() {
       const msgLower = userMsg.toLowerCase();
 
       if (msgLower.includes('wdv') || msgLower.includes('voucher') || msgLower.includes('code')) {
-        replyText = 'Deposits add funds directly to your SwiftPay wallet through the secure payment provider flow.';
+        replyText = 'Deposits add funds directly to your Nevo wallet through the secure payment provider flow.';
       } else if (msgLower.includes('delay') || msgLower.includes('confirm') || msgLower.includes('wait')) {
         replyText = 'Apologies for the delay! If your bank is under maintenance, our backend operators reconcile transfers manually. Drop your account name and transfer receipt here for prompt verification!';
       } else if (msgLower.includes('airtime') || msgLower.includes('data')) {
         replyText = 'To load airtime or data, open the relevant service, choose the network and amount, then pay from your wallet balance.';
       } else if (msgLower.includes('hello') || msgLower.includes('hi') || msgLower.includes('support')) {
-        replyText = `Hi! SwiftPay Live Agent online. How can we assist with your balance, deposits, transfers, or bills?`;
+        replyText = `Hi! Nevo Live Agent online. How can we assist with your balance, deposits, transfers, or bills?`;
       }
 
       setLiveChatMessages((prev) => [...prev, { sender: 'agent', text: replyText, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
@@ -2532,7 +2502,7 @@ export default function App() {
               <Shield className="h-7 w-7 text-[#2dd4bf]" />
             </div>
             <h1 className="text-2xl font-black font-display bg-gradient-to-r from-[#818cf8] to-[#2dd4bf] bg-clip-text text-transparent">
-              SwiftPay Admin Portal
+              Nevo Admin Portal
             </h1>
             <p className="text-xs text-slate-400 mt-2 font-mono uppercase tracking-wider">SECURE AUTHORIZATION</p>
           </div>
@@ -2740,9 +2710,9 @@ export default function App() {
                 </div>
               )}
               <h2 className="text-3xl font-black font-display tracking-tight bg-gradient-to-r from-white via-slate-100 to-teal-200 bg-clip-text text-transparent">
-                {systemSettings.websiteName || "SwiftPay"}
+                {systemSettings.websiteName || "Nevo"}
               </h2>
-              <span className="text-[10px] tracking-wider uppercase font-mono font-bold text-teal-400 block mt-1">{systemSettings.websiteName || "SwiftPay"} Digital Platform</span>
+              <span className="text-[10px] tracking-wider uppercase font-mono font-bold text-teal-400 block mt-1">{systemSettings.websiteName || "Nevo"} Digital Platform</span>
               <p className="text-xs text-slate-300 mt-4 px-3 leading-relaxed">
                 Get your account ready and instantly start buying, selling airtime and data online and start paying all your bills in cheaper price
               </p>
@@ -3130,7 +3100,7 @@ export default function App() {
 
             {/* Legal Notice */}
             <div className="text-center text-[10px] text-slate-400 leading-normal pb-4">
-              By continuing, you agree to SwiftPay's{' '}
+              By continuing, you agree to Nevo's{' '}
               <a
                 href="/terms"
                 onClick={(e) => {
@@ -3167,7 +3137,7 @@ export default function App() {
                   <div className="flex items-center justify-between border-b border-white/5 pb-4">
                     <div>
                       <span className="text-xl font-black font-display bg-gradient-to-r from-indigo-400 to-teal-300 bg-clip-text text-transparent">
-                        SwiftPay
+                        Nevo
                       </span>
                       <span className="text-[8px] font-mono text-slate-400 block uppercase tracking-widest mt-0.5">Version 4.1.0</span>
                     </div>
@@ -3239,7 +3209,7 @@ export default function App() {
                       </button>
                     )}
                     <span className="text-lg font-black font-display bg-gradient-to-r from-[#818cf8] to-[#2dd4bf] bg-clip-text text-transparent">
-                      SwiftPay
+                      Nevo
                     </span>
 
                     {/* Adaptive Device Layout Detected Badge */}
@@ -3284,8 +3254,8 @@ export default function App() {
                       {/* Greeting Block */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="text-base sm:text-lg font-bold font-display text-white">Hi, {user?.fullName.split(' ')[0] || 'Adebayo'}</h4>
-                          <p className="text-[11px] text-slate-400 mt-0.5">Welcome back, transact cheaper today.</p>
+                          <h4 className="text-base sm:text-lg font-bold font-display text-white min-h-[24px]">{typedGreeting}<span className="inline-block w-px h-4 ml-0.5 align-middle bg-teal-400 animate-pulse" /></h4>
+                          <p className="text-[11px] text-slate-400 mt-0.5">Welcome back to Nevo — complete tasks, watch adverts and earn money.</p>
                         </div>
                         {/* User Avatar */}
                         <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-gradient-to-tr from-indigo-500 to-teal-400 p-0.5 shadow-md">
@@ -3345,7 +3315,7 @@ export default function App() {
                         <h5 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-2">Quick Actions</h5>
                         <div className="grid grid-cols-4 gap-1.5 sm:gap-3 w-full max-w-full min-w-0">
                           {[
-                            { id: 'social', label: 'Platform', icon: MessageSquare, bg: 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20' },
+                            { id: 'support', label: 'Support', icon: MessageSquare, bg: 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20' },
                             { id: 'deposit', label: 'Deposit', icon: Wallet, bg: 'bg-teal-500/15 text-teal-400 border border-teal-500/20' },
                             { id: 'guide', label: 'Watch Guide', icon: Clock, bg: 'bg-violet-500/15 text-violet-400 border border-violet-500/20' },
                             { id: 'airtime', label: 'Airtime', icon: Smartphone, bg: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' }
@@ -3354,8 +3324,8 @@ export default function App() {
                               id={`btn-action-${act.id}`}
                               key={act.id}
                               onClick={() => {
-                                if (act.id === 'social') {
-                                  setActiveTab('social');
+                                if (act.id === 'support') {
+                                  setCurrentScreen('support_live_chat');
                                 } else if (act.id === 'deposit') {
                                   setPaymentModalOpen(true);
                                 } else if (act.id === 'guide') {
@@ -3372,6 +3342,24 @@ export default function App() {
                               <span className="text-[10px] font-medium text-slate-300 text-center truncate w-full block">
                                 {act.label}
                               </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* EARN & REWARDS GRID */}
+                      <div>
+                        <h5 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-2">Earn & Rewards</h5>
+                        <div className="grid grid-cols-4 gap-1.5 sm:gap-2.5 w-full max-w-full min-w-0">
+                          {[
+                            { id: 'tasks' as const, label: 'Tasks', icon: CheckCircle2, bg: 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20' },
+                            { id: 'referrals' as const, label: 'Referrals', icon: Share2, bg: 'bg-teal-500/15 text-teal-400 border border-teal-500/20' },
+                            { id: 'activation' as const, label: 'Withdrawal', icon: ShieldCheck, bg: 'bg-violet-500/15 text-violet-400 border border-violet-500/20' },
+                            { id: 'history' as const, label: 'Rewards', icon: Clock, bg: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' }
+                          ].map((item) => (
+                            <button key={item.id} onClick={() => { setRewardsTab(item.id); setActiveTab('social'); }} className="p-1.5 sm:p-2.5 rounded-xl bg-[#0a0a14] border border-white/5 hover:border-white/15 flex flex-col items-center hover:bg-[#10101f] active:scale-95 transition-all text-center w-full min-w-0 shadow-sm">
+                              <div className={`p-1.5 rounded-lg mb-1 shrink-0 ${item.bg}`}><item.icon className="h-4 w-4" /></div>
+                              <span className="text-[9px] font-bold text-slate-300 uppercase leading-none truncate w-full block">{item.label}</span>
                             </button>
                           ))}
                         </div>
@@ -3448,6 +3436,7 @@ export default function App() {
                   user={user}
                   token={localStorage.getItem('swiftpay_token') || ''}
                   onToast={showToast}
+                  initialTab={rewardsTab}
                 />
               )}
 
@@ -3825,7 +3814,7 @@ export default function App() {
                       <div className="flex items-center gap-3">
                         <Info className="h-5 w-5 text-[#818cf8]" />
                         <div>
-                          <h6 className="text-xs font-bold text-slate-800 dark:text-white">About SwiftPay</h6>
+                          <h6 className="text-xs font-bold text-slate-800 dark:text-white">About Nevo</h6>
                           <p className="text-[10px] text-slate-400 mt-0.5">Read about the rebranding and our mission</p>
                         </div>
                       </div>
@@ -3878,11 +3867,11 @@ export default function App() {
                     >
                       <ArrowLeft className="h-4 w-4" />
                     </button>
-                    <h4 className="text-base font-bold font-display text-slate-800 dark:text-white">Purchase WDV Voucher</h4>
+                    <h4 className="text-base font-bold font-display text-slate-800 dark:text-white">Purchase Deposit</h4>
                   </div>
 
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Purchase a WDV voucher securely online. Your voucher is issued only after the payment gateway confirms the payment.
+                    Purchase a deposit securely online. Your voucher is issued only after the payment gateway confirms the payment.
                   </p>
 
                   {/* Instant Online Payment Option (Paystack / Flutterwave / Korapay) */}
@@ -3910,7 +3899,7 @@ export default function App() {
                       className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-teal-400 to-emerald-400 hover:from-teal-300 hover:to-emerald-300 text-slate-950 text-xs font-black uppercase tracking-wider shadow-lg shadow-teal-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <CreditCard className="h-4 w-4 stroke-[2.5]" />
-                      <span>BUY WDV VOUCHER — ₦6,500</span>
+                      <span>BUY DEPOSIT — ₦6,500</span>
                       <ArrowRight className="h-4 w-4" />
                     </button>
                   </div>
@@ -3921,7 +3910,7 @@ export default function App() {
               {false && currentScreen === 'wdv_instructions' && (
                 <div className="p-5 space-y-5 animate-[fadeIn_0.2s_ease-out]">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-base font-bold font-display text-slate-800 dark:text-white">WDV Voucher Payment Details</h4>
+                    <h4 className="text-base font-bold font-display text-slate-800 dark:text-white">Deposit Payment Details</h4>
                     <span className="text-[10px] font-mono font-bold text-teal-400 bg-teal-500/10 px-2.5 py-1 rounded-full border border-teal-500/20 flex items-center gap-1.5">
                       <span className="h-2 w-2 rounded-full bg-teal-400 animate-pulse" />
                       Official Bank Transfer
@@ -4042,10 +4031,10 @@ export default function App() {
                         if (!waNumber) waNumber = '2349162845073';
 
                         const msg = encodeURIComponent(
-                          `Hello Admin, I have made a bank transfer of ₦${(wdvConfig.voucherPrice || 6500).toLocaleString()} for my WDV Voucher.\n` +
+                          `Hello Admin, I have made a bank transfer of ₦${(wdvConfig.voucherPrice || 6500).toLocaleString()} for my Deposit.\n` +
                           `Name: ${wdvFormName || user?.fullName || 'Customer'}\n` +
                           `Email: ${wdvFormEmail || user?.email || ''}\n` +
-                          `Please confirm my transfer and send my WDV Voucher code.`
+                          `Please confirm my transfer and send my Deposit code.`
                         );
 
                         const finalUrl = rawWa.startsWith('http') && !rawWa.includes('?')
@@ -4087,7 +4076,7 @@ export default function App() {
                   {/* Voucher Display Card */}
                   <div className="bg-[#0a0a14] border border-emerald-500/30 p-5 rounded-2xl text-center space-y-3 relative overflow-hidden">
                     <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold uppercase tracking-wider font-mono">
-                      SwiftPay Verified & Active
+                      Nevo Verified & Active
                     </div>
 
                     <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-xl space-y-2">
@@ -4840,36 +4829,10 @@ export default function App() {
                         )}
                       </div>
 
-                      {/* Payment Authorization */}
-                      <div className="space-y-1.5 relative">
-                        <div className="flex justify-between items-center">
-                          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Payment Authorization</label>
-                          <button
-                            type="button"
-                            onClick={() => setPaymentModalOpen(true)}
-                            className="text-[9px] font-bold text-indigo-500 dark:text-teal-400 hover:underline uppercase leading-none"
-                          >
-                            Deposit Funds
-                          </button>
-                        </div>
-                        <input
-                          type="text"
-                          value={billsWdvCode}
-                          onChange={(e) => setBillsWdvCode(e.target.value.toUpperCase())}
-                          placeholder="WDV-XXXX-XXXX-XXXX"
-                          className="w-full h-11 px-3 bg-white/50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500 dark:focus:border-teal-500 font-mono placeholder:opacity-50"
-                        />
-                        <div className="absolute top-0 right-0 mt-[-2px] flex items-center gap-1 bg-indigo-500/10 px-2 py-0.5 rounded text-[8px] font-mono font-bold text-indigo-600 dark:text-teal-400 uppercase">
-                          Required
-                        </div>
-                      </div>
-
-                      {/* Informational Alert Box */}
-                      <div className="p-3 bg-indigo-500/5 dark:bg-teal-500/5 rounded-xl border border-indigo-500/10 dark:border-teal-500/10 space-y-1">
-                        <span className="text-[9px] font-bold text-indigo-600 dark:text-teal-400 uppercase block">Wallet Security</span>
-                        <p className="text-[9.5px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                          A valid and unused WDV Voucher is required for all utility payments. Each voucher is consumed atomically during payment to secure authorization.
-                        </p>
+                      {/* Wallet Payment Authorization */}
+                      <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-2.5">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                        <div><p className="font-bold">✓ Wallet Ready</p><p className="text-[9px] opacity-80 mt-0.5">Your Nevo wallet balance is used directly for this payment.</p></div>
                       </div>
 
                       {/* Submit Button */}
@@ -4879,12 +4842,11 @@ export default function App() {
                         disabled={
                           !billsAccountNumber || 
                           !billsAmount || 
-                          !billsWdvCode || 
                           isSubmitting || 
                           (billsType === 'electricity' && !isMeterValidated)
                         }
                         className={`w-full h-12 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 dark:from-teal-600 dark:to-teal-700 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
-                          (!billsAccountNumber || !billsAmount || !billsWdvCode || isSubmitting || (billsType === 'electricity' && !isMeterValidated)) 
+                          (!billsAccountNumber || !billsAmount || isSubmitting || (billsType === 'electricity' && !isMeterValidated)) 
                             ? 'opacity-50 cursor-not-allowed' 
                             : 'shadow-lg hover:shadow-indigo-500/10'
                         }`}
@@ -5043,7 +5005,7 @@ export default function App() {
                     </GlassCard>
                   )}
 
-                  {/* STEP 2: Amount & Voucher Authorization */}
+                  {/* STEP 2: Amount & Deposit Authorization */}
                   {withdrawStep === 2 && (
                     <GlassCard className="p-6 space-y-5 border-white/10">
                       <div className="border-b border-white/5 pb-3 flex items-center justify-between">
@@ -5052,7 +5014,7 @@ export default function App() {
                             <span className="h-6 w-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs font-mono font-bold">2</span>
                             Step 2: Amount & Authorization
                           </h3>
-                          <p className="text-[11px] text-slate-400 mt-1">Specify withdrawal amount and enter your WDV voucher code.</p>
+                          <p className="text-[11px] text-slate-400 mt-1">Specify withdrawal amount and enter your deposit code.</p>
                         </div>
                         <button
                           type="button"
@@ -5097,31 +5059,10 @@ export default function App() {
                           )}
                         </div>
 
-                        {/* Payment Authorization */}
-                        <div>
-                          <div className="flex items-center justify-between mb-1.5">
-                            <label className="text-[11px] font-mono text-rose-400 font-bold uppercase tracking-wider">Payment Authorization</label>
-                            <button
-                              id="btn-goto-buy-wdv-withdraw"
-                              type="button"
-                              onClick={() => {
-                                setWdvBackScreen('withdraw');
-                                setPaymentModalOpen(true);
-                              }}
-                              className="text-[10px] font-bold text-teal-400 hover:underline cursor-pointer"
-                            >
-                              Deposit Funds
-                            </button>
-                          </div>
-                          <input
-                            id="input-withdraw-wdv"
-                            type="text"
-                            placeholder="e.g. WDV-XXXX-XXXX-XXXX"
-                            required
-                            value={withdrawWdvCode}
-                            onChange={(e) => setWithdrawWdvCode(e.target.value)}
-                            className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono tracking-widest uppercase focus:outline-none focus:ring-1 focus:ring-teal-400"
-                          />
+                        {/* Withdrawal eligibility */}
+                        <div className="p-3 rounded-xl bg-teal-500/10 border border-teal-500/20 text-xs text-teal-200 leading-relaxed">
+                          <div className="font-bold mb-1">Withdrawal requirements</div>
+                          <div>Invite at least 5 active users, then deposit at least ₦520 through the Deposit button to unlock withdrawals.</div>
                         </div>
 
                         <button
@@ -5134,11 +5075,10 @@ export default function App() {
                             !withdrawAmount ||
                             parseInt(withdrawAmount) < 50 ||
                             parseInt(withdrawAmount) > 200000 ||
-                            !withdrawWdvCode ||
                             isSubmitting
                           }
                           className={`w-full py-4 bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
-                            (!withdrawAccount || withdrawAccount.length !== 10 || !withdrawAccName || !withdrawAmount || parseInt(withdrawAmount) < 50 || parseInt(withdrawAmount) > 200000 || !withdrawWdvCode || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
+                            (!withdrawAccount || withdrawAccount.length !== 10 || !withdrawAccName || !withdrawAmount || parseInt(withdrawAmount) < 50 || parseInt(withdrawAmount) > 200000 || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
                         >
                           {isSubmitting ? (
@@ -5296,7 +5236,7 @@ export default function App() {
                     </GlassCard>
                   )}
 
-                  {/* STEP 2: Amount & Voucher Authorization */}
+                  {/* STEP 2: Amount & Deposit Authorization */}
                   {transferStep === 2 && (
                     <GlassCard className="p-6 space-y-5 border-white/10">
                       <div className="border-b border-white/5 pb-3 flex items-center justify-between">
@@ -5305,7 +5245,7 @@ export default function App() {
                             <span className="h-6 w-6 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-mono font-bold">2</span>
                             Step 2: Amount & Authorization
                           </h3>
-                          <p className="text-[11px] text-slate-400 mt-1">Specify transfer amount and enter WDV voucher code.</p>
+                          <p className="text-[11px] text-slate-400 mt-1">Specify transfer amount and enter deposit code.</p>
                         </div>
                         <button
                           type="button"
@@ -5395,11 +5335,10 @@ export default function App() {
                             !transferAmount ||
                             parseInt(transferAmount) < 50 ||
                             parseInt(transferAmount) > 200000 ||
-                            (!transferWdvCode && !user?.wdvVerified && !user?.isWdvVerified) ||
                             isSubmitting
                           }
                           className={`w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
-                            (!transferAccNum || transferAccNum.length !== 10 || !transferAccName || !transferAmount || parseInt(transferAmount) < 50 || parseInt(transferAmount) > 200000 || (!transferWdvCode && !user?.wdvVerified && !user?.isWdvVerified) || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
+                            (!transferAccNum || transferAccNum.length !== 10 || !transferAccName || !transferAmount || parseInt(transferAmount) < 50 || parseInt(transferAmount) > 200000 || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
                         >
                           {isSubmitting ? (
@@ -5460,7 +5399,7 @@ export default function App() {
                   </div>
 
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Learn how our customized WDV Voucher system operates and how you save on bank transaction bills.
+                    Learn how our customized Deposit system operates and how you save on bank transaction bills.
                   </p>
 
                   <div className="space-y-3">
@@ -5500,9 +5439,9 @@ export default function App() {
                   <div className="rounded-3xl p-6 bg-gradient-to-tr from-indigo-950 via-purple-950 to-teal-950 text-white relative overflow-hidden border border-white/5 shadow-lg">
                     <div className="absolute right-0 top-0 h-24 w-24 bg-teal-500/10 rounded-full blur-xl" />
                     
-                    <h5 className="text-base font-extrabold font-display">SwiftPay Digital Platform</h5>
+                    <h5 className="text-base font-extrabold font-display">Nevo Digital Platform</h5>
                     <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                      SwiftPay is a premium digital banking platform offering enhanced features, better security, and a more streamlined user experience. We utilize a glowing glassmorphism system with zero downtime.
+                      Nevo is a premium digital banking platform offering enhanced features, better security, and a more streamlined user experience. We utilize a glowing glassmorphism system with zero downtime.
                     </p>
                   </div>
 
@@ -5693,7 +5632,7 @@ export default function App() {
                     <div className="flex items-center justify-between border-b border-slate-150 dark:border-slate-900 pb-4">
                       <div>
                         <span className="text-base font-black font-display bg-gradient-to-r from-indigo-600 to-teal-500 dark:from-indigo-400 dark:to-teal-300 bg-clip-text text-transparent">
-                          SwiftPay
+                          Nevo
                         </span>
                         <span className="text-[8px] font-mono text-slate-400 block uppercase tracking-widest mt-0.5">Version 4.1.0</span>
                       </div>
@@ -5788,7 +5727,7 @@ export default function App() {
                   <div>
                     <h5 className="text-sm font-bold text-white font-display">Voucher Redemptions Guide</h5>
                     <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                      This walkthrough simulated guide explains how copying PalmPay account credentials, initiating standard transfers, and generating Withdrawal Vouchers (WDV) operates with zero fees on SwiftPay.
+                      This walkthrough simulated guide explains how copying PalmPay account credentials, initiating standard transfers, and generating Withdrawal Vouchers (WDV) operates with zero fees on Nevo.
                     </p>
                   </div>
 

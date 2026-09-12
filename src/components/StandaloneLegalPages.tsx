@@ -14,7 +14,7 @@ export function StandaloneTermsPage({ navigateTo }: StandalonePageProps) {
     fetchMasterSettings().then((s) => setSettings(s));
   }, []);
 
-  const brandName = settings.websiteName || 'SwiftPay';
+  const brandName = settings.websiteName || 'Nevo';
   const supportEmail = settings.supportEmail || 'support@swiftpay.com';
   const telegramLink = settings.telegramLink || 'https://t.me/swiftpay';
   const officeAddress = settings.officeAddress || 'Lagos, Nigeria';
@@ -199,7 +199,7 @@ export function StandalonePrivacyPage({ navigateTo }: StandalonePageProps) {
     fetchMasterSettings().then((s) => setSettings(s));
   }, []);
 
-  const brandName = settings.websiteName || 'SwiftPay';
+  const brandName = settings.websiteName || 'Nevo';
   const supportEmail = settings.supportEmail || 'support@swiftpay.com';
   const telegramLink = settings.telegramLink || 'https://t.me/swiftpay';
   const officeAddress = settings.officeAddress || 'Lagos, Nigeria';
@@ -264,7 +264,7 @@ export function StandalonePrivacyPage({ navigateTo }: StandalonePageProps) {
 
 export function Custom404Page({ navigateTo }: StandalonePageProps) {
   const settings = getCachedSettings();
-  const brandName = settings.websiteName || 'SwiftPay';
+  const brandName = settings.websiteName || 'Nevo';
 
   return (
     <div className="min-h-screen bg-[#050507] text-slate-100 flex flex-col items-center justify-center p-4 font-sans text-center">

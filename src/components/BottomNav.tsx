@@ -11,7 +11,7 @@ interface BottomNavProps {
 export default function BottomNav({ activeTab, currentScreen, onTabChange, onFabClick }: BottomNavProps) {
   const tabs = [
     { id: 'wallet', label: 'Wallet', icon: Wallet },
-    { id: 'social', label: 'Social', icon: Users },
+    { id: 'social', label: 'Earn', icon: Users },
     { id: 'placeholder', label: '', icon: null, isFabSpace: true }, // Center spacer
     { id: 'data', label: 'Data', icon: Smartphone },
     { id: 'profile', label: 'Profile', icon: User },

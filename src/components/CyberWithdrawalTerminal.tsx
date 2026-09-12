@@ -244,7 +244,7 @@ export function CyberWithdrawalTerminal({
             </div>
             <div>
               <h1 className="text-sm sm:text-base font-black text-white tracking-widest uppercase flex items-center gap-2">
-                SWIFTPAY SECURE TRANSACTION TERMINAL
+                NEVO SECURE TRANSACTION TERMINAL
                 <span className="text-[10px] text-teal-400 font-normal px-2 py-0.5 rounded bg-teal-950 border border-teal-500/30">
                   PARTIAL DISBURSEMENT ACTIVE
                 </span>

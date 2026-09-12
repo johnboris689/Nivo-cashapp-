@@ -137,11 +137,11 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
   },
   {
     id: 'tx-2',
-    type: 'buy_wdv',
+    type: 'deposit',
     amount: 10000,
     date: '2026-07-08T18:45:00Z',
     status: 'success',
-    description: 'WDV Voucher Purchase'
+    description: 'Wallet Deposit'
   },
   {
     id: 'tx-3',
@@ -179,16 +179,15 @@ export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
   },
   {
     id: 'notif-wdv-102',
-    title: 'WDV Voucher Generated',
-    body: 'Your payment has been confirmed successfully. Your voucher has been generated and is ready for use.',
+    title: 'Deposit Confirmed',
+    body: 'Your wallet deposit has been confirmed successfully and is ready for use.',
     date: '2026-08-05T12:15:00Z',
     unread: true,
     type: 'voucher',
-    category: 'WDV Voucher',
+    category: 'Wallet Deposit',
     status: 'Payment Verified',
     amount: 6500,
-    voucherCode: 'WDV-F3A8-AAF2-1D79',
-    reference: 'DVA_928174012'
+    reference: 'DEP_928174012'
   },
   {
     id: 'notif-bal-103',
@@ -199,13 +198,13 @@ export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
     type: 'balance',
     category: 'Daily Refreshed Balance',
     status: 'Completed',
-    amount: 200000,
-    reference: 'REF-DAILY-20260804'
+    amount: 750,
+    reference: 'REF-WELCOME-20260804'
   },
   {
     id: 'notif-welcome-104',
-    title: 'Welcome to SwiftPay!',
-    body: 'Welcome to SwiftPay. Enjoy a faster, more secure, violet-to-teal digital banking experience!',
+    title: 'Welcome to Nevo!',
+    body: 'Welcome to Nevo. Enjoy a faster, more secure, violet-to-teal digital banking experience!',
     date: '2026-07-09T00:00:00Z',
     unread: false,
     type: 'login',
@@ -218,11 +217,11 @@ export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
 export const FAQS = [
   {
     question: 'What is a WDV (Withdrawal Voucher)?',
-    answer: 'The Withdrawal Voucher (WDV) is a first-class voucher code purchased on SwiftPay. You pay for it via a secure manual bank transfer. Once generated, it acts as instant store credit or a redeemable token. You can copy this code and redeem it during airtime, data, or bank transfer operations instead of paying from your direct wallet balance.'
+    answer: 'The Withdrawal Voucher (WDV) is a first-class voucher code purchased on Nevo. You pay for it via a secure manual bank transfer. Once generated, it acts as instant store credit or a redeemable token. You can copy this code and redeem it during airtime, data, or bank transfer operations instead of paying from your direct wallet balance.'
   },
   {
     question: 'How do I fund my Naira Wallet?',
-    answer: 'You can fund your SwiftPay wallet by clicking "Withdraw" or utilizing any active voucher code, or completing a direct peer bank transfer. Direct balance updates occur instantly after verifying the transaction.'
+    answer: 'You can fund your Nevo wallet by clicking "Withdraw" or utilizing any active voucher code, or completing a direct peer bank transfer. Direct balance updates occur instantly after verifying the transaction.'
   },
   {
     question: 'How long does WDV confirmation take?',
@@ -230,7 +229,7 @@ export const FAQS = [
   },
   {
     question: 'Are there any transaction fees?',
-    answer: 'No! SwiftPay offers zero charge transfers on WDV generations, and heavily discounted airtime and data bundles compared to direct retail rates.'
+    answer: 'No! Nevo offers zero charge transfers on WDV generations, and heavily discounted airtime and data bundles compared to direct retail rates.'
   },
   {
     question: 'What happens if a bank is temporarily unavailable?',

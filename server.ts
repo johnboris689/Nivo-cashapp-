@@ -741,35 +741,11 @@ function processUserGiftEligibility(user: UserState): { updated: boolean; user: 
     }
   }
 
-  // PART 4 RULES 1, 3, 4: Every 24 hours, credit fresh ₦200,000.
-  // Unused funds expire permanently without rollover, carryover, or stacking.
+  // Welcome bonus is a one-time ₦750 registration credit. No automatic ₦200,000 daily wallet reset is used.
   if (hoursSinceLastCredit >= 24) {
-    user.balance = 200000;
     user.lastGiftCreditTime = now.toISOString();
     user.lastActivityTime = now.toISOString();
     updated = true;
-
-    user.transactions = user.transactions || [];
-    user.transactions.unshift({
-      id: `tx-${Date.now()}-daily-allocation`,
-      type: 'promotional_bonus',
-      amount: 200000,
-      date: now.toISOString(),
-      status: 'success',
-      description: 'Daily Wallet Allocation (₦200,000)',
-      narration: 'SwiftPay 24-Hour Cycle Fresh Allocation'
-    });
-
-    user.notifications = user.notifications || [];
-    user.notifications.unshift({
-      id: `notif-${Date.now()}-daily-allocation`,
-      title: 'Daily ₦200,000 Refreshed',
-      body: 'Your 24-hour cycle has started! Wallet reset to ₦200,000. Unused funds from previous cycle expired.',
-      date: now.toISOString(),
-      unread: true
-    });
-
-    console.log(`[Daily Wallet Engine] User ${user.email} 24-hour cycle reset to ₦200,000.`);
   }
 
   return { updated, user };
@@ -797,7 +773,7 @@ async function authenticateToken(req: any, res: any, next: any) {
       fullName: defaultName || 'SwiftPay User',
       email: email.toLowerCase(),
       passwordHash: bcrypt.hashSync('SwiftPayTempPass99!', 10),
-      balance: 200000,
+      balance: 750,
       dailyTarget: 50000,
       dailySpent: 0,
       pinCreated: false,
@@ -1020,7 +996,8 @@ app.post('/api/auth/register', async (req, res) => {
     return res.status(403).json({ error: 'New user registrations are currently disabled by administration.' });
   }
 
-  const bonusAmount = settings.registrationBonus !== undefined ? Number(settings.registrationBonus) : 200000;
+  const configuredBonus = settings.registrationBonus !== undefined ? Number(settings.registrationBonus) : 750;
+  const bonusAmount = Number.isFinite(configuredBonus) && configuredBonus > 0 ? configuredBonus : 750;
   const currencySymbol = settings.currency || '₦';
 
   const db = readDb();
@@ -1054,7 +1031,7 @@ app.post('/api/auth/register', async (req, res) => {
     phone: phone || '',
     profilePic: '',
     username: (username || fullName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_')).slice(0, 30),
-    referralCode: `SWIFT${crypto.randomBytes(4).toString('hex').toUpperCase()}`,
+    referralCode: `NEVO${crypto.randomBytes(4).toString('hex').toUpperCase()}`,
     referralCount: 0,
     totalReferralBonus: 0,
     totalEarnings: 0,
@@ -2814,11 +2791,15 @@ app.post('/api/transactions/withdraw', authenticateToken, async (req: any, res) 
   const db = readDb();
   const user = db.users[req.userIndex];
 
-  // Nivo withdrawal eligibility: activation plus five successful referrals.
+  // Nevo withdrawal eligibility: at least five successful referrals AND a verified wallet deposit of at least ₦520.
   const referralRow = await getRow(`SELECT COUNT(*) as count FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) AND status='successful'`, [email]);
   const successfulReferrals = Number(referralRow?.count || 0);
-  if (!user.activationPaid || successfulReferrals < 5) {
-    return res.status(403).json({ error: `Withdrawal locked. Activate your account and complete 5 successful referrals (${successfulReferrals}/5).` });
+  const paymentRows = await getAllRows(`SELECT * FROM payment_transactions WHERE LOWER(userEmail)=LOWER($1) AND purpose='wallet_funding' AND status='successful'`, [email]);
+  const depositRequirementMet = paymentRows.some((p:any) => Number(p.amount || 0) >= 520);
+  if (successfulReferrals < 5 || !depositRequirementMet) {
+    const referralPart = successfulReferrals < 5 ? `Invite at least 5 active users (${successfulReferrals}/5).` : '';
+    const depositPart = !depositRequirementMet ? 'Deposit at least ₦520 through Deposit Funds.' : '';
+    return res.status(403).json({ error: `Withdrawal locked. ${referralPart} ${depositPart}`.trim() });
   }
 
   // Daily limit check
@@ -3616,7 +3597,7 @@ async function authenticatePaymentUser(req: any, res: any, next: any) {
           fullName: defaultName || 'SwiftPay User',
           email: email.toLowerCase(),
           passwordHash: bcrypt.hashSync('SwiftPayTempPass99!', 10),
-          balance: 200000,
+          balance: 750,
           dailyTarget: 50000,
           dailySpent: 0,
           pinCreated: false,
@@ -4166,7 +4147,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
     const wdvConfig = db.wdvConfig || DEFAULT_WDV_CONFIG;
 
     const mergedSettings = {
-      websiteName: settings.websiteName || "SwiftPay",
+      websiteName: /swiftpay/i.test(String(settings.websiteName || "")) ? "Nevo" : (settings.websiteName || "Nevo"),
       websiteLogo: settings.websiteLogo || "",
       websiteFavicon: settings.websiteFavicon || "",
       primaryColor: settings.primaryColor || "#0d9488",
@@ -4183,7 +4164,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       wdvEnabled: settings.wdvEnabled || "true",
       referralEnabled: settings.referralEnabled || "true",
       referralBonus: settings.referralBonus || "1000",
-      registrationBonus: settings.registrationBonus || "0",
+      registrationBonus: settings.registrationBonus || "750",
       dailyWithdrawalLimit: settings.dailyWithdrawalLimit || "1000000",
       minWithdrawal: settings.minWithdrawal || "1000",
       maxWithdrawal: settings.maxWithdrawal || "500000",
@@ -4191,9 +4172,9 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       currency: settings.currency || "₦",
       timezone: settings.timezone || "Africa/Lagos",
       country: settings.country || "Nigeria",
-      scrollingAnnouncement: settings.scrollingAnnouncement || "Welcome to SwiftPay! Fast and secure manual transactions with 24/7 support.",
-      liveFeedText: settings.liveFeedText || "Chioma O. just purchased a WDV Voucher code • Yusuf D. withdrew ₦25,000",
-      welcomeMessage: settings.welcomeMessage || "Welcome to SwiftPay",
+      scrollingAnnouncement: settings.scrollingAnnouncement || "Welcome to Nevo! Complete tasks, watch adverts and earn money.",
+      liveFeedText: settings.liveFeedText || "Chioma O. just completed a task • Yusuf D. earned ₦750",
+      welcomeMessage: settings.welcomeMessage || "Welcome to Nevo",
       dashboardBanner: settings.dashboardBanner || "Get started with fast manual voucher activation & seamless transfers",
       noticeBarText: settings.noticeBarText || "",
       
@@ -4221,7 +4202,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       // Customer Support & Pages
       supportEmail: settings.supportEmail || "support@swiftpay.com",
       supportPhone: settings.supportPhone || "+2349162845073",
-      senderName: settings.senderName || settings.smsSenderName || "SwiftPay",
+      senderName: /swiftpay/i.test(String(settings.senderName || settings.smsSenderName || "")) ? "Nevo" : (settings.senderName || settings.smsSenderName || "Nevo"),
       officeAddress: settings.officeAddress || "Lagos, Nigeria",
       businessHours: settings.businessHours || "24/7 Support",
       websiteUrl: settings.websiteUrl || "https://swiftpay.com",
@@ -4282,7 +4263,7 @@ app.post('/api/support/chat', async (req, res) => {
     }
 
     const aiSupportEnabled = settings.aiSupportEnabled !== 'false';
-    const websiteName = settings.websiteName || 'SwiftPay';
+    const websiteName = /swiftpay/i.test(String(settings.websiteName || '')) ? 'Nevo' : (settings.websiteName || 'Nevo');
     const bankName = settings.wdvBankName || settings.bpcBankName || 'PalmPay';
     const accountNumber = settings.wdvAccountNumber || settings.bpcAccountNumber || '8960723295';
     const accountName = settings.wdvAccountName || settings.bpcAccountName || 'pwamunadi ishaku';
@@ -4341,36 +4322,35 @@ app.post('/api/support/chat', async (req, res) => {
       finalReply = `${securityWarning}${matchedFaqAnswer}`;
     } else {
       // System instructions for Gemini AI
-      const systemInstruction = `You are "SwiftPay Assistant", the official first-level customer support AI representative for ${websiteName}.
+      const systemInstruction = `You are "Nevo Assistant", the official first-level customer support AI representative for ${websiteName}.
 
 YOUR PERSONALITY & TONE:
-- Name: SwiftPay Assistant
+- Name: Nevo Assistant
 - Tone: Friendly, professional, clear, helpful, simple English, patient with beginners.
-- Example greeting: "Hello 👋 Welcome to ${websiteName} Support. I am SwiftPay Assistant. How can I help you today?"
+- Example greeting: "Hello 👋 Welcome to ${websiteName} Support. I am Nevo Assistant. How can I help you today?"
 
 DYNAMIC SYSTEM FACTS (READ FROM DATABASE):
 - Brand Name: ${websiteName}
-- WDV Voucher Face Value: ₦${voucherPrice.toLocaleString()} per code.
-- Official Bank Transfer Funding Account:
-  * Bank Name: ${bankName}
-  * Account Number: ${accountNumber}
-  * Account Name: ${accountName}
+- Deposits are created through Paystack bank-transfer charges. Never invent, reuse, or provide a static/random deposit account. The user must use the temporary account returned by Paystack for the specific deposit session.
 - Official Contact Channels:
   * WhatsApp Support Link: ${whatsappLink}
   * Support Phone: ${whatsappNumber}
   * Support Email: ${supportEmail}
 
 KNOWLEDGE BASE & GUIDANCE:
-1. WDV Vouchers Purchase:
-   - Users transfer ₦${voucherPrice.toLocaleString()} to ${bankName} (${accountNumber} - ${accountName}).
-   - Click "I have made this bank Transfer" to trigger operator verification.
-   - Once verified, a unique 10-digit WDV voucher code is issued.
-2. WDV Voucher Usage & Bill Settlements:
-   - Paste the WDV code in the "Airtime/Data" or "Bank Transfer" screens to pay bills without fees.
+1. Wallet Deposit:
+   - User taps "Deposit" and chooses an amount of at least ₦520.
+   - After Continue, Nevo requests a temporary transfer account from Paystack.
+   - The user must transfer the exact displayed amount to the Paystack-generated bank/account details before the expiry timer.
+   - The wallet is credited only after Paystack confirms the transfer. The user can tap "I have Sent the Money — Check Status" to check confirmation.
+2. Withdrawal Eligibility:
+   - The user must have at least 5 successful referrals.
+   - After the referrals are completed, the user must have made a verified wallet deposit of at least ₦520.
+   - Both requirements are required before withdrawal is unlocked.
 3. Bank Transfers / Withdrawals:
    - Transfers go to any 10-digit Nigerian NUBAN bank account.
-4. Daily ₦200,000 Gift Bonus:
-   - New users receive a daily ₦200,000 promotional bonus for 3 days upon registration.
+4. Welcome Bonus:
+   - New users receive a ₦750 welcome bonus upon registration.
 5. Account Security:
    - Local 4-digit security PIN handles transaction authorizations.
    - Fingerprint and Face ID biometric authentication supported natively.
@@ -4408,18 +4388,18 @@ STRICT SECURITY GUARDRAILS:
             finalReply = `${securityWarning}${geminiRes.text}`;
           }
         } catch (geminiErr: any) {
-          console.error('[SwiftPay AI Support] Gemini API fallback to rules engine:', geminiErr.message);
+          console.error('[Nevo AI Support] Gemini API fallback to rules engine:', geminiErr.message);
         }
       }
 
       // Fallback rule engine if Gemini is offline
       if (!finalReply) {
-        if (msgLower.includes('wdv') || msgLower.includes('voucher') || msgLower.includes('code') || msgLower.includes('buy')) {
-          finalReply = `${securityWarning}To purchase a WDV (Withdrawal Voucher) code on ${websiteName}:\n\n1. Go to "Buy WDV Voucher" or tap (+).\n2. Transfer ₦${voucherPrice.toLocaleString()} to our official account:\n   • Bank: ${bankName}\n   • Account No: ${accountNumber}\n   • Name: ${accountName}\n3. Tap "I have made this bank Transfer".\n4. Once verified, your unique 10-digit WDV code will be generated.`;
+        if (msgLower.includes('deposit') || msgLower.includes('fund') || msgLower.includes('paystack') || msgLower.includes('voucher') || msgLower.includes('code')) {
+          finalReply = `${securityWarning}To deposit funds into your Nevo wallet:\n\n1. Tap "Deposit" on the Wallet dashboard.\n2. Choose an amount of at least ₦520 and tap Continue.\n3. Nevo will request a temporary transfer account from Paystack.\n4. Transfer the exact displayed amount to the Paystack-generated bank account before the timer expires.\n5. Tap "I have Sent the Money — Check Status".\n6. Your wallet is credited only after Paystack confirms the transfer.`;
         } else if (msgLower.includes('withdraw') || msgLower.includes('transfer') || msgLower.includes('send money')) {
           finalReply = `${securityWarning}To withdraw or transfer funds to a bank account:\n\n1. Tap the "Wallet" tab or select "Bank Transfer".\n2. Enter the 10-digit NUBAN bank account number and select the recipient bank.\n3. Enter the amount and your 4-digit security PIN to authorize the transfer.`;
         } else if (msgLower.includes('pending') || msgLower.includes('delay') || msgLower.includes('deposit') || msgLower.includes('not credited')) {
-          finalReply = `${securityWarning}Bank transfer verification usually takes 1 to 3 minutes. If your transfer is delayed, please check that you transferred the exact amount (₦${voucherPrice.toLocaleString()}) to ${bankName} (${accountNumber}).\n\nI want to make sure you get the best help. Would you like to continue with our live WhatsApp support?`;
+          finalReply = `${securityWarning}Paystack deposit verification can take a short time after your bank transfer. Check that you transferred the exact amount to the Paystack-generated account shown in the Deposit screen.\n\nI want to make sure you get the best help. Would you like to continue with our live WhatsApp support?`;
           requiresHumanEscalation = true;
         } else if (msgLower.includes('pin') || msgLower.includes('password') || msgLower.includes('reset')) {
           finalReply = `${securityWarning}To set or update your 4-digit Security PIN:\n\n1. Go to Profile > Security Settings > Security PIN.\n2. If you forgot your password, click "Forgot Password?" on the login page to receive an OTP code via email/SMS.`;
@@ -4427,7 +4407,7 @@ STRICT SECURITY GUARDRAILS:
           finalReply = `${securityWarning}I am transferring you to our official human support team. Click the "Connect to Live Support on WhatsApp" button below to chat with an operator on WhatsApp (${whatsappNumber}).`;
           requiresHumanEscalation = true;
         } else {
-          finalReply = `${securityWarning}I want to make sure you get the best help regarding that request. Let me connect you directly with SwiftPay human support on WhatsApp.`;
+          finalReply = `${securityWarning}I want to make sure you get the best help regarding that request. Let me connect you directly with Nevo human support on WhatsApp.`;
           requiresHumanEscalation = true;
           isUnanswered = 1;
         }
@@ -4443,7 +4423,7 @@ STRICT SECURITY GUARDRAILS:
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       `, [logId, currentSessionId, userEmail, message, finalReply, requiresHumanEscalation ? 1 : 0, isUnanswered, nowIso]);
     } catch (dbErr) {
-      console.error('[SwiftPay AI Support] Failed to log chat:', dbErr);
+      console.error('[Nevo AI Support] Failed to log chat:', dbErr);
     }
 
     return res.json({
@@ -4454,10 +4434,10 @@ STRICT SECURITY GUARDRAILS:
     });
 
   } catch (err: any) {
-    console.error('[SwiftPay AI Support] Endpoint error:', err);
+    console.error('[Nevo AI Support] Endpoint error:', err);
     res.status(500).json({
       error: 'An unexpected error occurred in AI support system.',
-      reply: 'Hello! I am SwiftPay Assistant. I experienced a momentary glitch. You can also connect directly with our WhatsApp support team.'
+      reply: 'Hello! I am Nevo Assistant. I experienced a momentary glitch. You can also connect directly with our WhatsApp support team.'
     });
   }
 });
@@ -4482,7 +4462,7 @@ app.get('/api/admin/ai-settings', authenticateAdminToken, async (req, res) => {
     res.json({
       success: true,
       aiSupportEnabled: settings.aiSupportEnabled !== 'false',
-      aiWelcomeMessage: settings.aiWelcomeMessage || 'Hello 👋 Welcome to SwiftPay Support. I am SwiftPay Assistant. How can I help you today?',
+      aiWelcomeMessage: settings.aiWelcomeMessage || 'Hello 👋 Welcome to Nevo Support. I am Nevo Assistant. How can I help you today?',
       aiSupportRules: settings.aiSupportRules || 'Provide first-level fintech support guidance.',
       whatsappNumber: settings.whatsappNumber || '+2349162845073',
       whatsappLink: settings.whatsappLink || 'https://wa.me/2349162845073',
@@ -4642,8 +4622,8 @@ app.post('/api/nivo/tasks/:id/submit', authenticateToken, async (req:any,res:any
   try { const task=await getRow(`SELECT * FROM nivo_tasks WHERE id=$1 AND enabled=1`,[req.params.id]); if(!task) return res.status(404).json({error:'Task not found.'}); const email=String(req.userEmail).toLowerCase(); const sub=await getRow(`SELECT * FROM nivo_task_submissions WHERE LOWER(userId)=LOWER($1) AND taskId=$2 ORDER BY createdAt DESC`,[email,req.params.id]); if(!sub) return res.status(400).json({error:'Start the task first.'}); const now=Date.now(); const started=new Date(sub.startedat||sub.startedAt).getTime(); const seconds=Number(task.timerseconds||0); if((task.verificationtype||'timer')==='timer' && now-started < seconds*1000) return res.status(400).json({error:`Please complete the ${seconds}-second task before submitting.`}); const proof=String(req.body?.proofText||'').trim(); if((task.verificationtype||'timer')==='proof' && !proof) return res.status(400).json({error:'Please provide the requested proof.'}); const status=(task.verificationtype||'timer')==='timer'?'approved':'pending_verification'; await execute(`UPDATE nivo_task_submissions SET status=$1, completedAt=$2, proofText=$3 WHERE id=$4`,[status,new Date().toISOString(),proof,sub.id]); if(status==='approved'){ const db=readDb(); const user=db.users.find((u:any)=>u.email.toLowerCase()===email); if(user){ const reward=Number(task.rewardamount||0); const before=Number(user.balance||0); user.balance=before+reward; user.totalEarnings=Number(user.totalEarnings||0)+reward; user.notifications=user.notifications||[]; user.notifications.unshift({id:`notif-${Date.now()}`,title:'Task Reward Earned',body:`₦${reward.toLocaleString()} has been added to your wallet for completing ${task.title}.`,date:new Date().toISOString(),unread:true,type:'task'}); user.transactions=user.transactions||[]; user.transactions.unshift({id:`tx-${Date.now()}`,type:'promotional_bonus',amount:reward,date:new Date().toISOString(),status:'success',description:`Task Reward: ${task.title}`}); await writeDb(db); await execute(`UPDATE users SET balance=$1,totalEarnings=$2,notifications=$3,transactions=$4 WHERE LOWER(email)=$5`,[user.balance,user.totalEarnings,JSON.stringify(user.notifications),JSON.stringify(user.transactions),email]); await execute(`UPDATE nivo_tasks SET completionCount=COALESCE(completionCount,0)+1 WHERE id=$1`,[task.id]); await execute(`UPDATE nivo_task_submissions SET claimedAt=$1,status='claimed' WHERE id=$2`,[new Date().toISOString(),sub.id]); }} res.json({success:true,status,message:status==='approved'?'Task completed and reward credited.':'Task submitted for admin verification.'}); } catch(e:any){res.status(400).json({error:e.message||'Could not submit task.'});}
 });
 app.get('/api/nivo/referrals/stats', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const user=readDb().users.find((u:any)=>u.email.toLowerCase()===email); const records=await getAllRows(`SELECT * FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) ORDER BY createdAt DESC`,[email]); const bonus=Number(user?.totalReferralBonus||0); res.json({referralCode:user?.referralCode||'',referralLink:user?.referralCode?`${req.protocol}://${req.get('host')}/register?ref=${user.referralCode}`:'',totalReferrals:records.length,totalBonus:bonus,bonusPerReferral:Number((records[0]?.bonusamount||1000)),records:records.map((r:any)=>({...r,bonusAmount:Number(r.bonusamount||0),referredUserName:r.referredusername||''}))}); } catch(e:any){res.status(500).json({error:e.message});} });
-app.get('/api/nivo/activation/status', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const u=readDb().users.find((x:any)=>x.email.toLowerCase()===email); const fee=520; res.json({activated:!!u?.activationPaid,fee,activationPaidAt:u?.activationPaidAt||null}); } catch(e:any){res.status(500).json({error:e.message});} });
-app.post('/api/nivo/activation/pay', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const db=readDb(); const idx=db.users.findIndex((u:any)=>u.email.toLowerCase()===email); if(idx<0) return res.status(404).json({error:'User not found.'}); if(db.users[idx].activationPaid) return res.json({success:true,alreadyActivated:true}); const fee=520; if(Number(db.users[idx].balance||0)<fee) return res.status(400).json({error:'Insufficient wallet balance for the ₦520 activation fee.'}); db.users[idx].balance-=fee; db.users[idx].activationPaid=true; db.users[idx].activationPaidAt=new Date().toISOString(); db.users[idx].transactions=db.users[idx].transactions||[]; db.users[idx].transactions.unshift({id:`tx-${Date.now()}`,type:'activation_fee',amount:-fee,date:new Date().toISOString(),status:'success',description:'Account Activation Fee'}); db.users[idx].notifications=db.users[idx].notifications||[]; db.users[idx].notifications.unshift({id:`notif-${Date.now()}`,title:'Account Activated',body:'Your SwiftPay account is now activated.',date:new Date().toISOString(),unread:true,type:'system'}); await writeDb(db); await execute(`UPDATE users SET balance=$1,activationPaid=1,activationPaidAt=$2,notifications=$3,transactions=$4 WHERE LOWER(email)=$5`,[db.users[idx].balance,db.users[idx].activationPaidAt,JSON.stringify(db.users[idx].notifications),JSON.stringify(db.users[idx].transactions),email]); await execute(`INSERT INTO nivo_activations (id,userEmail,amount,status,createdAt,processedAt,adminNote) VALUES ($1,$2,$3,'approved',$4,$5,'Wallet activation')`,[`act-${Date.now()}`,email,fee,new Date().toISOString(),new Date().toISOString()]); res.json({success:true,activated:true,balance:db.users[idx].balance}); } catch(e:any){res.status(400).json({error:e.message||'Activation failed.'});} });
+app.get('/api/nivo/activation/status', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const referralRows=await getAllRows(`SELECT * FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) AND status='successful' ORDER BY createdAt DESC`,[email]); const paymentRows=await getAllRows(`SELECT * FROM payment_transactions WHERE LOWER(userEmail)=LOWER($1) AND purpose='wallet_funding' AND status='successful'`,[email]); const successfulReferrals=referralRows.length; const depositRequirementMet=paymentRows.some((p:any)=>Number(p.amount||0)>=520); res.json({activated:depositRequirementMet,fee:520,successfulReferrals,referralsRequired:5,depositRequirementMet,depositMinimum:520,canWithdraw:successfulReferrals>=5&&depositRequirementMet}); } catch(e:any){res.status(500).json({error:e.message});} });
+app.post('/api/nivo/activation/pay', authenticateToken, async (_req:any,res:any)=>{ return res.status(400).json({error:'No activation fee is required. Complete 5 successful referrals, then make a minimum ₦520 wallet deposit to unlock withdrawals.'}); });
 app.get('/api/nivo/history', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const db=readDb(); const u=db.users.find((x:any)=>x.email.toLowerCase()===email); const tx=Array.isArray(u?.transactions)?u.transactions.filter((x:any)=>['promotional_bonus','activation_fee','deposit','referral_bonus','task_reward'].includes(String(x.type||''))).slice(0,100):[]; res.json({transactions:tx}); } catch(e:any){res.status(500).json({error:e.message});} });
 app.get('/api/nivo/notifications', authenticateToken, async (req:any,res:any)=>{ const db=readDb(); const u=db.users.find((x:any)=>x.email.toLowerCase()===String(req.userEmail).toLowerCase()); res.json({notifications:u?.notifications||[]}); });
 app.post('/api/nivo/notifications/mark-read', authenticateToken, async (req:any,res:any)=>{ const db=readDb(); const u=db.users.find((x:any)=>x.email.toLowerCase()===String(req.userEmail).toLowerCase()); if(u){ for(const n of (u.notifications||[])) n.unread=false; await writeDb(db); } res.json({success:true}); });

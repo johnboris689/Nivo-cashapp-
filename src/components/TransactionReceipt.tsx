@@ -128,7 +128,7 @@ export default function TransactionReceipt({
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(22);
       doc.setTextColor(255, 255, 255);
-      doc.text('SWIFTPAY DIGITAL BANKING', 20, 22);
+      doc.text('NEVO DIGITAL BANKING', 20, 22);
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
@@ -223,10 +223,10 @@ export default function TransactionReceipt({
       // Bottom Watermark & Time
       doc.setFontSize(7.5);
       doc.setTextColor(148, 163, 184);
-      doc.text(`Generated on ${new Date().toLocaleString()} • SwiftPay Enterprise Engine`, 105, 280, { align: 'center' });
+      doc.text(`Generated on ${new Date().toLocaleString()} • Nevo Enterprise Engine`, 105, 280, { align: 'center' });
 
       // Save PDF file cleanly triggering direct download
-      const filename = `${type === 'withdraw' ? 'Withdrawal' : 'SwiftPay'}-Receipt-${isoDate}.pdf`;
+      const filename = `${type === 'withdraw' ? 'Withdrawal' : 'Nevo'}-Receipt-${isoDate}.pdf`;
       doc.save(filename);
       onToast(`PDF receipt downloaded: ${filename}`, 'success');
     } catch (err) {
@@ -236,7 +236,7 @@ export default function TransactionReceipt({
   };
 
   const handleShareClick = () => {
-    const summary = `SwiftPay Receipt:\n${title}\n` + contentRows.map(row => `${row.label}: ${row.value}`).join('\n');
+    const summary = `Nevo Receipt:\n${title}\n` + contentRows.map(row => `${row.label}: ${row.value}`).join('\n');
     onShare(summary);
   };
 

@@ -9,7 +9,7 @@ interface LegalPageProps {
 
 export function TermsOfService({ onBack }: LegalPageProps) {
   const settings = getCachedSettings();
-  const brandName = settings.websiteName || 'SwiftPay';
+  const brandName = settings.websiteName || 'Nevo';
   const supportPhone = settings.supportPhone || '+2349162845073';
 
   return (
@@ -42,14 +42,14 @@ export function TermsOfService({ onBack }: LegalPageProps) {
         <div>
           <h5 className="font-bold text-white uppercase text-xs mb-1">2. Wallet Balances and Account Funding</h5>
           <p>
-            {brandName} operates digital wallet balances for Nigeria (Naira). Balances can be used for virtual payments. All direct wallet balances are stored in persistent state. Account funding must be conducted via authorized channels, including manual peer-to-peer transfers or confirmed Withdrawal Voucher (WDV) vouchers.
+            {brandName} operates digital wallet balances for Nigeria (Naira). Balances can be used for virtual payments. All direct wallet balances are stored in persistent state. Account funding must be conducted via authorized channels, including manual peer-to-peer transfers or confirmed Withdrawal Voucher (deposit) vouchers.
           </p>
         </div>
 
         <div>
-          <h5 className="font-bold text-white uppercase text-xs mb-1">3. Withdrawal Vouchers (WDV)</h5>
+          <h5 className="font-bold text-white uppercase text-xs mb-1">3. Wallet Deposits</h5>
           <p>
-            Withdrawal Vouchers are unique cryptographic voucher tokens purchased by users. A WDV voucher is strictly non-refundable and has a fixed face value of ₦6,500. Verification of the WDV code is performed server-side. Users are solely responsible for keeping their active voucher codes secure. Sharing voucher codes is strictly at your own risk.
+            Wallet Deposits are unique cryptographic voucher tokens purchased by users. A deposit voucher is strictly non-refundable and has a fixed face value of ₦6,500. Verification of the deposit code is performed server-side. Users are solely responsible for keeping their active voucher codes secure. Sharing voucher codes is strictly at your own risk.
           </p>
         </div>
 
@@ -87,7 +87,7 @@ export function TermsOfService({ onBack }: LegalPageProps) {
 
 export function PrivacyPolicy({ onBack }: LegalPageProps) {
   const settings = getCachedSettings();
-  const brandName = settings.websiteName || 'SwiftPay';
+  const brandName = settings.websiteName || 'Nevo';
 
   return (
     <div className="flex-1 flex flex-col bg-slate-950 text-white overflow-y-auto no-scrollbar p-6 space-y-6">

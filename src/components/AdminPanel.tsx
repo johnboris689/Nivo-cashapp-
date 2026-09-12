@@ -230,7 +230,7 @@ export default function AdminPanel({
   const [savingWdvConfig, setSavingWdvConfig] = useState(false);
 
   // System Master Settings State
-  const [websiteName, setWebsiteName] = useState('SwiftPay');
+  const [websiteName, setWebsiteName] = useState('Nevo');
   const [websiteLogo, setWebsiteLogo] = useState('');
   const [websiteFavicon, setWebsiteFavicon] = useState('');
   const [primaryColor, setPrimaryColor] = useState('#0d9488');
@@ -245,7 +245,7 @@ export default function AdminPanel({
   const [wdvEnabled, setWdvEnabled] = useState(true);
   const [referralEnabled, setReferralEnabled] = useState(true);
   const [referralBonus, setReferralBonus] = useState('1000');
-  const [registrationBonus, setRegistrationBonus] = useState('0');
+  const [registrationBonus, setRegistrationBonus] = useState('750');
   const [dailyWithdrawalLimit, setDailyWithdrawalLimit] = useState('1000000');
   const [minWithdrawal, setMinWithdrawal] = useState('1000');
   const [maxWithdrawal, setMaxWithdrawal] = useState('500000');
@@ -253,16 +253,16 @@ export default function AdminPanel({
   const [currency, setCurrency] = useState('₦');
   const [timezone, setTimezone] = useState('Africa/Lagos');
   const [country, setCountry] = useState('Nigeria');
-  const [scrollingAnnouncement, setScrollingAnnouncement] = useState('Welcome to SwiftPay! Fast and secure manual transactions with 24/7 support.');
-  const [liveFeedText, setLiveFeedText] = useState('Chioma O. just purchased a WDV Voucher code • Yusuf D. withdrew ₦25,000');
-  const [welcomeMessage, setWelcomeMessage] = useState('Welcome to SwiftPay');
+  const [scrollingAnnouncement, setScrollingAnnouncement] = useState('Welcome to Nevo! Fast and secure manual transactions with 24/7 support.');
+  const [liveFeedText, setLiveFeedText] = useState('Chioma O. just completed a task • Yusuf D. earned ₦750');
+  const [welcomeMessage, setWelcomeMessage] = useState('Welcome to Nevo');
   const [dashboardBanner, setDashboardBanner] = useState('Get started with fast manual voucher activation & seamless transfers');
   const [noticeBarText, setNoticeBarText] = useState('');
   const [paymentCountdown, setPaymentCountdown] = useState('900');
   const [paymentsEnabled, setPaymentsEnabled] = useState(true);
 
   // WhatsApp & Communication
-  const [whatsappMessage, setWhatsappMessage] = useState('Hello Admin, I have made a manual bank transfer for WDV Voucher.');
+  const [whatsappMessage, setWhatsappMessage] = useState('Hello Admin, I have made a wallet deposit via Paystack.');
   const [telegramLink, setTelegramLink] = useState('https://t.me/swiftpay');
   const [facebookLink, setFacebookLink] = useState('');
   const [instagramLink, setInstagramLink] = useState('');
@@ -271,7 +271,7 @@ export default function AdminPanel({
 
   // AI Support Settings & Analytics State
   const [aiSupportEnabled, setAiSupportEnabled] = useState(true);
-  const [aiWelcomeMessage, setAiWelcomeMessage] = useState('Hello 👋 Welcome to SwiftPay Support. I am SwiftPay Assistant. How can I help you today?');
+  const [aiWelcomeMessage, setAiWelcomeMessage] = useState('Hello 👋 Welcome to Nevo Support. I am Nevo Assistant. How can I help you today?');
   const [aiSupportRules, setAiSupportRules] = useState('Provide friendly, professional level-1 customer support and fintech guidance.');
   const [aiCustomFaqs, setAiCustomFaqs] = useState<any[]>([]);
   const [newFaqQuestion, setNewFaqQuestion] = useState('');
@@ -295,9 +295,9 @@ export default function AdminPanel({
   const [officeAddress, setOfficeAddress] = useState('Lagos, Nigeria');
   const [businessHours, setBusinessHours] = useState('24/7 Support');
   const [websiteUrl, setWebsiteUrl] = useState('https://swiftpay.com');
-  const [privacyPolicy, setPrivacyPolicy] = useState('SwiftPay Privacy Policy details...');
-  const [termsOfService, setTermsOfService] = useState('SwiftPay Terms of Service details...');
-  const [aboutUs, setAboutUs] = useState('SwiftPay is Nigeria\'s premier digital financial voucher platform...');
+  const [privacyPolicy, setPrivacyPolicy] = useState('Nevo Privacy Policy details...');
+  const [termsOfService, setTermsOfService] = useState('Nevo Terms of Service details...');
+  const [aboutUs, setAboutUs] = useState('Nevo is Nigeria\'s premier digital financial voucher platform...');
   const [contactUs, setContactUs] = useState('Contact support via WhatsApp or Email.');
   const [faqContent, setFaqContent] = useState('Frequently Asked Questions...');
 
@@ -317,12 +317,12 @@ export default function AdminPanel({
 
   // Withdrawal Account
   const [withdrawBankName, setWithdrawBankName] = useState('PalmPay');
-  const [withdrawAccountName, setWithdrawAccountName] = useState('SwiftPay Admin');
+  const [withdrawAccountName, setWithdrawAccountName] = useState('Nevo Admin');
   const [withdrawAccountNumber, setWithdrawAccountNumber] = useState('8960723295');
   const [withdrawalInstructions, setWithdrawalInstructions] = useState('Withdrawals are processed manually within 1-2 hours upon approval.');
 
   // Dynamic Admin & Recovery Settings
-  const [senderName, setSenderName] = useState('SwiftPay');
+  const [senderName, setSenderName] = useState('Nevo');
   const [videoUrl, setVideoUrl] = useState('');
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [recoveryEnabled, setRecoveryEnabled] = useState(true);
@@ -1336,7 +1336,7 @@ export default function AdminPanel({
         onSendSimulatedEmail(
           email,
           'Security Update: Account Status Modified',
-          `Hello, \n\nAn administrator has updated your SwiftPay security status.\nParameter: ${field}\nNew Value: ${val ? 'TRUE (Active constraint applied)' : 'FALSE (Restored to default)'}\n\nIf you believe this was an error, contact premium support.`
+          `Hello, \n\nAn administrator has updated your Nevo security status.\nParameter: ${field}\nNew Value: ${val ? 'TRUE (Active constraint applied)' : 'FALSE (Restored to default)'}\n\nIf you believe this was an error, contact premium support.`
         );
       } else {
         onToast('Failed to update user parameters', 'error');
@@ -1369,7 +1369,7 @@ export default function AdminPanel({
         onSendSimulatedEmail(
           email,
           'Wallet Credit/Debit Transaction Authorized',
-          `Hello, \n\nYour SwiftPay wallet has been adjusted by an administrator.\nNew Wallet Balance: ₦${amt.toLocaleString()}\n\nThank you for choosing SwiftPay!`
+          `Hello, \n\nYour Nevo wallet has been adjusted by an administrator.\nNew Wallet Balance: ₦${amt.toLocaleString()}\n\nThank you for choosing Nevo!`
         );
       } else {
         onToast('Failed to edit balance', 'error');
@@ -1387,11 +1387,11 @@ export default function AdminPanel({
         body: JSON.stringify({ email })
       });
       if (res.ok) {
-        onToast('Temporary password "SwiftPayAdmin99!" dispatched to user email', 'success');
+        onToast('Temporary password "NevoAdmin99!" dispatched to user email', 'success');
         onSendSimulatedEmail(
           email,
-          'SwiftPay: Account Credentials Reset by Admin',
-          `Hello, \n\nAn administrator has reset your password.\nYour temporary password is: SwiftPayAdmin99!\n\nPlease log in immediately and update your security settings.`
+          'Nevo: Account Credentials Reset by Admin',
+          `Hello, \n\nAn administrator has reset your password.\nYour temporary password is: NevoAdmin99!\n\nPlease log in immediately and update your security settings.`
         );
       } else {
         onToast('Failed to reset password', 'error');
@@ -1539,8 +1539,8 @@ export default function AdminPanel({
       users.forEach(u => {
         onSendSimulatedEmail(
           u.email,
-          `SwiftPay Announcement: ${broadcastTitle}`,
-          `Greetings, \n\nWe have published a new announcement on SwiftPay: \n\n${broadcastBody}\n\nTransact securely on SwiftPay!`
+          `Nevo Announcement: ${broadcastTitle}`,
+          `Greetings, \n\nWe have published a new announcement on Nevo: \n\n${broadcastBody}\n\nTransact securely on Nevo!`
         );
       });
       onToast(`Announcement emails sent to ${users.length} active users!`, 'success');
@@ -1559,7 +1559,7 @@ export default function AdminPanel({
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "SwiftPay_Users_Report.csv");
+    link.setAttribute("download", "Nevo_Users_Report.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -1575,7 +1575,7 @@ export default function AdminPanel({
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "SwiftPay_Transactions_Report.csv");
+    link.setAttribute("download", "Nevo_Transactions_Report.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -3614,7 +3614,7 @@ export default function AdminPanel({
             <Video className="h-4 w-4" />
             Direct Video Walkthrough Guide Manager
           </h5>
-          <p className="text-[10px] text-slate-400 mt-0.5">Upload walkthrough MP4 guide directly to the SwiftPay server or delete existing guide videos. HTML5 native media players are used for rendering.</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">Upload walkthrough MP4 guide directly to the Nevo server or delete existing guide videos. HTML5 native media players are used for rendering.</p>
         </div>
 
         <div className="space-y-4">
@@ -4295,7 +4295,7 @@ export default function AdminPanel({
                         type="text"
                         value={aiWelcomeMessage}
                         onChange={(e) => setAiWelcomeMessage(e.target.value)}
-                        placeholder="Hello 👋 Welcome to SwiftPay Support..."
+                        placeholder="Hello 👋 Welcome to Nevo Support..."
                         className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-teal-400 transition-all font-sans"
                       />
                       <p className="text-[10px] text-slate-500 mt-1">Greeting presented to users when starting a chat session.</p>
@@ -4588,7 +4588,7 @@ export default function AdminPanel({
                     const encodedUri = encodeURI(csvContent);
                     const link = document.createElement("a");
                     link.setAttribute("href", encodedUri);
-                    link.setAttribute("download", `SwiftPay_Audit_Report_${new Date().toISOString().split('T')[0]}.csv`);
+                    link.setAttribute("download", `Nevo_Audit_Report_${new Date().toISOString().split('T')[0]}.csv`);
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);

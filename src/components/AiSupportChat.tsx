@@ -42,18 +42,18 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
   const [isLoading, setIsLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
-  const brandName = settings.websiteName || 'SwiftPay';
+  const brandName = settings.websiteName || 'Nevo';
   const whatsappLink = settings.whatsappLink || settings.bpcWhatsappLink || 'https://wa.me/2349162845073';
-  const supportEmail = settings.supportEmail || 'support@swiftpay.com';
+  const supportEmail = settings.supportEmail || 'support@nevo.app';
 
   // Initial welcome greeting
   const initialGreeting: ChatMessage = {
     id: 'msg-welcome-1',
     sender: 'assistant',
-    text: `Hello 👋 Welcome to ${brandName} Support! I am ${brandName} Assistant, your 24/7 automated fintech guide.\n\nHow can I help you with your account, WDV vouchers, bank transfers, or bill settlements today?`,
+    text: `Hello 👋 Welcome to ${brandName} Support! I am ${brandName} Assistant, your 24/7 automated fintech guide.\n\nHow can I help you with your account, deposits, bank transfers, or bill settlements today?`,
     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     suggestedActions: [
-      { label: '🎫 How to buy WDV voucher?', action: 'How to buy WDV voucher?' },
+      { label: '💳 How to deposit funds?', action: 'How to deposit funds?' },
       { label: '💸 How to withdraw to bank?', action: 'How to withdraw to bank?' },
       { label: '⏳ Deposit pending verification?', action: 'My bank transfer deposit is pending' },
       { label: '🔑 How to reset security PIN?', action: 'How do I reset my security PIN?' },
@@ -64,7 +64,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     // Try to restore session chat history from sessionStorage
     try {
-      const saved = sessionStorage.getItem('swiftpay_ai_chat_history');
+      const saved = sessionStorage.getItem('nevo_ai_chat_history');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -82,7 +82,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
   // Save chat history to sessionStorage whenever messages update
   useEffect(() => {
     try {
-      sessionStorage.setItem('swiftpay_ai_chat_history', JSON.stringify(messages));
+      sessionStorage.setItem('nevo_ai_chat_history', JSON.stringify(messages));
     } catch (e) {}
   }, [messages]);
 
@@ -143,7 +143,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
     } catch (err: any) {
       console.error('[AI Chat] Request failed:', err);
       // Fallback client-side response if server request encounters network glitch
-      let fallbackText = `I apologize for the momentary network hiccup! Here is quick guidance:\n\n• **WDV Vouchers**: Buy via manual bank transfer to ${settings.bankName || 'PalmPay'} (${settings.accountNumber || '8960723295'}).\n• **Withdrawals**: Instant 10-digit NUBAN transfers available on the Wallet tab.\n• **Human Support**: Tap below to speak directly with an official agent on WhatsApp.`;
+      let fallbackText = `I apologize for the momentary network hiccup! Here is quick guidance:\n\n• **Deposits**: Tap Deposit, choose at least ₦520, continue, and transfer the exact amount to the temporary Paystack-generated account shown on screen.\n• **Confirmation**: Tap “I have Sent the Money — Check Status”. Your wallet is credited only after Paystack confirms the transfer.\n• **Withdrawals**: Complete 5 successful referrals and make a verified deposit of at least ₦520.\n• **Human Support**: Tap below to speak directly with an official agent on WhatsApp.`;
       
       const errorMsg: ChatMessage = {
         id: `msg-err-${Date.now()}`,
@@ -162,7 +162,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
 
   const handleResetChat = () => {
     setMessages([initialGreeting]);
-    sessionStorage.removeItem('swiftpay_ai_chat_history');
+    sessionStorage.removeItem('nevo_ai_chat_history');
   };
 
   const handleCopyText = (text: string, idx: number) => {
@@ -173,7 +173,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
 
   // Quick Action Suggestions Chips
   const quickChips = [
-    { label: '🎫 Buy WDV Voucher', text: 'How do I purchase a WDV voucher?' },
+    { label: '💳 How to Deposit', text: 'How do I make a deposit?' },
     { label: '💸 Withdraw Cash', text: 'How do I transfer money to my bank account?' },
     { label: '⏳ Deposit Pending', text: 'I made a bank transfer but my deposit is pending' },
     { label: '🔑 Reset Security PIN', text: 'How do I reset my 4-digit transaction PIN?' },
@@ -406,7 +406,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
               <Bot className="h-4 w-4 text-teal-400" />
             </div>
             <div className="p-3 bg-slate-900 border border-white/10 rounded-2xl rounded-tl-none flex items-center gap-1.5 shadow-sm">
-              <span className="text-[11px] font-mono text-slate-400 mr-1">SwiftPay Assistant is thinking</span>
+              <span className="text-[11px] font-mono text-slate-400 mr-1">Nevo Assistant is thinking</span>
               <div className="h-1.5 w-1.5 bg-teal-400 rounded-full animate-bounce" />
               <div className="h-1.5 w-1.5 bg-teal-400 rounded-full animate-bounce [animation-delay:0.2s]" />
               <div className="h-1.5 w-1.5 bg-teal-400 rounded-full animate-bounce [animation-delay:0.4s]" />
@@ -445,7 +445,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
           <input
             id="input-ai-support-message"
             type="text"
-            placeholder="Ask SwiftPay Assistant anything..."
+            placeholder="Ask Nevo Assistant anything..."
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             disabled={isLoading}

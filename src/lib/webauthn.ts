@@ -1,5 +1,5 @@
 /**
- * WebAuthn / Native Device Biometric Helper for SwiftPay
+ * WebAuthn / Native Device Biometric Helper for Nevo
  * Interacts with browser navigator.credentials (Fingerprint, Touch ID, Face ID, Windows Hello)
  */
 

@@ -122,12 +122,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
         setSuccessData(data);
         setFlowState('success');
         onSuccess?.(data);
-        onToast?.('Payment successful. Your WDV voucher is ready.', 'success');
+        onToast?.('Payment successful. Your deposit is ready.', 'success');
         return 'success';
       }
 
       if (data.status === 'failed' || data.status === 'abandoned') {
-        setErrorMessage(data.message || 'The payment was not completed. No WDV voucher was generated.');
+        setErrorMessage(data.message || 'The payment was not completed. No deposit was generated.');
         setFlowState('failed');
         return 'failed';
       }
@@ -207,13 +207,13 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       setFlowState('awaiting_payment');
 
       if (data.authorizationUrl) {
-        const popup = window.open(data.authorizationUrl, 'SwiftPay_WDV_Payment', 'width=500,height=700,menubar=no,toolbar=no');
+        const popup = window.open(data.authorizationUrl, 'Nevo_WDV_Payment', 'width=500,height=700,menubar=no,toolbar=no');
         if (!popup) onToast?.('Your browser blocked the payment window. Tap “Open Secure Checkout” below.', 'info');
       } else {
         setErrorMessage('The payment gateway did not return a checkout link.');
       }
     } catch (err: any) {
-      console.error('WDV payment init error:', err);
+      console.error('deposit payment init error:', err);
       setErrorMessage(err.message || 'Payment could not be initialized.');
       setFlowState('failed');
     }
@@ -241,7 +241,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20"><CreditCard className="h-5 w-5" /></div>
             <div>
-              <h3 className="text-sm sm:text-base font-bold text-white font-display">Buy WDV Voucher</h3>
+              <h3 className="text-sm sm:text-base font-bold text-white font-display">Buy Deposit</h3>
               <p className="text-[11px] text-slate-400">Secure payment • Voucher issued after server verification</p>
             </div>
           </div>
@@ -252,7 +252,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           {flowState === 'select' && (
             <div className="space-y-4">
               <div className="p-5 rounded-2xl bg-gradient-to-br from-teal-500/15 via-slate-950 to-indigo-500/15 border border-teal-500/25 text-center">
-                <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-teal-300">WDV Voucher</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-teal-300">Deposit</span>
                 <div className="text-3xl font-black text-white mt-2">₦6,500.00</div>
                 <p className="text-xs text-slate-400 mt-2">One-time purchase. The voucher is generated only after the gateway confirms your payment.</p>
               </div>
@@ -293,7 +293,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
               {errorMessage && <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex gap-2"><AlertCircle className="h-4 w-4 shrink-0" /><span>{errorMessage}</span></div>}
 
               <button type="button" onClick={handleInitiatePayment} disabled={!isSelectedProviderConfigured || loadingConfig} className="w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-400 to-emerald-400 disabled:opacity-40 text-slate-950 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-teal-500/20">
-                BUY WDV VOUCHER — ₦6,500
+                DEPOSIT FUNDS — ₦6,500
                 <ArrowRight className="h-4 w-4" />
               </button>
               <div className="flex justify-center items-center gap-2 text-[10px] text-slate-500 font-mono"><Lock className="h-3 w-3" /> Server-side payment verification</div>
@@ -303,7 +303,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           {flowState === 'processing' && (
             <div className="py-14 text-center space-y-4">
               <div className="relative mx-auto h-16 w-16"><div className="h-16 w-16 rounded-full border-4 border-teal-500/20 border-t-teal-400 animate-spin" /><CreditCard className="h-6 w-6 text-teal-400 absolute inset-0 m-auto" /></div>
-              <div><h4 className="text-base font-bold text-white">Opening Secure Checkout…</h4><p className="text-xs text-slate-400 mt-1">Creating your ₦6,500 WDV purchase session.</p></div>
+              <div><h4 className="text-base font-bold text-white">Opening Secure Checkout…</h4><p className="text-xs text-slate-400 mt-1">Creating your ₦6,500 deposit session.</p></div>
             </div>
           )}
 
@@ -331,18 +331,18 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           {flowState === 'success' && (
             <div className="py-4 space-y-5 text-center">
               <div className="h-16 w-16 mx-auto rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center"><CheckCircle2 className="h-8 w-8" /></div>
-              <div><h4 className="text-xl font-black text-white">Payment Successful</h4><p className="text-xs text-slate-400 mt-1">Your WDV Voucher is Ready.</p></div>
+              <div><h4 className="text-xl font-black text-white">Payment Successful</h4><p className="text-xs text-slate-400 mt-1">Your Deposit is Ready.</p></div>
               <div className="p-5 rounded-2xl bg-slate-950 border border-emerald-500/30 space-y-3">
                 <p className="text-xs text-slate-400">₦6,500.00 payment received successfully.</p>
                 <div className="rounded-xl bg-slate-900 border border-slate-800 p-4">
-                  <span className="text-[10px] text-slate-500 uppercase tracking-widest block mb-2">WDV Voucher</span>
+                  <span className="text-[10px] text-slate-500 uppercase tracking-widest block mb-2">Deposit</span>
                   <span className="font-mono text-lg font-black tracking-widest text-teal-300 select-all">{successData?.voucherCode}</span>
                 </div>
                 <button type="button" onClick={copyVoucher} className="w-full py-3 rounded-xl bg-teal-400 hover:bg-teal-300 text-slate-950 text-xs font-black uppercase flex items-center justify-center gap-2">
                   {copied ? <><Check className="h-4 w-4" /> Voucher copied!</> : <><Copy className="h-4 w-4" /> Copy Voucher</>}
                 </button>
               </div>
-              <p className="text-[11px] text-slate-400">The voucher has been saved to the SwiftPay WDV system and linked to this successful payment.</p>
+              <p className="text-[11px] text-slate-400">The voucher has been saved to the Nevo WDV system and linked to this successful payment.</p>
               <button type="button" onClick={onClose} className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold">Close</button>
             </div>
           )}
@@ -350,7 +350,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           {flowState === 'failed' && (
             <div className="py-6 space-y-4 text-center">
               <div className="h-16 w-16 mx-auto rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center justify-center"><AlertCircle className="h-8 w-8" /></div>
-              <div><h4 className="text-base font-bold text-white">Payment Not Completed</h4><p className="text-xs text-rose-300 mt-1 leading-relaxed">{errorMessage || 'The payment was not confirmed. No WDV voucher was generated.'}</p></div>
+              <div><h4 className="text-base font-bold text-white">Payment Not Completed</h4><p className="text-xs text-rose-300 mt-1 leading-relaxed">{errorMessage || 'The payment was not confirmed. No deposit was generated.'}</p></div>
               <div className="flex gap-2"><button type="button" onClick={() => { setErrorMessage(''); setFlowState('select'); }} className="flex-1 py-3 rounded-xl bg-teal-400 text-slate-950 text-xs font-black">Try Again</button><button type="button" onClick={onClose} className="flex-1 py-3 rounded-xl bg-slate-800 text-white text-xs font-bold">Close</button></div>
             </div>
           )}

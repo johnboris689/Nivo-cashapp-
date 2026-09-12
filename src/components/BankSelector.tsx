@@ -281,7 +281,7 @@ export const BankSelector: React.FC<BankSelectorProps> = ({
             {/* Footer Summary */}
             <div className="p-3 bg-slate-950/80 border-t border-white/5 text-[10px] font-mono text-slate-400 text-center flex items-center justify-between px-4">
               <span>Showing {filteredBanks.length} of {sortedBanks.length} banks</span>
-              <span className="text-teal-400">SwiftPay Secured</span>
+              <span className="text-teal-400">Nevo Secured</span>
             </div>
           </div>
         </div>

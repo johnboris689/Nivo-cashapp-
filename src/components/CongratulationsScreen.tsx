@@ -226,7 +226,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
               <span className="text-white font-black text-xs tracking-tighter">SP</span>
             </div>
             <span className="text-sm font-black tracking-tight bg-gradient-to-r from-teal-400 to-indigo-300 bg-clip-text text-transparent">
-              {getCachedSettings().websiteName || 'SwiftPay'}
+              {getCachedSettings().websiteName || 'Nevo'}
             </span>
           </div>
 
@@ -266,7 +266,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
               Congratulations!
             </h1>
             <p className="text-sm font-semibold text-teal-300 tracking-wide">
-              Your {getCachedSettings().websiteName || 'SwiftPay'} account is now active.
+              Your {getCachedSettings().websiteName || 'Nevo'} account is now active.
             </p>
           </div>
 

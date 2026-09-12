@@ -84,7 +84,7 @@ function getJsonDb(): JsonData {
       supportEmail: "support@swiftpay.com",
       supportPhone: "+2349162845073",
       whatsappNumber: "+2349162845073",
-      senderName: "SwiftPay",
+      senderName: "Nevo",
       videoUrl: "",
       recoveryEnabled: "true",
       smsRecoveryEnabled: "true",
@@ -106,7 +106,7 @@ function getJsonDb(): JsonData {
           email: 'user@example.com',
           phone: '08034567890',
           passwordhash: defaultUserPasswordHash,
-          balance: 200000,
+          balance: 750,
           dailytarget: 50000,
           dailyspent: 18400,
           pincreated: 1,
@@ -318,7 +318,7 @@ function getJsonDb(): JsonData {
         supportEmail: "support@swiftpay.com",
         supportPhone: "+2349162845073",
         whatsappNumber: "+2349162845073",
-        senderName: "SwiftPay",
+        senderName: "Nevo",
         videoUrl: "",
         recoveryEnabled: "true",
         smsRecoveryEnabled: "true",
@@ -489,10 +489,10 @@ export async function initDb() {
     const taskCount = await getRow(`SELECT COUNT(*) as count FROM nivo_tasks`);
     if (!taskCount || Number(taskCount.count || 0) === 0) {
       const tasks = [
-        ['task-1','Follow SwiftPay on X','Follow the official SwiftPay social account for product updates and announcements.',500,'social','https://x.com/SwiftPay','proof',0,'Enter your X username or profile link.'],
+        ['task-1','Follow Nevo on X','Follow the official SwiftPay social account for product updates and announcements.',500,'social','https://x.com/SwiftPay','proof',0,'Enter your X username or profile link.'],
         ['task-2','Join the SwiftPay Telegram Community','Join the official community to receive updates and reward announcements.',600,'social','https://t.me/SwiftPay','proof',0,'Enter your Telegram username.'],
-        ['task-3','Daily Check-In','Visit the featured SwiftPay page for 30 seconds to complete today’s check-in.',300,'daily','/','timer',30,''],
-        ['task-4','Watch SwiftPay Guide','Watch the official guide for 45 seconds and submit completion.',500,'special','/','timer',45,'']
+        ['task-3','Daily Check-In','Visit the featured Nevo page for 30 seconds to complete today’s check-in.',300,'daily','/','timer',30,''],
+        ['task-4','Watch Advert & Earn','Watch the featured advert for 45 seconds and submit completion.',500,'special','/','timer',45,'']
       ];
       for (const t of tasks) await execute(`INSERT INTO nivo_tasks (id,title,description,rewardAmount,category,actionUrl,verificationType,timerSeconds,proofInstructions,enabled,createdAt,completionCount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,1,$10,0)`, [...t, new Date().toISOString()]);
     }
@@ -816,7 +816,7 @@ export async function initDb() {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)`,
       [
         'Adebayo Samuel', 'adebayo_samuel', 'user@example.com', '08034567890', defaultUserPasswordHash,
-        200000, 50000, 18400, 1, '1234', 1, '', 3, 0, 0,
+        750, 50000, 0, 1, '1234', 1, '', 3, 0, 0,
         new Date().toISOString(), 'active', '[]', '[]', '[]', '[]', '[]'
       ]
     );
@@ -830,7 +830,7 @@ export async function initDb() {
       supportEmail: "support@swiftpay.com",
       supportPhone: "+2349162845073",
       whatsappNumber: "+2349162845073",
-      senderName: "SwiftPay",
+      senderName: "Nevo",
       videoUrl: "",
       recoveryEnabled: "true",
       smsRecoveryEnabled: "true",
