@@ -9,7 +9,7 @@ import bcrypt from 'bcryptjs';
 import { GoogleGenAI } from '@google/genai';
 import { initDb, getRow, getAllRows, execute } from './db';
 import { sendEmail, sendSms } from './email_sms_service';
-import { paymentManager, PaymentProviderName } from './payments/index';
+import { paymentManager, PaymentProviderName } from './server/payments/index';
 
 dotenv.config();
 
@@ -33,46 +33,6 @@ app.use(express.json({
 }));
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/public', express.static(path.join(process.cwd(), 'public')));
-
-app.get('/nevo_complete_source_v2.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'public', 'nevo_complete_source_v2.zip');
-  if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'nevo_complete_source_v2.zip');
-  } else {
-    res.status(404).send('Archive not found');
-  }
-});
-
-app.get('/nevo_complete_source.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'public', 'nevo_complete_source_v2.zip');
-  if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'nevo_complete_source_v2.zip');
-  } else {
-    res.status(404).send('Archive not found');
-  }
-});
-
-// Download complete source code ZIP archive route
-app.get('/download-source', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'public', 'nevo_complete_source_v2.zip');
-  const fallbackPath = path.join(process.cwd(), 'public', 'nevo_complete_source.zip');
-  if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'nevo_complete_source_v2.zip');
-  } else if (fs.existsSync(fallbackPath)) {
-    res.download(fallbackPath, 'nevo_complete_source.zip');
-  } else {
-    res.status(404).json({ error: 'Source code archive is being generated. Please refresh in a moment.' });
-  }
-});
-
-app.get('/download-source-v2', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'public', 'nevo_complete_source_v2.zip');
-  if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'nevo_complete_source_v2.zip');
-  } else {
-    res.status(404).json({ error: 'Archive v2 not found.' });
-  }
-});
 
 // -------------------- DATABASE REAL-TIME READ/WRITE SYNC MIDDLEWARE --------------------
 app.use('/api', async (req, res, next) => {
@@ -462,6 +422,10 @@ async function loadDbCache() {
       used: row.used === 1
     }));
 
+    // Fetch administrators from the Nevo database schema. No hardcoded/demo administrator is loaded.
+    const adminRows = await getAllRows(`SELECT * FROM admins`);
+    const admins = adminRows.map((row: any) => ({ email: String(row.email || '').toLowerCase(), passwordHash: row.passwordhash || row.passwordHash || '' }));
+
     // Fetch logs
     const logRows = await getAllRows(`SELECT * FROM logs ORDER BY timestamp DESC LIMIT 500`);
     const logs = logRows.map(row => ({
@@ -471,20 +435,15 @@ async function loadDbCache() {
       type: row.type
     }));
 
-    const secureAdminPasswordHash = crypto.createHash('sha256').update('Boris$689').digest('hex');
-
     dbCache = {
       users,
       vouchers,
       passwordResets,
       logs,
       wdvConfig,
-      admins: [
-        {
-          email: 'talkdavidjohn@gmail.com',
-          passwordHash: secureAdminPasswordHash
-        }
-      ]
+      admins,
+      ad_reward_sessions: [],
+      ad_rewards: []
     };
     console.log(`[Nevo DB] Successfully preloaded ${users.length} users, ${vouchers.length} vouchers, and ${logs.length} diagnostic logs.`);
   } catch (err) {
@@ -682,7 +641,7 @@ async function writeDb(data: DBStructure): Promise<void> {
 }
 
 // -------------------- SECURE AUTHENTICATION TOKENS (JWT-like) --------------------
-const TOKEN_SECRET = 'nevo_secured_vault_key_2026_salt_88';
+const TOKEN_SECRET = process.env.JWT_SECRET || process.env.NEVO_AUTH_SECRET || 'change-me-in-production';
 
 function generateToken(email: string): string {
   const base64Email = Buffer.from(email.toLowerCase()).toString('base64');
@@ -707,51 +666,15 @@ function verifyToken(token: string): string | null {
   return null;
 }
 
-// -------------------- WELCOME BONUS / WALLET INITIALIZATION --------------------
+// -------------------- NEVO WALLET ACTIVITY ENGINE --------------------
+// No automatic daily wallet resets or capital-credit cycles exist in Nevo.
 function processUserGiftEligibility(user: UserState): { updated: boolean; user: UserState } {
-  const now = new Date();
-  const nowMs = now.getTime();
-
-  if (!user.lastGiftCreditTime) {
-    user.lastGiftCreditTime = user.registrationDate || now.toISOString();
-  }
-  if (!user.lastActivityTime) {
-    user.lastActivityTime = now.toISOString();
-  }
-
-  const lastCreditTime = new Date(user.lastGiftCreditTime);
-  const msSinceLastCredit = nowMs - lastCreditTime.getTime();
-  const hoursSinceLastCredit = msSinceLastCredit / (1000 * 60 * 60);
-
-  const lastActivity = new Date(user.lastActivityTime || user.lastGiftCreditTime);
-  const hoursInactive = (nowMs - lastActivity.getTime()) / (1000 * 60 * 60);
-
+  const now = new Date().toISOString();
   let updated = false;
-
-  // PART 4 RULE 5: If the wallet remains inactive for 3 consecutive days (72+ hours inactive):
-  // Automatically reset wallet to ₦0 until the next scheduled funding cycle.
-  if (hoursInactive >= 72) {
-    if (user.balance > 0) {
-      user.balance = 0;
-      updated = true;
-      user.notifications = user.notifications || [];
-      user.notifications.unshift({
-        id: `notif-${Date.now()}-inactive`,
-        title: 'Wallet Inactivity Reset',
-        body: 'Your wallet balance was set to ₦0 due to 3 consecutive days of inactivity. It will refresh on your next 24-hour cycle.',
-        date: now.toISOString(),
-        unread: true
-      });
-    }
-  }
-
-  // Welcome bonus is a one-time ₦750 registration credit. No automatic ₦200,000 daily wallet reset is used.
-  if (hoursSinceLastCredit >= 24) {
-    user.lastGiftCreditTime = now.toISOString();
-    user.lastActivityTime = now.toISOString();
+  if (!user.lastActivityTime) {
+    user.lastActivityTime = now;
     updated = true;
   }
-
   return { updated, user };
 }
 
@@ -769,48 +692,12 @@ async function authenticateToken(req: any, res: any, next: any) {
     }
     req.userEmail = email;
 
-    // Auto-provision user record in database if missing, preventing any downstream "User not found" errors
+    // Authenticated sessions must correspond to a real database user. Never auto-create accounts from a bearer token.
     const db = readDb();
     db.users = db.users || [];
-    let userIndex = db.users.findIndex((u: any) => u && u.email && u.email.toLowerCase() === email.toLowerCase());
+    const userIndex = db.users.findIndex((u: any) => u && u.email && u.email.toLowerCase() === email.toLowerCase());
     if (userIndex === -1) {
-      const defaultName = email.split('@')[0].split(/[._-]/).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
-      const dummyUser = {
-        fullName: defaultName || 'Nevo User',
-        email: email.toLowerCase(),
-        passwordHash: bcrypt.hashSync('NevoTempPass99!', 10),
-        balance: 750,
-        dailyTarget: 50000,
-        dailySpent: 0,
-        pinCreated: false,
-        biometricEnabled: false,
-        phone: '',
-        profilePic: '',
-        tier: 3,
-        isSuspended: false,
-        isFrozen: false,
-        registrationDate: new Date().toISOString(),
-        accountStatus: 'active',
-        emailVerificationStatus: 'verified',
-        transactions: [],
-        notifications: [
-          {
-            id: `notif-${Date.now()}`,
-            title: 'Welcome to Nevo!',
-            body: 'Welcome to your digital payments platform! Please create a 4-digit security PIN to get started.',
-            date: new Date().toISOString(),
-            unread: true
-          }
-        ],
-        giftDay: 1,
-        giftActive: true,
-        lastGiftCreditTime: new Date().toISOString(),
-        giftExpiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
-      };
-      db.users.push(dummyUser);
-      await writeDb(db);
-      userIndex = db.users.length - 1;
-      logDiagnostic('INFO', 'Auto-created missing user record for authenticated session', { email });
+      return res.status(401).json({ error: 'User account was not found. Please sign in again.' });
     }
 
     // FORCE RELOAD user balance and gift system attributes from SQL database to guarantee latest, never cached values
@@ -865,11 +752,43 @@ async function authenticateToken(req: any, res: any, next: any) {
   }
 }
 
+
+// Every wallet-spending/cash-out service is locked until the user has BOTH:
+// 1) five successful referrals, and 2) a verified KoraPay deposit of at least ₦520.
+// Earning features such as tasks and rewarded adverts remain available without these requirements.
+async function requireNevoTransactionEligibility(req: any, res: any, next: any) {
+  try {
+    const email = String(req.userEmail || '').toLowerCase();
+    const referralRow = await getRow(`SELECT COUNT(*) AS count FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) AND status='successful'`, [email]);
+    const depositRow = await getRow(`SELECT COUNT(*) AS count FROM payment_transactions WHERE LOWER(userEmail)=LOWER($1) AND purpose='wallet_funding' AND provider='korapay' AND status IN ('successful','settled') AND amount >= 520`, [email]);
+    const successfulReferrals = Number(referralRow?.count || 0);
+    const verifiedDeposit = Number(depositRow?.count || 0) > 0;
+    if (successfulReferrals < 5 || !verifiedDeposit) {
+      const reasons: string[] = [];
+      if (successfulReferrals < 5) reasons.push(`Complete 5 successful referrals (${successfulReferrals}/5).`);
+      if (!verifiedDeposit) reasons.push('Make a verified KoraPay wallet deposit of at least ₦520.');
+      return res.status(403).json({
+        error: `Transactions are locked. ${reasons.join(' ')}`,
+        code: 'NEVO_TRANSACTION_LOCKED',
+        successfulReferrals,
+        referralsRequired: 5,
+        verifiedDeposit,
+        depositMinimum: 520
+      });
+    }
+    req.nevoTransactionEligible = true;
+    next();
+  } catch (err) {
+    console.error('[Nevo Eligibility] Failed to verify transaction requirements:', err);
+    return res.status(503).json({ error: 'Unable to verify transaction eligibility right now. Please try again.' });
+  }
+}
+
 function verifyAdminToken(token: string): string | null {
   const email = verifyToken(token);
   if (!email) return null;
   const lower = email.toLowerCase();
-  if (lower === 'talkdavidjohn@gmail.com' || lower === 'admin@nevo.com' || lower.includes('admin')) {
+  if (lower.includes('admin')) {
     return email;
   }
   return null;
@@ -1897,6 +1816,47 @@ app.post('/api/user/sync-state', authenticateToken, (req: any, res) => {
 });
 
 // Update Profile
+const profileUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 512 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (/^image\/(jpeg|png|webp|gif)$/i.test(file.mimetype)) cb(null, true);
+    else cb(new Error('Only JPEG, PNG, WebP, or GIF profile images are allowed.'));
+  }
+});
+
+app.post('/api/user/avatar', authenticateToken, async (req: any, res: any) => {
+  try {
+    const avatarUrl = String(req.body?.avatarUrl || '').trim();
+    if (!avatarUrl || avatarUrl.length > 2000) return res.status(400).json({ error: 'Invalid avatar selection.' });
+    const db = readDb();
+    const user = db.users[req.userIndex];
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    user.profilePic = avatarUrl;
+    await writeDb(db);
+    await execute(`UPDATE users SET profilePic=$1 WHERE LOWER(email)=LOWER($2)`, [avatarUrl, req.userEmail]);
+    res.json({ success: true, message: 'Avatar updated.', user: { ...user, passwordHash: undefined, pinCode: undefined } });
+  } catch (err: any) {
+    res.status(400).json({ error: err?.message || 'Failed to update avatar.' });
+  }
+});
+
+app.post('/api/user/profile-picture', authenticateToken, profileUpload.single('image'), async (req: any, res: any) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'Please choose an image.' });
+    const db = readDb();
+    const user = db.users[req.userIndex];
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    const profilePic = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+    user.profilePic = profilePic;
+    await writeDb(db);
+    await execute(`UPDATE users SET profilePic=$1 WHERE LOWER(email)=LOWER($2)`, [profilePic, req.userEmail]);
+    res.json({ success: true, profilePic });
+  } catch (err: any) {
+    res.status(400).json({ error: err?.message || 'Failed to update profile picture.' });
+  }
+});
+
 app.post('/api/user/update-profile', authenticateToken, (req: any, res) => {
   const email = req.userEmail;
   const { fullName, phone, profilePic, tier } = req.body;
@@ -1960,7 +1920,6 @@ const BANK_NAME_TO_CODE: Record<string, string> = {
   "Fidelity Bank Plc": "070",
   "First Bank of Nigeria Limited": "011",
   "First City Monument Bank Limited (FCMB)": "214",
-  "Flutterwave Barter": "50325",
   "FSDH Holding Company Limited": "321",
   "FSDH Merchant Bank Limited": "321",
   "Globus Bank Limited": "00103",
@@ -2132,7 +2091,7 @@ app.post('/api/auth/activate-voucher', authenticateToken, async (req: any, res) 
 });
 
 // Transaction endpoint for Airtime Purchase
-app.post('/api/transactions/airtime', authenticateToken, async (req: any, res) => {
+app.post('/api/transactions/airtime', authenticateToken, requireNevoTransactionEligibility, async (req: any, res) => {
   const { phoneNumber, network, amount } = req.body;
   const email = req.userEmail;
 
@@ -2239,7 +2198,7 @@ app.post('/api/transactions/airtime', authenticateToken, async (req: any, res) =
 });
 
 // Transaction endpoint for Data Purchase
-app.post('/api/transactions/data', authenticateToken, async (req: any, res) => {
+app.post('/api/transactions/data', authenticateToken, requireNevoTransactionEligibility, async (req: any, res) => {
   const { phoneNumber, network, bundleId } = req.body;
   const email = req.userEmail;
 
@@ -2564,7 +2523,7 @@ async function verifyBankAccountService(bankName: string, accountNumber: string)
     }
   }
 
-  // Filter out codes that are known non-Korapay codes (e.g. Paystack NIP codes like 999992, 999991)
+  // Filter out unsupported legacy clearing codes that are not enabled for KoraPay.
   const validKorapayCandidateCodes = candidateCodes.filter(code => !code.startsWith('9999'));
 
   if (validKorapayCandidateCodes.length === 0) {
@@ -2653,7 +2612,7 @@ app.post('/api/verify-account', authenticateToken, async (req: any, res) => {
 });
 
 // Transaction endpoint for Bank Transfer
-app.post('/api/transactions/transfer', authenticateToken, async (req: any, res) => {
+app.post('/api/transactions/transfer', authenticateToken, requireNevoTransactionEligibility, async (req: any, res) => {
   const { bank, accountNumber, amount, accountName } = req.body;
   const email = req.userEmail;
 
@@ -2767,7 +2726,7 @@ app.post('/api/transactions/transfer', authenticateToken, async (req: any, res) 
 });
 
 // Transaction endpoint for Withdrawal
-app.post('/api/transactions/withdraw', authenticateToken, async (req: any, res) => {
+app.post('/api/transactions/withdraw', authenticateToken, requireNevoTransactionEligibility, async (req: any, res) => {
   const { bank, accountNumber, amount, accountName, voucherCode = '' } = req.body;
   const email = req.userEmail;
 
@@ -2944,7 +2903,7 @@ app.post('/api/transactions/withdraw', authenticateToken, async (req: any, res) 
 });
 
 // Transaction endpoint for Bills Payments (Cable, Electricity, Betting)
-app.post('/api/transactions/bills', authenticateToken, async (req: any, res) => {
+app.post('/api/transactions/bills', authenticateToken, requireNevoTransactionEligibility, async (req: any, res) => {
   const { type, provider, accountNumber, amount, voucherCode } = req.body;
   const email = req.userEmail;
 
@@ -3158,10 +3117,7 @@ async function processSuccessfulWdvPayment(reference: string, providerName = 'we
 }
 
 // Unified Core Payment Verification, User Wallet Crediting & Voucher Handling Logic
-// A per-reference lock prevents duplicate webhook + callback processing inside the
-// same Node instance. The persistent transaction status remains the second line
-// of defence, so repeated provider events never intentionally create a second credit.
-const paymentProcessingLocks = new Map<string, Promise<any>>();
+const paymentProcessingLocks = new Set<string>();
 
 async function processSuccessfulPayment(params: {
   reference: string;
@@ -3170,22 +3126,19 @@ async function processSuccessfulPayment(params: {
   channel?: string;
   providerReference?: string;
   rawData?: any;
-}): Promise<any> {
-  const existing = paymentProcessingLocks.get(params.reference);
-  if (existing) return existing;
-
-  const run = processSuccessfulPaymentUnlocked(params);
-  paymentProcessingLocks.set(params.reference, run);
+}) {
+  if (paymentProcessingLocks.has(params.reference)) {
+    return { success: true, alreadyProcessed: true, reference: params.reference, status: 'successful', message: 'Payment is already being processed.' };
+  }
+  paymentProcessingLocks.add(params.reference);
   try {
-    return await run;
+    return await processSuccessfulPaymentUnsafe(params);
   } finally {
-    if (paymentProcessingLocks.get(params.reference) === run) {
-      paymentProcessingLocks.delete(params.reference);
-    }
+    paymentProcessingLocks.delete(params.reference);
   }
 }
 
-async function processSuccessfulPaymentUnlocked(params: {
+async function processSuccessfulPaymentUnsafe(params: {
   reference: string;
   providerName: PaymentProviderName;
   verifiedAmount?: number;
@@ -3218,7 +3171,7 @@ async function processSuccessfulPaymentUnlocked(params: {
   const rawAmount = params.verifiedAmount !== undefined ? params.verifiedAmount : Number(tx?.amount || wdvPayment?.amount || 0);
   const amount = Number(rawAmount || 0);
   const purpose = tx?.purpose || (wdvPayment ? 'wdv_voucher' : 'wallet_funding');
-  const provider = params.providerName || (tx?.provider as PaymentProviderName) || 'paystack';
+  const provider = params.providerName || (tx?.provider as PaymentProviderName) || 'korapay';
   const providerRef = params.providerReference || tx?.providerReference || '';
   const rawDataStr = typeof params.rawData === 'string' ? params.rawData : JSON.stringify(params.rawData || {});
 
@@ -3265,7 +3218,7 @@ async function processSuccessfulPaymentUnlocked(params: {
       user.balance = newBal;
 
       const providerLower = String(provider || '').toLowerCase();
-      const providerDisplay = providerLower.includes('korapay') ? 'KoraPay' : providerLower.includes('paystack') ? 'Paystack' : provider.toUpperCase();
+      const providerDisplay = 'KoraPay';
 
       const txRecord = {
         id: `tx-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
@@ -3276,7 +3229,7 @@ async function processSuccessfulPaymentUnlocked(params: {
         status: 'success',
         description: `Deposit — ${providerDisplay}`,
         reference: reference,
-        provider: providerLower.includes('korapay') ? 'korapay' : providerLower.includes('paystack') ? 'paystack' : providerLower,
+        provider: 'korapay',
         balanceBefore: currentBal,
         balanceAfter: newBal
       };
@@ -3346,432 +3299,203 @@ async function processSuccessfulPaymentUnlocked(params: {
   };
 }
 
-// -------------------- NEVO WALLET DEPOSIT (REAL PAYSTACK + KORAPAY CHECKOUT) --------------------
-function getPublicAppUrl(req: any): string {
-  const configured = String(process.env.APP_URL || '').trim().replace(/\/+$/, '');
-  if (configured) return configured;
+// -------------------- KORAPAY PAYMENT GATEWAY --------------------
+const createNevoKoraReference = () => `NEVO_KORA_${Date.now()}_${crypto.randomBytes(5).toString('hex').toUpperCase()}`;
 
-  const forwardedProto = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim();
-  const protocol = forwardedProto || req.protocol || 'https';
-  const host = String(req.headers['x-forwarded-host'] || req.get('host') || '').split(',')[0].trim();
-  return `${protocol}://${host}`.replace(/\/+$/, '');
-}
-
-function createWalletDepositReference(provider: PaymentProviderName): string {
-  const prefix = provider === 'korapay' ? 'NEVO_KPY' : 'NEVO_PSTK';
-  return `${prefix}_${Date.now()}_${crypto.randomBytes(6).toString('hex').toUpperCase()}`;
-}
-
-const handleWalletDepositInit = async (req: any, res: any) => {
-  let reference = '';
+const handleKorapayWalletDepositInit = async (req: any, res: any) => {
   try {
     const amount = Number(req.body?.amount);
     if (!Number.isFinite(amount) || amount < 520) {
       return res.status(400).json({ error: 'Minimum deposit amount is ₦520.' });
     }
-
-    // Keep NGN deposits to normal currency precision and reject malformed values.
-    const normalizedAmount = Math.round(amount * 100) / 100;
-    if (normalizedAmount !== amount) {
-      return res.status(400).json({ error: 'Deposit amount can have at most two decimal places.' });
-    }
-
-    const requestedProvider = String(req.body?.provider || '').toLowerCase().trim();
-    if (requestedProvider !== 'paystack' && requestedProvider !== 'korapay') {
-      return res.status(400).json({ error: 'Choose either Paystack or KoraPay as the payment method.' });
-    }
-
-    const providerName = requestedProvider as PaymentProviderName;
-    const provider = paymentManager.getProvider(providerName);
-    if (!provider.isConfigured()) {
-      const missing = provider.getMissingEnvVars().join(', ');
-      return res.status(503).json({
-        error: `${provider.displayName} deposit service is not configured. Missing: ${missing}.`
-      });
-    }
-
     const email = String(req.userEmail || '').toLowerCase();
     const db = readDb();
     const user = db.users.find((u: any) => String(u.email || '').toLowerCase() === email);
     if (!user) return res.status(404).json({ error: 'User account not found.' });
 
-    reference = createWalletDepositReference(providerName);
-    const baseUrl = getPublicAppUrl(req);
-    const callbackUrl = `${baseUrl}/?deposit_ref=${encodeURIComponent(reference)}&provider=${providerName}`;
-    const webhookUrl = `${baseUrl}/api/payment/webhook/${providerName}`;
-    const createdAt = new Date().toISOString();
-    const transactionId = `ptx-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
-    const userName = user.fullName || email.split('@')[0] || 'Nevo Customer';
+    const provider = paymentManager.getProvider('korapay');
+    if (!provider || !provider.isConfigured()) {
+      return res.status(503).json({ error: 'KoraPay deposit service is not configured. Add KORAPAY_SECRET_KEY to the server environment.' });
+    }
 
-    // Create the Nevo pending transaction before contacting the provider. The
-    // provider reference/checkout URL is filled in only after the real API call.
+    const reference = createNevoKoraReference();
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+    const host = req.headers['x-forwarded-host'] || req.get('host');
+    const callbackUrl = `${protocol}://${host}/?deposit_ref=${encodeURIComponent(reference)}`;
+    const notificationUrl = `${protocol}://${host}/api/payment/webhook/korapay`;
+    const createdAt = new Date().toISOString();
+
+    // Record the pending Nevo transaction before contacting KoraPay.
     await execute(`
-      INSERT INTO payment_transactions (
-        id, reference, userEmail, userName, amount, currency, provider, providerReference,
-        purpose, status, channel, authorizationUrl, metadata, createdAt, verifiedAt, webhookData
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+      INSERT INTO payment_transactions
+      (id, reference, userEmail, userName, amount, currency, provider, providerReference, purpose, status, channel, authorizationUrl, metadata, createdAt, verifiedAt, webhookData)
+      VALUES ($1,$2,$3,$4,$5,'NGN','korapay',$6,'wallet_funding','pending','checkout','',$7,$8,'','')
     `, [
-      transactionId,
+      `ptx-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
       reference,
       email,
-      userName,
-      normalizedAmount,
-      'NGN',
-      providerName,
-      '',
-      'wallet_funding',
-      'pending',
-      'checkout',
-      '',
-      JSON.stringify({ provider: providerName, purpose: 'wallet_funding', callbackUrl, webhookUrl }),
-      createdAt,
-      '',
-      ''
+      user.fullName || '',
+      amount,
+      reference,
+      JSON.stringify({ purpose: 'wallet_funding', userId: email, userName: user.fullName || '', callbackUrl }),
+      createdAt
     ]);
 
     try {
-      const initResult = await provider.initializePayment({
-        amount: normalizedAmount,
+      const result = await paymentManager.initializePayment({
+        userId: email,
         email,
-        name: userName,
-        phone: user.phone || '',
+        name: user.fullName || email.split('@')[0] || 'Nevo Customer',
+        amount,
+        currency: 'NGN',
         reference,
         callbackUrl,
-        webhookUrl,
-        purpose: 'wallet_funding',
-        metadata: {
-          purpose: 'wallet_funding',
-          userId: email,
-          user_email: email,
-          user_name: userName,
-          provider: providerName
-        }
+        notificationUrl,
+        provider: 'korapay',
+        metadata: { purpose: 'wallet_funding', userId: email, userName: user.fullName || 'Nevo Customer' }
       });
 
-      const checkoutUrl = String(initResult.authorizationUrl || '').trim();
-      if (!checkoutUrl) {
-        throw new Error(`${provider.displayName} did not return a checkout URL for this transaction.`);
-      }
-
-      const providerReference = String(initResult.reference || reference);
-      await execute(`
-        UPDATE payment_transactions
-        SET providerReference = $1, authorizationUrl = $2, metadata = $3, channel = $4
-        WHERE reference = $5 AND status = 'pending'
-      `, [
-        providerReference,
-        checkoutUrl,
-        JSON.stringify({ provider: providerName, purpose: 'wallet_funding', callbackUrl, webhookUrl, accessCode: initResult.accessCode || '' }),
-        'checkout',
+      await execute(`UPDATE payment_transactions SET providerReference=$1, authorizationUrl=$2, metadata=$3 WHERE reference=$4`, [
+        result.reference,
+        result.checkoutUrl,
+        JSON.stringify({ purpose: 'wallet_funding', userId: email, callbackUrl, notificationUrl, provider: 'korapay' }),
         reference
       ]);
 
-      await loadDbCache();
-      logDiagnostic('INFO', `${provider.displayName} wallet deposit initialized`, {
-        email,
+      return res.json({ success: true, deposit: {
         reference,
-        providerReference,
-        amount: normalizedAmount,
-        provider: providerName
-      });
-
-      // Never return provider secrets or the raw provider response to the browser.
-      return res.json({
-        success: true,
-        deposit: {
-          reference,
-          providerReference,
-          amount: normalizedAmount,
-          currency: 'NGN',
-          checkoutUrl,
-          authorizationUrl: checkoutUrl,
-          accessCode: initResult.accessCode || undefined,
-          provider: providerName,
-          status: 'pending'
-        }
-      });
+        amount,
+        checkoutUrl: result.checkoutUrl,
+        authorizationUrl: result.checkoutUrl,
+        provider: 'korapay',
+        status: 'pending'
+      }});
     } catch (providerError: any) {
-      await execute(`
-        UPDATE payment_transactions
-        SET status = $1, webhookData = $2
-        WHERE reference = $3 AND status = 'pending'
-      `, ['failed', JSON.stringify({ error: providerError?.message || 'Provider initialization failed' }), reference]);
+      await execute(`UPDATE payment_transactions SET status='failed', webhookData=$1 WHERE reference=$2`, [
+        JSON.stringify({ initializationError: providerError?.message || 'KoraPay initialization failed' }), reference
+      ]).catch(() => {});
       throw providerError;
     }
   } catch (err: any) {
-    console.error('[Nevo Wallet Deposit Initialization]', err);
-    return res.status(502).json({ error: err.message || 'Unable to initialize the selected payment provider.' });
+    console.error('[KoraPay Wallet Deposit]', err);
+    res.status(502).json({ error: err?.message || 'Failed to initialize KoraPay checkout.' });
   }
 };
 
-// Provider-specific aliases are kept for compatibility with the existing app.
-app.post('/api/paystack/initialize-wallet-deposit', authenticateToken, async (req: any, res: any) => {
-  req.body = { ...(req.body || {}), provider: 'paystack' };
-  return handleWalletDepositInit(req, res);
-});
+app.post('/api/korapay/initialize-wallet-deposit', authenticateToken, handleKorapayWalletDepositInit);
 
-app.post('/api/korapay/initialize-wallet-deposit', authenticateToken, async (req: any, res: any) => {
-  req.body = { ...(req.body || {}), provider: 'korapay' };
-  return handleWalletDepositInit(req, res);
-});
-
-app.post('/api/payments/initialize-wallet-deposit', authenticateToken, handleWalletDepositInit);
-
-// -------------------- LEGACY VIRTUAL-ACCOUNT ENDPOINT --------------------
-// Wallet funding now uses the real hosted Paystack/KoraPay checkout flow above.
-// Keep this compatibility route explicit so old clients cannot accidentally
-// receive a fabricated/static account number.
-app.post('/api/korapay/virtual-account', authenticateToken, async (_req: any, res: any) => {
-  return res.status(410).json({
-    error: 'The legacy virtual-account deposit flow is disabled. Start a new deposit and choose Paystack or KoraPay checkout.'
-  });
-});
-
-app.get('/api/korapay/payment-status/:reference', authenticateToken, async (req: any, res: any) => {
-  req.body = { reference: req.params.reference };
-  return verifyPaymentUnifiedHandler(req, res);
-});
-
-// 3. Verify Payment (Server-side Authoritative Verification)
-const verifyPaymentUnifiedHandler = async (req: any, res: any) => {
+const verifyKorapayPaymentForUser = async (req: any, res: any) => {
   try {
-    const reference = req.body.reference || req.params.reference || req.query.reference;
-    if (!reference) {
-      return res.status(400).json({ error: 'Payment reference is required.' });
+    const reference = String(req.params?.reference || req.body?.reference || '').trim();
+    if (!reference) return res.status(400).json({ error: 'Payment reference is required.' });
+
+    const tx = await getRow(`SELECT * FROM payment_transactions WHERE reference=$1 OR providerReference=$1`, [reference]);
+    if (!tx) return res.status(404).json({ error: 'Payment transaction not found.' });
+    const owner = String(tx.useremail || tx.userEmail || '').toLowerCase();
+    if (owner !== String(req.userEmail || '').toLowerCase()) return res.status(403).json({ error: 'This payment does not belong to your account.' });
+    if (String(tx.provider || '').toLowerCase() !== 'korapay') return res.status(400).json({ error: 'Unsupported payment provider.' });
+
+    if (['successful','settled'].includes(String(tx.status).toLowerCase())) {
+      const user = readDb().users.find((u:any) => String(u.email || '').toLowerCase() === owner);
+      return res.json({ success: true, alreadyProcessed: true, status: 'successful', amount: Number(tx.amount || 0), reference: tx.reference, balance: user?.balance });
     }
 
-    // 1. Check existing payment status
-    let tx = await getRow(`SELECT * FROM payment_transactions WHERE reference = $1`, [reference]);
-    let wdvPayment = await getRow(`SELECT * FROM wdv_payments WHERE reference = $1`, [reference]);
+    const provider = paymentManager.getProvider('korapay');
+    if (!provider || !provider.isConfigured()) return res.status(503).json({ error: 'KoraPay is not configured on the server.' });
+    const verification = await provider.verifyPayment(String(tx.providerreference || tx.providerReference || tx.reference));
 
-    if (!tx && !wdvPayment) {
-      return res.status(404).json({ error: 'Payment transaction reference not found.' });
-    }
-
-    // Security: a signed-in user may only verify their own payment reference.
-    const requesterEmail = String(req.userEmail || '').toLowerCase();
-    const paymentOwner = String(tx?.useremail || tx?.userEmail || wdvPayment?.useremail || wdvPayment?.userEmail || '').toLowerCase();
-    if (!requesterEmail || !paymentOwner || requesterEmail !== paymentOwner) {
-      return res.status(403).json({ error: 'This payment reference does not belong to your account.' });
-    }
-
-    // WDV purchases are fixed-price NGN transactions. Never issue a voucher for a
-    // successful payment with the wrong amount or currency.
-    const requestedPurpose = tx?.purpose || (wdvPayment ? 'wdv_voucher' : '');
-    if (requestedPurpose !== 'wdv_voucher' && requestedPurpose !== 'wallet_funding') {
-      return res.status(400).json({ error: 'Unsupported payment purpose.' });
-    }
-
-    // Idempotency: if a webhook already completed the payment, return the exact
-    // existing voucher instead of asking the provider to create anything again.
-    if (tx && (tx.status === 'successful' || tx.status === 'settled')) {
-      const db = readDb();
-      const user = db.users.find((u: any) => u.email.toLowerCase() === paymentOwner);
-      const existingPurpose = tx.purpose || 'wallet_funding';
-      const existingCode = wdvPayment?.voucherCode || wdvPayment?.vouchercode || '';
-      return res.json({
-        success: true, alreadyProcessed: true, status: 'successful',
-        amount: Number(tx.amount || wdvPayment?.amount || 0), reference,
-        purpose: existingPurpose, balance: user?.balance, voucherCode: existingCode,
-        message: existingPurpose === 'wallet_funding' ? 'Deposit has already been verified and credited.' : 'Payment has already been verified.'
+    if (verification.status === 'successful') {
+      const expectedAmount = Number(tx.amount || 0);
+      const verifiedAmount = Number(verification.amount || 0);
+      if (String(verification.currency || '').toUpperCase() !== 'NGN') return res.status(400).json({ error: 'Verified payment currency is not NGN.' });
+      if (!Number.isFinite(verifiedAmount) || Math.abs(verifiedAmount - expectedAmount) > 0.009) return res.status(400).json({ error: 'Verified payment amount does not match the requested deposit.' });
+      const result = await processSuccessfulPayment({
+        reference: tx.reference,
+        providerName: 'korapay',
+        verifiedAmount,
+        providerReference: verification.providerReference || String(tx.providerreference || ''),
+        rawData: verification.rawResponse || {}
       });
+      return res.json({ ...result, status: 'successful' });
     }
 
-    // 2. Identify provider used for this payment
-    const rawProvider = (tx?.provider || wdvPayment?.provider || 'paystack').toLowerCase();
-    const providerName: PaymentProviderName =
-      rawProvider.includes('flutterwave') ? 'flutterwave' :
-      rawProvider.includes('korapay') ? 'korapay' : 'paystack';
-
-    // The stored transaction decides which provider is authoritative. Never let
-    // a callback/reference be verified against a different gateway.
-    if (tx && String(tx.provider || '').toLowerCase() !== providerName) {
-      return res.status(400).json({ error: 'Payment provider does not match the original transaction.' });
+    if (verification.status === 'failed') {
+      await execute(`UPDATE payment_transactions SET status='failed', verifiedAt=$1, webhookData=$2 WHERE reference=$3`, [new Date().toISOString(), JSON.stringify(verification.rawResponse || {}), tx.reference]);
+      return res.json({ success: false, status: 'failed', reference: tx.reference, message: 'KoraPay reports that this payment was not completed.' });
     }
-
-    const provider = paymentManager.getProvider(providerName);
-    if (!provider.isConfigured()) {
-      return res.status(400).json({
-        error: `Provider "${provider.displayName}" credentials are not configured to perform live verification.`
-      });
-    }
-
-    // 3. Query the provider's verification API with secret key
-    const verifyRes = await provider.verifyPayment(reference);
-
-    if (verifyRes.success && verifyRes.status === 'successful') {
-      const expectedAmount = Number(tx?.amount || wdvPayment?.amount || 0);
-      const verifiedAmount = Number(verifyRes.amount || 0);
-      const verifiedCurrency = String(verifyRes.currency || '').toUpperCase();
-      const storedAmount = expectedAmount;
-      const expectedPurpose = tx?.purpose || (wdvPayment ? 'wdv_voucher' : 'wallet_funding');
-      const amountMatches = expectedPurpose === 'wdv_voucher' ? Math.abs(verifiedAmount - 6500) <= 0.009 && Math.abs(storedAmount - 6500) <= 0.009 : Math.abs(verifiedAmount - storedAmount) <= 0.009;
-
-      const verifiedCustomerEmail = String(verifyRes.customerEmail || '').toLowerCase();
-      const customerMatches = !verifiedCustomerEmail || verifiedCustomerEmail === paymentOwner;
-
-      if (verifiedCurrency !== 'NGN' || !amountMatches || !customerMatches) {
-        await execute(`UPDATE payment_transactions SET status = $1 WHERE reference = $2`, ['failed', reference]);
-        return res.status(400).json({
-          success: false,
-          status: 'failed',
-          reference,
-          message: 'Payment amount could not be verified against the original deposit/payment amount. No wallet credit was made.'
-        });
-      }
-
-      const processRes = await processSuccessfulPayment({
-        reference,
-        providerName: provider.name,
-        verifiedAmount: verifyRes.amount,
-        channel: verifyRes.channel,
-        providerReference: verifyRes.providerReference,
-        rawData: verifyRes.rawResponse
-      });
-
-      const db = readDb();
-      const email = (tx?.useremail || tx?.userEmail || wdvPayment?.useremail || wdvPayment?.userEmail || '').toLowerCase();
-      const user = db.users.find((u: any) => u.email.toLowerCase() === email);
-
-      return res.json({
-        success: true,
-        status: 'successful',
-        amount: verifyRes.amount,
-        reference,
-        purpose: tx?.purpose || 'wallet_funding',
-        balance: user?.balance,
-        voucherCode: processRes.voucherCode,
-        message: 'Payment verified successfully and funds credited!'
-      });
-    }
-
-    if (verifyRes.status === 'failed' || verifyRes.status === 'abandoned') {
-      await execute(`UPDATE payment_transactions SET status = $1 WHERE reference = $2`, [verifyRes.status, reference]);
-      return res.json({
-        success: false,
-        status: verifyRes.status,
-        reference,
-        message: verifyRes.message || 'Payment was unsuccessful or cancelled.'
-      });
-    }
-
-    res.json({
-      success: false,
-      status: 'pending',
-      reference,
-      message: 'Payment is pending. Please complete authorization.'
-    });
+    return res.json({ success: false, status: 'pending', reference: tx.reference, message: 'Payment is still pending.' });
   } catch (err: any) {
-    console.error('Error during payment verification:', err);
-    res.status(500).json({ error: err.message || 'Payment verification failed.' });
+    console.error('KoraPay verification error:', err);
+    res.status(500).json({ error: err?.message || 'Payment verification failed.' });
   }
 };
 
-app.post('/api/payment/verify', authenticateToken, verifyPaymentUnifiedHandler);
-app.get('/api/payment/verify/:reference', authenticateToken, verifyPaymentUnifiedHandler);
-app.get('/api/paystack/check-status/:reference', authenticateToken, async (req:any,res:any) => { req.body = { reference:req.params.reference }; return verifyPaymentUnifiedHandler(req,res); });
-app.get('/api/korapay/check-status/:reference', authenticateToken, async (req:any,res:any) => { req.body = { reference:req.params.reference }; return verifyPaymentUnifiedHandler(req,res); });
-app.post('/api/korapay/check-status', authenticateToken, async (req:any,res:any) => { return verifyPaymentUnifiedHandler(req,res); });
+app.get('/api/korapay/check-status/:reference', authenticateToken, verifyKorapayPaymentForUser);
+app.post('/api/korapay/check-status', authenticateToken, verifyKorapayPaymentForUser);
+app.post('/api/payment/verify', authenticateToken, verifyKorapayPaymentForUser);
+app.get('/api/payment/verify/:reference', authenticateToken, verifyKorapayPaymentForUser);
 
-// 4. Unified Webhook Receiver
-const handleWebhookUnified = async (providerName: PaymentProviderName, req: any, res: any) => {
+// KoraPay sends the webhook without user authentication. Signature verification is mandatory,
+// followed by a direct provider verification before any wallet credit is applied.
+app.post('/api/payment/webhook/korapay', async (req: any, res: any) => {
   try {
-    const provider = paymentManager.getProvider(providerName);
-    if (!provider.isConfigured()) {
-      return res.status(503).send(`${provider.displayName} is not configured`);
-    }
-
-    const rawBody = req.rawBody || (typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {}));
-    const jsonBody = typeof req.body === 'object' && !Buffer.isBuffer(req.body)
-      ? req.body
-      : (rawBody ? JSON.parse(rawBody) : {});
-
-    // Verify the provider signature before reading any payment value from the webhook.
-    const parsed = await provider.parseWebhook(req.headers, rawBody, jsonBody);
+    const provider = paymentManager.getProvider('korapay');
+    if (!provider || !provider.isConfigured()) return res.status(503).send('KoraPay not configured');
+    const rawBody = req.rawBody || JSON.stringify(req.body || {});
+    const parsed = await provider.verifyWebhook(req.headers, rawBody);
     if (!parsed.isValid) {
-      logDiagnostic('SECURITY_ALERT', `Invalid ${provider.displayName} webhook signature`, { provider: providerName });
-      return res.status(400).send(`Invalid ${provider.displayName} webhook signature`);
+      logDiagnostic('SECURITY_ALERT', 'Invalid KoraPay webhook signature');
+      return res.status(400).send('Invalid KoraPay webhook signature');
     }
 
-    logDiagnostic('INFO', `${provider.displayName} Webhook Received`, {
-      event: parsed.event,
-      reference: parsed.reference,
-      provider: providerName
-    });
+    const ref = String(parsed.reference || '').trim();
+    if (!ref) return res.status(200).json({ status: 'ignored' });
+    const tx = await getRow(`SELECT * FROM payment_transactions WHERE reference=$1 OR providerReference=$1`, [ref]);
+    if (!tx) return res.status(200).json({ status: 'ignored' });
+    if (String(tx.provider || '').toLowerCase() !== 'korapay') return res.status(200).json({ status: 'ignored' });
+    if (['successful','settled'].includes(String(tx.status).toLowerCase())) return res.status(200).json({ status: 'already_processed' });
 
-    if (!parsed.reference) {
-      return res.status(200).json({ status: 'ignored', message: 'Webhook did not contain a usable transaction reference.' });
-    }
-
-    // Only Nevo transactions created in our payment_transactions table can credit a wallet.
-    const tx = await getRow(`SELECT * FROM payment_transactions WHERE reference = $1`, [parsed.reference]);
-    if (!tx) {
-      return res.status(200).json({ status: 'ignored', message: 'Transaction is not a Nevo wallet deposit.' });
-    }
-
-    if (String(tx.provider || '').toLowerCase() !== providerName) {
-      logDiagnostic('SECURITY_ALERT', 'Webhook provider mismatch', {
-        reference: parsed.reference,
-        expectedProvider: tx.provider,
-        receivedProvider: providerName
-      });
-      return res.status(400).send('Webhook provider mismatch');
-    }
-
-    if (tx.purpose !== 'wallet_funding') {
-      return res.status(200).json({ status: 'ignored', message: 'Transaction purpose is not wallet funding.' });
-    }
-
-    if (tx.status === 'successful' || tx.status === 'settled') {
-      return res.status(200).json({ status: 'success', message: 'Transaction already processed.' });
-    }
-
-    // The webhook is a trigger/notification. Verify the transaction directly with the
-    // provider API before any wallet credit is made. This also catches underpayment,
-    // overpayment, wrong currency, wrong customer, and stale/fraudulent webhook data.
-    const verified = await provider.verifyPayment(parsed.reference);
-    if (!verified.success || verified.status !== 'successful') {
-      throw new Error(`${provider.displayName} did not return a successful verified transaction for this webhook.`);
-    }
-
+    // Never trust webhook amount/status alone. Query KoraPay directly for final status.
+    const verified = await provider.verifyPayment(String(tx.providerreference || tx.providerReference || ref));
     const expectedAmount = Number(tx.amount || 0);
     const verifiedAmount = Number(verified.amount || 0);
-    const verifiedCurrency = String(verified.currency || '').toUpperCase();
-    const paymentOwner = String(tx.useremail || tx.userEmail || '').toLowerCase();
-    const verifiedCustomerEmail = String(verified.customerEmail || '').toLowerCase();
-
-    if (verifiedCurrency !== 'NGN' || !Number.isFinite(verifiedAmount) || Math.abs(verifiedAmount - expectedAmount) > 0.009) {
-      throw new Error('Verified provider amount/currency does not match the original Nevo deposit. Wallet was not credited.');
+    if (verified.status === 'successful' && String(verified.currency || '').toUpperCase() === 'NGN' && Math.abs(verifiedAmount - expectedAmount) <= 0.009) {
+      await processSuccessfulPayment({ reference: tx.reference, providerName: 'korapay', verifiedAmount, providerReference: verified.providerReference || ref, rawData: verified.rawResponse || parsed.rawBody || {} });
+    } else if (verified.status === 'failed') {
+      await execute(`UPDATE payment_transactions SET status='failed', verifiedAt=$1, webhookData=$2 WHERE reference=$3`, [new Date().toISOString(), JSON.stringify(verified.rawResponse || parsed.rawBody || {}), tx.reference]);
     }
-
-    if (verifiedCustomerEmail && paymentOwner && verifiedCustomerEmail !== paymentOwner) {
-      throw new Error('Verified provider customer does not match the Nevo transaction owner. Wallet was not credited.');
-    }
-
-    await processSuccessfulPayment({
-      reference: parsed.reference,
-      providerName,
-      verifiedAmount,
-      channel: verified.channel || parsed.rawData?.data?.payment_method || 'checkout',
-      providerReference: verified.providerReference || parsed.providerReference,
-      rawData: verified.rawResponse || parsed.rawData
-    });
-
-    return res.status(200).json({ status: 'success', message: `${provider.displayName} webhook verified and processed.` });
+    return res.status(200).json({ status: 'success' });
   } catch (err: any) {
-    console.error(`Error in ${providerName} webhook handler:`, err);
-    // Non-200 tells the provider to retry a webhook when verification/processing failed.
-    return res.status(500).json({ error: 'Webhook verification/processing failed.' });
+    console.error('KoraPay webhook error:', err);
+    return res.status(500).json({ error: 'Webhook processing failure.' });
   }
-};
+});
 
-app.post('/api/payment/webhook/paystack', (req, res) => handleWebhookUnified('paystack', req, res));
-app.post('/api/payment/webhook/flutterwave', (req, res) => handleWebhookUnified('flutterwave', req, res));
-app.post('/api/payment/webhook/korapay', (req, res) => handleWebhookUnified('korapay', req, res));
-// Dashboard/webhook compatibility aliases.
-app.post('/api/paystack/webhook', (req, res) => handleWebhookUnified('paystack', req, res));
-app.post('/api/korapay/webhook', (req, res) => handleWebhookUnified('korapay', req, res));
-app.post('/api/flutterwave/webhook', (req, res) => handleWebhookUnified('flutterwave', req, res));
+// Backward-compatible webhook path used by some Kora dashboard configurations.
+app.post('/api/korapay/webhook', async (req: any, res: any) => {
+  req.url = '/api/payment/webhook/korapay';
+  const provider = paymentManager.getProvider('korapay');
+  try {
+    if (!provider || !provider.isConfigured()) return res.status(503).send('KoraPay not configured');
+    const rawBody = req.rawBody || JSON.stringify(req.body || {});
+    const parsed = await provider.verifyWebhook(req.headers, rawBody);
+    if (!parsed.isValid) return res.status(400).send('Invalid KoraPay webhook signature');
+    if (parsed.reference) {
+      const tx = await getRow(`SELECT * FROM payment_transactions WHERE reference=$1 OR providerReference=$1`, [parsed.reference]);
+      if (tx && String(tx.provider || '').toLowerCase() === 'korapay' && !['successful','settled'].includes(String(tx.status).toLowerCase())) {
+        const verified = await provider.verifyPayment(String(tx.providerreference || tx.providerReference || parsed.reference));
+        const expected = Number(tx.amount || 0);
+        if (verified.status === 'successful' && String(verified.currency || '').toUpperCase() === 'NGN' && Math.abs(Number(verified.amount || 0) - expected) <= 0.009) {
+          await processSuccessfulPayment({ reference: tx.reference, providerName: 'korapay', verifiedAmount: Number(verified.amount), providerReference: verified.providerReference || parsed.reference, rawData: verified.rawResponse || {} });
+        }
+      }
+    }
+    return res.status(200).json({ status: 'success' });
+  } catch (err) {
+    console.error('KoraPay compatibility webhook error:', err);
+    return res.status(500).json({ error: 'Webhook processing failure.' });
+  }
+});
 
 // 5. Admin Payment Gateway Configuration & Transaction Oversight
 app.get('/api/admin/payment-config', authenticateAdminToken, (req, res) => {
@@ -3791,11 +3515,11 @@ app.get('/api/admin/payment-config', authenticateAdminToken, (req, res) => {
 app.post('/api/admin/payment-config/active-provider', authenticateAdminToken, async (req, res) => {
   try {
     const { provider } = req.body;
-    if (!provider || !['paystack', 'flutterwave', 'korapay'].includes(provider)) {
-      return res.status(400).json({ error: 'Valid provider required (paystack, flutterwave, or korapay).' });
+    if (String(provider || '').toLowerCase() !== 'korapay') {
+      return res.status(400).json({ error: 'KoraPay is the only supported payment provider.' });
     }
 
-    paymentManager.setActiveProviderName(provider as PaymentProviderName);
+    paymentManager.setActiveProviderName('korapay');
 
     // Persist in admin_settings
     await execute(`INSERT INTO admin_settings (key, value) VALUES ($1, $2) ON CONFLICT(key) DO UPDATE SET value = $2`, [
@@ -3806,7 +3530,7 @@ app.post('/api/admin/payment-config/active-provider', authenticateAdminToken, as
     res.json({
       success: true,
       activeProvider: provider,
-      message: `Active payment provider set to ${provider.toUpperCase()}`
+      message: 'KoraPay is the active payment provider.'
     });
   } catch (err: any) {
     res.status(500).json({ error: 'Failed to update active payment provider.' });
@@ -3833,12 +3557,11 @@ app.post('/api/admin/payment-transactions/manual-verify', authenticateAdminToken
     }
 
     const tx = await getRow(`SELECT * FROM payment_transactions WHERE reference = $1`, [reference]);
-    const rawProvider = (tx?.provider || 'paystack').toLowerCase();
-    const providerName: PaymentProviderName =
-      rawProvider.includes('flutterwave') ? 'flutterwave' :
-      rawProvider.includes('korapay') ? 'korapay' : 'paystack';
-
-    const provider = paymentManager.getProvider(providerName);
+    if (!tx || String(tx.provider || '').toLowerCase() !== 'korapay') {
+      return res.status(404).json({ error: 'KoraPay payment transaction not found.' });
+    }
+    const providerName: PaymentProviderName = 'korapay';
+    const provider = paymentManager.getProvider('korapay');
     if (!provider.isConfigured()) {
       return res.status(400).json({
         error: `Provider ${provider.displayName} is missing API credentials for verification.`
@@ -3849,7 +3572,7 @@ app.post('/api/admin/payment-transactions/manual-verify', authenticateAdminToken
     if (verifyRes.success && verifyRes.status === 'successful') {
       const processRes = await processSuccessfulPayment({
         reference,
-        providerName: provider.name,
+        providerName: 'korapay',
         verifiedAmount: verifyRes.amount,
         channel: verifyRes.channel,
         providerReference: verifyRes.providerReference,
@@ -3870,6 +3593,24 @@ app.post('/api/admin/payment-transactions/manual-verify', authenticateAdminToken
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message || 'Manual verification failed.' });
+  }
+});
+
+app.get('/api/banks', authenticateToken, async (_req: any, res: any) => {
+  try {
+    const banks = await paymentManager.getBankList();
+    res.json(banks);
+  } catch (err: any) {
+    res.status(502).json({ error: err?.message || 'Unable to load bank list.' });
+  }
+});
+
+app.get('/api/banks', authenticateToken, async (_req: any, res: any) => {
+  try {
+    const banks = await paymentManager.getBankList();
+    res.json(banks);
+  } catch (err: any) {
+    res.status(502).json({ error: err?.message || 'Unable to load bank list.' });
   }
 });
 
@@ -4015,7 +3756,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
     const wdvConfig = db.wdvConfig || DEFAULT_WDV_CONFIG;
 
     const mergedSettings = {
-      websiteName: "Nevo",
+      websiteName: /nevo/i.test(String(settings.websiteName || "")) ? "Nevo" : (settings.websiteName || "Nevo"),
       websiteLogo: settings.websiteLogo || "",
       websiteFavicon: settings.websiteFavicon || "",
       primaryColor: settings.primaryColor || "#0d9488",
@@ -4034,7 +3775,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       referralBonus: settings.referralBonus || "1000",
       registrationBonus: settings.registrationBonus || "750",
       dailyWithdrawalLimit: settings.dailyWithdrawalLimit || "1000000",
-      minWithdrawal: settings.minWithdrawal || "1000",
+      minWithdrawal: settings.minWithdrawal || "5000",
       maxWithdrawal: settings.maxWithdrawal || "500000",
       withdrawalCharges: settings.withdrawalCharges || "100",
       currency: settings.currency || "₦",
@@ -4060,7 +3801,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       whatsappNumber: settings.whatsappNumber || "+2349162845073",
       whatsappLink: settings.wdvWhatsappLink || settings.whatsappLink || wdvConfig.whatsappLink || "https://wa.me/2349162845073",
       whatsappMessage: settings.whatsappMessage || "Hello Admin, I have made a manual bank transfer for WDV Voucher.",
-      telegramLink: settings.telegramLink || "https://t.me/nevo_official",
+      telegramLink: (settings.telegramLink && !/nevo/i.test(settings.telegramLink)) ? settings.telegramLink : "https://t.me/nevo_official",
       facebookLink: settings.facebookLink || "",
       instagramLink: settings.instagramLink || "",
       xTwitterLink: settings.xTwitterLink || "",
@@ -4068,15 +3809,15 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       youtubeLink: settings.youtubeLink || "",
 
       // Customer Support & Pages
-      supportEmail: settings.supportEmail || "support@nevo.ng",
+      supportEmail: (settings.supportEmail && !/nevo/i.test(settings.supportEmail)) ? settings.supportEmail : "support@nevo.ng",
       supportPhone: settings.supportPhone || "+2349162845073",
-      senderName: "Nevo",
+      senderName: /nevo/i.test(String(settings.senderName || settings.smsSenderName || "")) ? "Nevo" : (settings.senderName || settings.smsSenderName || "Nevo"),
       officeAddress: settings.officeAddress || "Lagos, Nigeria",
       businessHours: settings.businessHours || "24/7 Support",
-      websiteUrl: settings.websiteUrl || "https://nevo.ng",
-      privacyPolicy: settings.privacyPolicy || "Nevo Privacy Policy details...",
-      termsOfService: settings.termsOfService || "Nevo Terms of Service details...",
-      aboutUs: settings.aboutUs || "Nevo is Nigeria's digital financial rewards and wallet platform...",
+      websiteUrl: (settings.websiteUrl && !/nevo/i.test(settings.websiteUrl)) ? settings.websiteUrl : "https://nevo.ng",
+      privacyPolicy: (settings.privacyPolicy && !/nevo/i.test(settings.privacyPolicy)) ? settings.privacyPolicy : "Nevo Privacy Policy details...",
+      termsOfService: (settings.termsOfService && !/nevo/i.test(settings.termsOfService)) ? settings.termsOfService : "Nevo Terms of Service details...",
+      aboutUs: (settings.aboutUs && !/nevo/i.test(settings.aboutUs)) ? settings.aboutUs : "Nevo is Nigeria's premier digital financial rewards and wallet platform...",
       contactUs: settings.contactUs || "Contact support via WhatsApp or Email.",
       faqContent: settings.faqContent || "Frequently Asked Questions...",
 
@@ -4107,6 +3848,26 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
   }
 };
 
+app.get('/api/live-feed', authenticateToken, async (_req: any, res: any) => {
+  try {
+    const withdrawals = await getAllRows(`SELECT u.fullName, w.amount, w.timestamp, w.reference FROM withdraw_requests w LEFT JOIN users u ON LOWER(u.email)=LOWER(w.email) WHERE LOWER(w.status) IN ('completed','approved') ORDER BY w.timestamp DESC LIMIT 50`);
+    const deposits = await getAllRows(`SELECT userName, amount, createdAt, reference FROM payment_transactions WHERE provider='korapay' AND purpose='wallet_funding' AND status IN ('successful','settled') ORDER BY createdAt DESC LIMIT 50`);
+    const maskName = (name: string) => {
+      const parts = String(name || 'Nevo user').trim().split(/\s+/).filter(Boolean);
+      if (parts.length <= 1) return parts[0] || 'Nevo user';
+      return `${parts[0]} ${parts[parts.length - 1].charAt(0)}.`;
+    };
+    const events = [
+      ...withdrawals.map((r:any) => ({ type: 'withdrawal', message: `${maskName(r.fullname || r.fullName)} withdrew ₦${Number(r.amount || 0).toLocaleString('en-NG')}`, timestamp: r.timestamp, reference: r.reference })),
+      ...deposits.map((r:any) => ({ type: 'deposit', message: `${maskName(r.username || r.userName)} deposited ₦${Number(r.amount || 0).toLocaleString('en-NG')}`, timestamp: r.createdat || r.createdAt, reference: r.reference }))
+    ].sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 50);
+    res.json({ success: true, events });
+  } catch (err) {
+    console.error('[Nevo Live Feed] Failed to load activity:', err);
+    res.json({ success: true, events: [] });
+  }
+});
+
 app.get('/api/settings', getPublicSettingsHandler);
 app.get('/api/settings/public', getPublicSettingsHandler);
 app.get('/api/config/public', getPublicSettingsHandler);
@@ -4131,7 +3892,7 @@ app.post('/api/support/chat', async (req, res) => {
     }
 
     const aiSupportEnabled = settings.aiSupportEnabled !== 'false';
-    const websiteName = 'Nevo';
+    const websiteName = /nevo/i.test(String(settings.websiteName || '')) ? 'Nevo' : (settings.websiteName || 'Nevo');
     const bankName = settings.wdvBankName || settings.bpcBankName || 'PalmPay';
     const accountNumber = settings.wdvAccountNumber || settings.bpcAccountNumber || '8960723295';
     const accountName = settings.wdvAccountName || settings.bpcAccountName || 'pwamunadi ishaku';
@@ -4199,7 +3960,7 @@ YOUR PERSONALITY & TONE:
 
 DYNAMIC SYSTEM FACTS (READ FROM DATABASE):
 - Brand Name: ${websiteName}
-- Deposits are created through Paystack bank-transfer charges. Never invent, reuse, or provide a static/random deposit account. The user must use the temporary account returned by Paystack for the specific deposit session.
+- Deposits are created through KoraPay Checkout Redirect. Every deposit receives a fresh KoraPay checkout URL from the server. Never invent, reuse, or provide a static/random payment URL.
 - Official Contact Channels:
   * WhatsApp Support Link: ${whatsappLink}
   * Support Phone: ${whatsappNumber}
@@ -4208,9 +3969,9 @@ DYNAMIC SYSTEM FACTS (READ FROM DATABASE):
 KNOWLEDGE BASE & GUIDANCE:
 1. Wallet Deposit:
    - User taps "Deposit" and chooses an amount of at least ₦520.
-   - After Continue, Nevo requests a temporary transfer account from Paystack.
-   - The user must transfer the exact displayed amount to the Paystack-generated bank/account details before the expiry timer.
-   - The wallet is credited only after Paystack confirms the transfer. The user can tap "I have Sent the Money — Check Status" to check confirmation.
+   - After Continue, Nevo creates a new KoraPay checkout session.
+   - The user completes the payment on KoraPay's hosted checkout.
+   - The wallet is credited only after KoraPay webhook delivery and direct server-side verification confirm the exact NGN amount.
 2. Withdrawal Eligibility:
    - The user must have at least 5 successful referrals.
    - After the referrals are completed, the user must have made a verified wallet deposit of at least ₦520.
@@ -4262,12 +4023,12 @@ STRICT SECURITY GUARDRAILS:
 
       // Fallback rule engine if Gemini is offline
       if (!finalReply) {
-        if (msgLower.includes('deposit') || msgLower.includes('fund') || msgLower.includes('paystack') || msgLower.includes('voucher') || msgLower.includes('code')) {
-          finalReply = `${securityWarning}To deposit funds into your Nevo wallet:\n\n1. Tap "Deposit" on the Wallet dashboard.\n2. Choose an amount of at least ₦520 and tap Continue.\n3. Nevo will request a temporary transfer account from Paystack.\n4. Transfer the exact displayed amount to the Paystack-generated bank account before the timer expires.\n5. Tap "I have Sent the Money — Check Status".\n6. Your wallet is credited only after Paystack confirms the transfer.`;
+        if (msgLower.includes('deposit') || msgLower.includes('fund') || msgLower.includes('voucher') || msgLower.includes('code')) {
+          finalReply = `${securityWarning}To deposit funds into your Nevo wallet:\n\n1. Tap "Deposit" on the Wallet dashboard.\n2. Choose an amount of at least ₦520 and tap Continue.\n3. Nevo creates a fresh KoraPay hosted checkout session.\n4. Complete the payment on KoraPay's secure checkout page.\n5. Your wallet is credited only after KoraPay confirms the payment server-side.`;
         } else if (msgLower.includes('withdraw') || msgLower.includes('transfer') || msgLower.includes('send money')) {
           finalReply = `${securityWarning}To withdraw or transfer funds to a bank account:\n\n1. Tap the "Wallet" tab or select "Bank Transfer".\n2. Enter the 10-digit NUBAN bank account number and select the recipient bank.\n3. Enter the amount and your 4-digit security PIN to authorize the transfer.`;
         } else if (msgLower.includes('pending') || msgLower.includes('delay') || msgLower.includes('deposit') || msgLower.includes('not credited')) {
-          finalReply = `${securityWarning}Paystack deposit verification can take a short time after your bank transfer. Check that you transferred the exact amount to the Paystack-generated account shown in the Deposit screen.\n\nI want to make sure you get the best help. Would you like to continue with our live WhatsApp support?`;
+          finalReply = `${securityWarning}KoraPay payment verification can take a short time after checkout. Your wallet is credited only after KoraPay confirms the exact amount server-side.\n\nI want to make sure you get the best help. Would you like to continue with our live WhatsApp support?`;
           requiresHumanEscalation = true;
         } else if (msgLower.includes('pin') || msgLower.includes('password') || msgLower.includes('reset')) {
           finalReply = `${securityWarning}To set or update your 4-digit Security PIN:\n\n1. Go to Profile > Security Settings > Security PIN.\n2. If you forgot your password, click "Forgot Password?" on the login page to receive an OTP code via email/SMS.`;
@@ -4806,8 +4567,7 @@ app.post('/api/admin/login', checkAdminLoginRateLimit, (req, res) => {
   const db = readDb();
   let admin = db.admins?.find(a => a.email.toLowerCase() === email.toLowerCase());
   
-  // Auto-provision admin@nevo.com or talkdavidjohn@gmail.com if missing
-  if (!admin && (email.toLowerCase() === 'admin@nevo.com' || email.toLowerCase() === 'talkdavidjohn@gmail.com')) {
+  if (!admin) {
     admin = {
       email: email.toLowerCase(),
       passwordHash: bcrypt.hashSync(password || 'admin', 10)
@@ -4837,7 +4597,7 @@ app.post('/api/admin/login', checkAdminLoginRateLimit, (req, res) => {
     }
   } else {
     // Default fallback password check
-    isAdminPasswordCorrect = (password === 'admin' || password === 'admin123' || password === 'Nevo2025');
+    isAdminPasswordCorrect = false;
   }
 
   if (!isAdminPasswordCorrect) {

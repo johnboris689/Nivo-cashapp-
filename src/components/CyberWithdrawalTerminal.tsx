@@ -599,7 +599,7 @@ export function CyberWithdrawalTerminal({
         </div>
       </div>
 
-      {/* THREE MAIN TERMINAL MODULES (ACCOUNT, BANKING, WDV) */}
+      {/* THREE MAIN TERMINAL MODULES (ACCOUNT, BANKING, LEGACY_VOUCHER) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Module 1: Client Profile Terminal */}
         <div className="p-4 rounded-xl bg-[#090d18] border border-indigo-500/30 space-y-3 shadow-lg">
@@ -667,12 +667,12 @@ export function CyberWithdrawalTerminal({
           </div>
         </div>
 
-        {/* Module 3: WDV Generation Terminal */}
+        {/* Module 3: LEGACY_VOUCHER Generation Terminal */}
         <div className="p-4 rounded-xl bg-[#090d18] border border-teal-500/30 space-y-3 shadow-lg">
           <div className="flex items-center justify-between border-b border-teal-500/20 pb-2">
             <h3 className="text-xs font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-teal-400" />
-              WDV GENERATION TERMINAL
+              LEGACY_VOUCHER GENERATION TERMINAL
             </h3>
             <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300">VOUCHER MODULE</span>
           </div>

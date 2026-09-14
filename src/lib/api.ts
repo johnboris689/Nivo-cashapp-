@@ -1,11 +1,11 @@
 import { User, Transaction, DepositRequest, WithdrawalRequest, ActivationRequest, Task, NotificationItem, BankDetails, SiteSettings, AdminStats, ReferralRecord, TaskSubmission, TaskSubmissionStatus, PaymentOverviewResponse } from '../types';
 
-const TOKEN_KEY = 'nivo_auth_token';
-const ADMIN_TOKEN_KEY = 'nivo_admin_token';
+const TOKEN_KEY = 'nevo_auth_token';
+const ADMIN_TOKEN_KEY = 'nevo_admin_token';
 
 export function getAuthToken(): string | null {
   return (
-    localStorage.getItem('nevo_token') ||
+    localStorage.getItem('nevo_auth_token') ||
     localStorage.getItem(TOKEN_KEY) ||
     localStorage.getItem('token') ||
     null
@@ -13,12 +13,12 @@ export function getAuthToken(): string | null {
 }
 
 export function setAuthToken(token: string) {
-  localStorage.setItem('nevo_token', token);
+  localStorage.setItem('nevo_auth_token', token);
   localStorage.setItem(TOKEN_KEY, token);
 }
 
 export function removeAuthToken() {
-  localStorage.removeItem('nevo_token');
+  localStorage.removeItem('nevo_auth_token');
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem('token');
 }
@@ -92,6 +92,15 @@ export const api = {
   // --- Public ---
   getSettings: () => request<SiteSettings>('/api/settings'),
   getBankDetails: () => request<BankDetails>('/api/bank-details'),
+  getBanks: () => request<{ name: string; code: string }[]>('/api/banks'),
+  resolveBankAccount: async (payload: { accountNumber: string; bankCode: string }) => {
+    const token = getAuthToken();
+    const qs = new URLSearchParams({ accountNumber: payload.accountNumber, bankCode: payload.bankCode });
+    const res = await fetch(`/api/bank/resolve?${qs.toString()}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Unable to resolve bank account.');
+    return data;
+  },
 
   // --- Auth ---
   register: (payload: { fullName: string; username: string; email: string; phone: string; password: string; referralCode?: string }) =>
@@ -114,6 +123,20 @@ export const api = {
       body: JSON.stringify({ avatarUrl }),
     }),
 
+  uploadProfilePicture: async (file: File) => {
+    const token = getAuthToken();
+    const form = new FormData();
+    form.append('image', file);
+    const response = await fetch('/api/user/profile-picture', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'Failed to upload profile picture.');
+    return data as { success: boolean; profilePic: string };
+  },
+
   forgotPassword: (email: string) =>
     request<{ message: string }>('/api/auth/forgot-password', {
       method: 'POST',
@@ -135,34 +158,17 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
-  // --- Wallet & Paystack Automated Deposits ---
+  // --- Wallet & KoraPay Deposits ---
   getTransactions: () => request<Transaction[]>('/api/wallet/transactions'),
 
-  initializePaystackVirtualAccount: (amount: number) =>
-    request<{ message: string; deposit: DepositRequest }>('/api/paystack/initialize-virtual-account', {
+  initializeKoraPayDeposit: (amount: number) =>
+    request<{ message: string; deposit: DepositRequest }>('/api/korapay/initialize-wallet-deposit', {
       method: 'POST',
       body: JSON.stringify({ amount }),
     }),
 
-  checkDepositStatus: (reference: string) =>
-    request<{ status: 'pending' | 'approved' | 'completed' | 'failed' | 'rejected'; webhookStatus: string; deposit: DepositRequest; userWalletBalance: number }>(
-      `/api/paystack/check-status/${encodeURIComponent(reference)}`
-    ),
-
-  submitDeposit: (payload: { amount: number }) =>
-    request<{ message: string; deposit: DepositRequest }>('/api/paystack/initialize-virtual-account', {
-      method: 'POST',
-      body: JSON.stringify({ amount: payload.amount }),
-    }),
-
-  getBanks: () =>
-    request<{ name: string; code: string }[]>('/api/paystack/banks'),
-
-  resolveBankAccount: (payload: { accountNumber: string; bankCode: string }) =>
-    request<{ accountNumber: string; accountName: string; status: string }>('/api/paystack/resolve-account', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    }),
+  checkKoraPayDepositStatus: (reference: string) =>
+    request<any>(`/api/korapay/check-status/${encodeURIComponent(reference)}`),
 
   submitWithdrawal: (payload: { amount: number; bankName: string; accountNumber: string; accountName: string }) =>
     request<{ message: string; withdrawal: WithdrawalRequest }>('/api/wallet/withdraw', {

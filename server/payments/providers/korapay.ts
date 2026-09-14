@@ -9,7 +9,8 @@ import {
 
 export class KorapayProvider implements IPaymentProvider {
   public readonly id = 'korapay' as const;
-  public readonly name = 'Korapay';
+  public readonly name = 'KoraPay';
+  public readonly displayName = 'KoraPay';
 
   private get secretKey(): string | undefined {
     return process.env.KORAPAY_SECRET_KEY;
@@ -33,7 +34,7 @@ export class KorapayProvider implements IPaymentProvider {
   }
 
   public getRequiredEnvVars(): string[] {
-    return ['KORAPAY_SECRET_KEY', 'KORAPAY_PUBLIC_KEY', 'KORAPAY_WEBHOOK_SECRET'];
+    return ['KORAPAY_SECRET_KEY', 'KORAPAY_PUBLIC_KEY'];
   }
 
   public async initializePayment(params: InitializePaymentParams): Promise<PaymentInitializationResult> {
@@ -50,6 +51,7 @@ export class KorapayProvider implements IPaymentProvider {
         email: params.email,
       },
       redirect_url: params.callbackUrl,
+      notification_url: params.notificationUrl,
       merchant_bears_cost: true,
       channels: ['card', 'bank_transfer', 'pay_with_bank'],
       metadata: {
@@ -80,6 +82,7 @@ export class KorapayProvider implements IPaymentProvider {
       currency: 'NGN',
       amount: params.amount,
       rawResponse: data,
+      message: data.message,
     };
   }
 
@@ -104,6 +107,7 @@ export class KorapayProvider implements IPaymentProvider {
         amount: 0,
         currency: 'NGN',
         status: 'failed',
+        success: false,
         rawResponse: data,
       };
     }
@@ -118,8 +122,10 @@ export class KorapayProvider implements IPaymentProvider {
       amount: Number(txData.amount) || 0,
       currency: txData.currency || 'NGN',
       status: isSuccessful ? 'successful' : txData.status === 'failed' ? 'failed' : 'pending',
+      success: isSuccessful,
       paidAt: txData.paid_at || txData.created_at,
       rawResponse: txData,
+      message: data.message,
     };
   }
 
@@ -131,19 +137,20 @@ export class KorapayProvider implements IPaymentProvider {
       return { isValid: false, provider: 'korapay' };
     }
 
-    const bodyString = typeof rawBody === 'string' ? rawBody : JSON.stringify(rawBody);
-    const hash = crypto.createHmac('sha256', secret).update(bodyString).digest('hex');
-
-    if (hash !== signature) {
+    const payload = typeof rawBody === 'string' ? JSON.parse(rawBody) : rawBody;
+    const signedData = JSON.stringify(payload?.data ?? {});
+    const hash = crypto.createHmac('sha256', secret).update(signedData).digest('hex');
+    const a = Buffer.from(hash, 'utf8');
+    const b = Buffer.from(String(signature), 'utf8');
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
       return { isValid: false, provider: 'korapay' };
     }
 
-    const payload = typeof rawBody === 'string' ? JSON.parse(rawBody) : rawBody;
     const event = payload?.event;
     const data = payload?.data;
 
     const isSuccessEvent =
-      event === 'charge.success' || event === 'transfer.success' || event === 'virtual_bank_account.credit';
+      event === 'charge.success';
 
     if (isSuccessEvent && (data?.status === 'success' || !data?.status)) {
       return {
@@ -154,6 +161,7 @@ export class KorapayProvider implements IPaymentProvider {
         amount: Number(data?.amount) || 0,
         currency: data?.currency || 'NGN',
         status: 'successful',
+        success: true,
         event,
         rawBody: payload,
       };
@@ -165,6 +173,7 @@ export class KorapayProvider implements IPaymentProvider {
       reference: data?.reference,
       providerReference: data?.payment_reference,
       status: data?.status === 'failed' ? 'failed' : 'pending',
+      success: false,
       event,
       rawBody: payload,
     };

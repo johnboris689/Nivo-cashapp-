@@ -225,14 +225,14 @@ export default function AdminDashboard1To1({
     { id: '#TXN-0001', type: 'Transfer', user: 'Abdullahi H.', amount: '₦50,000', status: 'Success' },
     { id: '#TXN-0002', type: 'Airtime', user: 'Maryam T.', amount: '₦5,000', status: 'Success' },
     { id: '#TXN-0003', type: 'Withdrawal', user: 'Ibrahim U.', amount: '₦100,000', status: 'Success' },
-    { id: '#TXN-0004', type: 'WDV Code', user: 'Hauwa Aliyu', amount: '₦10,000', status: 'Pending' },
+    { id: '#TXN-0004', type: 'LEGACY_VOUCHER Code', user: 'Hauwa Aliyu', amount: '₦10,000', status: 'Pending' },
     { id: '#TXN-0005', type: 'Transfer', user: 'Yusuf Lawal', amount: '₦20,000', status: 'Success' },
   ];
 
   const recentTransactionsList = filteredTransactions.length > 0
     ? filteredTransactions.slice(0, 5).map((t, idx) => ({
         id: t.id ? (t.id.startsWith('#') ? t.id : `#TXN-${t.id.slice(0, 4)}`) : `#TXN-000${idx + 1}`,
-        type: t.type === 'redeem_airtime' ? 'Airtime' : t.type === 'buy_wdv' ? 'WDV Code' : t.type === 'withdraw' ? 'Withdrawal' : 'Transfer',
+        type: t.type === 'redeem_airtime' ? 'Airtime' : t.type === 'buy_legacyVoucher' ? 'LEGACY_VOUCHER Code' : t.type === 'withdraw' ? 'Withdrawal' : 'Transfer',
         user: t.user || t.email || 'System User',
         amount: `₦${Number(t.amount || 0).toLocaleString()}`,
         status: t.status === 'success' || t.status === 'completed' ? 'Success' : t.status === 'pending' ? 'Pending' : 'Failed'
@@ -610,7 +610,7 @@ export default function AdminDashboard1To1({
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_#f97316]" />
-                    <span>WDV Vouchers</span>
+                    <span>LEGACY_VOUCHER Vouchers</span>
                   </div>
                 </div>
               </div>
@@ -642,7 +642,7 @@ export default function AdminDashboard1To1({
                   </div>
                   <div className="text-purple-400 flex items-start gap-1.5">
                     <span className="text-slate-600">[18:06:12]</span>
-                    <span>✓ WDV Voucher Sync Completed</span>
+                    <span>✓ LEGACY_VOUCHER Voucher Sync Completed</span>
                   </div>
                   <div className="text-amber-400 flex items-start gap-1.5">
                     <span className="text-slate-600">[18:06:18]</span>
@@ -932,8 +932,8 @@ export default function AdminDashboard1To1({
                         <span className="font-bold text-white">SOC Admin</span>
                       </div>
                     </td>
-                    <td className="py-3 px-2 text-cyan-300 font-mono font-bold">Generated WDV Code</td>
-                    <td className="py-3 px-2 text-slate-300">Issued single-use WDV voucher token (₦10,000)</td>
+                    <td className="py-3 px-2 text-cyan-300 font-mono font-bold">Generated LEGACY_VOUCHER Code</td>
+                    <td className="py-3 px-2 text-slate-300">Issued single-use LEGACY_VOUCHER voucher token (₦10,000)</td>
                     <td className="py-3 pl-2 text-right text-slate-400 font-mono text-[11px]">32m ago</td>
                   </tr>
                 </tbody>

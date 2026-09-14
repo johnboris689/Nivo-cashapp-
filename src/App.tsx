@@ -51,7 +51,7 @@ import {
 import { AdsPage } from './pages/AdsPage';
 
 import { registerDeviceBiometric, loginWithBiometric, isWebAuthnSupported } from './lib/webauthn';
-import { User, WdvCode, Transaction, NotificationItem } from './types';
+import { User, LegacyVoucherCode, Transaction, NotificationItem } from './types';
 import { formatNaira } from './utils/formatters';
 import WalletDepositModal from './components/WalletDepositModal';
 import NivoFeaturesPanel from './components/NivoFeaturesPanel';
@@ -69,7 +69,6 @@ import GlassCard from './components/GlassCard';
 import CongratulationsScreen from './components/CongratulationsScreen';
 import NumericPad from './components/NumericPad';
 import BottomNav from './components/BottomNav';
-import WdvVoucher from './components/WdvVoucher';
 import { BankSelector } from './components/BankSelector';
 import QuickFabMenu from './components/QuickFabMenu';
 import NotificationsModal from './components/NotificationsModal';
@@ -82,7 +81,7 @@ import AiSupportChat from './components/AiSupportChat';
 const isVoucherValid = (code: string) => {
   if (!code) return false;
   const norm = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  return norm.startsWith('WDV') && norm.length === 15;
+  return norm.startsWith('LEGACY_VOUCHER') && norm.length === 15;
 };
 
 // Upgraded components
@@ -217,7 +216,7 @@ export default function App() {
           setCurrentScreen('transfer_bank');
         } else if (path === '/dashboard/buy-data' || path === '/dashboard/buy_data' || path === '/buy-data' || path === '/buy_data') {
           setCurrentScreen('buy_data');
-        } else if (path === '/dashboard/buy-wdv' || path === '/dashboard/buy_wdv' || path === '/buy-wdv' || path === '/buy_wdv') {
+        } else if (path === '/dashboard/buy-legacyVoucher' || path === '/dashboard/buy_legacyVoucher' || path === '/buy-legacyVoucher' || path === '/buy_legacyVoucher') {
           setPaymentModalOpen(true);
         } else if (e.state && e.state.appScreen) {
           setCurrentScreen(e.state.appScreen);
@@ -240,7 +239,7 @@ export default function App() {
         setCurrentScreen('transfer_bank');
       } else if (currentPath === '/dashboard/buy-data' || currentPath === '/dashboard/buy_data' || currentPath === '/buy-data' || currentPath === '/buy_data') {
         setCurrentScreen('buy_data');
-      } else if (currentPath === '/dashboard/buy-wdv' || currentPath === '/dashboard/buy_wdv' || currentPath === '/buy-wdv' || currentPath === '/buy_wdv') {
+      } else if (currentPath === '/dashboard/buy-legacyVoucher' || currentPath === '/dashboard/buy_legacyVoucher' || currentPath === '/buy-legacyVoucher' || currentPath === '/buy_legacyVoucher') {
         setPaymentModalOpen(true);
       } else {
         window.history.replaceState({ appScreen: 'dashboard' }, '', window.location.pathname + window.location.search);
@@ -303,15 +302,15 @@ export default function App() {
 
   // Current screen or tab state
   const [currentScreen, setCurrentScreen] = useState<string>('dashboard');
-  const [wdvBackScreen, setWdvBackScreen] = useState<string>('dashboard');
+  const [legacyVoucherBackScreen, setLegacyVoucherBackScreen] = useState<string>('dashboard');
   const changeScreen = (screenName: string) => {
     if (!window.location.pathname.startsWith('/Boris')) {
       if (currentScreen !== screenName) {
         window.history.pushState({ appScreen: screenName }, '', window.location.pathname + window.location.search);
       }
     }
-    if (screenName === 'buy_wdv' && currentScreen !== 'buy_wdv') {
-      setWdvBackScreen(currentScreen);
+    if (screenName === 'buy_legacyVoucher' && currentScreen !== 'buy_legacyVoucher') {
+      setLegacyVoucherBackScreen(currentScreen);
     }
     setCurrentScreen(screenName);
   };
@@ -379,7 +378,7 @@ export default function App() {
     return saved ? JSON.parse(saved) : INITIAL_TRANSACTIONS;
   });
 
-  const [vouchers, setVouchers] = useState<WdvCode[]>(() => {
+  const [vouchers, setVouchers] = useState<LegacyVoucherCode[]>(() => {
     const saved = localStorage.getItem('nevo_vouchers');
     return saved ? JSON.parse(saved) : [];
   });
@@ -390,7 +389,7 @@ export default function App() {
   });
 
   // Flow specific parameters - Deposit Configuration Price is strictly fixed at dynamic configured price
-  const [wdvConfig, setWdvConfig] = useState<{
+  const [legacyVoucherConfig, setLegacyVoucherConfig] = useState<{
     bankName: string;
     accountNumber: string;
     accountName: string;
@@ -407,8 +406,9 @@ export default function App() {
     instructions: "Copy the system account details below. Make a manual bank transfer of the exact locked amount. Return here and click 'I have made this bank Transfer' to trigger operator check.",
     maintenanceNotice: "Wema Bank transfers are temporarily delayed. Please use other supported banks (like PalmPay or GTBank) for instant manual validation."
   });
-  const [buyWdvAmount, setBuyWdvAmount] = useState<string>('6500');
+  const [buyLegacyVoucherAmount, setBuyLegacyVoucherAmount] = useState<string>('6500');
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [showRegistrationWelcome, setShowRegistrationWelcome] = useState(false);
 
   const [systemSettings, setSystemSettings] = useState<Record<string, string>>({
     websiteName: "Nevo",
@@ -424,18 +424,18 @@ export default function App() {
   });
 
   useEffect(() => {
-    const loadWdvAndPublicSettings = async () => {
+    const loadLegacyVoucherAndPublicSettings = async () => {
       try {
-        const [wdvRes, settingsRes] = await Promise.all([
-          fetch('/api/config/wdv'),
+        const [legacyVoucherRes, settingsRes] = await Promise.all([
+          fetch('/api/config/legacyVoucher'),
           fetch('/api/settings/public')
         ]);
 
-        if (wdvRes.ok) {
-          const data = await wdvRes.json();
+        if (legacyVoucherRes.ok) {
+          const data = await legacyVoucherRes.json();
           if (data.success && data.config) {
-            setWdvConfig(data.config);
-            setBuyWdvAmount(String(data.config.voucherPrice));
+            setLegacyVoucherConfig(data.config);
+            setBuyLegacyVoucherAmount(String(data.config.voucherPrice));
           }
         }
 
@@ -449,11 +449,11 @@ export default function App() {
         console.warn('Failed to fetch system configuration:', e);
       }
     };
-    loadWdvAndPublicSettings();
-    const interval = setInterval(loadWdvAndPublicSettings, 10000);
+    loadLegacyVoucherAndPublicSettings();
+    const interval = setInterval(loadLegacyVoucherAndPublicSettings, 10000);
 
     const handleSettingsUpdated = () => {
-      loadWdvAndPublicSettings();
+      loadLegacyVoucherAndPublicSettings();
     };
     window.addEventListener('settingsUpdated', handleSettingsUpdated);
 
@@ -480,22 +480,22 @@ export default function App() {
       document.documentElement.style.setProperty('--primary-color', systemSettings.primaryColor);
     }
   }, [systemSettings]);
-  const [wdvFormName, setWdvFormName] = useState('');
-  const [wdvFormEmail, setWdvFormEmail] = useState('');
-  const [wdvProcessingSeconds, setWdvProcessingSeconds] = useState(3);
+  const [legacyVoucherFormName, setLegacyVoucherFormName] = useState('');
+  const [legacyVoucherFormEmail, setLegacyVoucherFormEmail] = useState('');
+  const [legacyVoucherProcessingSeconds, setLegacyVoucherProcessingSeconds] = useState(3);
   const [warningDismissed, setWarningDismissed] = useState(false);
 
   // Airtime fields
   const [airtimeNetwork, setAirtimeNetwork] = useState('mtn');
   const [airtimePhone, setAirtimePhone] = useState('');
   const [airtimeAmount, setAirtimeAmount] = useState('');
-  const [airtimeWdvCode, setAirtimeWdvCode] = useState('');
+  const [airtimeLegacyVoucherCode, setAirtimeLegacyVoucherCode] = useState('');
   const [airtimePlanSelected, setAirtimePlanSelected] = useState<string>('');
 
   // Data fields (separating the Data Purchase screen)
   const [dataNetwork, setDataNetwork] = useState('mtn');
   const [dataPhone, setDataPhone] = useState('');
-  const [dataWdvCode, setDataWdvCode] = useState('');
+  const [dataLegacyVoucherCode, setDataLegacyVoucherCode] = useState('');
   const [selectedDataPlan, setSelectedDataPlan] = useState<any>(null);
 
   // Transfer fields
@@ -504,7 +504,7 @@ export default function App() {
   const [transferAccNum, setTransferAccNum] = useState('');
   const [transferAccName, setTransferAccName] = useState('');
   const [transferAmount, setTransferAmount] = useState('');
-  const [transferWdvCode, setTransferWdvCode] = useState('');
+  const [transferLegacyVoucherCode, setTransferLegacyVoucherCode] = useState('');
   const [isVerifyingAccount, setIsVerifyingAccount] = useState(false);
   const [transferVerified, setTransferVerified] = useState(false);
   const [transferError, setTransferError] = useState<string | null>(null);
@@ -516,7 +516,7 @@ export default function App() {
   const [withdrawBank, setWithdrawBank] = useState('9PSB');
   const [withdrawAccount, setWithdrawAccount] = useState('');
   const [withdrawAccName, setWithdrawAccName] = useState('');
-  const [withdrawWdvCode, setWithdrawWdvCode] = useState('');
+  const [withdrawLegacyVoucherCode, setWithdrawLegacyVoucherCode] = useState('');
   const [isVerifyingWithdrawAccount, setIsVerifyingWithdrawAccount] = useState(false);
   const [withdrawVerified, setWithdrawVerified] = useState(true);
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
@@ -526,7 +526,7 @@ export default function App() {
   const [billsProvider, setBillsProvider] = useState('DSTV');
   const [billsAccountNumber, setBillsAccountNumber] = useState('');
   const [billsAmount, setBillsAmount] = useState('');
-  const [billsWdvCode, setBillsWdvCode] = useState('');
+  const [billsLegacyVoucherCode, setBillsLegacyVoucherCode] = useState('');
   const [billsCablePackage, setBillsCablePackage] = useState('dstv-premium');
   const [billsMeterType, setBillsMeterType] = useState<'prepaid' | 'postpaid'>('prepaid');
   const [isMeterValidated, setIsMeterValidated] = useState(false);
@@ -638,10 +638,10 @@ export default function App() {
   ]);
   const [liveChatInput, setLiveChatInput] = useState('');
   const [isAgentTyping, setIsAgentTyping] = useState(false);
-  const [generatedWdv, setGeneratedWdv] = useState<WdvCode | null>(null);
+  const [generatedLegacyVoucher, setGeneratedLegacyVoucher] = useState<LegacyVoucherCode | null>(null);
 
-  // Virtual Account WDV Payment System state
-  const [activeWdvPayment, setActiveWdvPayment] = useState<{
+  // Virtual Account LEGACY_VOUCHER Payment System state
+  const [activeLegacyVoucherPayment, setActiveLegacyVoucherPayment] = useState<{
     id?: string;
     reference: string;
     bankName: string;
@@ -653,8 +653,8 @@ export default function App() {
     status: string;
     voucherCode?: string;
   } | null>(null);
-  const [isInitiatingWdv, setIsInitiatingWdv] = useState(false);
-  const [isVerifyingWdv, setIsVerifyingWdv] = useState(false);
+  const [isInitiatingLegacyVoucher, setIsInitiatingLegacyVoucher] = useState(false);
+  const [isVerifyingLegacyVoucher, setIsVerifyingLegacyVoucher] = useState(false);
   const [paymentCountdown, setPaymentCountdown] = useState<number>(900);
 
   // Dynamic system-wide configurations
@@ -775,19 +775,12 @@ export default function App() {
     const ref = params.get('ref');
     if (ref) setReferralCodeInput(ref.toUpperCase());
 
-    // Providers return the browser to this callback after checkout. The URL is
-    // never treated as proof of payment; it only gives us the reference to ask
-    // the Nevo backend to perform authoritative provider verification. KoraPay
-    // may append `reference` itself, so accept either callback form.
-    const depositRef = params.get('deposit_ref') || params.get('reference');
-    const depositProvider = params.get('provider') || (depositRef?.startsWith('NEVO_KPY_') ? 'korapay' : 'paystack');
+    const depositRef = params.get('deposit_ref');
     if (depositRef) {
-      const token = localStorage.getItem('nevo_token');
+      const token = localStorage.getItem('nevo_auth_token');
       if (token) {
-        showToast('Verifying payment with payment provider...', 'info');
-        const verifyEndpoint = depositProvider === 'korapay'
-          ? `/api/korapay/check-status/${encodeURIComponent(depositRef)}`
-          : `/api/paystack/check-status/${encodeURIComponent(depositRef)}`;
+        showToast('Verifying your KoraPay payment...', 'info');
+        const verifyEndpoint = `/api/korapay/check-status/${encodeURIComponent(depositRef)}`;
         fetch(verifyEndpoint, {
           headers: { Authorization: `Bearer ${token}` }
         })
@@ -808,8 +801,7 @@ export default function App() {
           .finally(() => {
             const url = new URL(window.location.href);
             url.searchParams.delete('deposit_ref');
-            url.searchParams.delete('provider');
-            window.history.replaceState({}, document.title, url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : ''));
+                window.history.replaceState({}, document.title, url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : ''));
           });
       }
     }
@@ -982,7 +974,7 @@ export default function App() {
 
   // Centralized Dynamic Backend State Sync Engine
   const syncWithBackend = async (force: boolean = false) => {
-    const token = localStorage.getItem('nevo_token');
+    const token = localStorage.getItem('nevo_auth_token');
     if (!token) return;
 
     try {
@@ -994,7 +986,7 @@ export default function App() {
       if (res.status === 401 || res.status === 403) {
         setIsAuthenticated(false);
         localStorage.removeItem('nevo_auth');
-        localStorage.removeItem('nevo_token');
+        localStorage.removeItem('nevo_auth_token');
         localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         return;
@@ -1136,8 +1128,9 @@ export default function App() {
       }
 
       setUser(data.user);
-      localStorage.setItem('nevo_token', data.token);
+      localStorage.setItem('nevo_auth_token', data.token);
       localStorage.setItem('nevo_auth', 'true');
+      setShowRegistrationWelcome(true);
       setIsAuthenticated(true);
       setHasSetupPin(true);
       setIsPinUnlocked(true);
@@ -1174,7 +1167,7 @@ export default function App() {
       }
 
       setUser(data.user);
-      localStorage.setItem('nevo_token', data.token);
+      localStorage.setItem('nevo_auth_token', data.token);
       localStorage.setItem('nevo_auth', 'true');
       setIsAuthenticated(true);
       setHasSetupPin(true);
@@ -1219,7 +1212,7 @@ export default function App() {
       }
 
       setUser(data.user);
-      localStorage.setItem('nevo_token', data.token);
+      localStorage.setItem('nevo_auth_token', data.token);
       localStorage.setItem('nevo_auth', 'true');
       setIsAuthenticated(true);
       setHasSetupPin(true);
@@ -1253,7 +1246,7 @@ export default function App() {
       }
 
       setUser(result.user);
-      localStorage.setItem('nevo_token', result.token);
+      localStorage.setItem('nevo_auth_token', result.token);
       localStorage.setItem('nevo_auth', 'true');
       setIsAuthenticated(true);
       setHasSetupPin(true);
@@ -1434,7 +1427,7 @@ export default function App() {
             // Verify
             setTimeout(async () => {
               if (pinEntry === newConfirm) {
-                const token = localStorage.getItem('nevo_token');
+                const token = localStorage.getItem('nevo_auth_token');
                 if (token) {
                   try {
                     const res = await fetch('/api/auth/pin/setup', {
@@ -1476,7 +1469,7 @@ export default function App() {
         setPinEntry(newPin);
         if (newPin.length === 4) {
           setTimeout(async () => {
-            const token = localStorage.getItem('nevo_token');
+            const token = localStorage.getItem('nevo_auth_token');
             if (user?.email) {
               try {
                 const res = await fetch('/api/auth/pin/login', {
@@ -1533,7 +1526,7 @@ export default function App() {
     if (biometricStatus !== 'idle') return;
     setBiometricStatus('reading');
 
-    const token = localStorage.getItem('nevo_token');
+    const token = localStorage.getItem('nevo_auth_token');
 
     if (currentScreen === 'pin_setup' || currentScreen === 'dashboard') {
       if (token) {
@@ -1558,7 +1551,7 @@ export default function App() {
         const result = await loginWithBiometric(targetEmail);
         if (result.success && result.user) {
           setUser(result.user);
-          if (result.token) localStorage.setItem('nevo_token', result.token);
+          if (result.token) localStorage.setItem('nevo_auth_token', result.token);
           setBiometricStatus('success');
           setIsAuthenticated(true);
           setIsPinUnlocked(true);
@@ -1619,7 +1612,7 @@ export default function App() {
     setTransferVerified(false);
 
     const controller = new AbortController();
-    const token = localStorage.getItem('nevo_token');
+    const token = localStorage.getItem('nevo_auth_token');
 
     fetch('/api/verify-account', {
       method: 'POST',
@@ -1716,7 +1709,7 @@ export default function App() {
     setWithdrawVerified(false);
 
     const controller = new AbortController();
-    const token = localStorage.getItem('nevo_token');
+    const token = localStorage.getItem('nevo_auth_token');
 
     fetch('/api/verify-account', {
       method: 'POST',
@@ -1770,30 +1763,30 @@ export default function App() {
     };
   }, [withdrawBank, withdrawAccount]);
 
-  // WDV Payment Initiate Handler (Manual Bank Transfer)
-  const handleInitiateWdv = async (e?: React.FormEvent) => {
+  // LEGACY_VOUCHER Payment Initiate Handler (Manual Bank Transfer)
+  const handleInitiateLegacyVoucher = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    setIsInitiatingWdv(true);
-    setWdvFormName(user?.fullName || 'Client User');
-    setWdvFormEmail(user?.email || 'user@example.com');
+    setIsInitiatingLegacyVoucher(true);
+    setLegacyVoucherFormName(user?.fullName || 'Client User');
+    setLegacyVoucherFormEmail(user?.email || 'user@example.com');
 
-    setActiveWdvPayment({
-      reference: `wdv-${Date.now()}`,
-      bankName: wdvConfig.bankName,
-      accountNumber: wdvConfig.accountNumber,
-      accountName: wdvConfig.accountName,
-      amount: wdvConfig.voucherPrice,
+    setActiveLegacyVoucherPayment({
+      reference: `legacyVoucher-${Date.now()}`,
+      bankName: legacyVoucherConfig.bankName,
+      accountNumber: legacyVoucherConfig.accountNumber,
+      accountName: legacyVoucherConfig.accountName,
+      amount: legacyVoucherConfig.voucherPrice,
       expiresAt: new Date(Date.now() + 900000).toISOString(),
       status: 'pending'
     });
     setPaymentCountdown(900);
-    setCurrentScreen('wdv_instructions');
-    setIsInitiatingWdv(false);
+    setCurrentScreen('legacyVoucher_instructions');
+    setIsInitiatingLegacyVoucher(false);
   };
 
   // Generate and Download PDF Receipt for Deposit
-  const handleDownloadWdvPdfReceipt = () => {
-    if (!generatedWdv) return;
+  const handleDownloadLegacyVoucherPdfReceipt = () => {
+    if (!generatedLegacyVoucher) return;
     try {
       const doc = new jsPDF({
         orientation: 'portrait',
@@ -1846,7 +1839,7 @@ export default function App() {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(22);
       doc.setTextColor(13, 148, 136);
-      doc.text(generatedWdv.code || generatedWdv.voucherCode || 'WDV-CODE-ISSUED', 30, 79);
+      doc.text(generatedLegacyVoucher.code || generatedLegacyVoucher.voucherCode || 'LEGACY_VOUCHER-CODE-ISSUED', 30, 79);
 
       // Details Table
       let startY = 98;
@@ -1856,8 +1849,8 @@ export default function App() {
 
       const rows = [
         { label: 'Voucher Status', val: 'UNUSED / ACTIVE' },
-        { label: 'Voucher Price', val: `NGN ${(generatedWdv.amount || 6500).toLocaleString()}` },
-        { label: 'Purchased By', val: user?.email || wdvFormEmail || 'Customer' },
+        { label: 'Voucher Price', val: `NGN ${(generatedLegacyVoucher.amount || 6500).toLocaleString()}` },
+        { label: 'Purchased By', val: user?.email || legacyVoucherFormEmail || 'Customer' },
         { label: 'Payment Method', val: 'Direct Bank Transfer' },
         { label: 'Issue Date', val: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }
       ];
@@ -1882,17 +1875,17 @@ export default function App() {
       doc.setTextColor(148, 163, 184);
       doc.text('Nevo Security System • Automatically Verified', 105, 170, { align: 'center' });
 
-      doc.save(`nevo-deposit-${generatedWdv.code || 'code'}.pdf`);
+      doc.save(`nevo-deposit-${generatedLegacyVoucher.code || 'code'}.pdf`);
       showToast('Deposit PDF Receipt Downloaded!', 'success');
     } catch (err) {
-      console.error('Error generating WDV PDF:', err);
-      showToast('Failed to generate WDV PDF', 'error');
+      console.error('Error generating LEGACY_VOUCHER PDF:', err);
+      showToast('Failed to generate LEGACY_VOUCHER PDF', 'error');
     }
   };
 
   // 15-Minute Countdown Ticker for Manual Bank Transfer Screen
   useEffect(() => {
-    if (currentScreen !== 'wdv_instructions') {
+    if (currentScreen !== 'legacyVoucher_instructions') {
       return;
     }
 
@@ -1951,7 +1944,7 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('nevo_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('nevo_auth_token')}`
         },
         body: JSON.stringify({
           phoneNumber: airtimePhone,
@@ -1965,7 +1958,7 @@ export default function App() {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
         localStorage.removeItem('nevo_auth');
-        localStorage.removeItem('nevo_token');
+        localStorage.removeItem('nevo_auth_token');
         localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
@@ -2011,7 +2004,7 @@ export default function App() {
       // Reset fields
       setAirtimePhone('');
       setAirtimeAmount('');
-      setAirtimeWdvCode('');
+      setAirtimeLegacyVoucherCode('');
       setCurrentScreen('dashboard');
       setActiveTab('wallet');
     } catch (err) {
@@ -2042,7 +2035,7 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('nevo_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('nevo_auth_token')}`
         },
         body: JSON.stringify({
           phoneNumber: dataPhone,
@@ -2056,7 +2049,7 @@ export default function App() {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
         localStorage.removeItem('nevo_auth');
-        localStorage.removeItem('nevo_token');
+        localStorage.removeItem('nevo_auth_token');
         localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
@@ -2102,7 +2095,7 @@ export default function App() {
       // Reset fields
       setDataPhone('');
       setSelectedDataPlan(null);
-      setDataWdvCode('');
+      setDataLegacyVoucherCode('');
       setCurrentScreen('dashboard');
       setActiveTab('wallet');
     } catch (err) {
@@ -2121,7 +2114,7 @@ export default function App() {
       return;
     }
     const price = parseInt(transferAmount);
-    if (!transferAmount || isNaN(price) || price < 50 || price > 200000) {
+    if (!transferAmount || isNaN(price) || price < 5000 || price > 200000) {
       showToast('Transfer amount must be between ₦50 and ₦200,000', 'error');
       return;
     }
@@ -2132,7 +2125,7 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('nevo_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('nevo_auth_token')}`
         },
         body: JSON.stringify({
           bank: transferBank,
@@ -2148,7 +2141,7 @@ export default function App() {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
         localStorage.removeItem('nevo_auth');
-        localStorage.removeItem('nevo_token');
+        localStorage.removeItem('nevo_auth_token');
         localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
@@ -2196,7 +2189,7 @@ export default function App() {
       // Reset and return
       setTransferAccNum('');
       setTransferAmount('');
-      setTransferWdvCode('');
+      setTransferLegacyVoucherCode('');
       setTransferAccName('');
       setCurrentScreen('dashboard');
       setActiveTab('wallet');
@@ -2216,7 +2209,7 @@ export default function App() {
       return;
     }
     const price = parseInt(withdrawAmount);
-    if (!withdrawAmount || isNaN(price) || price < 50 || price > 200000) {
+    if (!withdrawAmount || isNaN(price) || price < 5000 || price > 200000) {
       showToast('Withdrawal amount must be between ₦50 and ₦200,000', 'error');
       return;
     }
@@ -2227,7 +2220,7 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('nevo_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('nevo_auth_token')}`
         },
         body: JSON.stringify({
           bank: withdrawBank,
@@ -2243,7 +2236,7 @@ export default function App() {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
         localStorage.removeItem('nevo_auth');
-        localStorage.removeItem('nevo_token');
+        localStorage.removeItem('nevo_auth_token');
         localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
@@ -2291,7 +2284,7 @@ export default function App() {
       // Reset and return
       setWithdrawAccount('');
       setWithdrawAmount('');
-      setWithdrawWdvCode('');
+      setWithdrawLegacyVoucherCode('');
       setWithdrawAccName('');
       setCurrentScreen('dashboard');
       setActiveTab('wallet');
@@ -2328,7 +2321,7 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('nevo_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('nevo_auth_token')}`
         },
         body: JSON.stringify({
           type: billsType,
@@ -2343,7 +2336,7 @@ export default function App() {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
         localStorage.removeItem('nevo_auth');
-        localStorage.removeItem('nevo_token');
+        localStorage.removeItem('nevo_auth_token');
         localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
@@ -2389,7 +2382,7 @@ export default function App() {
       // Reset fields
       setBillsAccountNumber('');
       setBillsAmount('');
-      setBillsWdvCode('');
+      setBillsLegacyVoucherCode('');
       setCurrentScreen('dashboard');
       setActiveTab('wallet');
     } catch (err) {
@@ -2399,17 +2392,17 @@ export default function App() {
     }
   };
 
-  // Pre-fill WDV Code on transfer/airtime forms
-  const handleQuickRedeemWdv = (code: string, flow: 'airtime' | 'transfer') => {
+  // Pre-fill LEGACY_VOUCHER Code on transfer/airtime forms
+  const handleQuickRedeemLegacyVoucher = (code: string, flow: 'airtime' | 'transfer') => {
     if (flow === 'airtime') {
-      setAirtimeWdvCode(code);
+      setAirtimeLegacyVoucherCode(code);
       const voucher = vouchers.find(v => v.code === code);
       if (voucher) {
         setAirtimeAmount(voucher.amount.toString());
       }
       setCurrentScreen('buy_airtime');
     } else {
-      setTransferWdvCode(code);
+      setTransferLegacyVoucherCode(code);
       const voucher = vouchers.find(v => v.code === code);
       if (voucher) {
         setTransferAmount(voucher.amount.toString());
@@ -2435,7 +2428,7 @@ export default function App() {
       let replyText = 'Thank you for reaching out. A premium billing operator has logged your session. If you have made a transfer, please wait up to 3 minutes for automatic synchronization.';
       const msgLower = userMsg.toLowerCase();
 
-      if (msgLower.includes('wdv') || msgLower.includes('voucher') || msgLower.includes('code')) {
+      if (msgLower.includes('legacyVoucher') || msgLower.includes('voucher') || msgLower.includes('code')) {
         replyText = 'Deposits add funds directly to your Nevo wallet through the secure payment provider flow.';
       } else if (msgLower.includes('delay') || msgLower.includes('confirm') || msgLower.includes('wait')) {
         replyText = 'Apologies for the delay! If your bank is under maintenance, our backend operators reconcile transfers manually. Drop your account name and transfer receipt here for prompt verification!';
@@ -2699,13 +2692,14 @@ export default function App() {
 
   return (
     <>
-      {isAuthenticated && user && user.welcomeRewardShown === false && (
+      {isAuthenticated && user && showRegistrationWelcome && (
         <CongratulationsScreen
           userEmail={user.email}
           onContinue={() => {
+            setShowRegistrationWelcome(false);
             setUser({ ...user, welcomeRewardShown: true });
             setCurrentScreen('dashboard');
-            showToast('Welcome reward activated!', 'success');
+            showToast('Welcome to Nevo!', 'success');
           }}
         />
       )}
@@ -3496,7 +3490,7 @@ export default function App() {
               {currentScreen === 'dashboard' && activeTab === 'social' && (
                 <NivoFeaturesPanel
                   user={user}
-                  token={localStorage.getItem('nevo_token') || ''}
+                  token={localStorage.getItem('nevo_auth_token') || ''}
                   onToast={showToast}
                   initialTab={rewardsTab}
                 />
@@ -3602,7 +3596,7 @@ export default function App() {
                                 id="btn-disable-biometric"
                                 type="button"
                                 onClick={async () => {
-                                  const token = localStorage.getItem('nevo_token');
+                                  const token = localStorage.getItem('nevo_auth_token');
                                   if (!token) return;
                                   try {
                                     const res = await fetch('/api/auth/webauthn/disable', {
@@ -3631,7 +3625,7 @@ export default function App() {
                                 type="button"
                                 disabled={isActivatingBiometric}
                                 onClick={async () => {
-                                  const token = localStorage.getItem('nevo_token');
+                                  const token = localStorage.getItem('nevo_auth_token');
                                   if (!token) {
                                     showToast('Please log in again to register biometric.', 'error');
                                     return;
@@ -3679,7 +3673,7 @@ export default function App() {
                                 showToast('PIN must be a 4-digit or 6-digit numeric code.', 'error');
                                 return;
                               }
-                              const token = localStorage.getItem('nevo_token');
+                              const token = localStorage.getItem('nevo_auth_token');
                               if (!token) {
                                 showToast('Session expired. Please log in again.', 'error');
                                 return;
@@ -3912,17 +3906,17 @@ export default function App() {
                 </div>
               )}
 
-              {/* -------------------- FLOW 4: BUY WDV CODE FORM -------------------- */}
-              {false && currentScreen === 'buy_wdv' && (
+              {/* -------------------- FLOW 4: BUY LEGACY_VOUCHER CODE FORM -------------------- */}
+              {false && currentScreen === 'buy_legacyVoucher' && (
                 <div className="p-5 space-y-5 animate-[fadeIn_0.2s_ease-out]">
                   <div className="flex items-center gap-3">
                     <button
-                      id="btn-wdv-back"
+                      id="btn-legacyVoucher-back"
                       onClick={() => {
                         if (window.history.state && window.history.state.appScreen) {
                           window.history.back();
                         } else {
-                          setCurrentScreen(wdvBackScreen);
+                          setCurrentScreen(legacyVoucherBackScreen);
                         }
                       }}
                       className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-500"
@@ -3936,7 +3930,7 @@ export default function App() {
                     Purchase a deposit securely online. Your voucher is issued only after the payment gateway confirms the payment.
                   </p>
 
-                  {/* Instant Online Payment Option (Paystack / Flutterwave / Korapay) */}
+                  {/* Secure KoraPay Checkout */}
                   <div className="p-4 rounded-2xl bg-gradient-to-r from-teal-500/15 via-emerald-500/10 to-indigo-500/15 border border-teal-500/30 space-y-3 shadow-lg shadow-teal-500/5">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
@@ -3969,7 +3963,7 @@ export default function App() {
               )}
 
               {/* -------------------- FLOW 4.2: MANUAL BANK TRANSFER PAYMENT -------------------- */}
-              {false && currentScreen === 'wdv_instructions' && (
+              {false && currentScreen === 'legacyVoucher_instructions' && (
                 <div className="p-5 space-y-5 animate-[fadeIn_0.2s_ease-out]">
                   <div className="flex items-center justify-between">
                     <h4 className="text-base font-bold font-display text-slate-800 dark:text-white">Deposit Payment Details</h4>
@@ -3982,13 +3976,13 @@ export default function App() {
                   {/* Instructions */}
                   <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800/80 leading-relaxed text-xs text-slate-600 dark:text-slate-300 space-y-1">
                     <div className="font-semibold text-[10px] font-mono uppercase text-teal-400 tracking-wider">Payment Instructions:</div>
-                    <p>{wdvConfig.instructions || `Transfer exactly ₦${(wdvConfig.voucherPrice || 6500).toLocaleString()} to the official account details below. After completing your bank transfer, tap the "I HAVE MADE THIS TRANSFER" button below to notify support on WhatsApp.`}</p>
+                    <p>{legacyVoucherConfig.instructions || `Transfer exactly ₦${(legacyVoucherConfig.voucherPrice || 6500).toLocaleString()} to the official account details below. After completing your bank transfer, tap the "I HAVE MADE THIS TRANSFER" button below to notify support on WhatsApp.`}</p>
                   </div>
 
                   {/* Maintenance notice if present */}
-                  {wdvConfig.maintenanceNotice && (
+                  {legacyVoucherConfig.maintenanceNotice && (
                     <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-600 dark:text-amber-400 font-medium">
-                      ⚠️ {wdvConfig.maintenanceNotice}
+                      ⚠️ {legacyVoucherConfig.maintenanceNotice}
                     </div>
                   )}
 
@@ -3999,13 +3993,13 @@ export default function App() {
                       <span className="text-xs text-slate-400">Fixed Voucher Price:</span>
                       <div className="flex items-center gap-1.5">
                         <span className="text-base font-mono font-extrabold text-teal-400">
-                          {nairaFormat(wdvConfig.voucherPrice || 6500)}
+                          {nairaFormat(legacyVoucherConfig.voucherPrice || 6500)}
                         </span>
                         <button
                           id="btn-copy-amount"
                           type="button"
                           onClick={() => {
-                            navigator.clipboard.writeText(String(wdvConfig.voucherPrice || 6500));
+                            navigator.clipboard.writeText(String(legacyVoucherConfig.voucherPrice || 6500));
                             showToast('Amount copied!', 'success');
                           }}
                           className="p-1 text-[9px] font-mono font-bold bg-white/10 rounded border border-white/10 text-slate-300 hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
@@ -4020,13 +4014,13 @@ export default function App() {
                       <span className="text-xs text-slate-400">Bank Name:</span>
                       <div className="flex items-center gap-1.5">
                         <span className="text-sm font-mono font-bold text-white">
-                          {wdvConfig.bankName || "PalmPay"}
+                          {legacyVoucherConfig.bankName || "PalmPay"}
                         </span>
                         <button
                           id="btn-copy-bank"
                           type="button"
                           onClick={() => {
-                            navigator.clipboard.writeText(wdvConfig.bankName || "PalmPay");
+                            navigator.clipboard.writeText(legacyVoucherConfig.bankName || "PalmPay");
                             showToast('Bank copied!', 'success');
                           }}
                           className="p-1 text-[9px] font-mono font-bold bg-white/10 rounded border border-white/10 text-slate-300 hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
@@ -4041,13 +4035,13 @@ export default function App() {
                       <span className="text-xs text-slate-400">Account Number:</span>
                       <div className="flex items-center gap-1.5">
                         <span className="text-lg font-mono font-extrabold text-amber-400 tracking-wider">
-                          {wdvConfig.accountNumber || "8960723295"}
+                          {legacyVoucherConfig.accountNumber || "8960723295"}
                         </span>
                         <button
                           id="btn-copy-acc-num"
                           type="button"
                           onClick={() => {
-                            navigator.clipboard.writeText(wdvConfig.accountNumber || "8960723295");
+                            navigator.clipboard.writeText(legacyVoucherConfig.accountNumber || "8960723295");
                             showToast('Account Number copied!', 'success');
                           }}
                           className="p-1 text-[9px] font-mono font-bold bg-white/10 rounded border border-white/10 text-slate-300 hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
@@ -4062,13 +4056,13 @@ export default function App() {
                       <span className="text-xs text-slate-400">Account Name:</span>
                       <div className="flex items-center gap-1.5">
                         <span className="text-xs font-mono font-bold text-white uppercase text-right max-w-[180px] truncate">
-                          {wdvConfig.accountName || "pwamunadi ishaku"}
+                          {legacyVoucherConfig.accountName || "pwamunadi ishaku"}
                         </span>
                         <button
                           id="btn-copy-acc-name"
                           type="button"
                           onClick={() => {
-                            navigator.clipboard.writeText(wdvConfig.accountName || "pwamunadi ishaku");
+                            navigator.clipboard.writeText(legacyVoucherConfig.accountName || "pwamunadi ishaku");
                             showToast('Account Name copied!', 'success');
                           }}
                           className="p-1 text-[9px] font-mono font-bold bg-white/10 rounded border border-white/10 text-slate-300 hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
@@ -4085,7 +4079,7 @@ export default function App() {
                       id="btn-confirm-transfer-whatsapp"
                       type="button"
                       onClick={() => {
-                        const rawWa = wdvConfig.whatsappLink || systemSettings.whatsappLink || systemSettings.whatsappNumber || "+2349162845073";
+                        const rawWa = legacyVoucherConfig.whatsappLink || systemSettings.whatsappLink || systemSettings.whatsappNumber || "+2349162845073";
                         let waNumber = rawWa.replace(/[^0-9]/g, '');
                         if (!waNumber && rawWa.includes('wa.me/')) {
                           waNumber = rawWa.split('wa.me/')[1]?.replace(/[^0-9]/g, '') || '2349162845073';
@@ -4093,9 +4087,9 @@ export default function App() {
                         if (!waNumber) waNumber = '2349162845073';
 
                         const msg = encodeURIComponent(
-                          `Hello Admin, I have made a bank transfer of ₦${(wdvConfig.voucherPrice || 6500).toLocaleString()} for my Deposit.\n` +
-                          `Name: ${wdvFormName || user?.fullName || 'Customer'}\n` +
-                          `Email: ${wdvFormEmail || user?.email || ''}\n` +
+                          `Hello Admin, I have made a bank transfer of ₦${(legacyVoucherConfig.voucherPrice || 6500).toLocaleString()} for my Deposit.\n` +
+                          `Name: ${legacyVoucherFormName || user?.fullName || 'Customer'}\n` +
+                          `Email: ${legacyVoucherFormEmail || user?.email || ''}\n` +
                           `Please confirm my transfer and send my Deposit code.`
                         );
 
@@ -4124,8 +4118,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* -------------------- FLOW 4.3: WDV CONFIRMED SUCCESS TICKET -------------------- */}
-              {false && currentScreen === 'wdv_success' && generatedWdv && (
+              {/* -------------------- FLOW 4.3: LEGACY_VOUCHER CONFIRMED SUCCESS TICKET -------------------- */}
+              {false && currentScreen === 'legacyVoucher_success' && generatedLegacyVoucher && (
                 <div className="p-5 space-y-5 animate-[fadeIn_0.2s_ease-out]">
                   <div className="text-center pt-4">
                     <div className="h-14 w-14 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto mb-3">
@@ -4144,11 +4138,11 @@ export default function App() {
                     <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-xl space-y-2">
                       <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest block">Payment Authorization</span>
                       <div className="text-xl font-mono font-extrabold text-teal-400 tracking-wider">
-                        {generatedWdv.code || generatedWdv.voucherCode}
+                        {generatedLegacyVoucher.code || generatedLegacyVoucher.voucherCode}
                       </div>
                       <button
                         onClick={() => {
-                          navigator.clipboard.writeText(generatedWdv.code || generatedWdv.voucherCode || '');
+                          navigator.clipboard.writeText(generatedLegacyVoucher.code || generatedLegacyVoucher.voucherCode || '');
                           showToast('Voucher Code copied to clipboard!', 'success');
                         }}
                         className="px-3 py-1 bg-teal-500/20 text-teal-300 hover:bg-teal-500/30 text-[10px] font-mono font-bold rounded-lg border border-teal-500/30 transition-all inline-flex items-center gap-1"
@@ -4158,23 +4152,23 @@ export default function App() {
                     </div>
 
                     <p className="text-xs text-slate-300 leading-relaxed">
-                      Your Withdrawal Voucher (WDV) worth {nairaFormat(generatedWdv.amount || 6500)} is now saved and active on your account.
+                      Your Withdrawal Voucher (LEGACY_VOUCHER) worth {nairaFormat(generatedLegacyVoucher.amount || 6500)} is now saved and active on your account.
                     </p>
                   </div>
 
                   <div className="pt-2 space-y-2.5">
                     <button
-                      id="btn-download-wdv-pdf"
-                      onClick={handleDownloadWdvPdfReceipt}
+                      id="btn-download-legacyVoucher-pdf"
+                      onClick={handleDownloadLegacyVoucherPdfReceipt}
                       className="w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-white text-xs font-extrabold uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2"
                     >
                       <Download className="h-4 w-4" />
                       <span>Download PDF Receipt</span>
                     </button>
                     <button
-                      id="btn-wdv-success-home"
+                      id="btn-legacyVoucher-success-home"
                       onClick={() => {
-                        setGeneratedWdv(null);
+                        setGeneratedLegacyVoucher(null);
                         setCurrentScreen('dashboard');
                         setActiveTab('wallet');
                       }}
@@ -4328,13 +4322,13 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* Optional WDV Code input */}
+                      {/* Optional LEGACY_VOUCHER Code input */}
                       {true ? (
-                        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-2.5">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                        <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-300 font-medium flex items-center gap-2.5">
+                          <ShieldCheck className="h-4 w-4 text-amber-400 shrink-0" />
                           <div>
-                            <p className="font-bold">✓ Wallet Ready</p>
-                            <p className="text-[9px] opacity-80 mt-0.5">Your wallet balance can be used directly. No voucher is required.</p>
+                            <p className="font-bold">Transaction Access Locked</p>
+                            <p className="text-[9px] opacity-80 mt-0.5">Complete 5 successful referrals and make a verified KoraPay deposit of at least ₦520 to spend or cash out wallet funds.</p>
                           </div>
                         </div>
                       ) : (
@@ -4342,7 +4336,7 @@ export default function App() {
                           <div className="flex items-center justify-between mb-1">
                             <label className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold text-rose-500">Payment Authorization</label>
                             <button
-                              id="btn-goto-buy-wdv-airtime"
+                              id="btn-goto-buy-legacyVoucher-airtime"
                               type="button"
                               onClick={() => setPaymentModalOpen(true)}
                               className="text-[9px] font-bold text-indigo-600 dark:text-teal-400 hover:underline"
@@ -4351,14 +4345,14 @@ export default function App() {
                             </button>
                           </div>
                           <input
-                            id="input-airtime-wdv"
+                            id="input-airtime-legacyVoucher"
                             type="text"
                             placeholder="No voucher required"
-                            value={airtimeWdvCode}
-                            onChange={(e) => setAirtimeWdvCode(e.target.value)}
+                            value={airtimeLegacyVoucherCode}
+                            onChange={(e) => setAirtimeLegacyVoucherCode(e.target.value)}
                             className="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-rose-500 font-mono tracking-widest uppercase"
                           />
-                          {!airtimeWdvCode ? (
+                          {!airtimeLegacyVoucherCode ? (
                             <div className="mt-1.5 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg text-[10px] text-amber-600 dark:text-amber-400 leading-normal">
                               A wallet deposit is required. Tap{' '}
                               <button
@@ -4369,7 +4363,7 @@ export default function App() {
                                 'Deposit Funds'
                               </button>.
                             </div>
-                          ) : !isVoucherValid(airtimeWdvCode) ? (
+                          ) : !isVoucherValid(airtimeLegacyVoucherCode) ? (
                             <div className="mt-1.5 p-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-[10px] text-rose-600 dark:text-rose-400 font-medium">
                               Invalid wallet authorization.
                             </div>
@@ -4389,11 +4383,11 @@ export default function App() {
                           airtimePhone.length < 10 ||
                           !airtimeAmount ||
                           parseInt(airtimeAmount) < 100 ||
-                          (!true && !isVoucherValid(airtimeWdvCode)) ||
+                          (!true && !isVoucherValid(airtimeLegacyVoucherCode)) ||
                           isSubmitting
                         }
                         className={`w-full text-xs font-bold uppercase tracking-widest py-3.5 bg-gradient-to-r from-indigo-600 to-teal-500 hover:from-indigo-700 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-indigo-500/20 active:scale-95 transition-all mt-2 flex items-center justify-center gap-2 ${
-                          (!airtimePhone || airtimePhone.length < 10 || !airtimeAmount || parseInt(airtimeAmount) < 100 || (!true && !isVoucherValid(airtimeWdvCode)) || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
+                          (!airtimePhone || airtimePhone.length < 10 || !airtimeAmount || parseInt(airtimeAmount) < 100 || (!true && !isVoucherValid(airtimeLegacyVoucherCode)) || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                       >
                         {isSubmitting ? (
@@ -4596,13 +4590,13 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* Optional WDV Code input */}
+                      {/* Optional LEGACY_VOUCHER Code input */}
                       {true ? (
-                        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-2.5">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                        <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-300 font-medium flex items-center gap-2.5">
+                          <ShieldCheck className="h-4 w-4 text-amber-400 shrink-0" />
                           <div>
-                            <p className="font-bold">✓ Wallet Ready</p>
-                            <p className="text-[9px] opacity-80 mt-0.5">Your wallet balance can be used directly. No voucher is required.</p>
+                            <p className="font-bold">Transaction Access Locked</p>
+                            <p className="text-[9px] opacity-80 mt-0.5">Complete 5 successful referrals and make a verified KoraPay deposit of at least ₦520 to spend or cash out wallet funds.</p>
                           </div>
                         </div>
                       ) : (
@@ -4610,7 +4604,7 @@ export default function App() {
                           <div className="flex items-center justify-between mb-1">
                             <label className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold text-rose-500">Payment Authorization</label>
                             <button
-                              id="btn-goto-buy-wdv-data"
+                              id="btn-goto-buy-legacyVoucher-data"
                               type="button"
                               onClick={() => setPaymentModalOpen(true)}
                               className="text-[9px] font-bold text-indigo-600 dark:text-teal-400 hover:underline"
@@ -4619,14 +4613,14 @@ export default function App() {
                             </button>
                           </div>
                           <input
-                            id="input-data-wdv"
+                            id="input-data-legacyVoucher"
                             type="text"
                             placeholder="No voucher required"
-                            value={dataWdvCode}
-                            onChange={(e) => setDataWdvCode(e.target.value)}
+                            value={dataLegacyVoucherCode}
+                            onChange={(e) => setDataLegacyVoucherCode(e.target.value)}
                             className="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-rose-500 font-mono tracking-widest uppercase"
                           />
-                          {!dataWdvCode ? (
+                          {!dataLegacyVoucherCode ? (
                             <div className="mt-1.5 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg text-[10px] text-amber-600 dark:text-amber-400 leading-normal">
                               A wallet deposit is required. Tap{' '}
                               <button
@@ -4637,7 +4631,7 @@ export default function App() {
                                 'Deposit Funds'
                               </button>.
                             </div>
-                          ) : !isVoucherValid(dataWdvCode) ? (
+                          ) : !isVoucherValid(dataLegacyVoucherCode) ? (
                             <div className="mt-1.5 p-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-[10px] text-rose-600 dark:text-rose-400 font-medium">
                               Invalid wallet authorization.
                             </div>
@@ -4656,11 +4650,11 @@ export default function App() {
                           !dataPhone ||
                           dataPhone.length < 10 ||
                           !selectedDataPlan ||
-                          (!true && !isVoucherValid(dataWdvCode)) ||
+                          (!true && !isVoucherValid(dataLegacyVoucherCode)) ||
                           isSubmitting
                         }
                         className={`w-full text-xs font-extrabold uppercase tracking-widest py-3.5 bg-gradient-to-r from-indigo-600 to-teal-500 hover:from-indigo-700 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-indigo-500/20 active:scale-95 transition-all mt-2 flex items-center justify-center gap-2 ${
-                          (!dataPhone || dataPhone.length < 10 || !selectedDataPlan || (!true && !isVoucherValid(dataWdvCode)) || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
+                          (!dataPhone || dataPhone.length < 10 || !selectedDataPlan || (!true && !isVoucherValid(dataLegacyVoucherCode)) || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                       >
                         {isSubmitting ? (
@@ -4892,9 +4886,9 @@ export default function App() {
                       </div>
 
                       {/* Wallet Payment Authorization */}
-                      <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-2.5">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                        <div><p className="font-bold">✓ Wallet Ready</p><p className="text-[9px] opacity-80 mt-0.5">Your Nevo wallet balance is used directly for this payment.</p></div>
+                      <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-300 font-medium flex items-center gap-2.5">
+                        <ShieldCheck className="h-4 w-4 text-amber-400 shrink-0" />
+                        <div><p className="font-bold">Transaction Access Locked</p><p className="text-[9px] opacity-80 mt-0.5">Complete 5 successful referrals and make a verified KoraPay deposit of at least ₦520 before paying bills.</p></div>
                       </div>
 
                       {/* Submit Button */}
@@ -4964,7 +4958,7 @@ export default function App() {
                     </div>
                     <div className="text-right">
                       <span className="text-[9px] font-mono text-slate-400 block uppercase">Withdrawal Limits</span>
-                      <span className="text-xs font-bold text-slate-300 font-mono mt-0.5 block">Min ₦50 • Max ₦200,000</span>
+                      <span className="text-xs font-bold text-slate-300 font-mono mt-0.5 block">Min ₦5,000 • Max ₦200,000</span>
                     </div>
                   </div>
 
@@ -5110,14 +5104,14 @@ export default function App() {
                             type="number"
                             min={50}
                             max={200000}
-                            placeholder="Min ₦50 - Max ₦200,000"
+                            placeholder="Min ₦5,000 - Max ₦200,000"
                             required
                             value={withdrawAmount}
                             onChange={(e) => setWithdrawAmount(e.target.value)}
                             className="w-full text-sm bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono font-bold focus:outline-none focus:ring-1 focus:ring-teal-400"
                           />
-                          {withdrawAmount && (parseInt(withdrawAmount) < 50 || parseInt(withdrawAmount) > 200000) && (
-                            <p className="text-[10px] text-rose-400 font-mono mt-1">Amount must be between ₦50 and ₦200,000.</p>
+                          {withdrawAmount && (parseInt(withdrawAmount) < 5000 || parseInt(withdrawAmount) > 200000) && (
+                            <p className="text-[10px] text-rose-400 font-mono mt-1">Amount must be between ₦5,000 and ₦200,000.</p>
                           )}
                         </div>
 
@@ -5135,12 +5129,12 @@ export default function App() {
                             withdrawAccount.length !== 10 ||
                             !withdrawAccName ||
                             !withdrawAmount ||
-                            parseInt(withdrawAmount) < 50 ||
+                            parseInt(withdrawAmount) < 5000 ||
                             parseInt(withdrawAmount) > 200000 ||
                             isSubmitting
                           }
                           className={`w-full py-4 bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
-                            (!withdrawAccount || withdrawAccount.length !== 10 || !withdrawAccName || !withdrawAmount || parseInt(withdrawAmount) < 50 || parseInt(withdrawAmount) > 200000 || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
+                            (!withdrawAccount || withdrawAccount.length !== 10 || !withdrawAccName || !withdrawAmount || parseInt(withdrawAmount) < 5000 || parseInt(withdrawAmount) > 200000 || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
                         >
                           {isSubmitting ? (
@@ -5207,7 +5201,7 @@ export default function App() {
                     </div>
                     <div className="text-right">
                       <span className="text-[9px] font-mono text-slate-400 block uppercase">Transfer Limits</span>
-                      <span className="text-xs font-bold text-slate-300 font-mono mt-0.5 block">Min ₦50 • Max ₦200,000</span>
+                      <span className="text-xs font-bold text-slate-300 font-mono mt-0.5 block">Min ₦5,000 • Max ₦200,000</span>
                     </div>
                   </div>
 
@@ -5353,25 +5347,25 @@ export default function App() {
                             type="number"
                             min={50}
                             max={200000}
-                            placeholder="Min ₦50 - Max ₦200,000"
+                            placeholder="Min ₦5,000 - Max ₦200,000"
                             required
                             value={transferAmount}
                             onChange={(e) => setTransferAmount(e.target.value)}
                             className="w-full text-sm bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono font-bold focus:outline-none focus:ring-1 focus:ring-indigo-400"
                           />
                           {transferAmount && (parseInt(transferAmount) < 50 || parseInt(transferAmount) > 200000) && (
-                            <p className="text-[10px] text-rose-400 font-mono mt-1">Amount must be between ₦50 and ₦200,000.</p>
+                            <p className="text-[10px] text-rose-400 font-mono mt-1">Amount must be between ₦5,000 and ₦200,000.</p>
                           )}
                         </div>
 
-                        {/* WDV Code field */}
+                        {/* LEGACY_VOUCHER Code field */}
                         <div>
                           {true ? (
-                            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 font-medium flex items-center gap-2.5">
-                              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-300 font-medium flex items-center gap-2.5">
+                              <ShieldCheck className="h-4 w-4 text-amber-400 shrink-0" />
                               <div>
-                                <p className="font-bold">✓ Wallet Ready</p>
-                                <p className="text-[9px] opacity-80 mt-0.5">Your wallet balance can be used directly. No voucher is required.</p>
+                                <p className="font-bold">Transaction Access Locked</p>
+                                <p className="text-[9px] opacity-80 mt-0.5">Complete 5 successful referrals and make a verified KoraPay deposit of at least ₦520 before transferring wallet funds.</p>
                               </div>
                             </div>
                           ) : (
@@ -5379,7 +5373,7 @@ export default function App() {
                               <div className="flex items-center justify-between mb-1.5">
                                 <label className="text-[11px] font-mono text-rose-400 font-bold uppercase tracking-wider">Payment Authorization</label>
                                 <button
-                                  id="btn-goto-buy-wdv-transfer"
+                                  id="btn-goto-buy-legacyVoucher-transfer"
                                   type="button"
                                   onClick={() => setPaymentModalOpen(true)}
                                   className="text-[10px] font-bold text-indigo-400 hover:underline cursor-pointer flex items-center gap-1"
@@ -5388,11 +5382,11 @@ export default function App() {
                                 </button>
                               </div>
                               <input
-                                id="input-transfer-wdv"
+                                id="input-transfer-legacyVoucher"
                                 type="text"
                                 placeholder="No voucher required"
-                                value={transferWdvCode}
-                                onChange={(e) => setTransferWdvCode(e.target.value)}
+                                value={transferLegacyVoucherCode}
+                                onChange={(e) => setTransferLegacyVoucherCode(e.target.value)}
                                 className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono tracking-widest uppercase focus:outline-none focus:ring-1 focus:ring-indigo-400"
                               />
                             </div>
@@ -5533,7 +5527,7 @@ export default function App() {
                     <GlassCard className="p-5 space-y-3">
                       {[
                         'Daily instant withdrawal limits up to ₦100,000.',
-                        'Premium WDV (Withdrawal Voucher) token discount system.',
+                        'Premium LEGACY_VOUCHER (Withdrawal Voucher) token discount system.',
                         'Cheaper airtime & data package recharges.',
                         'Encrypted passcode entry and biometric fingerprint scanners.',
                         '24/7 dedicated Telegram, WhatsApp, and email support operators.'
@@ -5801,7 +5795,7 @@ export default function App() {
                   <div>
                     <h5 className="text-sm font-bold text-white font-display">Voucher Redemptions Guide</h5>
                     <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                      This walkthrough simulated guide explains how copying PalmPay account credentials, initiating standard transfers, and generating Withdrawal Vouchers (WDV) operates with zero fees on Nevo.
+                      This walkthrough simulated guide explains how copying PalmPay account credentials, initiating standard transfers, and generating Withdrawal Vouchers (LEGACY_VOUCHER) operates with zero fees on Nevo.
                     </p>
                   </div>
 
@@ -5964,22 +5958,10 @@ export default function App() {
           </div>
         )}
 
-        {/* -------------------- REGISTRATION CONGRATULATIONS PAGE -------------------- */}
-        {isAuthenticated && currentScreen === 'congratulations' && (
-          <CongratulationsScreen
-            userEmail={user?.email || 'user@nevo.ng'}
-            onContinue={async () => {
-              await syncWithBackend();
-              setCurrentScreen('dashboard');
-              setActiveTab('wallet');
-            }}
-          />
-        )}
-
         <WalletDepositModal
           isOpen={paymentModalOpen}
           onClose={() => setPaymentModalOpen(false)}
-          token={localStorage.getItem('nevo_token') || ''}
+          token={localStorage.getItem('nevo_auth_token') || ''}
           onToast={showToast}
           onSuccess={() => syncWithBackend()}
         />

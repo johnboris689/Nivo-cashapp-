@@ -28,9 +28,9 @@ export const AdminSettingsPage: React.FC = () => {
   const [supportEmail, setSupportEmail] = useState('support@nivocash.app');
   const [telegramChannel, setTelegramChannel] = useState('https://t.me/nivocash');
   const [minDeposit, setMinDeposit] = useState('1000');
-  const [minWithdrawal, setMinWithdrawal] = useState('2000');
+  const [minWithdrawal, setMinWithdrawal] = useState('5000');
   const [activationFeeAmount, setActivationFeeAmount] = useState('520');
-  const [paymentProvider, setPaymentProvider] = useState<'auto' | 'paystack' | 'flutterwave' | 'korapay'>('auto');
+  const [paymentProvider, setPaymentProvider] = useState<'korapay'>('korapay');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [announcementBanner, setAnnouncementBanner] = useState('');
 
@@ -48,7 +48,7 @@ export const AdminSettingsPage: React.FC = () => {
       setMinDeposit(settingsData.minDeposit.toString());
       setMinWithdrawal(settingsData.minWithdrawal.toString());
       setActivationFeeAmount((settingsData.activationFeeAmount || 520).toString());
-      setPaymentProvider(settingsData.paymentProvider || 'auto');
+      setPaymentProvider('korapay');
       setMaintenanceMode(Boolean(settingsData.maintenanceMode));
       setAnnouncementBanner(settingsData.announcementBanner || '');
 
@@ -148,7 +148,7 @@ export const AdminSettingsPage: React.FC = () => {
                 <div>
                   <h3 className="text-sm font-black text-white">Payment Gateway Infrastructure</h3>
                   <p className="text-[11px] text-zinc-400">
-                    Supports Paystack, Flutterwave, and Korapay without hardcoded secrets.
+                    Supports KoraPay only without hardcoded secrets.
                   </p>
                 </div>
               </div>
@@ -174,10 +174,7 @@ export const AdminSettingsPage: React.FC = () => {
                 onChange={(e) => setPaymentProvider(e.target.value as any)}
                 className="w-full bg-[#16090D] border border-zinc-700 rounded-xl px-4 py-3 text-white text-xs font-bold focus:outline-none focus:border-[#8F1D3A] transition-colors cursor-pointer"
               >
-                <option value="auto">Auto-Detect (Prioritizes first configured provider with valid credentials)</option>
-                <option value="paystack">Force Paystack Gateway</option>
-                <option value="flutterwave">Force Flutterwave Gateway</option>
-                <option value="korapay">Force Korapay Gateway</option>
+                  <option value="korapay">KoraPay Gateway</option>
               </select>
               <p className="text-[11px] text-zinc-400">
                 Current active provider resolved by backend:{' '}

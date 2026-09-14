@@ -44,7 +44,7 @@ export const PaymentAdminTab: React.FC<PaymentAdminTabProps> = ({
   getAdminHeaders
 }) => {
   const [providers, setProviders] = useState<PaymentConfigProvider[]>([]);
-  const [activeProvider, setActiveProvider] = useState<string>('paystack');
+  const [activeProvider, setActiveProvider] = useState<string>('korapay');
   const [transactions, setTransactions] = useState<PaymentTransactionRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [switchingProvider, setSwitchingProvider] = useState(false);
@@ -61,7 +61,7 @@ export const PaymentAdminTab: React.FC<PaymentAdminTabProps> = ({
       const data = await res.json();
       if (data.success) {
         setProviders(data.providers || []);
-        setActiveProvider(data.activeProvider || 'paystack');
+        setActiveProvider(data.activeProvider || 'korapay');
       }
     } catch (err) {
       console.error('Failed to fetch admin payment config:', err);
@@ -179,7 +179,7 @@ export const PaymentAdminTab: React.FC<PaymentAdminTabProps> = ({
               <h4 className="text-base font-bold text-white font-display flex items-center gap-2">
                 <span>Nigerian Payment Gateway System</span>
                 <span className="text-[10px] font-mono font-bold bg-teal-500/15 text-teal-300 border border-teal-500/30 px-2 py-0.5 rounded-full">
-                  Paystack • Flutterwave • Korapay
+                  KoraPay
                 </span>
               </h4>
               <p className="text-xs text-slate-400 mt-0.5">
@@ -378,10 +378,10 @@ export const PaymentAdminTab: React.FC<PaymentAdminTabProps> = ({
                         ₦{Number(tx.amount || 0).toLocaleString()}
                       </td>
                       <td className="py-3 px-3 uppercase text-indigo-300 font-bold">
-                        {tx.provider || 'paystack'}
+                        {tx.provider || 'korapay'}
                       </td>
                       <td className="py-3 px-3 text-slate-400">
-                        {tx.purpose === 'wdv_voucher' ? 'WDV Voucher' : 'Wallet Funding'}
+                        {tx.purpose === 'legacyVoucher_voucher' ? 'LEGACY_VOUCHER Voucher' : 'Wallet Funding'}
                       </td>
                       <td className="py-3 px-3">
                         {isSuccess ? (

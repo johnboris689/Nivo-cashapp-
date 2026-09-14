@@ -151,11 +151,11 @@ export default function AdminPanel({
   const [activeTab, setActiveTab] = useState<'overview' | 'voucher_generator' | 'payments' | 'withdrawals' | 'users' | 'settings' | 'security' | 'reports' | 'logs' | 'payment_settings' | 'ai_support' | 'nivo_rewards'>('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  // WDV Virtual Payments State
+  // LEGACY_VOUCHER Virtual Payments State
   const [payments, setPayments] = useState<any[]>([]);
   const [loadingPayments, setLoadingPayments] = useState(false);
   const [paymentSearch, setPaymentSearch] = useState('');
-  const [paymentSubTab, setPaymentSubTab] = useState<'gateways' | 'manual_wdv'>('gateways');
+  const [paymentSubTab, setPaymentSubTab] = useState<'gateways' | 'manual_legacyVoucher'>('gateways');
   
   // Withdrawal Management System State
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
@@ -218,16 +218,16 @@ export default function AdminPanel({
   const [broadcastType, setBroadcastType] = useState('system');
   const [sendAsEmail, setSendAsEmail] = useState(true);
 
-  // WDV Payment Config fields
-  const [wdvBankName, setWdvBankName] = useState('PalmPay');
-  const [wdvAccountNumber, setWdvAccountNumber] = useState('8960723295');
-  const [wdvAccountName, setWdvAccountName] = useState('pwamunadi ishaku');
-  const [wdvWhatsappLink, setWdvWhatsappLink] = useState('https://wa.me/2349162845073');
-  const [wdvWhatsappNumber, setWdvWhatsappNumber] = useState('+2349162845073');
-  const [wdvVoucherPrice, setWdvVoucherPrice] = useState('6500');
-  const [wdvInstructions, setWdvInstructions] = useState('');
-  const [wdvMaintenanceNotice, setWdvMaintenanceNotice] = useState('');
-  const [savingWdvConfig, setSavingWdvConfig] = useState(false);
+  // LEGACY_VOUCHER Payment Config fields
+  const [legacyVoucherBankName, setLegacyVoucherBankName] = useState('PalmPay');
+  const [legacyVoucherAccountNumber, setLegacyVoucherAccountNumber] = useState('8960723295');
+  const [legacyVoucherAccountName, setLegacyVoucherAccountName] = useState('pwamunadi ishaku');
+  const [legacyVoucherWhatsappLink, setLegacyVoucherWhatsappLink] = useState('https://wa.me/2349162845073');
+  const [legacyVoucherWhatsappNumber, setLegacyVoucherWhatsappNumber] = useState('+2349162845073');
+  const [legacyVoucherVoucherPrice, setLegacyVoucherVoucherPrice] = useState('6500');
+  const [legacyVoucherInstructions, setLegacyVoucherInstructions] = useState('');
+  const [legacyVoucherMaintenanceNotice, setLegacyVoucherMaintenanceNotice] = useState('');
+  const [savingLegacyVoucherConfig, setSavingLegacyVoucherConfig] = useState(false);
 
   // System Master Settings State
   const [websiteName, setWebsiteName] = useState('Nevo');
@@ -242,12 +242,12 @@ export default function AdminPanel({
   const [airtimeEnabled, setAirtimeEnabled] = useState(true);
   const [dataEnabled, setDataEnabled] = useState(true);
   const [billsEnabled, setBillsEnabled] = useState(true);
-  const [wdvEnabled, setWdvEnabled] = useState(true);
+  const [legacyVoucherEnabled, setLegacyVoucherEnabled] = useState(true);
   const [referralEnabled, setReferralEnabled] = useState(true);
-  const [referralBonus, setReferralBonus] = useState('1000');
+  const [referralBonus, setReferralBonus] = useState('5000');
   const [registrationBonus, setRegistrationBonus] = useState('750');
   const [dailyWithdrawalLimit, setDailyWithdrawalLimit] = useState('1000000');
-  const [minWithdrawal, setMinWithdrawal] = useState('1000');
+  const [minWithdrawal, setMinWithdrawal] = useState('5000');
   const [maxWithdrawal, setMaxWithdrawal] = useState('500000');
   const [withdrawalCharges, setWithdrawalCharges] = useState('100');
   const [currency, setCurrency] = useState('₦');
@@ -262,7 +262,7 @@ export default function AdminPanel({
   const [paymentsEnabled, setPaymentsEnabled] = useState(true);
 
   // WhatsApp & Communication
-  const [whatsappMessage, setWhatsappMessage] = useState('Hello Admin, I have made a wallet deposit via Paystack.');
+  const [whatsappMessage, setWhatsappMessage] = useState('Hello Admin, I have made a wallet deposit via KoraPay.');
   const [telegramLink, setTelegramLink] = useState('https://t.me/nevo');
   const [facebookLink, setFacebookLink] = useState('');
   const [instagramLink, setInstagramLink] = useState('');
@@ -311,7 +311,7 @@ export default function AdminPanel({
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
 
   // Voucher Specific
-  const [voucherPrefix, setVoucherPrefix] = useState('WDV');
+  const [voucherPrefix, setVoucherPrefix] = useState('LEGACY_VOUCHER');
   const [voucherLength, setVoucherLength] = useState('10');
   const [voucherValidity, setVoucherValidity] = useState('30 Days');
 
@@ -335,7 +335,7 @@ export default function AdminPanel({
   const [logs, setLogs] = useState<any[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
 
-  // WDV Voucher Management state
+  // LEGACY_VOUCHER Voucher Management state
   const [vouchers, setVouchers] = useState<any[]>([]);
   const [loadingVouchers, setLoadingVouchers] = useState(false);
   const [voucherSearchTerm, setVoucherSearchTerm] = useState('');
@@ -416,35 +416,35 @@ export default function AdminPanel({
     }
   };
 
-  const fetchWdvConfig = async () => {
+  const fetchLegacyVoucherConfig = async () => {
     try {
-      const res = await fetch('/api/config/wdv');
+      const res = await fetch('/api/config/legacyVoucher');
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.config) {
-          setWdvBankName(data.config.bankName || 'PalmPay');
-          setWdvAccountNumber(data.config.accountNumber || '8960723295');
-          setWdvAccountName(data.config.accountName || 'pwamunadi ishaku');
+          setLegacyVoucherBankName(data.config.bankName || 'PalmPay');
+          setLegacyVoucherAccountNumber(data.config.accountNumber || '8960723295');
+          setLegacyVoucherAccountName(data.config.accountName || 'pwamunadi ishaku');
           const waLink = data.config.whatsappLink || 'https://wa.me/2349162845073';
-          setWdvWhatsappLink(waLink);
+          setLegacyVoucherWhatsappLink(waLink);
           const waNum = data.config.whatsappNumber || (waLink.includes('wa.me/') ? '+' + waLink.split('wa.me/')[1] : waLink);
-          setWdvWhatsappNumber(waNum);
-          setWdvVoucherPrice(String(data.config.voucherPrice ?? 6500));
-          setWdvInstructions(data.config.instructions || "Transfer only the exact amount shown. After payment, click 'I Have Made This Transfer' and contact support on WhatsApp.");
-          setWdvMaintenanceNotice(data.config.maintenanceNotice || 'Payments are verified manually within a few minutes.');
+          setLegacyVoucherWhatsappNumber(waNum);
+          setLegacyVoucherVoucherPrice(String(data.config.voucherPrice ?? 6500));
+          setLegacyVoucherInstructions(data.config.instructions || "Transfer only the exact amount shown. After payment, click 'I Have Made This Transfer' and contact support on WhatsApp.");
+          setLegacyVoucherMaintenanceNotice(data.config.maintenanceNotice || 'Payments are verified manually within a few minutes.');
         }
       }
     } catch (err) {
-      console.error('Error fetching WDV config:', err);
+      console.error('Error fetching LEGACY_VOUCHER config:', err);
     }
   };
 
-  const handleSaveWdvConfig = async (e?: React.FormEvent) => {
+  const handleSaveLegacyVoucherConfig = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    setSavingWdvConfig(true);
+    setSavingLegacyVoucherConfig(true);
 
-    let waLink = wdvWhatsappLink;
-    let waNum = wdvWhatsappNumber;
+    let waLink = legacyVoucherWhatsappLink;
+    let waNum = legacyVoucherWhatsappNumber;
     if (waNum) {
       if (waNum.startsWith('http')) {
         waLink = waNum;
@@ -457,30 +457,30 @@ export default function AdminPanel({
     }
 
     try {
-      const res = await fetch('/api/admin/config/wdv', {
+      const res = await fetch('/api/admin/config/legacyVoucher', {
         method: 'POST',
         headers: getAdminHeaders(),
         body: JSON.stringify({
-          bankName: wdvBankName,
-          accountNumber: wdvAccountNumber,
-          accountName: wdvAccountName,
+          bankName: legacyVoucherBankName,
+          accountNumber: legacyVoucherAccountNumber,
+          accountName: legacyVoucherAccountName,
           whatsappNumber: waNum,
           whatsappLink: waLink,
-          voucherPrice: Number(wdvVoucherPrice),
-          instructions: wdvInstructions,
-          maintenanceNotice: wdvMaintenanceNotice
+          voucherPrice: Number(legacyVoucherVoucherPrice),
+          instructions: legacyVoucherInstructions,
+          maintenanceNotice: legacyVoucherMaintenanceNotice
         })
       });
       if (res.ok) {
-        onToast('WDV Payment Account settings saved to database and live on website!', 'success');
-        fetchWdvConfig();
+        onToast('LEGACY_VOUCHER Payment Account settings saved to database and live on website!', 'success');
+        fetchLegacyVoucherConfig();
       } else {
-        onToast('Failed to save WDV payment account configuration', 'error');
+        onToast('Failed to save LEGACY_VOUCHER payment account configuration', 'error');
       }
     } catch (err) {
       onToast('Network error saving configuration', 'error');
     } finally {
-      setSavingWdvConfig(false);
+      setSavingLegacyVoucherConfig(false);
     }
   };
 
@@ -514,7 +514,7 @@ export default function AdminPanel({
           if (s.airtimeEnabled) setAirtimeEnabled(s.airtimeEnabled === 'true');
           if (s.dataEnabled) setDataEnabled(s.dataEnabled === 'true');
           if (s.billsEnabled) setBillsEnabled(s.billsEnabled === 'true');
-          if (s.wdvEnabled) setWdvEnabled(s.wdvEnabled === 'true');
+          if (s.legacyVoucherEnabled) setLegacyVoucherEnabled(s.legacyVoucherEnabled === 'true');
           if (s.referralEnabled) setReferralEnabled(s.referralEnabled === 'true');
           if (s.referralBonus) setReferralBonus(s.referralBonus);
           if (s.registrationBonus) setRegistrationBonus(s.registrationBonus);
@@ -599,7 +599,7 @@ export default function AdminPanel({
         airtimeEnabled: String(airtimeEnabled),
         dataEnabled: String(dataEnabled),
         billsEnabled: String(billsEnabled),
-        wdvEnabled: String(wdvEnabled),
+        legacyVoucherEnabled: String(legacyVoucherEnabled),
         referralEnabled: String(referralEnabled),
         referralBonus,
         registrationBonus,
@@ -734,7 +734,7 @@ export default function AdminPanel({
   React.useEffect(() => {
     fetchAllUsers();
     fetchLogs();
-    fetchWdvConfig();
+    fetchLegacyVoucherConfig();
     fetchAdminSettings();
     fetchVouchers();
     fetchWithdrawals();
@@ -896,8 +896,8 @@ export default function AdminPanel({
           aiSupportEnabled,
           aiWelcomeMessage,
           aiSupportRules,
-          whatsappNumber: wdvWhatsappNumber,
-          whatsappLink: wdvWhatsappLink
+          whatsappNumber: legacyVoucherWhatsappNumber,
+          whatsappLink: legacyVoucherWhatsappLink
         })
       });
       if (res.ok) {
@@ -1112,7 +1112,7 @@ export default function AdminPanel({
   const fetchVouchers = async () => {
     setLoadingVouchers(true);
     try {
-      const res = await fetch('/api/admin/wdv', {
+      const res = await fetch('/api/admin/legacyVoucher', {
         headers: getAdminHeaders()
       });
       if (res.ok) {
@@ -1129,12 +1129,12 @@ export default function AdminPanel({
           const raw = Array.isArray(data?.vouchers) ? data.vouchers : [];
           setVouchers(raw.map(normalizeVoucher).filter(Boolean));
         } else {
-          onToast('Failed to fetch WDV vouchers', 'error');
+          onToast('Failed to fetch LEGACY_VOUCHER vouchers', 'error');
         }
       }
     } catch (err) {
-      console.error('Error loading WDV vouchers:', err);
-      onToast('Network error loading WDV vouchers', 'error');
+      console.error('Error loading LEGACY_VOUCHER vouchers:', err);
+      onToast('Network error loading LEGACY_VOUCHER vouchers', 'error');
     } finally {
       setLoadingVouchers(false);
     }
@@ -1147,7 +1147,7 @@ export default function AdminPanel({
     }
     setGeneratingVoucher(true);
     try {
-      const res = await fetch('/api/admin/wdv/generate', {
+      const res = await fetch('/api/admin/legacyVoucher/generate', {
         method: 'POST',
         headers: getAdminHeaders()
       });
@@ -1173,7 +1173,7 @@ export default function AdminPanel({
 
         const newVoucher = normalizeVoucher(rawNew);
         const codeDisplay = newVoucher?.voucherCode || newVoucher?.code || data.code || 'Code';
-        onToast(`New WDV voucher generated: ${codeDisplay}`, 'success');
+        onToast(`New LEGACY_VOUCHER voucher generated: ${codeDisplay}`, 'success');
 
         if (newVoucher) {
           setVouchers(prev => {
@@ -1187,7 +1187,7 @@ export default function AdminPanel({
         onToast(data?.error || 'Failed to generate voucher', 'error');
       }
     } catch (err) {
-      console.error('Error generating WDV voucher:', err);
+      console.error('Error generating LEGACY_VOUCHER voucher:', err);
       onToast('Network error generating voucher', 'error');
     } finally {
       setGeneratingVoucher(false);
@@ -1199,7 +1199,7 @@ export default function AdminPanel({
       return;
     }
     try {
-      const res = await fetch(`/api/admin/wdv/${id}`, {
+      const res = await fetch(`/api/admin/legacyVoucher/${id}`, {
         method: 'DELETE',
         headers: getAdminHeaders()
       });
@@ -1306,7 +1306,7 @@ export default function AdminPanel({
   const totalTxsCount = transactions.length;
   const airtimeTxs = transactions.filter(t => t.type === 'redeem_airtime');
   const transferTxs = transactions.filter(t => t.type === 'bank_transfer_direct' || t.type === 'withdraw');
-  const wdvTxs = transactions.filter(t => t.type === 'buy_wdv');
+  const legacyVoucherTxs = transactions.filter(t => t.type === 'buy_legacyVoucher');
   
   const totalRevenue = transactions
     .filter(t => t.status === 'success')
@@ -1568,9 +1568,9 @@ export default function AdminPanel({
 
   const handleExportTransactionsCSV = () => {
     let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Transaction ID,Type,Amount,Date,Status,Description,WDV Used,WDV Generated,Charges\n";
+    csvContent += "Transaction ID,Type,Amount,Date,Status,Description,LEGACY_VOUCHER Used,LEGACY_VOUCHER Generated,Charges\n";
     transactions.forEach(t => {
-      csvContent += `"${t.id}","${t.type}",${t.amount},"${t.date}","${t.status}","${t.description}","${t.wdvCodeUsed || ''}","${t.wdvCodeGenerated || ''}",${t.charges || 10}\n`;
+      csvContent += `"${t.id}","${t.type}",${t.amount},"${t.date}","${t.status}","${t.description}","${t.legacyVoucherCodeUsed || ''}","${t.legacyVoucherCodeGenerated || ''}",${t.charges || 10}\n`;
     });
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -1922,14 +1922,14 @@ export default function AdminPanel({
               <span className="text-[8px] text-slate-400 font-mono">Transfers</span>
             </div>
 
-            {/* WDV Generation Purchases */}
+            {/* LEGACY_VOUCHER Generation Purchases */}
             <div className="flex flex-col items-center gap-1 w-1/4 group cursor-pointer z-10">
-              <span className="text-[8px] font-mono text-slate-300 font-bold opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 px-1 py-0.5 rounded -mt-6 absolute">{wdvTxs.length} txs</span>
+              <span className="text-[8px] font-mono text-slate-300 font-bold opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 px-1 py-0.5 rounded -mt-6 absolute">{legacyVoucherTxs.length} txs</span>
               <div
-                style={{ height: `${Math.max(15, Math.min(80, (wdvTxs.length / (totalTxsCount || 1)) * 100))}%` }}
+                style={{ height: `${Math.max(15, Math.min(80, (legacyVoucherTxs.length / (totalTxsCount || 1)) * 100))}%` }}
                 className="w-10 bg-gradient-to-t from-teal-500 to-teal-300 rounded-t-md hover:from-teal-400 hover:to-teal-200 transition-all duration-300"
               />
-              <span className="text-[8px] text-slate-400 font-mono">WDV Codes</span>
+              <span className="text-[8px] text-slate-400 font-mono">LEGACY_VOUCHER Codes</span>
             </div>
 
             {/* Airtime Redeem logs */}
@@ -2176,27 +2176,27 @@ export default function AdminPanel({
         </form>
       </GlassCard>
 
-      {/* WDV Payment & System Configurations */}
+      {/* LEGACY_VOUCHER Payment & System Configurations */}
       <GlassCard className="p-4 border-white/5 space-y-4">
         <div className="flex justify-between items-center pb-2 border-b border-white/5">
           <div>
             <h5 className="text-xs font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
               <ShoppingBag className="h-4 w-4 text-teal-400" />
-              WDV Payment details &amp; Pricing Config
+              LEGACY_VOUCHER Payment details &amp; Pricing Config
             </h5>
             <p className="text-[10px] text-slate-400 mt-0.5">Control system bank transfer details, warning notices, and voucher pricing dynamically</p>
           </div>
         </div>
 
-        <form onSubmit={handleSaveWdvConfig} className="space-y-4">
+        <form onSubmit={handleSaveLegacyVoucherConfig} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="text-[9px] font-mono text-slate-400 block mb-1">Payment Bank Name</label>
               <input
                 type="text"
                 required
-                value={wdvBankName}
-                onChange={(e) => setWdvBankName(e.target.value)}
+                value={legacyVoucherBankName}
+                onChange={(e) => setLegacyVoucherBankName(e.target.value)}
                 className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-teal-400"
               />
             </div>
@@ -2206,8 +2206,8 @@ export default function AdminPanel({
               <input
                 type="text"
                 required
-                value={wdvAccountNumber}
-                onChange={(e) => setWdvAccountNumber(e.target.value)}
+                value={legacyVoucherAccountNumber}
+                onChange={(e) => setLegacyVoucherAccountNumber(e.target.value)}
                 className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-teal-400"
               />
             </div>
@@ -2217,8 +2217,8 @@ export default function AdminPanel({
               <input
                 type="text"
                 required
-                value={wdvAccountName}
-                onChange={(e) => setWdvAccountName(e.target.value)}
+                value={legacyVoucherAccountName}
+                onChange={(e) => setLegacyVoucherAccountName(e.target.value)}
                 className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-teal-400"
               />
             </div>
@@ -2228,8 +2228,8 @@ export default function AdminPanel({
               <input
                 type="url"
                 required
-                value={wdvWhatsappLink}
-                onChange={(e) => setWdvWhatsappLink(e.target.value)}
+                value={legacyVoucherWhatsappLink}
+                onChange={(e) => setLegacyVoucherWhatsappLink(e.target.value)}
                 className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-teal-400 font-mono"
               />
             </div>
@@ -2240,8 +2240,8 @@ export default function AdminPanel({
             <input
               type="number"
               required
-              value={wdvVoucherPrice}
-              onChange={(e) => setWdvVoucherPrice(e.target.value)}
+              value={legacyVoucherVoucherPrice}
+              onChange={(e) => setLegacyVoucherVoucherPrice(e.target.value)}
               className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-teal-400 font-mono"
             />
           </div>
@@ -2251,8 +2251,8 @@ export default function AdminPanel({
             <textarea
               required
               rows={3}
-              value={wdvInstructions}
-              onChange={(e) => setWdvInstructions(e.target.value)}
+              value={legacyVoucherInstructions}
+              onChange={(e) => setLegacyVoucherInstructions(e.target.value)}
               className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-teal-400 resize-none font-sans"
             />
           </div>
@@ -2261,8 +2261,8 @@ export default function AdminPanel({
             <label className="text-[9px] font-mono text-slate-400 block mb-1">System Warning / Bank Maintenance Notice (Leave blank to hide)</label>
             <textarea
               rows={2}
-              value={wdvMaintenanceNotice}
-              onChange={(e) => setWdvMaintenanceNotice(e.target.value)}
+              value={legacyVoucherMaintenanceNotice}
+              onChange={(e) => setLegacyVoucherMaintenanceNotice(e.target.value)}
               className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-teal-400 resize-none font-sans"
             />
           </div>
@@ -2270,10 +2270,10 @@ export default function AdminPanel({
           <div className="flex justify-end pt-1">
             <button
               type="submit"
-              disabled={savingWdvConfig}
+              disabled={savingLegacyVoucherConfig}
               className="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-600 hover:to-indigo-700 disabled:opacity-50 text-slate-950 font-bold text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
             >
-              {savingWdvConfig ? 'Saving Settings...' : 'Save Configuration'}
+              {savingLegacyVoucherConfig ? 'Saving Settings...' : 'Save Configuration'}
             </button>
           </div>
         </form>
@@ -2457,7 +2457,7 @@ export default function AdminPanel({
 
                             <td className="p-3 font-mono text-[10px] text-slate-400">
                               <div>Reg: {new Date(u.registeredAt || Date.now()).toLocaleDateString()}</div>
-                              <div>Ref: {u.referralCount || 0} • WDV: {u.wdvPurchases || 0}</div>
+                              <div>Ref: {u.referralCount || 0} • LEGACY_VOUCHER: {u.legacyVoucherPurchases || 0}</div>
                             </td>
 
                             <td className="p-3 text-right">
@@ -2560,7 +2560,7 @@ export default function AdminPanel({
                   <div className="space-y-1">
                     <h4 className="text-sm font-black uppercase tracking-wider text-teal-400 flex items-center gap-2">
                       <Key className="h-5 w-5 text-teal-400" />
-                      WDV Voucher Generator
+                      LEGACY_VOUCHER Voucher Generator
                     </h4>
                     <p className="text-[10px] text-slate-400 max-w-xl">
                       Generate, manage, copy, and track secure, single-use cashout vouchers. 
@@ -2604,13 +2604,13 @@ export default function AdminPanel({
                     ) : (
                       <>
                         <RefreshCw className="h-4 w-4" />
-                        Generate New WDV Voucher
+                        Generate New LEGACY_VOUCHER Voucher
                       </>
                     )}
                   </button>
                   
                   <p className="text-[8px] text-slate-500 font-mono">
-                    Format: WDV-XXXX-XXXX-XXXX • Stored in PostgreSQL/SQLite datastore with strict constraints.
+                    Format: LEGACY_VOUCHER-XXXX-XXXX-XXXX • Stored in PostgreSQL/SQLite datastore with strict constraints.
                   </p>
                 </div>
               </GlassCard>
@@ -2804,7 +2804,7 @@ export default function AdminPanel({
                   <div>
                     <h5 className="text-xs font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
                       <CreditCard className="h-4 w-4 text-teal-400" />
-                      WDV Payments & Transfers Log
+                      LEGACY_VOUCHER Payments & Transfers Log
                     </h5>
                     <p className="text-[10px] text-slate-400 mt-0.5">Tracking of user bank transfer payments, references, and voucher issuances</p>
                   </div>
@@ -3306,19 +3306,19 @@ export default function AdminPanel({
                   }`}
                 >
                   <Zap className="h-4 w-4 text-teal-400" />
-                  <span>Payment Gateways (Paystack, Flutterwave, Korapay)</span>
+                  <span>Payment Gateway (KoraPay)</span>
                 </button>
                 <button style={{display:'none'}}
                   type="button"
-                  onClick={() => setPaymentSubTab('manual_wdv')}
+                  onClick={() => setPaymentSubTab('manual_legacyVoucher')}
                   className={`px-4 py-2 rounded-xl text-xs font-bold font-mono transition-all cursor-pointer flex items-center gap-2 ${
-                    paymentSubTab === 'manual_wdv'
+                    paymentSubTab === 'manual_legacyVoucher'
                       ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-sm'
                       : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
                   }`}
                 >
                   <Building className="h-4 w-4 text-teal-400" />
-                  <span>Manual Bank Transfer &amp; WDV Account</span>
+                  <span>Manual Bank Transfer &amp; LEGACY_VOUCHER Account</span>
                 </button>
               </div>
 
@@ -3339,10 +3339,10 @@ export default function AdminPanel({
                           </div>
                           <div>
                             <h4 className="text-base font-bold text-white tracking-wide">
-                              WDV Payment Account Management
+                              LEGACY_VOUCHER Payment Account Management
                             </h4>
                             <p className="text-[11px] text-slate-400">
-                              Configure the live bank payment details, voucher pricing, WhatsApp support number, and instructions displayed to users purchasing WDV Vouchers.
+                              Configure the live bank payment details, voucher pricing, WhatsApp support number, and instructions displayed to users purchasing LEGACY_VOUCHER Vouchers.
                             </p>
                           </div>
                         </div>
@@ -3368,7 +3368,7 @@ export default function AdminPanel({
                     <span className="text-[10px] text-slate-400">No code editing required</span>
                   </div>
 
-                  <form onSubmit={handleSaveWdvConfig} className="space-y-4">
+                  <form onSubmit={handleSaveLegacyVoucherConfig} className="space-y-4">
                     {/* Bank Name Field with Popular Nigerian Bank Selector */}
                     <div>
                       <label className="text-[10px] font-mono text-slate-300 block mb-1 font-bold">
@@ -3377,13 +3377,13 @@ export default function AdminPanel({
                       <div className="space-y-2">
                         <select
                           value={
-                            ['OPay', 'PalmPay', 'Moniepoint MFB', 'GTBank', 'UBA', 'Access Bank', 'Zenith Bank', 'First Bank', 'Kuda Bank', 'FCMB', 'Union Bank', 'Sterling Bank', 'Wema Bank', 'Stanbic IBTC Bank', 'Fidelity Bank'].includes(wdvBankName)
-                              ? wdvBankName
+                            ['OPay', 'PalmPay', 'Moniepoint MFB', 'GTBank', 'UBA', 'Access Bank', 'Zenith Bank', 'First Bank', 'Kuda Bank', 'FCMB', 'Union Bank', 'Sterling Bank', 'Wema Bank', 'Stanbic IBTC Bank', 'Fidelity Bank'].includes(legacyVoucherBankName)
+                              ? legacyVoucherBankName
                               : 'other'
                           }
                           onChange={(e) => {
                             if (e.target.value !== 'other') {
-                              setWdvBankName(e.target.value);
+                              setLegacyVoucherBankName(e.target.value);
                             }
                           }}
                           className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:ring-1 focus:ring-teal-400"
@@ -3410,8 +3410,8 @@ export default function AdminPanel({
                           type="text"
                           required
                           placeholder="Type Bank Name (e.g., OPay, PalmPay, GTBank)"
-                          value={wdvBankName}
-                          onChange={(e) => setWdvBankName(e.target.value)}
+                          value={legacyVoucherBankName}
+                          onChange={(e) => setLegacyVoucherBankName(e.target.value)}
                           className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:ring-1 focus:ring-teal-400 font-medium"
                         />
                       </div>
@@ -3427,8 +3427,8 @@ export default function AdminPanel({
                         type="text"
                         required
                         placeholder="e.g. 8960723295"
-                        value={wdvAccountNumber}
-                        onChange={(e) => setWdvAccountNumber(e.target.value)}
+                        value={legacyVoucherAccountNumber}
+                        onChange={(e) => setLegacyVoucherAccountNumber(e.target.value)}
                         className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:ring-1 focus:ring-teal-400 font-mono tracking-wider font-bold"
                       />
                     </div>
@@ -3442,8 +3442,8 @@ export default function AdminPanel({
                         type="text"
                         required
                         placeholder="e.g. PWAMUNADI ISHAKU"
-                        value={wdvAccountName}
-                        onChange={(e) => setWdvAccountName(e.target.value)}
+                        value={legacyVoucherAccountName}
+                        onChange={(e) => setLegacyVoucherAccountName(e.target.value)}
                         className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:ring-1 focus:ring-teal-400 font-medium uppercase"
                       />
                     </div>
@@ -3451,7 +3451,7 @@ export default function AdminPanel({
                     {/* Voucher Price */}
                     <div>
                       <label className="text-[10px] font-mono text-slate-300 block mb-1 font-bold">
-                        WDV Voucher Price (₦)
+                        LEGACY_VOUCHER Voucher Price (₦)
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-2.5 text-teal-400 font-bold text-xs">₦</span>
@@ -3459,12 +3459,12 @@ export default function AdminPanel({
                           type="number"
                           required
                           placeholder="6500"
-                          value={wdvVoucherPrice}
-                          onChange={(e) => setWdvVoucherPrice(e.target.value)}
+                          value={legacyVoucherVoucherPrice}
+                          onChange={(e) => setLegacyVoucherVoucherPrice(e.target.value)}
                           className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl pl-8 pr-3 py-2.5 text-white focus:outline-none focus:ring-1 focus:ring-teal-400 font-mono font-bold"
                         />
                       </div>
-                      <p className="text-[9px] text-slate-500 mt-1">Users will pay this exact locked amount for a WDV Voucher code.</p>
+                      <p className="text-[9px] text-slate-500 mt-1">Users will pay this exact locked amount for a LEGACY_VOUCHER Voucher code.</p>
                     </div>
 
                     {/* WhatsApp Number */}
@@ -3476,8 +3476,8 @@ export default function AdminPanel({
                         type="text"
                         required
                         placeholder="e.g. +2349162845073 or 09162845073"
-                        value={wdvWhatsappNumber}
-                        onChange={(e) => setWdvWhatsappNumber(e.target.value)}
+                        value={legacyVoucherWhatsappNumber}
+                        onChange={(e) => setLegacyVoucherWhatsappNumber(e.target.value)}
                         className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:ring-1 focus:ring-teal-400 font-mono"
                       />
                       <p className="text-[9px] text-slate-500 mt-1">
@@ -3494,8 +3494,8 @@ export default function AdminPanel({
                         required
                         rows={3}
                         placeholder="Enter transfer instructions..."
-                        value={wdvInstructions}
-                        onChange={(e) => setWdvInstructions(e.target.value)}
+                        value={legacyVoucherInstructions}
+                        onChange={(e) => setLegacyVoucherInstructions(e.target.value)}
                         className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:ring-1 focus:ring-teal-400 resize-none font-sans"
                       />
                     </div>
@@ -3508,8 +3508,8 @@ export default function AdminPanel({
                       <textarea
                         rows={2}
                         placeholder="e.g. Payments are verified manually within a few minutes."
-                        value={wdvMaintenanceNotice}
-                        onChange={(e) => setWdvMaintenanceNotice(e.target.value)}
+                        value={legacyVoucherMaintenanceNotice}
+                        onChange={(e) => setLegacyVoucherMaintenanceNotice(e.target.value)}
                         className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:ring-1 focus:ring-teal-400 resize-none font-sans"
                       />
                       <p className="text-[9px] text-slate-500 mt-1">Displayed in an alert box on the payment screen. Leave blank if none.</p>
@@ -3519,11 +3519,11 @@ export default function AdminPanel({
                     <div className="pt-2">
                       <button
                         type="submit"
-                        disabled={savingWdvConfig}
+                        disabled={savingLegacyVoucherConfig}
                         className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-600 hover:to-indigo-700 disabled:opacity-50 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-teal-500/10"
                       >
                         <Save className="h-4 w-4" />
-                        {savingWdvConfig ? 'Saving Settings to Database...' : 'Save Changes'}
+                        {savingLegacyVoucherConfig ? 'Saving Settings to Database...' : 'Save Changes'}
                       </button>
                     </div>
                   </form>
@@ -3543,7 +3543,7 @@ export default function AdminPanel({
                     </div>
 
                     <p className="text-[10px] text-slate-400">
-                      This is how the bank transfer card will appear on the <strong>Buy WDV Voucher</strong> page:
+                      This is how the bank transfer card will appear on the <strong>Buy LEGACY_VOUCHER Voucher</strong> page:
                     </p>
 
                     {/* Simulated User Card */}
@@ -3552,37 +3552,37 @@ export default function AdminPanel({
                       <div className="flex items-center justify-between bg-slate-950/80 p-3 rounded-xl border border-white/5">
                         <span className="text-[10px] font-mono text-slate-400 uppercase">Total Amount:</span>
                         <span className="text-sm font-black text-teal-400 font-mono">
-                          ₦{Number(wdvVoucherPrice || 6500).toLocaleString()}
+                          ₦{Number(legacyVoucherVoucherPrice || 6500).toLocaleString()}
                         </span>
                       </div>
 
                       {/* Notice Box if present */}
-                      {wdvMaintenanceNotice && (
+                      {legacyVoucherMaintenanceNotice && (
                         <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[10px] leading-snug">
-                          {wdvMaintenanceNotice}
+                          {legacyVoucherMaintenanceNotice}
                         </div>
                       )}
 
                       {/* Instructions */}
                       <div className="text-[10px] text-slate-300 bg-white/5 p-2.5 rounded-xl leading-relaxed">
-                        {wdvInstructions || "Copy the bank details below. Make a manual bank transfer of the exact amount. Return here and click 'I Have Made This Transfer' to notify operator."}
+                        {legacyVoucherInstructions || "Copy the bank details below. Make a manual bank transfer of the exact amount. Return here and click 'I Have Made This Transfer' to notify operator."}
                       </div>
 
                       {/* Account Details */}
                       <div className="space-y-2 pt-1">
                         <div className="bg-slate-950 p-2.5 rounded-xl border border-white/5 flex items-center justify-between">
                           <span className="text-[10px] font-mono text-slate-400">Bank Name:</span>
-                          <span className="text-xs font-bold text-white font-mono">{wdvBankName || 'PalmPay'}</span>
+                          <span className="text-xs font-bold text-white font-mono">{legacyVoucherBankName || 'PalmPay'}</span>
                         </div>
 
                         <div className="bg-slate-950 p-2.5 rounded-xl border border-white/5 flex items-center justify-between">
                           <span className="text-[10px] font-mono text-slate-400">Account Number:</span>
-                          <span className="text-xs font-bold text-teal-400 font-mono tracking-wider">{wdvAccountNumber || '8960723295'}</span>
+                          <span className="text-xs font-bold text-teal-400 font-mono tracking-wider">{legacyVoucherAccountNumber || '8960723295'}</span>
                         </div>
 
                         <div className="bg-slate-950 p-2.5 rounded-xl border border-white/5 flex items-center justify-between">
                           <span className="text-[10px] font-mono text-slate-400">Account Name:</span>
-                          <span className="text-xs font-bold text-white uppercase">{wdvAccountName || 'pwamunadi ishaku'}</span>
+                          <span className="text-xs font-bold text-white uppercase">{legacyVoucherAccountName || 'pwamunadi ishaku'}</span>
                         </div>
                       </div>
 
@@ -3593,7 +3593,7 @@ export default function AdminPanel({
                           I Have Made This Transfer
                         </div>
                         <p className="text-[9px] text-center text-slate-500 mt-1.5 font-mono">
-                          Redirects user to WhatsApp: {wdvWhatsappNumber || '+2349162845073'}
+                          Redirects user to WhatsApp: {legacyVoucherWhatsappNumber || '+2349162845073'}
                         </p>
                       </div>
                     </div>
@@ -3871,13 +3871,13 @@ export default function AdminPanel({
               <div className="flex items-center gap-2 bg-slate-900/60 p-2.5 rounded-xl border border-white/5">
                 <input
                   type="checkbox"
-                  id="toggle_wdv"
-                  checked={wdvEnabled}
-                  onChange={(e) => setWdvEnabled(e.target.checked)}
+                  id="toggle_legacyVoucher"
+                  checked={legacyVoucherEnabled}
+                  onChange={(e) => setLegacyVoucherEnabled(e.target.checked)}
                   className="rounded border-white/10 text-teal-500 focus:ring-0"
                 />
-                <label htmlFor="toggle_wdv" className="text-[9px] font-mono text-slate-300 cursor-pointer">
-                  WDV Voucher Purchases
+                <label htmlFor="toggle_legacyVoucher" className="text-[9px] font-mono text-slate-300 cursor-pointer">
+                  LEGACY_VOUCHER Voucher Purchases
                 </label>
               </div>
 
@@ -4324,8 +4324,8 @@ export default function AdminPanel({
                         </label>
                         <input
                           type="text"
-                          value={wdvWhatsappNumber}
-                          onChange={(e) => setWdvWhatsappNumber(e.target.value)}
+                          value={legacyVoucherWhatsappNumber}
+                          onChange={(e) => setLegacyVoucherWhatsappNumber(e.target.value)}
                           placeholder="+2349162845073"
                           className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-teal-400 font-mono"
                         />
@@ -4336,8 +4336,8 @@ export default function AdminPanel({
                         </label>
                         <input
                           type="url"
-                          value={wdvWhatsappLink}
-                          onChange={(e) => setWdvWhatsappLink(e.target.value)}
+                          value={legacyVoucherWhatsappLink}
+                          onChange={(e) => setLegacyVoucherWhatsappLink(e.target.value)}
                           placeholder="https://wa.me/2349162845073"
                           className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-teal-400 font-mono"
                         />
@@ -4752,8 +4752,8 @@ export default function AdminPanel({
                     <span className="text-amber-400 font-bold">{selectedUserForView.referralCount || 0} Users</span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-white/5">
-                    <span className="text-slate-400">WDV Purchases Count:</span>
-                    <span className="text-indigo-400 font-bold">{selectedUserForView.wdvPurchases || 0} Transactions</span>
+                    <span className="text-slate-400">LEGACY_VOUCHER Purchases Count:</span>
+                    <span className="text-indigo-400 font-bold">{selectedUserForView.legacyVoucherPurchases || 0} Transactions</span>
                   </div>
                   <div className="flex justify-between py-1">
                     <span className="text-slate-400">Withdrawal Status:</span>

@@ -1,8 +1,5 @@
 {
   "name": "Nevo",
-  "description": "Mobile-first Nigerian rewards and digital wallet platform for completing tasks, watching rewarded adverts, earning referral rewards, funding wallets through Paystack or KoraPay, and withdrawing eligible earnings.",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
+  "description": "Mobile-first Nigerian rewards and wallet platform for completing tasks, watching rewarded adverts, referrals, verified KoraPay wallet deposits, and eligible withdrawals.",
+  "requestFramePermissions": []
 }

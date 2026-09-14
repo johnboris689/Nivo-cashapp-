@@ -21,7 +21,6 @@ export const SUPPORTED_BANKS = [
   "Fidelity Bank Plc",
   "First Bank of Nigeria Limited",
   "First City Monument Bank Limited (FCMB)",
-  "Flutterwave Barter",
   "FSDH Holding Company Limited",
   "FSDH Merchant Bank Limited",
   "Globus Bank Limited",
@@ -126,113 +125,25 @@ export const SYSTEM_BANK_ACCOUNT: BankAccount = {
   bankName: 'PalmPay'
 };
 
-export const INITIAL_TRANSACTIONS: Transaction[] = [
-  {
-    id: 'tx-1',
-    type: 'deposit',
-    amount: 150000,
-    date: '2026-07-08T14:30:00Z',
-    status: 'success',
-    description: 'Wallet funding via Bank Transfer'
-  },
-  {
-    id: 'tx-2',
-    type: 'deposit',
-    amount: 10000,
-    date: '2026-07-08T18:45:00Z',
-    status: 'success',
-    description: 'Wallet Deposit'
-  },
-  {
-    id: 'tx-3',
-    type: 'redeem_airtime',
-    amount: 2500,
-    date: '2026-07-08T19:02:00Z',
-    status: 'success',
-    description: 'Airtime Recharge (MTN 08034567890)'
-  },
-  {
-    id: 'tx-4',
-    type: 'bank_transfer_direct',
-    amount: 45000,
-    date: '2026-07-09T01:15:00Z',
-    status: 'success',
-    description: 'Transfer to OPay - Adebayo Samuel'
-  }
-];
+export const INITIAL_TRANSACTIONS: Transaction[] = [];
 
-export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: 'notif-wdr-101',
-    title: 'Withdrawal Pending Approval',
-    body: 'Your withdrawal request has been received successfully and is currently under manual review by our compliance team. You will receive another notification once it has been approved or rejected.',
-    date: '2026-08-05T15:29:00Z',
-    unread: true,
-    type: 'withdraw',
-    category: 'Withdrawal',
-    status: 'Pending Review',
-    amount: 195000,
-    recipientName: 'IDRIS BELLO ANYANWU',
-    bankName: 'First Bank of Nigeria Limited',
-    accountNumber: '3091823712',
-    reference: 'WDR-202608051950'
-  },
-  {
-    id: 'notif-wdv-102',
-    title: 'Deposit Confirmed',
-    body: 'Your wallet deposit has been confirmed successfully and is ready for use.',
-    date: '2026-08-05T12:15:00Z',
-    unread: true,
-    type: 'voucher',
-    category: 'Wallet Deposit',
-    status: 'Payment Verified',
-    amount: 6500,
-    reference: 'DEP_928174012'
-  },
-  {
-    id: 'notif-bal-103',
-    title: 'Daily Rewards Update',
-    body: 'Your Nevo rewards activity is up to date. Complete tasks and watch rewarded adverts to earn more.',
-    date: '2026-08-04T08:00:00Z',
-    unread: false,
-    type: 'balance',
-    category: 'Daily Refreshed Balance',
-    status: 'Completed',
-    amount: 750,
-    reference: 'REF-WELCOME-20260804'
-  },
-  {
-    id: 'notif-welcome-104',
-    title: 'Welcome to Nevo!',
-    body: 'Welcome to Nevo. Enjoy a faster, more secure, violet-to-teal digital banking experience!',
-    date: '2026-07-09T00:00:00Z',
-    unread: false,
-    type: 'login',
-    category: 'Account Security',
-    status: 'Completed',
-    reference: 'SYS-WELCOME-001'
-  }
-];
+export const INITIAL_NOTIFICATIONS: NotificationItem[] = [];
 
 export const FAQS = [
   {
-    question: 'What is a WDV (Withdrawal Voucher)?',
-    answer: 'The Withdrawal Voucher (WDV) is a first-class voucher code purchased on Nevo. You pay for it via a secure manual bank transfer. Once generated, it acts as instant store credit or a redeemable token. You can copy this code and redeem it during airtime, data, or bank transfer operations instead of paying from your direct wallet balance.'
+    question: 'How do I fund my Nevo wallet?',
+    answer: 'Tap Deposit, choose an amount of at least ₦520, and continue to the fresh KoraPay hosted checkout. Nevo credits your wallet only after KoraPay confirms the payment server-side.'
   },
   {
-    question: 'How do I fund my Naira Wallet?',
-    answer: 'You can fund your Nevo wallet by clicking "Withdraw" or utilizing any active voucher code, or completing a direct peer bank transfer. Direct balance updates occur instantly after verifying the transaction.'
+    question: 'When can I withdraw or spend my wallet balance?',
+    answer: 'Complete at least 5 successful referrals and make a verified KoraPay wallet deposit of at least ₦520. Both requirements are required before wallet-spending and cash-out services are unlocked.'
   },
   {
-    question: 'How long does WDV confirmation take?',
-    answer: 'WDV validation usually takes under 3 minutes. Once you copy the bank transfer details, execute the transfer from your personal banking app, and click "I have made this bank Transfer", our system auto-reconciles the payment and activates your WDV Code immediately.'
+    question: 'How do I earn on Nevo?',
+    answer: 'Complete available tasks, watch eligible rewarded adverts, and refer friends. Rewards are recorded in your Nevo account history.'
   },
   {
-    question: 'Are there any transaction fees?',
-    answer: 'No! Nevo offers zero charge transfers on WDV generations, and heavily discounted airtime and data bundles compared to direct retail rates.'
-  },
-  {
-    question: 'What happens if a bank is temporarily unavailable?',
-    answer: 'If any major partner bank is undergoing service downtime, we display a status alert notification in the WDV screen. We highly recommend transferring to alternative active bank options to ensure instant confirmation.'
+    question: 'What is the minimum withdrawal?',
+    answer: 'The minimum withdrawal amount is ₦5,000 once your transaction eligibility requirements have been completed.'
   }
 ];

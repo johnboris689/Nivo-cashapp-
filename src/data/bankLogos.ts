@@ -128,12 +128,6 @@ export const BANK_LOGO_MAP: Record<string, { logoUrl: string; code: string; init
     initials: "FC",
     gradient: "from-slate-800 to-slate-900"
   },
-  "Flutterwave Barter": {
-    logoUrl: "/bank-logos/flutterwave_barter.svg",
-    code: "090270",
-    initials: "FB",
-    gradient: "from-slate-800 to-slate-900"
-  },
   "FSDH Holding Company Limited": {
     logoUrl: "/bank-logos/fsdh_holding_company_limited.svg",
     code: "060003",
@@ -418,7 +412,6 @@ export const BANK_CODE_TO_NAME: Record<string, string> = {
   "060002": "FBN Merchant Bank Limited",
   "214": "FCMB Group Plc",
   "070": "Fidelity Bank Plc",
-  "090270": "Flutterwave Barter",
   "060003": "FSDH Holding Company Limited",
   "000027": "Globus Bank Limited",
   "103": "Globus Bank Limited",

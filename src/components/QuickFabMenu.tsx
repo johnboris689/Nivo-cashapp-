@@ -14,7 +14,7 @@ export default function QuickFabMenu({ isOpen, onClose, onSelectAction }: QuickF
     {
       id: 'deposit',
       title: 'Deposit Funds',
-      desc: 'Add money to your wallet using a Paystack transfer account',
+      desc: 'Add money to your wallet through KoraPay',
       icon: Wallet,
       color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
       textColor: 'text-white'

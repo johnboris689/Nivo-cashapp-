@@ -61,7 +61,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
   useEffect(() => {
     fetchData();
 
-    // Check for payment callback from Paystack, Flutterwave, or Korapay
+    // Check for payment callback from KoraPay
     const searchParams = new URLSearchParams(window.location.search);
     const ref = searchParams.get('reference') || searchParams.get('trxref') || searchParams.get('tx_ref');
 

@@ -17,18 +17,21 @@ function hasPostgresConfig(): boolean {
 
 let pgPool: pg.Pool | null = null;
 
+async function configureNevoPostgresPool(pool: pg.Pool, createSchema = false) {
+  if (createSchema) {
+    await pool.query('CREATE SCHEMA IF NOT EXISTS nevo');
+  }
+  pool.on('connect', (client) => {
+    client.query('SET search_path TO nevo, public').catch((err) => {
+      console.error('[Nevo DB] Failed to set PostgreSQL search path:', err.message);
+    });
+  });
+  await pool.query('SET search_path TO nevo, public');
+}
+
 const JSON_FILE = path.join(process.cwd(), 'nevo_db.json');
 
-// Default WDV config values
-const DEFAULT_WDV_CONFIG = {
-  bankName: "PalmPay",
-  accountNumber: "8960723295",
-  accountName: "pwamunadi ishaku",
-  whatsappLink: "https://wa.me/2349162845073",
-  voucherPrice: 6500,
-  instructions: "Copy the system account details below. Make a manual bank transfer of the exact locked amount. Return here and click 'I have made this bank Transfer' to trigger operator check.",
-  maintenanceNotice: "Wema Bank transfers are temporarily delayed. Please use other supported banks (like PalmPay or GTBank) for instant manual validation."
-};
+const DEFAULT_WDV_CONFIG = {};
 
 interface JsonData {
   users: any[];
@@ -83,60 +86,29 @@ function safeStringifyJsonField(val: any): string {
 function getJsonDb(): JsonData {
   if (!fs.existsSync(JSON_FILE)) {
     const defaultSettings: Record<string, string> = {
-      supportEmail: "support@nevo.com",
-      supportPhone: "+2349162845073",
-      whatsappNumber: "+2349162845073",
+      websiteName: "Nevo",
+      supportEmail: process.env.SUPPORT_EMAIL || "support@nevo.com",
+      supportPhone: process.env.SUPPORT_PHONE || "+2349162845073",
+      whatsappNumber: process.env.WHATSAPP_NUMBER || "+2349162845073",
       senderName: "Nevo",
-      videoUrl: "",
+      currency: "₦",
+      registrationBonus: "750",
+      minWithdrawal: "5000",
+      maxWithdrawal: "500000",
+      referralRequired: "5",
+      depositMinimum: "520",
       recoveryEnabled: "true",
       smsRecoveryEnabled: "true",
-      wdvBankName: "PalmPay",
-      wdvAccountNumber: "8960723295",
-      wdvAccountName: "pwamunadi ishaku",
-      wdvVoucherPrice: "6500",
-      wdvInstructions: "Copy the system account details below. Make a manual bank transfer of the exact locked amount. Return here and click 'I have made this bank Transfer' to trigger operator check.",
-      wdvMaintenanceNotice: "Wema Bank transfers are temporarily delayed. Please use other supported banks (like PalmPay or GTBank) for instant manual validation."
+      aiSupportEnabled: "true",
+      videoUrl: ""
     };
-    const defaultUserPasswordHash = crypto.createHash('sha256').update('password123').digest('hex');
-    const secureAdminPasswordHash = crypto.createHash('sha256').update('Boris$689').digest('hex');
-    
     const initial: JsonData = {
-      users: [
-        {
-          fullname: 'Adebayo Samuel',
-          username: 'adebayo_samuel',
-          email: 'user@example.com',
-          phone: '08034567890',
-          passwordhash: defaultUserPasswordHash,
-          balance: 750,
-          dailytarget: 50000,
-          dailyspent: 18400,
-          pincreated: 1,
-          pincode: '1234',
-          biometricenabled: 1,
-          profilepic: '',
-          tier: 3,
-          issuspended: 0,
-          isfrozen: 0,
-          registrationdate: new Date().toISOString(),
-          accountstatus: 'active',
-          beneficiaries: '[]',
-          phonebeneficiaries: '[]',
-          loginhistory: '[]',
-          notifications: '[]',
-          transactions: '[]'
-        }
-      ],
+      users: [],
       vouchers: [],
       password_resets: [],
       admin_settings: defaultSettings,
       logs: [],
-      admins: [
-        {
-          email: 'talkdavidjohn@gmail.com',
-          passwordhash: secureAdminPasswordHash
-        }
-      ],
+      admins: [],
       withdraw_requests: [],
       wdv_payments: [],
       payment_transactions: [],
@@ -295,7 +267,7 @@ function getJsonDb(): JsonData {
         username: pt.userName || pt.username || '',
         amount: Number(pt.amount || 0),
         currency: pt.currency || 'NGN',
-        provider: pt.provider || 'paystack',
+        provider: pt.provider || 'korapay',
         providerReference: pt.providerReference || pt.providerreference || '',
         providerreference: pt.providerReference || pt.providerreference || '',
         purpose: pt.purpose || 'wallet_funding',
@@ -418,6 +390,11 @@ export async function initDb() {
   } else {
     console.log(`[Nevo DB] No DATABASE_URL or SQL_HOST found. Initializing pure JS JSON database fallback at ${JSON_FILE}...`);
     getJsonDb(); // ensure initialized
+  }
+
+  if (pgPool) {
+    await configureNevoPostgresPool(pgPool, true);
+    console.log('[Nevo DB] Using dedicated PostgreSQL schema: nevo');
   }
 
   // Create tables if they do not exist (PostgreSQL or local stub run)
@@ -809,54 +786,38 @@ export async function initDb() {
   try { await execute(`CREATE UNIQUE INDEX IF NOT EXISTS idx_password_resets_id_uniq ON password_resets(id)`); } catch (e) {}
   try { await execute(`CREATE UNIQUE INDEX IF NOT EXISTS idx_wdv_payments_ref_uniq ON wdv_payments(reference)`); } catch (e) {}
 
-  // Seed default admin if not exists
-  const secureAdminPasswordHash = crypto.createHash('sha256').update('Boris$689').digest('hex');
-  const existingAdmin = await getRow(`SELECT * FROM admins WHERE email = $1`, ['talkdavidjohn@gmail.com']);
-  if (!existingAdmin) {
-    await execute(
-      `INSERT INTO admins (email, passwordHash) VALUES ($1, $2)`,
-      ['talkdavidjohn@gmail.com', secureAdminPasswordHash]
-    );
-    console.log('[Nevo DB] Default secure admin seeded.');
-  }
-
-  // Seed initial user if database is empty
-  const defaultUserPasswordHash = crypto.createHash('sha256').update('password123').digest('hex');
-  const userCount = await getRow(`SELECT COUNT(*) as count FROM users`);
-  if (!userCount || Number(userCount.count || 0) === 0) {
-    await execute(
-      `INSERT INTO users (
-        fullName, username, email, phone, passwordHash, balance, dailyTarget, dailySpent,
-        pinCreated, pinCode, biometricEnabled, profilePic, tier, isSuspended, isFrozen,
-        registrationDate, accountStatus, beneficiaries, phoneBeneficiaries, loginHistory,
-        notifications, transactions
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)`,
-      [
-        'Adebayo Samuel', 'adebayo_samuel', 'user@example.com', '08034567890', defaultUserPasswordHash,
-        750, 50000, 0, 1, '1234', 1, '', 3, 0, 0,
-        new Date().toISOString(), 'active', '[]', '[]', '[]', '[]', '[]'
-      ]
-    );
-    console.log('[Nevo DB] Default user seeded.');
+  // Create the first admin only when explicit server credentials are supplied.
+  // No demo/default credentials are ever created.
+  const configuredAdminEmail = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+  const configuredAdminPassword = String(process.env.ADMIN_PASSWORD || '').trim();
+  if (configuredAdminEmail && configuredAdminPassword) {
+    const existingAdmin = await getRow(`SELECT * FROM admins WHERE email = $1`, [configuredAdminEmail]);
+    if (!existingAdmin) {
+      const hash = crypto.createHash('sha256').update(configuredAdminPassword).digest('hex');
+      await execute(`INSERT INTO admins (email, passwordHash) VALUES ($1, $2)`, [configuredAdminEmail, hash]);
+      console.log('[Nevo DB] Initial admin account created from ADMIN_EMAIL/ADMIN_PASSWORD.');
+    }
   }
 
   // Seed default admin settings if not present
   const settingsCount = await getRow(`SELECT COUNT(*) as count FROM admin_settings`);
   if (!settingsCount || Number(settingsCount.count || 0) === 0) {
     const defaultSettings: Record<string, string> = {
-      supportEmail: "support@nevo.com",
-      supportPhone: "+2349162845073",
-      whatsappNumber: "+2349162845073",
+      websiteName: "Nevo",
+      supportEmail: process.env.SUPPORT_EMAIL || "support@nevo.com",
+      supportPhone: process.env.SUPPORT_PHONE || "+2349162845073",
+      whatsappNumber: process.env.WHATSAPP_NUMBER || "+2349162845073",
       senderName: "Nevo",
-      videoUrl: "",
+      currency: "₦",
+      registrationBonus: "750",
+      minWithdrawal: "5000",
+      maxWithdrawal: "500000",
+      referralRequired: "5",
+      depositMinimum: "520",
+      aiSupportEnabled: "true",
       recoveryEnabled: "true",
       smsRecoveryEnabled: "true",
-      wdvBankName: "PalmPay",
-      wdvAccountNumber: "8960723295",
-      wdvAccountName: "pwamunadi ishaku",
-      wdvVoucherPrice: "6500",
-      wdvInstructions: "Copy the system account details below. Make a manual bank transfer of the exact locked amount. Return here and click 'I have made this bank Transfer' to trigger operator check.",
-      wdvMaintenanceNotice: "Wema Bank transfers are temporarily delayed. Please use other supported banks (like PalmPay or GTBank) for instant manual validation."
+      videoUrl: ""
     };
 
     for (const [key, value] of Object.entries(defaultSettings)) {
@@ -901,6 +862,7 @@ export async function initDb() {
         console.error('[Nevo DB Pool Error]', err.message);
       });
     }
+    await configureNevoPostgresPool(pgPool, false);
   }
 }
 
@@ -1107,7 +1069,7 @@ export function execute(sql: string, params: any[] = []): Promise<any> {
             userName: params[3] || '',
             amount: Number(params[4] || 0),
             currency: params[5] || 'NGN',
-            provider: params[6] || 'paystack',
+            provider: params[6] || 'korapay',
             providerreference: params[7] || '',
             providerReference: params[7] || '',
             purpose: params[8] || 'wallet_funding',

@@ -46,7 +46,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
 
   const [bankOptions, setBankOptions] = useState<{ name: string; code: string }[]>([]);
 
-  const minWithdrawal = settings?.minWithdrawal || 2000;
+  const minWithdrawal = settings?.minWithdrawal || 5000;
   const activationFee = settings?.activationFeeAmount || 520;
   const withdrawalFee = 0; // ₦0 fee
 

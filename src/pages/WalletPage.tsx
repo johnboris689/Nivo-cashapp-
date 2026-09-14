@@ -96,19 +96,19 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
           </div>
         </div>
 
-        {/* Automated Paystack Deposit Card */}
+        {/* Automated KoraPay Deposit Card */}
         <div className="nivo-glass-surface border border-zinc-800 rounded-3xl p-6 space-y-3 flex flex-col justify-between">
           <div>
             <span className="text-xs font-bold text-[#C13A5A] uppercase tracking-wider flex items-center gap-1.5">
               <Building2 className="w-4 h-4 text-[#8F1D3A]" />
-              Paystack One-Time Transfer
+              KoraPay Checkout
             </span>
             <div className="mt-3 space-y-1">
               <p className="text-xs text-zinc-400">Automated Wallet Funding</p>
-              <p className="text-sm font-bold text-white">Temporary Paystack Pay with Transfer</p>
+              <p className="text-sm font-bold text-white">Fresh KoraPay hosted checkout</p>
             </div>
             <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
-              Generate a temporary one-time account in seconds. Bank transfers are detected and credited automatically via webhook.
+              Create a fresh hosted checkout for each deposit. Wallet credit is applied only after KoraPay webhook and server-side verification.
             </p>
           </div>
 
@@ -116,7 +116,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
             onClick={onOpenDeposit}
             className="w-full text-center py-3 bg-[#8F1D3A] hover:bg-[#7A1831] text-black rounded-xl text-xs font-black cursor-pointer transition-all shadow-lg"
           >
-            Fund Wallet via One-Time Paystack Account
+            Fund Wallet via KoraPay
           </button>
         </div>
       </div>

@@ -12,6 +12,22 @@ export const ProfilePage: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [updatingAvatar, setUpdatingAvatar] = useState(false);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  const handleProfilePhoto = async (file?: File) => {
+    if (!file) return;
+    try {
+      setUploadingPhoto(true);
+      setMsg(null);
+      await api.uploadProfilePicture(file);
+      setMsg({ type: 'success', text: 'Profile picture updated successfully.' });
+      await refreshUser();
+    } catch (err: any) {
+      setMsg({ type: 'error', text: err.message || 'Failed to update profile picture.' });
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   const copyCode = () => {
     if (user?.referralCode) {
@@ -94,9 +110,10 @@ export const ProfilePage: React.FC = () => {
                   )}
                 </div>
               </div>
-              <div className="absolute -bottom-1 -right-1 nivo-glass-surface p-1 rounded-full border border-white/10 text-[#C13A5A]">
+              <label className="absolute -bottom-1 -right-1 nivo-glass-surface p-1 rounded-full border border-white/10 text-[#C13A5A] cursor-pointer" title="Upload profile picture">
                 <Camera className="w-3.5 h-3.5" />
-              </div>
+                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" disabled={uploadingPhoto} onChange={e => handleProfilePhoto(e.target.files?.[0])} />
+              </label>
             </div>
 
             <div>
@@ -125,7 +142,7 @@ export const ProfilePage: React.FC = () => {
                 Select Default Profile Avatar
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
-                Choose a high-definition 3D character avatar generated for your Nivo Cash profile
+                Choose a default avatar or upload your own profile picture. Your selected image is stored with your Nevo account.
               </p>
             </div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-[#C13A5A] bg-[#A52A4A]/10 px-3 py-1 rounded-full border border-[#A52A4A]/20 self-start sm:self-auto">

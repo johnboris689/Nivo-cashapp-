@@ -157,7 +157,7 @@ export function StandaloneTermsPage({ navigateTo }: StandalonePageProps) {
                 <span className="text-teal-400 font-mono text-sm">06</span> Voucher Purchases
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                {brandName} facilitates the purchase and redemption of unique Withdrawal Voucher (WDV) codes. Each premium WDV voucher possesses a fixed value. Verification of voucher codes is performed server-side with strict duplicate prevention. WDV vouchers are strictly non-refundable once generated.
+                {brandName} facilitates the purchase and redemption of unique Withdrawal Voucher (LEGACY_VOUCHER) codes. Each premium LEGACY_VOUCHER voucher possesses a fixed value. Verification of voucher codes is performed server-side with strict duplicate prevention. LEGACY_VOUCHER vouchers are strictly non-refundable once generated.
               </p>
             </div>
 

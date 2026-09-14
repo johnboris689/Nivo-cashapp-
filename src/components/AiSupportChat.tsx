@@ -143,7 +143,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
     } catch (err: any) {
       console.error('[AI Chat] Request failed:', err);
       // Fallback client-side response if server request encounters network glitch
-      let fallbackText = `I apologize for the momentary network hiccup! Here is quick guidance:\n\n• **Deposits**: Tap Deposit, choose at least ₦520, continue, and transfer the exact amount to the temporary Paystack-generated account shown on screen.\n• **Confirmation**: Tap “I have Sent the Money — Check Status”. Your wallet is credited only after Paystack confirms the transfer.\n• **Withdrawals**: Complete 5 successful referrals and make a verified deposit of at least ₦520.\n• **Human Support**: Tap below to speak directly with an official agent on WhatsApp.`;
+      let fallbackText = `I apologize for the momentary network hiccup! Here is quick guidance:\n\n• **Deposits**: Tap Deposit, choose at least ₦520, continue, and complete the exact amount through the fresh KoraPay hosted checkout shown after you continue.\n• **Confirmation**: Your wallet is credited only after KoraPay confirms the payment server-side.\n• **Withdrawals**: Complete 5 successful referrals and make a verified deposit of at least ₦520.\n• **Human Support**: Tap below to speak directly with an official agent on WhatsApp.`;
       
       const errorMsg: ChatMessage = {
         id: `msg-err-${Date.now()}`,

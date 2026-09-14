@@ -32,7 +32,7 @@ export default function TransactionList({
           icon: Landmark,
           bg: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
         };
-      case 'buy_wdv':
+      case 'buy_legacyVoucher':
         return {
           icon: Ticket,
           bg: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20'
@@ -60,7 +60,7 @@ export default function TransactionList({
       // Type filtering
       if (filter === 'in' && tx.type !== 'deposit') return false;
       if (filter === 'out' && tx.type === 'deposit') return false;
-      if (filter === 'wdv' && tx.type !== 'buy_wdv') return false;
+      if (filter === 'legacyVoucher' && tx.type !== 'buy_legacyVoucher') return false;
       return true;
     })
     .filter((tx) => {
@@ -70,8 +70,8 @@ export default function TransactionList({
       return (
         tx.description.toLowerCase().includes(term) ||
         tx.amount.toString().includes(term) ||
-        (tx.wdvCodeUsed && tx.wdvCodeUsed.toLowerCase().includes(term)) ||
-        (tx.wdvCodeGenerated && tx.wdvCodeGenerated.toLowerCase().includes(term))
+        (tx.legacyVoucherCodeUsed && tx.legacyVoucherCodeUsed.toLowerCase().includes(term)) ||
+        (tx.legacyVoucherCodeGenerated && tx.legacyVoucherCodeGenerated.toLowerCase().includes(term))
       );
     });
 
@@ -105,7 +105,7 @@ export default function TransactionList({
               { id: 'all', label: 'All' },
               { id: 'in', label: 'Incoming' },
               { id: 'out', label: 'Payments' },
-              { id: 'wdv', label: 'WDV Codes' }
+              { id: 'legacyVoucher', label: 'LEGACY_VOUCHER Codes' }
             ].map((btn) => (
               <button
                 id={`btn-tx-filter-${btn.id}`}
@@ -169,7 +169,7 @@ export default function TransactionList({
                     {formatCurrency(tx.amount)}
                   </span>
                   
-                  {tx.wdvCodeGenerated && (
+                  {tx.legacyVoucherCodeGenerated && (
                     <span className="text-[8px] font-bold font-mono text-teal-400 bg-teal-500/10 border border-teal-500/20 px-1 py-0.2 rounded block mt-0.5 uppercase">
                       Code Issued
                     </span>

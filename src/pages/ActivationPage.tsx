@@ -139,7 +139,7 @@ export const ActivationPage: React.FC = () => {
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#A52A4A]" />
-                <span><strong>Instant & Automatic:</strong> As soon as Paystack confirms your one-time transfer, your account activates automatically.</span>
+                <span><strong>Instant & Automatic:</strong> After KoraPay confirms your verified wallet deposit, the requirement is recorded automatically.</span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#A52A4A]" />
@@ -153,7 +153,7 @@ export const ActivationPage: React.FC = () => {
             className="w-full bg-[#8F1D3A] hover:bg-[#7A1831] text-black font-black text-sm py-4 rounded-2xl shadow-xl shadow-[#8F1D3A]/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <PlusCircle className="w-5 h-5" />
-            <span>Deposit ₦520 via Paystack One-Time Transfer Account</span>
+            <span>Deposit ₦520+ via KoraPay</span>
           </button>
         </div>
       )}
@@ -168,7 +168,7 @@ export const ActivationPage: React.FC = () => {
           <div className="space-y-1 max-w-lg mx-auto">
             <h2 className="text-2xl font-black text-white">Your Account is Activated!</h2>
             <p className="text-xs text-zinc-300 leading-relaxed">
-              Your 5 referrals and Paystack one-time transfer account wallet deposit have been verified. You have full access to instant bank withdrawals.
+              Your 5 referrals and verified KoraPay wallet deposit have been verified. You have full access to instant bank withdrawals.
             </p>
           </div>
 

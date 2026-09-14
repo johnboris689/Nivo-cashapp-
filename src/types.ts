@@ -33,8 +33,8 @@ export interface User {
   emailVerified: boolean;
   isAdmin?: boolean;
   welcomeRewardShown?: boolean;
-  wdvVerified?: boolean;
-  isWdvVerified?: boolean;
+  legacyVoucherVerified?: boolean;
+  isLegacyVoucherVerified?: boolean;
   notifications?: NotificationItem[];
   referralCode: string;
   referralLink: string;
@@ -49,9 +49,9 @@ export interface User {
   lastLogin: string;
 }
 
-export type WdvStatus = 'unused' | 'redeemed';
+export type LegacyVoucherStatus = 'unused' | 'redeemed';
 
-export interface WdvCode {
+export interface LegacyVoucherCode {
   id: string;
   code: string;
   voucherCode?: string;
@@ -60,7 +60,7 @@ export interface WdvCode {
   email?: string;
   createdAt?: string;
   generatedAt?: string;
-  status: WdvStatus;
+  status: LegacyVoucherStatus;
   redeemedFor?: string;
 }
 
@@ -68,7 +68,7 @@ export type TransactionType =
   | 'deposit'
   | 'withdraw'
   | 'withdrawal'
-  | 'buy_wdv'
+  | 'buy_legacyVoucher'
   | 'redeem_airtime'
   | 'redeem_data'
   | 'redeem_transfer'
@@ -130,8 +130,8 @@ export interface Transaction {
   description: string;
   reference?: string;
   refNum?: string;
-  wdvCodeUsed?: string;
-  wdvCodeGenerated?: string;
+  legacyVoucherCodeUsed?: string;
+  legacyVoucherCodeGenerated?: string;
   narration?: string;
   senderName?: string;
   recipientName?: string;
@@ -175,7 +175,7 @@ export interface DepositRequest {
   accountName: string;
   bankName: string;
   accountExpiresAt?: string;
-  provider: 'paystack' | 'flutterwave' | 'korapay' | string;
+  provider: 'korapay' | string;
   webhookStatus: 'verified' | 'pending' | 'failed';
   status: TransactionStatus;
   createdAt: string;
@@ -298,10 +298,10 @@ export interface SiteSettings {
   supportEmail: string;
   telegramChannel?: string;
   telegramGroupUrl: string;
-  paymentProvider?: 'auto' | 'paystack' | 'flutterwave' | 'korapay';
+  paymentProvider?: 'korapay';
 }
 
-export type PaymentProviderType = 'paystack' | 'flutterwave' | 'korapay';
+export type PaymentProviderType = 'korapay';
 
 export interface PaymentProviderStatus {
   id: PaymentProviderType;

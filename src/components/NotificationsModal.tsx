@@ -69,7 +69,7 @@ export default function NotificationsModal({
     let category = notif.category;
     if (!category) {
       if (/withdraw/i.test(combined)) category = 'Withdrawal';
-      else if (/voucher|wdv/i.test(combined)) category = 'WDV Voucher';
+      else if (/voucher|legacyVoucher/i.test(combined)) category = 'LEGACY_VOUCHER Voucher';
       else if (/daily|allocation|refreshed/i.test(combined)) category = 'Daily Refreshed Balance';
       else if (/transfer|cashout/i.test(combined)) category = 'Bank Transfer';
       else if (/airtime/i.test(combined)) category = 'Airtime Topup';
@@ -98,7 +98,7 @@ export default function NotificationsModal({
     // Voucher Code
     let voucherCode = notif.voucherCode;
     if (!voucherCode) {
-      const vMatch = combined.match(/(WDV-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}|WDV-[A-Z0-9-]+)/i);
+      const vMatch = combined.match(/(LEGACY_VOUCHER-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}|LEGACY_VOUCHER-[A-Z0-9-]+)/i);
       if (vMatch) voucherCode = vMatch[1];
     }
 
@@ -151,7 +151,7 @@ export default function NotificationsModal({
           badgeBg: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
           glow: 'bg-amber-500/10 border-amber-500/20'
         };
-      case 'wdv voucher':
+      case 'legacyVoucher voucher':
         return {
           icon: <Ticket className="h-6 w-6 text-emerald-400" />,
           badgeBg: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',

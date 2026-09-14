@@ -139,8 +139,8 @@ export const AdminDashboardPage: React.FC = () => {
           <div className="w-12 h-12 rounded-2xl bg-[#8F1D3A]/10 text-[#A52A4A] flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
             <Building2 className="w-6 h-6" />
           </div>
-          <h3 className="text-lg font-black text-white">Automated Paystack Deposits</h3>
-          <p className="text-xs text-zinc-400">Monitor automated Paystack One-Time Transfer Account deposits & webhook verifications.</p>
+          <h3 className="text-lg font-black text-white">Automated KoraPay Deposits</h3>
+          <p className="text-xs text-zinc-400">Monitor automated KoraPay hosted checkout deposits & webhook verifications.</p>
         </Link>
 
         <Link

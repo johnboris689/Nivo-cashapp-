@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Check, Sparkles, ArrowRight, ArrowUpRight, Smartphone, Wifi, Zap, ShieldCheck, Fingerprint, CheckCircle2 } from 'lucide-react';
+import { Check, Sparkles, ArrowRight, ArrowUpRight, Smartphone, Wifi, Zap, ShieldCheck, Gift, Fingerprint, CheckCircle2 } from 'lucide-react';
 import { registerDeviceBiometric } from '../lib/webauthn';
 import { getCachedSettings } from '../services/settingsService';
 
@@ -19,7 +19,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
   const handleRegisterBiometric = async () => {
     setIsBioLoading(true);
     setBioError('');
-    const token = localStorage.getItem('nevo_token');
+    const token = localStorage.getItem('nevo_auth_token');
     if (!token) {
       setBioError('Session invalid. Please continue to login.');
       setIsBioLoading(false);
@@ -83,7 +83,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('nevo_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('nevo_auth_token')}`
         }
       });
       if (response.ok) {
@@ -100,30 +100,10 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
   };
 
   const featureCards = [
-    {
-      icon: CheckCircle2,
-      title: "Complete Tasks",
-      desc: "Complete tasks and earn rewards",
-      color: "text-teal-400 bg-teal-500/10 border-teal-500/20"
-    },
-    {
-      icon: Sparkles,
-      title: "Watch Adverts",
-      desc: "Watch rewarded adverts and earn",
-      color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20"
-    },
-    {
-      icon: ArrowRight,
-      title: "Refer Friends",
-      desc: "Invite friends and earn bonuses",
-      color: "text-sky-400 bg-sky-500/10 border-sky-500/20"
-    },
-    {
-      icon: ArrowUpRight,
-      title: "Withdraw Funds",
-      desc: "Cash out your eligible earnings",
-      color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
-    },
+    { icon: CheckCircle2, title: "Complete Tasks", desc: "Complete tasks and earn rewards", color: "text-teal-400 bg-teal-500/10 border-teal-500/20" },
+    { icon: Sparkles, title: "Watch Adverts", desc: "Watch rewarded adverts and earn", color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
+    { icon: ArrowUpRight, title: "Refer Friends", desc: "Invite friends and earn rewards", color: "text-sky-400 bg-sky-500/10 border-sky-500/20" },
+    { icon: ArrowUpRight, title: "Withdraw Funds", desc: "Cash out after eligibility", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
   ];
 
   return (
@@ -223,7 +203,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
         >
           <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10">
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-indigo-500 to-teal-400 flex items-center justify-center shadow-md">
-              <span className="text-white font-black text-xs tracking-tighter">SP</span>
+              <span className="text-white font-black text-xs tracking-tighter">NV</span>
             </div>
             <span className="text-sm font-black tracking-tight bg-gradient-to-r from-teal-400 to-indigo-300 bg-clip-text text-transparent">
               {getCachedSettings().websiteName || 'Nevo'}
@@ -263,11 +243,20 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
           {/* Title and Subtitle */}
           <div className="space-y-1">
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white font-display">
-              Welcome to Nevo!
+              Congratulations!
             </h1>
             <p className="text-sm font-semibold text-teal-300 tracking-wide">
-              Your {getCachedSettings().websiteName || 'Nevo'} account is ready. Start completing tasks, watching adverts and earning rewards.
+              Your Nevo account is ready. Start earning with tasks and adverts.
             </p>
+          </div>
+
+          <div className="w-full bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-5 text-center shadow-2xl relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 via-indigo-500/5 to-transparent pointer-events-none" />
+            <div className="relative flex items-center justify-center gap-2 text-teal-300 font-black text-xs uppercase tracking-wider">
+              <Gift className="w-4 h-4" />
+              Welcome to Nevo
+            </div>
+            <p className="relative text-xs text-slate-300 leading-relaxed mt-3">Complete tasks, watch rewarded adverts, refer friends and build your Nevo earnings.</p>
           </div>
 
         {/* Biometric Fingerprint / Passkey Setup Card */}

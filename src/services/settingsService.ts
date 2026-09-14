@@ -15,7 +15,7 @@ export interface SystemSettings {
   airtimeEnabled: string;
   dataEnabled: string;
   billsEnabled: string;
-  wdvEnabled: string;
+  legacyVoucherEnabled: string;
   referralEnabled: string;
   referralBonus: string;
   registrationBonus: string;
@@ -91,19 +91,19 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   airtimeEnabled: "true",
   dataEnabled: "true",
   billsEnabled: "true",
-  wdvEnabled: "true",
+  legacyVoucherEnabled: "true",
   referralEnabled: "true",
   referralBonus: "1000",
   registrationBonus: "0",
   dailyWithdrawalLimit: "1000000",
-  minWithdrawal: "1000",
+  minWithdrawal: "5000",
   maxWithdrawal: "500000",
   withdrawalCharges: "100",
   currency: "₦",
   timezone: "Africa/Lagos",
   country: "Nigeria",
   scrollingAnnouncement: "Welcome! Fast and secure manual transactions with 24/7 support.",
-  liveFeedText: "Chioma O. just purchased a WDV Voucher code • Yusuf D. withdrew ₦25,000",
+  liveFeedText: "Chioma O. just purchased a LEGACY_VOUCHER Voucher code • Yusuf D. withdrew ₦25,000",
   welcomeMessage: "Welcome",
   dashboardBanner: "Get started with fast manual voucher activation & seamless transfers",
   noticeBarText: "",
@@ -142,7 +142,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   maxLoginAttempts: "5",
   deviceRestriction: "false",
   twoFactorEnabled: "false",
-  voucherPrefix: "WDV",
+  voucherPrefix: "LEGACY_VOUCHER",
   voucherLength: "10",
   voucherValidity: "30 Days",
   videoUrl: "",
@@ -175,7 +175,8 @@ export function hexToRgb(hex: string, defaultRgb = '13, 148, 136'): string {
 export function applyGlobalTheme(settings: SystemSettings) {
   if (!settings) return;
 
-  const brandName = 'Nevo';
+  const rawBrandName = settings.websiteName || DEFAULT_SETTINGS.websiteName;
+  const brandName = /nevo/i.test(rawBrandName) ? 'Nevo' : rawBrandName;
   const primary = settings.primaryColor || DEFAULT_SETTINGS.primaryColor;
   const secondary = settings.secondaryColor || DEFAULT_SETTINGS.secondaryColor;
   const accent = settings.accentColor || DEFAULT_SETTINGS.accentColor;
@@ -267,8 +268,8 @@ export async function fetchMasterSettings(): Promise<SystemSettings> {
       const data = await res.json();
       if (data.success && data.settings) {
         cachedSettings = { ...DEFAULT_SETTINGS, ...data.settings };
-        cachedSettings.websiteName = 'Nevo';
-        cachedSettings.senderName = 'Nevo';
+        if (/nevo/i.test(String(cachedSettings.websiteName || ''))) cachedSettings.websiteName = 'Nevo';
+        if (/nevo/i.test(String(cachedSettings.senderName || ''))) cachedSettings.senderName = 'Nevo';
         localStorage.setItem('master_system_settings', JSON.stringify(cachedSettings));
         applyGlobalTheme(cachedSettings);
         return cachedSettings;
@@ -287,8 +288,8 @@ export function getCachedSettings(): SystemSettings {
 
 export function updateCachedSettings(newSettings: Partial<SystemSettings>) {
   cachedSettings = { ...cachedSettings, ...newSettings };
-  cachedSettings.websiteName = 'Nevo';
-  cachedSettings.senderName = 'Nevo';
+  if (/nevo/i.test(String(cachedSettings.websiteName || ''))) cachedSettings.websiteName = 'Nevo';
+  if (/nevo/i.test(String(cachedSettings.senderName || ''))) cachedSettings.senderName = 'Nevo';
   localStorage.setItem('master_system_settings', JSON.stringify(cachedSettings));
   applyGlobalTheme(cachedSettings);
 }

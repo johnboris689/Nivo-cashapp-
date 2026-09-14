@@ -1,4 +1,4 @@
-export type PaymentProviderType = 'paystack' | 'flutterwave' | 'korapay';
+export type PaymentProviderType = 'korapay';
 
 export interface InitializePaymentParams {
   userId: string;
@@ -9,6 +9,7 @@ export interface InitializePaymentParams {
   currency?: string;
   reference: string;
   callbackUrl: string;
+  notificationUrl?: string;
   metadata?: Record<string, any>;
 }
 
@@ -16,10 +17,10 @@ export interface PaymentInitializationResult {
   provider: PaymentProviderType;
   reference: string;
   checkoutUrl: string;
-  accessCode?: string;
   currency: string;
   amount: number;
   rawResponse?: any;
+  message?: string;
 }
 
 export interface PaymentVerificationResult {
@@ -29,8 +30,13 @@ export interface PaymentVerificationResult {
   amount: number;
   currency: string;
   status: 'successful' | 'failed' | 'pending';
+  success?: boolean;
   paidAt?: string;
+  customerEmail?: string;
+  customerName?: string;
+  channel?: string;
   rawResponse?: any;
+  message?: string;
 }
 
 export interface WebhookVerificationResult {
@@ -41,6 +47,7 @@ export interface WebhookVerificationResult {
   amount?: number;
   currency?: string;
   status?: 'successful' | 'failed' | 'pending';
+  success?: boolean;
   event?: string;
   rawBody?: any;
 }
@@ -58,6 +65,7 @@ export interface ProviderConfigStatus {
 export interface IPaymentProvider {
   readonly id: PaymentProviderType;
   readonly name: string;
+  readonly displayName?: string;
   isConfigured(): boolean;
   getMissingCredentials(): string[];
   getRequiredEnvVars(): string[];
