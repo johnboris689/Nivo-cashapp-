@@ -3667,8 +3667,8 @@ const verifyPaymentUnifiedHandler = async (req: any, res: any) => {
   }
 };
 
-app.post('/api/payment/verify', authenticatePaymentUser, verifyPaymentUnifiedHandler);
-app.get('/api/payment/verify/:reference', authenticatePaymentUser, verifyPaymentUnifiedHandler);
+app.post('/api/payment/verify', authenticateToken, verifyPaymentUnifiedHandler);
+app.get('/api/payment/verify/:reference', authenticateToken, verifyPaymentUnifiedHandler);
 app.get('/api/paystack/check-status/:reference', authenticateToken, async (req:any,res:any) => { req.body = { reference:req.params.reference }; return verifyPaymentUnifiedHandler(req,res); });
 app.get('/api/korapay/check-status/:reference', authenticateToken, async (req:any,res:any) => { req.body = { reference:req.params.reference }; return verifyPaymentUnifiedHandler(req,res); });
 app.post('/api/korapay/check-status', authenticateToken, async (req:any,res:any) => { return verifyPaymentUnifiedHandler(req,res); });
