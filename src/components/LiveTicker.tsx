@@ -18,7 +18,7 @@ export default function LiveTicker() {
 
   useEffect(() => {
     load();
-    const refresh = window.setInterval(load, 15000);
+    const refresh = window.setInterval(load, 5000);
     return () => window.clearInterval(refresh);
   }, []);
 
@@ -29,7 +29,7 @@ export default function LiveTicker() {
   }, [events.length]);
 
   const current = events[index];
-  const text = current?.message || 'Recent Nevo activity will appear here as real transactions are completed.';
+  const text = current?.message || 'VERIFIED LIVE ACTIVITY — New deposits and withdrawals appear here only after they are confirmed by Nevo.';
 
   return (
     <div className="w-full bg-[#0a0a12] border-b border-white/[0.06] py-1 overflow-hidden flex items-center relative z-20 select-none shrink-0 font-sans">

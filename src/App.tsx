@@ -208,7 +208,19 @@ export default function App() {
       const path = window.location.pathname.toLowerCase();
       setAdminPath(window.location.pathname);
       if (!path.startsWith('/boris')) {
-        if (path === '/dashboard/withdraw' || path === '/withdraw') {
+        if (path === '/register') {
+          setAuthMode('signup');
+          const ref = new URLSearchParams(window.location.search).get('ref');
+          if (ref) setReferralCodeInput(ref.toUpperCase());
+          setCurrentScreen('onboarding');
+        } else if (path === '/login') {
+          setAuthMode('signin');
+          setCurrentScreen('onboarding');
+        } else if (path === '/referrals') {
+          setCurrentScreen('dashboard');
+          setActiveTab('social');
+          setRewardsTab('referrals');
+        } else if (path === '/dashboard/withdraw' || path === '/withdraw') {
           setCurrentScreen('withdraw');
         } else if (path === '/ads' || path === '/dashboard/ads') {
           setCurrentScreen('ads');
@@ -231,7 +243,19 @@ export default function App() {
     // Set initial state
     const currentPath = window.location.pathname.toLowerCase();
     if (!currentPath.startsWith('/boris')) {
-      if (currentPath === '/dashboard/withdraw' || currentPath === '/withdraw') {
+      if (currentPath === '/register') {
+        setAuthMode('signup');
+        const ref = new URLSearchParams(window.location.search).get('ref');
+        if (ref) setReferralCodeInput(ref.toUpperCase());
+        setCurrentScreen('onboarding');
+      } else if (currentPath === '/login') {
+        setAuthMode('signin');
+        setCurrentScreen('onboarding');
+      } else if (currentPath === '/referrals') {
+        setCurrentScreen('dashboard');
+        setActiveTab('social');
+        setRewardsTab('referrals');
+      } else if (currentPath === '/dashboard/withdraw' || currentPath === '/withdraw') {
         setCurrentScreen('withdraw');
       } else if (currentPath === '/ads' || currentPath === '/dashboard/ads') {
         setCurrentScreen('ads');
@@ -343,10 +367,12 @@ export default function App() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [referralCodeInput, setReferralCodeInput] = useState('');
 
   // Password Visibility toggles
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
 
@@ -1106,8 +1132,13 @@ export default function App() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isAuthSubmitting) return;
-    if (!fullName || !email || !password) {
-      showToast('Please fill out all fields', 'error');
+    if (!fullName.trim() || !email.trim() || !password || !confirmPassword) {
+      showToast('Please fill in your name, email, password, and confirm password.', 'error');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showToast('Passwords do not match.', 'error');
       return;
     }
 
@@ -2431,6 +2462,9 @@ export default function App() {
     normalizedPath === '/index.html' || 
     lowerNormalizedPath === '/terms' || 
     lowerNormalizedPath === '/privacy' || 
+    lowerNormalizedPath === '/register' ||
+    lowerNormalizedPath === '/login' ||
+    lowerNormalizedPath === '/referrals' ||
     lowerNormalizedPath === '/dashboard' ||
     lowerNormalizedPath === '/dashboard/withdraw' ||
     lowerNormalizedPath === '/withdraw' ||
@@ -2751,7 +2785,6 @@ export default function App() {
                     {authMode === 'signup' || signInMethod === 'password' ? (
                       <form onSubmit={authMode === 'signup' ? handleSignUp : handleSignIn} className="space-y-4">
                         {authMode === 'signup' && (
-                          <>
                           <div>
                             <label className="text-[10px] font-mono text-slate-400 block mb-1">Full Name</label>
                             <input
@@ -2764,11 +2797,6 @@ export default function App() {
                               className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
                             />
                           </div>
-                          <div>
-                            <label className="text-[10px] font-mono text-slate-400 block mb-1">Referral Code <span className="text-slate-600">(optional)</span></label>
-                            <input type="text" placeholder="SWIFTXXXX" value={referralCodeInput} onChange={e=>setReferralCodeInput(e.target.value.toUpperCase())} className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400" />
-                          </div>
-                          </>
                         )}
 
                         <div>
@@ -2802,16 +2830,65 @@ export default function App() {
                               </button>
                             )}
                           </div>
-                          <input
-                            id="auth-password"
-                            type="password"
-                            placeholder="••••••••"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
-                          />
+                          <div className="relative">
+                            <input
+                              id="auth-password"
+                              type={showPassword ? 'text' : 'password'}
+                              placeholder="••••••••"
+                              required
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl pl-4 pr-10 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
+                            />
+                            <button
+                              type="button"
+                              aria-label={showPassword ? 'Hide password' : 'Show password'}
+                              onClick={() => setShowPassword(v => !v)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                            >
+                              {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                            </button>
+                          </div>
                         </div>
+
+                        {authMode === 'signup' && (
+                          <div>
+                            <label className="text-[10px] font-mono text-slate-400 block mb-1">Confirm Password</label>
+                            <div className="relative">
+                              <input
+                                id="signup-confirm-password"
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                placeholder="Repeat your password"
+                                required
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl pl-4 pr-10 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
+                              />
+                              <button
+                                type="button"
+                                aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                                onClick={() => setShowConfirmPassword(v => !v)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                              >
+                                {showConfirmPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {authMode === 'signup' && (
+                          <div>
+                            <label className="text-[10px] font-mono text-slate-400 block mb-1">Referral Code <span className="text-slate-600">(optional)</span></label>
+                            <input
+                              id="signup-referral-code"
+                              type="text"
+                              placeholder="NEVOXXXX"
+                              value={referralCodeInput}
+                              onChange={e => setReferralCodeInput(e.target.value.toUpperCase())}
+                              className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400 uppercase font-mono"
+                            />
+                          </div>
+                        )}
 
                         <button
                           id="btn-auth-submit"
@@ -5051,7 +5128,7 @@ export default function App() {
                             <div className="font-bold">Withdrawal access is currently locked.</div>
                             <div>Complete 5 successful referrals first.</div>
                             <div className="font-mono text-[11px]">Referral progress: {withdrawSuccessfulReferrals}/5</div>
-                            <button type="button" onClick={() => { setCurrentScreen('referrals'); navigateTo('/referrals'); }} className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-indigo-600 text-white font-black text-[10px] uppercase tracking-wider">Invite Friends</button>
+                            <button type="button" onClick={() => { setCurrentScreen('dashboard'); setActiveTab('social'); setRewardsTab('referrals'); navigateTo('/referrals'); }} className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-indigo-600 text-white font-black text-[10px] uppercase tracking-wider">Invite Friends</button>
                           </div>
                         ) : !withdrawDepositVerified ? (
                           <div className="p-4 rounded-xl bg-teal-500/10 border border-teal-500/20 text-xs text-teal-100 leading-relaxed space-y-3">
