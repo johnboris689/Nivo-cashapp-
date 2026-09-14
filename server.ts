@@ -765,8 +765,11 @@ async function requireNevoTransactionEligibility(req: any, res: any, next: any) 
     const verifiedDeposit = Number(depositRow?.count || 0) > 0;
     if (successfulReferrals < 5 || !verifiedDeposit) {
       const reasons: string[] = [];
-      if (successfulReferrals < 5) reasons.push(`Complete 5 successful referrals (${successfulReferrals}/5).`);
-      if (!verifiedDeposit) reasons.push('Make a verified KoraPay wallet deposit of at least ₦520.');
+      if (successfulReferrals < 5) {
+        reasons.push(`Complete 5 successful referrals (${successfulReferrals}/5).`);
+      } else if (!verifiedDeposit) {
+        reasons.push('Make a verified KoraPay wallet deposit of at least ₦520. This is a real wallet deposit, not an activation fee.');
+      }
       return res.status(403).json({
         error: `Transactions are locked. ${reasons.join(' ')}`,
         code: 'NEVO_TRANSACTION_LOCKED',
@@ -1060,17 +1063,18 @@ app.post('/api/auth/register', async (req, res) => {
 
 // Login
 app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Please enter both your email address and password.' });
+  const { email, emailOrUsername, password } = req.body;
+  const identifier = String(emailOrUsername || email || '').trim();
+  if (!identifier || !password) {
+    return res.status(400).json({ error: 'Please enter your email/username and password.' });
   }
 
-  const key = email.toLowerCase();
+  const key = identifier.toLowerCase();
   const failed = failedLogins.get(key) || { count: 0, lockedUntil: 0 };
 
   if (failed.lockedUntil > Date.now()) {
     const remainingSeconds = Math.ceil((failed.lockedUntil - Date.now()) / 1000);
-    logDiagnostic('SECURITY_ALERT', 'Login attempt on locked account', { email });
+    logDiagnostic('SECURITY_ALERT', 'Login attempt on locked account', { identifier });
     return res.status(400).json({
       error: `Account is locked due to multiple failed login attempts. Retry in ${remainingSeconds}s.`,
       locked: true,
@@ -1079,15 +1083,15 @@ app.post('/api/auth/login', (req, res) => {
   }
 
   const db = readDb();
-  const user = db.users.find((u: any) => u.email.toLowerCase() === key);
+  const user = db.users.find((u: any) => String(u.email || '').toLowerCase() === key || String(u.username || '').toLowerCase() === key);
   
   if (!user) {
-    logDiagnostic('FAILED_LOGIN', 'Login failed: Non-existent user email', { email });
+    logDiagnostic('FAILED_LOGIN', 'Login failed: Non-existent user email/username', { identifier });
     return res.status(400).json({ error: 'Incorrect email address or password.' });
   }
 
   if (user.isSuspended) {
-    logDiagnostic('SECURITY_ALERT', 'Login attempt on suspended account', { email });
+    logDiagnostic('SECURITY_ALERT', 'Login attempt on suspended account', { email: user.email });
     return res.status(400).json({ error: 'This account has been suspended by the administrator.' });
   }
 
@@ -1108,7 +1112,7 @@ app.post('/api/auth/login', (req, res) => {
     if (failed.count >= 3) {
       failed.lockedUntil = Date.now() + 60 * 1000; // 1-minute lockout
       failedLogins.set(key, failed);
-      logDiagnostic('SECURITY_ALERT', 'Multiple failed login attempts. Account locked.', { email });
+      logDiagnostic('SECURITY_ALERT', 'Multiple failed login attempts. Account locked.', { email: user.email });
       return res.status(400).json({
         error: 'Account locked due to multiple failed attempts. Waiting period of 60 seconds is active.',
         locked: true,
@@ -1117,7 +1121,7 @@ app.post('/api/auth/login', (req, res) => {
     }
     failedLogins.set(key, failed);
     const remaining = 3 - failed.count;
-    logDiagnostic('FAILED_LOGIN', `Failed password attempt. Attempts remaining: ${remaining}`, { email });
+    logDiagnostic('FAILED_LOGIN', `Failed password attempt. Attempts remaining: ${remaining}`, { email: user.email });
     return res.status(400).json({ error: `Incorrect email address or password. ${remaining} attempts remaining.` });
   }
 
@@ -2360,7 +2364,7 @@ async function getKorapayBanks(): Promise<Array<{ name: string; code: string; ni
   if (korapayBanksCache && (now - lastKorapayBanksFetch < 3600000)) {
     return korapayBanksCache;
   }
-  const korapaySecretKey = process.env.KORAPAY_SECRET_KEY || process.env.KORAPAY_PUBLIC_KEY || '';
+  const korapaySecretKey = process.env.KORAPAY_SECRET_KEY || '';
   if (!korapaySecretKey) return [];
   try {
     const res = await fetch('https://api.korapay.com/merchant/api/v1/misc/banks?currency=NGN', {
@@ -2397,7 +2401,7 @@ async function verifyBankAccountService(bankName: string, accountNumber: string)
     return { success: false, error: "Unable to verify account name" };
   }
 
-  const korapaySecretKey = process.env.KORAPAY_SECRET_KEY || process.env.KORAPAY_PUBLIC_KEY || '';
+  const korapaySecretKey = process.env.KORAPAY_SECRET_KEY || '';
 
   const bankCodeMap: Record<string, string[]> = {
     'access bank': ['044'],
@@ -2584,8 +2588,8 @@ async function verifyBankAccountService(bankName: string, accountNumber: string)
 // Endpoint for real-time bank account verification
 app.post('/api/verify-account', authenticateToken, async (req: any, res) => {
   try {
-    const { bank, bankName, accountNumber } = req.body;
-    const selectedBank = bank || bankName;
+    const { bank, bankName, bankCode, accountNumber } = req.body;
+    const selectedBank = bank || bankName || bankCode;
 
     if (!selectedBank) {
       return res.status(400).json({ success: false, error: "Please select a bank." });
@@ -2608,6 +2612,19 @@ app.post('/api/verify-account', authenticateToken, async (req: any, res) => {
   } catch (err: any) {
     console.error('Account verification error:', err);
     return res.status(500).json({ success: false, error: "Verification service temporarily unavailable." });
+  }
+});
+
+app.get('/api/transactions/eligibility', authenticateToken, async (req: any, res: any) => {
+  try {
+    const email = String(req.userEmail || '').toLowerCase();
+    const referralRow = await getRow(`SELECT COUNT(*) AS count FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) AND status='successful'`, [email]);
+    const depositRow = await getRow(`SELECT COUNT(*) AS count FROM payment_transactions WHERE LOWER(userEmail)=LOWER($1) AND purpose='wallet_funding' AND provider='korapay' AND status IN ('successful','settled') AND amount >= 520`, [email]);
+    const successfulReferrals = Number(referralRow?.count || 0);
+    const verifiedDeposit = Number(depositRow?.count || 0) > 0;
+    return res.json({ successfulReferrals, referralsRequired: 5, verifiedDeposit, depositMinimum: 520, canWithdraw: successfulReferrals >= 5 && verifiedDeposit });
+  } catch (err: any) {
+    return res.status(503).json({ error: 'Unable to check withdrawal eligibility right now.' });
   }
 });
 
@@ -2774,10 +2791,11 @@ app.post('/api/transactions/withdraw', authenticateToken, requireNevoTransaction
   const successfulReferrals = Number(referralRow?.count || 0);
   const paymentRows = await getAllRows(`SELECT * FROM payment_transactions WHERE LOWER(userEmail)=LOWER($1) AND purpose='wallet_funding' AND status='successful'`, [email]);
   const depositRequirementMet = paymentRows.some((p:any) => Number(p.amount || 0) >= 520);
-  if (successfulReferrals < 5 || !depositRequirementMet) {
-    const referralPart = successfulReferrals < 5 ? `Invite at least 5 active users (${successfulReferrals}/5).` : '';
-    const depositPart = !depositRequirementMet ? 'Deposit at least ₦520 through Deposit Funds.' : '';
-    return res.status(403).json({ error: `Withdrawal locked. ${referralPart} ${depositPart}`.trim() });
+  if (successfulReferrals < 5) {
+    return res.status(403).json({ error: `Withdrawal locked. Complete 5 successful referrals (${successfulReferrals}/5) before withdrawals are available.` });
+  }
+  if (!depositRequirementMet) {
+    return res.status(403).json({ error: 'Withdrawal locked. Your 5 successful referrals are complete. Make a verified KoraPay wallet deposit of at least ₦520 to unlock withdrawals. This is not an activation fee; it is a real wallet deposit that remains your money.' });
   }
 
   // Daily limit check
@@ -3605,15 +3623,6 @@ app.get('/api/banks', authenticateToken, async (_req: any, res: any) => {
   }
 });
 
-app.get('/api/banks', authenticateToken, async (_req: any, res: any) => {
-  try {
-    const banks = await paymentManager.getBankList();
-    res.json(banks);
-  } catch (err: any) {
-    res.status(502).json({ error: err?.message || 'Unable to load bank list.' });
-  }
-});
-
 // Bank Account Name Resolution Endpoint
 app.get('/api/bank/resolve', authenticateToken, async (req: any, res) => {
   const accountNumber = String(req.query.accountNumber || '').trim();
@@ -4251,7 +4260,7 @@ app.post('/api/nivo/tasks/:id/submit', authenticateToken, async (req:any,res:any
   try { const task=await getRow(`SELECT * FROM nivo_tasks WHERE id=$1 AND enabled=1`,[req.params.id]); if(!task) return res.status(404).json({error:'Task not found.'}); const email=String(req.userEmail).toLowerCase(); const sub=await getRow(`SELECT * FROM nivo_task_submissions WHERE LOWER(userId)=LOWER($1) AND taskId=$2 ORDER BY createdAt DESC`,[email,req.params.id]); if(!sub) return res.status(400).json({error:'Start the task first.'}); const now=Date.now(); const started=new Date(sub.startedat||sub.startedAt).getTime(); const seconds=Number(task.timerseconds||0); if((task.verificationtype||'timer')==='timer' && now-started < seconds*1000) return res.status(400).json({error:`Please complete the ${seconds}-second task before submitting.`}); const proof=String(req.body?.proofText||'').trim(); if((task.verificationtype||'timer')==='proof' && !proof) return res.status(400).json({error:'Please provide the requested proof.'}); const status=(task.verificationtype||'timer')==='timer'?'approved':'pending_verification'; await execute(`UPDATE nivo_task_submissions SET status=$1, completedAt=$2, proofText=$3 WHERE id=$4`,[status,new Date().toISOString(),proof,sub.id]); if(status==='approved'){ const db=readDb(); const user=db.users.find((u:any)=>u.email.toLowerCase()===email); if(user){ const reward=Number(task.rewardamount||0); const before=Number(user.balance||0); user.balance=before+reward; user.totalEarnings=Number(user.totalEarnings||0)+reward; user.notifications=user.notifications||[]; user.notifications.unshift({id:`notif-${Date.now()}`,title:'Task Reward Earned',body:`₦${reward.toLocaleString()} has been added to your wallet for completing ${task.title}.`,date:new Date().toISOString(),unread:true,type:'task'}); user.transactions=user.transactions||[]; user.transactions.unshift({id:`tx-${Date.now()}`,type:'promotional_bonus',amount:reward,date:new Date().toISOString(),status:'success',description:`Task Reward: ${task.title}`}); await writeDb(db); await execute(`UPDATE users SET balance=$1,totalEarnings=$2,notifications=$3,transactions=$4 WHERE LOWER(email)=$5`,[user.balance,user.totalEarnings,JSON.stringify(user.notifications),JSON.stringify(user.transactions),email]); await execute(`UPDATE nivo_tasks SET completionCount=COALESCE(completionCount,0)+1 WHERE id=$1`,[task.id]); await execute(`UPDATE nivo_task_submissions SET claimedAt=$1,status='claimed' WHERE id=$2`,[new Date().toISOString(),sub.id]); }} res.json({success:true,status,message:status==='approved'?'Task completed and reward credited.':'Task submitted for admin verification.'}); } catch(e:any){res.status(400).json({error:e.message||'Could not submit task.'});}
 });
 app.get('/api/nivo/referrals/stats', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const user=readDb().users.find((u:any)=>u.email.toLowerCase()===email); const records=await getAllRows(`SELECT * FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) ORDER BY createdAt DESC`,[email]); const bonus=Number(user?.totalReferralBonus||0); res.json({referralCode:user?.referralCode||'',referralLink:user?.referralCode?`${req.protocol}://${req.get('host')}/register?ref=${user.referralCode}`:'',totalReferrals:records.length,totalBonus:bonus,bonusPerReferral:Number((records[0]?.bonusamount||1000)),records:records.map((r:any)=>({...r,bonusAmount:Number(r.bonusamount||0),referredUserName:r.referredusername||''}))}); } catch(e:any){res.status(500).json({error:e.message});} });
-app.get('/api/nivo/activation/status', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const referralRows=await getAllRows(`SELECT * FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) AND status='successful' ORDER BY createdAt DESC`,[email]); const paymentRows=await getAllRows(`SELECT * FROM payment_transactions WHERE LOWER(userEmail)=LOWER($1) AND purpose='wallet_funding' AND status='successful'`,[email]); const successfulReferrals=referralRows.length; const depositRequirementMet=paymentRows.some((p:any)=>Number(p.amount||0)>=520); res.json({activated:depositRequirementMet,fee:520,successfulReferrals,referralsRequired:5,depositRequirementMet,depositMinimum:520,canWithdraw:successfulReferrals>=5&&depositRequirementMet}); } catch(e:any){res.status(500).json({error:e.message});} });
+app.get('/api/nivo/activation/status', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const referralRows=await getAllRows(`SELECT * FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) AND status='successful' ORDER BY createdAt DESC`,[email]); const paymentRows=await getAllRows(`SELECT * FROM payment_transactions WHERE LOWER(userEmail)=LOWER($1) AND purpose='wallet_funding' AND provider='korapay' AND status IN ('successful','settled')`,[email]); const successfulReferrals=referralRows.length; const depositRequirementMet=paymentRows.some((p:any)=>Number(p.amount||0)>=520); res.json({successfulReferrals,referralsRequired:5,depositRequirementMet,depositMinimum:520,canWithdraw:successfulReferrals>=5&&depositRequirementMet}); } catch(e:any){res.status(500).json({error:e.message});} });
 app.post('/api/nivo/activation/pay', authenticateToken, async (_req:any,res:any)=>{ return res.status(400).json({error:'No activation fee is required. Complete 5 successful referrals, then make a minimum ₦520 wallet deposit to unlock withdrawals.'}); });
 app.get('/api/nivo/history', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const db=readDb(); const u=db.users.find((x:any)=>x.email.toLowerCase()===email); const tx=Array.isArray(u?.transactions)?u.transactions.filter((x:any)=>['promotional_bonus','activation_fee','deposit','referral_bonus','task_reward','ad_reward'].includes(String(x.type||''))).slice(0,100):[]; res.json({transactions:tx}); } catch(e:any){res.status(500).json({error:e.message});} });
 app.get('/api/nivo/notifications', authenticateToken, async (req:any,res:any)=>{ const db=readDb(); const u=db.users.find((x:any)=>x.email.toLowerCase()===String(req.userEmail).toLowerCase()); res.json({notifications:u?.notifications||[]}); });

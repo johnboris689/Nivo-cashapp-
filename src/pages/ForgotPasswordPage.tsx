@@ -92,8 +92,8 @@ export const ForgotPasswordPage: React.FC = () => {
     : step === 'otp'
     ? `Enter the 6-digit code sent to ${email}.`
     : step === 'password'
-    ? 'Choose a strong new password for your Nivo Cash account.'
-    : 'Your Nivo Cash password has been changed successfully.';
+    ? 'Choose a strong new password for your Nevo account.'
+    : 'Your Nevo password has been changed successfully.';
 
   return (
     <div className="min-h-screen bg-[#100709] flex items-center justify-center p-4 relative overflow-hidden">

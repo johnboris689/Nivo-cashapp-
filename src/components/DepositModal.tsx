@@ -1,3 +1,4 @@
+import { api } from '../lib/api';
 import React, { useState } from 'react';
 
 interface DepositModalProps {
@@ -15,12 +16,8 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose }) => {
     if (!Number.isFinite(value) || value < 520) return setError('Minimum deposit is ₦520.');
     setLoading(true); setError('');
     try {
-      const token = localStorage.getItem('nevo_auth_token');
-      const res = await fetch('/api/korapay/initialize-wallet-deposit', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ amount: value })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.success || !data.deposit?.checkoutUrl) throw new Error(data.error || 'Unable to initialize KoraPay checkout.');
+      const data = await api.initializeKoraPayDeposit(value);
+      if (!data?.deposit?.checkoutUrl) throw new Error('Unable to initialize KoraPay checkout.');
       window.location.assign(data.deposit.checkoutUrl);
     } catch (e: any) { setError(e.message || 'Unable to initialize payment.'); } finally { setLoading(false); }
   };

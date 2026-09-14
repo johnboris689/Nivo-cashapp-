@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Lock, Users, ArrowRight, CheckCircle2, Wallet, PlusCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../lib/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { DepositModal } from '../components/DepositModal';
 
@@ -8,10 +9,19 @@ export const ActivationPage: React.FC = () => {
   const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [showDepositModal, setShowDepositModal] = useState(false);
+  const [eligibility, setEligibility] = useState({ successfulReferrals: 0, verifiedDeposit: false, canWithdraw: false });
 
-  const currentRefs = user?.totalReferrals || 0;
-  const isActivated = !!user?.activationPaid;
-  const isFullyUnlocked = currentRefs >= 5 && isActivated;
+  React.useEffect(() => {
+    api.getTransactionEligibility().then((status) => setEligibility({
+      successfulReferrals: Number(status.successfulReferrals || 0),
+      verifiedDeposit: Boolean(status.verifiedDeposit),
+      canWithdraw: Boolean(status.canWithdraw),
+    })).catch(() => {});
+  }, [user]);
+
+  const currentRefs = eligibility.successfulReferrals;
+  const isActivated = eligibility.verifiedDeposit;
+  const isFullyUnlocked = eligibility.canWithdraw;
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 pb-12 animate-fade-in">
@@ -23,13 +33,13 @@ export const ActivationPage: React.FC = () => {
           <div className="space-y-2 max-w-xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8F1D3A]/10 border border-[#8F1D3A]/30 text-[#C13A5A] text-xs font-bold uppercase tracking-wider">
               <ShieldCheck className="w-3.5 h-3.5" />
-              Account Verification & Activation
+              Withdrawal Access Requirements
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Withdrawal Activation System
+              Withdrawal Access
             </h1>
             <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-              To keep Nivo Cash secure and prevent duplicate bot accounts, withdrawal access requires completing referral targets and automated wallet funding.
+              Withdrawal access is unlocked in two stages. First complete 5 successful referrals. After that, verified wallet funding is required.
             </p>
           </div>
 
@@ -40,7 +50,7 @@ export const ActivationPage: React.FC = () => {
                   <CheckCircle2 className="w-6 h-6 text-[#A52A4A]" />
                 </div>
                 <div>
-                  <p className="text-xs font-black text-white">ACCOUNT ACTIVATED</p>
+                  <p className="text-xs font-black text-white">WITHDRAWAL ACCESS UNLOCKED</p>
                   <p className="text-[11px] text-[#A52A4A]">Withdrawals fully unlocked</p>
                 </div>
               </div>
@@ -52,7 +62,7 @@ export const ActivationPage: React.FC = () => {
                 <div>
                   <p className="text-xs font-black text-white">WITHDRAWAL LOCKED</p>
                   <p className="text-[11px] text-[#C13A5A]/90">
-                    {currentRefs < 5 ? '5 Referrals Required' : '₦520 Deposit Required'}
+                    {currentRefs < 5 ? '5 Successful Referrals Required' : isActivated ? 'Withdrawal Access Unlocked' : 'Verified ₦520+ Deposit Required'}
                   </p>
                 </div>
               </div>
@@ -73,10 +83,10 @@ export const ActivationPage: React.FC = () => {
               Referral Requirement Pending ({currentRefs} / 5)
             </span>
             <h2 className="text-xl sm:text-2xl font-black text-white pt-2">
-              You need 5 successful referrals before account activation.
+              Complete 5 successful referrals to unlock the next withdrawal step.
             </h2>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Share your unique referral link with friends or family. Once 5 people register using your link, Step 2 will automatically unlock!
+              Share your unique referral link with friends or family. Once 5 referrals are successfully completed, the next withdrawal step will automatically unlock.
             </p>
           </div>
 
@@ -119,17 +129,17 @@ export const ActivationPage: React.FC = () => {
               <span className="text-[10px] font-extrabold text-[#A52A4A] uppercase tracking-widest bg-[#8F1D3A]/10 border border-[#8F1D3A]/20 px-2.5 py-0.5 rounded-full">
                 Referral Goal Reached (5/5 ✅)
               </span>
-              <h2 className="text-xl font-black text-white mt-1">Activate Your Account</h2>
+              <h2 className="text-xl font-black text-white mt-1">Complete Withdrawal Access Verification</h2>
             </div>
           </div>
 
           <div className="nivo-glass-surface border border-[#8F1D3A]/20 rounded-2xl p-5 space-y-3">
             <div className="flex items-center gap-2 text-[#C13A5A] font-extrabold text-sm">
               <Sparkles className="w-4 h-4" />
-              <span>Final Step: First Wallet Deposit (₦520 Minimum)</span>
+              <span>Final Step: Verified Wallet Deposit (₦520 Minimum)</span>
             </div>
             <p className="text-xs text-zinc-300 leading-relaxed">
-              To activate withdrawals, make a minimum deposit of <strong>₦520</strong>. This deposit is <strong>not a fee</strong>. It is simply your first wallet funding transaction.
+              Make a verified KoraPay wallet deposit of at least <strong>₦520</strong>. This deposit is <strong>not an activation fee</strong>; it is real wallet funding credited to your balance.
             </p>
 
             <ul className="text-xs text-zinc-400 space-y-2 pt-2 border-t border-zinc-800">
@@ -143,7 +153,7 @@ export const ActivationPage: React.FC = () => {
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#A52A4A]" />
-                <span><strong>Permanent Access:</strong> Once activated, withdrawal access remains unlocked permanently.</span>
+                <span><strong>Your Money:</strong> The deposit remains in your wallet and can be withdrawn once the normal withdrawal requirements are met.</span>
               </li>
             </ul>
           </div>
@@ -166,9 +176,9 @@ export const ActivationPage: React.FC = () => {
           </div>
 
           <div className="space-y-1 max-w-lg mx-auto">
-            <h2 className="text-2xl font-black text-white">Your Account is Activated!</h2>
+            <h2 className="text-2xl font-black text-white">Your Withdrawal Access is Unlocked!</h2>
             <p className="text-xs text-zinc-300 leading-relaxed">
-              Your 5 referrals and verified KoraPay wallet deposit have been verified. You have full access to instant bank withdrawals.
+              Your 5 successful referrals and verified KoraPay wallet deposit have been confirmed. Withdrawal access is now unlocked, subject to the normal withdrawal limits.
             </p>
           </div>
 

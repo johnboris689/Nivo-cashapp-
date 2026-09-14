@@ -142,7 +142,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
             <h1 className="text-sm font-extrabold text-white flex items-center gap-1.5">
               <span>Hi, {user?.fullName?.split(' ')[0]}</span> 👋
             </h1>
-            <p className="text-[11px] text-slate-400">Welcome to Nivo Cash</p>
+            <p className="text-[11px] text-slate-400">Welcome to Nevo</p>
           </div>
         </div>
         <span className="bg-[#8F1D3A]/10 text-[#A52A4A] text-[10px] font-bold px-3 py-1 rounded-full border border-[#8F1D3A]/20 flex items-center gap-1.5 shadow-sm">

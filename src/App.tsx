@@ -51,6 +51,7 @@ import {
 import { AdsPage } from './pages/AdsPage';
 
 import { registerDeviceBiometric, loginWithBiometric, isWebAuthnSupported } from './lib/webauthn';
+import { api, getAuthToken, setAuthToken, removeAuthToken } from './lib/api';
 import { User, LegacyVoucherCode, Transaction, NotificationItem } from './types';
 import { formatNaira } from './utils/formatters';
 import WalletDepositModal from './components/WalletDepositModal';
@@ -518,8 +519,12 @@ export default function App() {
   const [withdrawAccName, setWithdrawAccName] = useState('');
   const [withdrawLegacyVoucherCode, setWithdrawLegacyVoucherCode] = useState('');
   const [isVerifyingWithdrawAccount, setIsVerifyingWithdrawAccount] = useState(false);
-  const [withdrawVerified, setWithdrawVerified] = useState(true);
+  const [withdrawVerified, setWithdrawVerified] = useState(false);
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
+  const [withdrawSuccessfulReferrals, setWithdrawSuccessfulReferrals] = useState(0);
+  const [withdrawDepositVerified, setWithdrawDepositVerified] = useState(false);
+  const [withdrawEligibilityLoading, setWithdrawEligibilityLoading] = useState(false);
+  const [withdrawNameConfirmed, setWithdrawNameConfirmed] = useState(false);
 
   // Bills Fields
   const [billsType, setBillsType] = useState<'cable' | 'electricity' | 'betting'>('cable');
@@ -777,7 +782,7 @@ export default function App() {
 
     const depositRef = params.get('deposit_ref');
     if (depositRef) {
-      const token = localStorage.getItem('nevo_auth_token');
+      const token = getAuthToken();
       if (token) {
         showToast('Verifying your KoraPay payment...', 'info');
         const verifyEndpoint = `/api/korapay/check-status/${encodeURIComponent(depositRef)}`;
@@ -974,7 +979,7 @@ export default function App() {
 
   // Centralized Dynamic Backend State Sync Engine
   const syncWithBackend = async (force: boolean = false) => {
-    const token = localStorage.getItem('nevo_auth_token');
+    const token = getAuthToken();
     if (!token) return;
 
     try {
@@ -986,7 +991,7 @@ export default function App() {
       if (res.status === 401 || res.status === 403) {
         setIsAuthenticated(false);
         localStorage.removeItem('nevo_auth');
-        localStorage.removeItem('nevo_auth_token');
+        removeAuthToken();
         localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         return;
@@ -1128,7 +1133,7 @@ export default function App() {
       }
 
       setUser(data.user);
-      localStorage.setItem('nevo_auth_token', data.token);
+      setAuthToken(data.token);
       localStorage.setItem('nevo_auth', 'true');
       setShowRegistrationWelcome(true);
       setIsAuthenticated(true);
@@ -1167,7 +1172,7 @@ export default function App() {
       }
 
       setUser(data.user);
-      localStorage.setItem('nevo_auth_token', data.token);
+      setAuthToken(data.token);
       localStorage.setItem('nevo_auth', 'true');
       setIsAuthenticated(true);
       setHasSetupPin(true);
@@ -1212,7 +1217,7 @@ export default function App() {
       }
 
       setUser(data.user);
-      localStorage.setItem('nevo_auth_token', data.token);
+      setAuthToken(data.token);
       localStorage.setItem('nevo_auth', 'true');
       setIsAuthenticated(true);
       setHasSetupPin(true);
@@ -1246,7 +1251,7 @@ export default function App() {
       }
 
       setUser(result.user);
-      localStorage.setItem('nevo_auth_token', result.token);
+      setAuthToken(result.token);
       localStorage.setItem('nevo_auth', 'true');
       setIsAuthenticated(true);
       setHasSetupPin(true);
@@ -1427,7 +1432,7 @@ export default function App() {
             // Verify
             setTimeout(async () => {
               if (pinEntry === newConfirm) {
-                const token = localStorage.getItem('nevo_auth_token');
+                const token = getAuthToken();
                 if (token) {
                   try {
                     const res = await fetch('/api/auth/pin/setup', {
@@ -1469,7 +1474,7 @@ export default function App() {
         setPinEntry(newPin);
         if (newPin.length === 4) {
           setTimeout(async () => {
-            const token = localStorage.getItem('nevo_auth_token');
+            const token = getAuthToken();
             if (user?.email) {
               try {
                 const res = await fetch('/api/auth/pin/login', {
@@ -1526,7 +1531,7 @@ export default function App() {
     if (biometricStatus !== 'idle') return;
     setBiometricStatus('reading');
 
-    const token = localStorage.getItem('nevo_auth_token');
+    const token = getAuthToken();
 
     if (currentScreen === 'pin_setup' || currentScreen === 'dashboard') {
       if (token) {
@@ -1551,7 +1556,7 @@ export default function App() {
         const result = await loginWithBiometric(targetEmail);
         if (result.success && result.user) {
           setUser(result.user);
-          if (result.token) localStorage.setItem('nevo_auth_token', result.token);
+          if (result.token) setAuthToken(result.token);
           setBiometricStatus('success');
           setIsAuthenticated(true);
           setIsPinUnlocked(true);
@@ -1570,136 +1575,93 @@ export default function App() {
   };
 
   // ----------------------------------------------------
-  // Real-time Bank Account Verification Effect (Transfer Bank)
+  // Real-time Bank Account Verification Effects
   // ----------------------------------------------------
   useEffect(() => {
-    let isMounted = true;
-
-    if (!transferAccNum || transferAccNum.length !== 10) {
+    let active = true;
+    if (!transferAccNum || transferAccNum.length !== 10 || !transferBank) {
       setTransferVerified(false);
       setTransferAccName('');
-      setTransferError(null);
+      setTransferError(transferAccNum.length === 10 && !transferBank ? 'Please select a bank' : null);
       setIsVerifyingAccount(false);
       return;
     }
 
-    if (!transferBank) {
-      setTransferVerified(false);
-      setTransferError('Please select a bank');
-      setIsVerifyingAccount(false);
-      return;
-    }
-
-    const cacheKey = `${transferBank}:${transferAccNum}`;
+    const cacheKey = `transfer:${transferBank}:${transferAccNum}`;
     const cached = verificationCacheRef.current[cacheKey];
-
     if (cached) {
-      if (cached.success && cached.accountName) {
-        setTransferAccName(cached.accountName);
-        setTransferVerified(true);
-        setTransferError(null);
-      } else {
-        setTransferAccName('');
-        setTransferVerified(false);
-        setTransferError(cached.error || 'Invalid account number or bank combination');
-      }
+      setTransferAccName(cached.success ? (cached.accountName || '') : '');
+      setTransferVerified(Boolean(cached.success && cached.accountName));
+      setTransferError(cached.success ? null : (cached.error || 'Invalid account number or bank combination'));
       setIsVerifyingAccount(false);
       return;
     }
 
     setIsVerifyingAccount(true);
-    setTransferError(null);
     setTransferVerified(false);
-
-    const controller = new AbortController();
-    const token = localStorage.getItem('nevo_auth_token');
-
-    fetch('/api/verify-account', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
-      },
-      body: JSON.stringify({
-        bank: transferBank,
-        accountNumber: transferAccNum
-      }),
-      signal: controller.signal
-    })
-      .then(async (res) => {
-        const data = await res.json();
-        if (!isMounted) return;
-
-        if (res.ok && data.success && data.accountName) {
-          verificationCacheRef.current[cacheKey] = {
-            success: true,
-            accountName: data.accountName
-          };
+    setTransferAccName('');
+    setTransferError(null);
+    api.verifyBankAccount({ bank: transferBank, accountNumber: transferAccNum })
+      .then((data) => {
+        if (!active) return;
+        if (data.success && data.accountName) {
+          verificationCacheRef.current[cacheKey] = { success: true, accountName: data.accountName };
           setTransferAccName(data.accountName);
           setTransferVerified(true);
           setTransferError(null);
         } else {
-          const errMsg = data.error || 'Invalid account number or bank combination';
-          verificationCacheRef.current[cacheKey] = {
-            success: false,
-            error: errMsg
-          };
+          const message = 'Unable to verify this bank account. Please check the bank and account number.';
+          verificationCacheRef.current[cacheKey] = { success: false, error: message };
           setTransferAccName('');
           setTransferVerified(false);
-          setTransferError(errMsg);
+          setTransferError(message);
         }
       })
-      .catch((err) => {
-        if (!isMounted || err.name === 'AbortError') return;
+      .catch((err: any) => {
+        if (!active) return;
         setTransferVerified(false);
-        setTransferError('Failed to verify account. Please check network connection.');
+        setTransferAccName('');
+        setTransferError(err?.message || 'Unable to verify account. Please sign in again if your session has expired.');
       })
-      .finally(() => {
-        if (isMounted) {
-          setIsVerifyingAccount(false);
-        }
-      });
+      .finally(() => { if (active) setIsVerifyingAccount(false); });
 
-    return () => {
-      isMounted = false;
-      controller.abort();
-    };
+    return () => { active = false; };
   }, [transferBank, transferAccNum]);
 
-  // ----------------------------------------------------
-  // Real-time Bank Account Verification Effect (Withdrawal Modal)
-  // ----------------------------------------------------
   useEffect(() => {
-    let isMounted = true;
+    if (currentScreen !== 'withdraw' || !user) return;
+    let active = true;
+    setWithdrawEligibilityLoading(true);
+    api.getWithdrawalEligibility()
+      .then((status) => {
+        if (!active) return;
+        setWithdrawSuccessfulReferrals(Number(status.successfulReferrals || 0));
+        setWithdrawDepositVerified(Boolean(status.verifiedDeposit));
+      })
+      .catch((err: any) => {
+        if (active) showToast(err?.message || 'Unable to check withdrawal access.', 'error');
+      })
+      .finally(() => { if (active) setWithdrawEligibilityLoading(false); });
+    return () => { active = false; };
+  }, [currentScreen, user]);
 
-    if (!withdrawAccount || withdrawAccount.length !== 10) {
+  useEffect(() => {
+    let active = true;
+    if (!withdrawAccount || withdrawAccount.length !== 10 || !withdrawBank) {
       setWithdrawVerified(false);
       setWithdrawAccName('');
-      setWithdrawError(null);
+      setWithdrawError(withdrawAccount.length === 10 && !withdrawBank ? 'Please select a bank' : null);
       setIsVerifyingWithdrawAccount(false);
+      setWithdrawNameConfirmed(false);
       return;
     }
 
-    if (!withdrawBank) {
-      setWithdrawVerified(false);
-      setWithdrawError('Please select a bank');
-      setIsVerifyingWithdrawAccount(false);
-      return;
-    }
-
-    const cacheKey = `${withdrawBank}:${withdrawAccount}`;
+    const cacheKey = `withdraw:${withdrawBank}:${withdrawAccount}`;
     const cached = verificationCacheRef.current[cacheKey];
-
     if (cached) {
-      if (cached.success && cached.accountName) {
-        setWithdrawAccName(cached.accountName);
-        setWithdrawVerified(true);
-        setWithdrawError(null);
-      } else {
-        setWithdrawAccName('');
-        setWithdrawVerified(false);
-        setWithdrawError(cached.error || 'Invalid account number or bank combination');
-      }
+      setWithdrawAccName(cached.success ? (cached.accountName || '') : '');
+      setWithdrawVerified(Boolean(cached.success && cached.accountName));
+      setWithdrawError(cached.success ? null : (cached.error || 'Invalid account number or bank combination'));
       setIsVerifyingWithdrawAccount(false);
       return;
     }
@@ -1707,60 +1669,34 @@ export default function App() {
     setIsVerifyingWithdrawAccount(true);
     setWithdrawError(null);
     setWithdrawVerified(false);
-
-    const controller = new AbortController();
-    const token = localStorage.getItem('nevo_auth_token');
-
-    fetch('/api/verify-account', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
-      },
-      body: JSON.stringify({
-        bank: withdrawBank,
-        accountNumber: withdrawAccount
-      }),
-      signal: controller.signal
-    })
-      .then(async (res) => {
-        const data = await res.json();
-        if (!isMounted) return;
-
-        if (res.ok && data.success && data.accountName) {
-          verificationCacheRef.current[cacheKey] = {
-            success: true,
-            accountName: data.accountName
-          };
+    setWithdrawAccName('');
+    setWithdrawNameConfirmed(false);
+    api.verifyBankAccount({ bank: withdrawBank, accountNumber: withdrawAccount })
+      .then((data) => {
+        if (!active) return;
+        if (data.success && data.accountName) {
+          verificationCacheRef.current[cacheKey] = { success: true, accountName: data.accountName };
           setWithdrawAccName(data.accountName);
           setWithdrawVerified(true);
           setWithdrawError(null);
         } else {
-          const errMsg = data.error || 'Invalid account number or bank combination';
-          verificationCacheRef.current[cacheKey] = {
-            success: false,
-            error: errMsg
-          };
+          const message = 'Unable to verify this bank account. Please check the bank and account number.';
+          verificationCacheRef.current[cacheKey] = { success: false, error: message };
           setWithdrawAccName('');
           setWithdrawVerified(false);
-          setWithdrawError(errMsg);
+          setWithdrawError(message);
         }
       })
-      .catch((err) => {
-        if (!isMounted || err.name === 'AbortError') return;
+      .catch((err: any) => {
+        if (!active) return;
         setWithdrawVerified(false);
-        setWithdrawError('Failed to verify account. Please check network connection.');
+        setWithdrawAccName('');
+        setWithdrawNameConfirmed(false);
+        setWithdrawError(err?.message || 'Unable to verify account. Please sign in again if your session has expired.');
       })
-      .finally(() => {
-        if (isMounted) {
-          setIsVerifyingWithdrawAccount(false);
-        }
-      });
+      .finally(() => { if (active) setIsVerifyingWithdrawAccount(false); });
 
-    return () => {
-      isMounted = false;
-      controller.abort();
-    };
+    return () => { active = false; };
   }, [withdrawBank, withdrawAccount]);
 
   // LEGACY_VOUCHER Payment Initiate Handler (Manual Bank Transfer)
@@ -1958,7 +1894,7 @@ export default function App() {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
         localStorage.removeItem('nevo_auth');
-        localStorage.removeItem('nevo_auth_token');
+        removeAuthToken();
         localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
@@ -2049,7 +1985,7 @@ export default function App() {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
         localStorage.removeItem('nevo_auth');
-        localStorage.removeItem('nevo_auth_token');
+        removeAuthToken();
         localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
@@ -2141,7 +2077,7 @@ export default function App() {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
         localStorage.removeItem('nevo_auth');
-        localStorage.removeItem('nevo_auth_token');
+        removeAuthToken();
         localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
@@ -2204,50 +2140,33 @@ export default function App() {
   const handleWithdrawalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
-    if (!withdrawAccount || withdrawAccount.length !== 10 || !withdrawAccName) {
-      showToast('Please enter a valid 10-digit account number and account name', 'error');
+    if (!withdrawAccount || withdrawAccount.length !== 10 || !withdrawAccName || !withdrawNameConfirmed) {
+      showToast('Please verify the bank account and confirm the displayed account name first.', 'error');
+      return;
+    }
+    if (withdrawSuccessfulReferrals < 5) {
+      showToast(`Complete 5 successful referrals first (${withdrawSuccessfulReferrals}/5).`, 'error');
+      return;
+    }
+    if (!withdrawDepositVerified) {
+      showToast('Make a verified KoraPay deposit of at least ₦520 before withdrawing. This is not an activation fee; it remains your money.', 'error');
       return;
     }
     const price = parseInt(withdrawAmount);
     if (!withdrawAmount || isNaN(price) || price < 5000 || price > 200000) {
-      showToast('Withdrawal amount must be between ₦50 and ₦200,000', 'error');
+      showToast('Withdrawal amount must be between ₦5,000 and ₦200,000', 'error');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/transactions/withdraw', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('nevo_auth_token')}`
-        },
-        body: JSON.stringify({
-          bank: withdrawBank,
-          accountNumber: withdrawAccount,
-          amount: price,
-          voucherCode: '',
-          accountName: withdrawAccName
-        })
+      const result = await api.submitWithdrawal({
+        amount: price,
+        bankName: withdrawBank,
+        accountNumber: withdrawAccount,
+        accountName: withdrawAccName
       });
-      const data = await res.json();
-
-      if (res.status === 401 || res.status === 403) {
-        showToast('Your session has expired. Please log in again.', 'error');
-        setIsAuthenticated(false);
-        localStorage.removeItem('nevo_auth');
-        localStorage.removeItem('nevo_auth_token');
-        localStorage.removeItem('nevo_user');
-        setCurrentScreen('onboarding');
-        setIsSubmitting(false);
-        return;
-      }
-
-      if (!res.ok) {
-        showToast(data.error || 'Withdrawal failed.', 'error');
-        setIsSubmitting(false);
-        return;
-      }
+      const data: any = result;
 
       // Update user state and transactions list from returned data
       lastTxTime.current = Date.now();
@@ -2286,10 +2205,11 @@ export default function App() {
       setWithdrawAmount('');
       setWithdrawLegacyVoucherCode('');
       setWithdrawAccName('');
+      setWithdrawNameConfirmed(false);
       setCurrentScreen('dashboard');
       setActiveTab('wallet');
-    } catch (err) {
-      showToast('Error performing withdrawal.', 'error');
+    } catch (err: any) {
+      showToast(err?.message || 'Error performing withdrawal.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -2336,7 +2256,7 @@ export default function App() {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
         localStorage.removeItem('nevo_auth');
-        localStorage.removeItem('nevo_auth_token');
+        removeAuthToken();
         localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
@@ -3596,7 +3516,7 @@ export default function App() {
                                 id="btn-disable-biometric"
                                 type="button"
                                 onClick={async () => {
-                                  const token = localStorage.getItem('nevo_auth_token');
+                                  const token = getAuthToken();
                                   if (!token) return;
                                   try {
                                     const res = await fetch('/api/auth/webauthn/disable', {
@@ -3625,7 +3545,7 @@ export default function App() {
                                 type="button"
                                 disabled={isActivatingBiometric}
                                 onClick={async () => {
-                                  const token = localStorage.getItem('nevo_auth_token');
+                                  const token = getAuthToken();
                                   if (!token) {
                                     showToast('Please log in again to register biometric.', 'error');
                                     return;
@@ -3673,7 +3593,7 @@ export default function App() {
                                 showToast('PIN must be a 4-digit or 6-digit numeric code.', 'error');
                                 return;
                               }
-                              const token = localStorage.getItem('nevo_auth_token');
+                              const token = getAuthToken();
                               if (!token) {
                                 showToast('Session expired. Please log in again.', 'error');
                                 return;
@@ -4328,7 +4248,7 @@ export default function App() {
                           <ShieldCheck className="h-4 w-4 text-amber-400 shrink-0" />
                           <div>
                             <p className="font-bold">Transaction Access Locked</p>
-                            <p className="text-[9px] opacity-80 mt-0.5">Complete 5 successful referrals and make a verified KoraPay deposit of at least ₦520 to spend or cash out wallet funds.</p>
+                            <p className="text-[9px] opacity-80 mt-0.5">Complete 5 successful referrals to unlock wallet transactions.</p>
                           </div>
                         </div>
                       ) : (
@@ -4596,7 +4516,7 @@ export default function App() {
                           <ShieldCheck className="h-4 w-4 text-amber-400 shrink-0" />
                           <div>
                             <p className="font-bold">Transaction Access Locked</p>
-                            <p className="text-[9px] opacity-80 mt-0.5">Complete 5 successful referrals and make a verified KoraPay deposit of at least ₦520 to spend or cash out wallet funds.</p>
+                            <p className="text-[9px] opacity-80 mt-0.5">Complete 5 successful referrals to unlock wallet transactions.</p>
                           </div>
                         </div>
                       ) : (
@@ -4888,7 +4808,7 @@ export default function App() {
                       {/* Wallet Payment Authorization */}
                       <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-300 font-medium flex items-center gap-2.5">
                         <ShieldCheck className="h-4 w-4 text-amber-400 shrink-0" />
-                        <div><p className="font-bold">Transaction Access Locked</p><p className="text-[9px] opacity-80 mt-0.5">Complete 5 successful referrals and make a verified KoraPay deposit of at least ₦520 before paying bills.</p></div>
+                        <div><p className="font-bold">Transaction Access Locked</p><p className="text-[9px] opacity-80 mt-0.5">Complete 5 successful referrals to unlock bill payments.</p></div>
                       </div>
 
                       {/* Submit Button */}
@@ -4983,6 +4903,7 @@ export default function App() {
                             onChange={(bankName) => {
                               setWithdrawBank(bankName);
                               setWithdrawVerified(false);
+                              setWithdrawNameConfirmed(false);
                               setWithdrawAccName('');
                               setWithdrawError('');
                             }}
@@ -5004,6 +4925,7 @@ export default function App() {
                               const val = e.target.value.replace(/[^0-9]/g, '');
                               if (val.length <= 10) {
                                 setWithdrawAccount(val);
+                                setWithdrawNameConfirmed(false);
                               }
                             }}
                             className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono tracking-widest focus:outline-none focus:ring-1 focus:ring-teal-400"
@@ -5026,12 +4948,18 @@ export default function App() {
                               <span>Resolving account holder's name...</span>
                             </div>
                           ) : withdrawVerified && withdrawAccName ? (
-                            <div className="w-full text-xs bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 text-emerald-300 font-mono font-bold flex items-center justify-between shadow-inner">
-                              <div className="flex items-center gap-2 truncate">
-                                <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                                <span className="truncate">{withdrawAccName}</span>
+                            <div className="space-y-2">
+                              <div className="w-full text-xs bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 text-emerald-300 font-mono font-bold flex items-center justify-between shadow-inner">
+                                <div className="flex items-center gap-2 truncate">
+                                  <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                                  <span className="truncate">{withdrawAccName}</span>
+                                </div>
+                                <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-bold uppercase shrink-0">VERIFIED</span>
                               </div>
-                              <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-bold uppercase shrink-0">VERIFIED</span>
+                              <label className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/10 cursor-pointer">
+                                <input type="checkbox" checked={withdrawNameConfirmed} onChange={(e) => setWithdrawNameConfirmed(e.target.checked)} className="mt-0.5 accent-teal-400" />
+                                <span className="text-[10px] text-slate-300 leading-relaxed">I confirm that this verified account name belongs to the bank account I want to receive the withdrawal.</span>
+                              </label>
                             </div>
                           ) : withdrawError ? (
                             <div className="w-full text-xs bg-rose-500/10 border border-rose-500/30 rounded-xl px-4 py-3 text-rose-400 font-mono flex items-center gap-2">
@@ -5049,13 +4977,13 @@ export default function App() {
                       <button
                         id="btn-withdraw-step1-continue"
                         type="button"
-                        disabled={!withdrawBank || withdrawAccount.length !== 10 || !withdrawVerified || !withdrawAccName}
+                        disabled={!withdrawBank || withdrawAccount.length !== 10 || !withdrawVerified || !withdrawAccName || !withdrawNameConfirmed}
                         onClick={() => setWithdrawStep(2)}
                         className={`w-full py-4 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
-                          (!withdrawBank || withdrawAccount.length !== 10 || !withdrawVerified || !withdrawAccName) ? 'opacity-40 cursor-not-allowed' : ''
+                          (!withdrawBank || withdrawAccount.length !== 10 || !withdrawVerified || !withdrawAccName || !withdrawNameConfirmed) ? 'opacity-40 cursor-not-allowed' : ''
                         }`}
                       >
-                        <span>Continue to Step 2</span>
+                        <span>Confirm Name & Continue to Step 2</span>
                         <ArrowRight className="h-4 w-4" />
                       </button>
                     </GlassCard>
@@ -5070,7 +4998,7 @@ export default function App() {
                             <span className="h-6 w-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs font-mono font-bold">2</span>
                             Step 2: Amount & Authorization
                           </h3>
-                          <p className="text-[11px] text-slate-400 mt-1">Specify withdrawal amount and enter your deposit code.</p>
+                          <p className="text-[11px] text-slate-400 mt-1">Confirm your withdrawal amount. Your wallet deposit is not an activation fee.</p>
                         </div>
                         <button
                           type="button"
@@ -5097,12 +5025,12 @@ export default function App() {
                         <div>
                           <div className="flex justify-between items-center mb-1.5">
                             <label className="text-[11px] font-mono text-slate-300 font-bold">Withdrawal Amount (₦)</label>
-                            <span className="text-[10px] font-mono text-slate-400">Min: ₦50 • Max: ₦200,000</span>
+                            <span className="text-[10px] font-mono text-slate-400">Min: ₦5,000 • Max: ₦200,000</span>
                           </div>
                           <input
                             id="withdraw-amount"
                             type="number"
-                            min={50}
+                            min={5000}
                             max={200000}
                             placeholder="Min ₦5,000 - Max ₦200,000"
                             required
@@ -5116,10 +5044,28 @@ export default function App() {
                         </div>
 
                         {/* Withdrawal eligibility */}
-                        <div className="p-3 rounded-xl bg-teal-500/10 border border-teal-500/20 text-xs text-teal-200 leading-relaxed">
-                          <div className="font-bold mb-1">Withdrawal requirements</div>
-                          <div>Invite at least 5 active users, then deposit at least ₦520 through the Deposit button to unlock withdrawals.</div>
-                        </div>
+                        {withdrawEligibilityLoading ? (
+                          <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 text-xs text-slate-300">Checking withdrawal access…</div>
+                        ) : withdrawSuccessfulReferrals < 5 ? (
+                          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-100 leading-relaxed space-y-3">
+                            <div className="font-bold">Withdrawal access is currently locked.</div>
+                            <div>Complete 5 successful referrals first.</div>
+                            <div className="font-mono text-[11px]">Referral progress: {withdrawSuccessfulReferrals}/5</div>
+                            <button type="button" onClick={() => { setCurrentScreen('referrals'); navigateTo('/referrals'); }} className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-indigo-600 text-white font-black text-[10px] uppercase tracking-wider">Invite Friends</button>
+                          </div>
+                        ) : !withdrawDepositVerified ? (
+                          <div className="p-4 rounded-xl bg-teal-500/10 border border-teal-500/20 text-xs text-teal-100 leading-relaxed space-y-3">
+                            <div className="font-bold">Referral requirement complete (5/5).</div>
+                            <div>Make a verified KoraPay wallet deposit of at least <strong>₦520</strong> before you can withdraw.</div>
+                            <div className="text-[10px] text-teal-100/80">This is not an activation fee. The deposit is credited to your wallet and remains your money. Once the normal withdrawal requirements are met, it can be withdrawn with your available balance.</div>
+                            <button type="button" onClick={() => window.dispatchEvent(new CustomEvent('nevo-open-deposit'))} className="w-full py-2.5 rounded-xl bg-gradient-to-r from-teal-400 to-indigo-500 text-slate-950 font-black text-[10px] uppercase tracking-wider">Deposit ₦520+ via KoraPay</button>
+                          </div>
+                        ) : (
+                          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-200 leading-relaxed">
+                            <div className="font-bold">Withdrawal access unlocked.</div>
+                            <div>Your verified KoraPay deposit has been credited to your wallet. It is not an activation fee and remains your money.</div>
+                          </div>
+                        )}
 
                         <button
                           id="btn-withdraw-submit"
@@ -5128,13 +5074,15 @@ export default function App() {
                             !withdrawAccount ||
                             withdrawAccount.length !== 10 ||
                             !withdrawAccName ||
+                            withdrawSuccessfulReferrals < 5 ||
+                            !withdrawDepositVerified ||
                             !withdrawAmount ||
                             parseInt(withdrawAmount) < 5000 ||
                             parseInt(withdrawAmount) > 200000 ||
                             isSubmitting
                           }
                           className={`w-full py-4 bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
-                            (!withdrawAccount || withdrawAccount.length !== 10 || !withdrawAccName || !withdrawAmount || parseInt(withdrawAmount) < 5000 || parseInt(withdrawAmount) > 200000 || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
+                            (!withdrawAccount || withdrawAccount.length !== 10 || !withdrawAccName || withdrawSuccessfulReferrals < 5 || !withdrawDepositVerified || !withdrawAmount || parseInt(withdrawAmount) < 5000 || parseInt(withdrawAmount) > 200000 || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
                         >
                           {isSubmitting ? (
@@ -5340,12 +5288,12 @@ export default function App() {
                         <div>
                           <div className="flex justify-between items-center mb-1.5">
                             <label className="text-[11px] font-mono text-slate-300 font-bold">Transfer Amount (₦)</label>
-                            <span className="text-[10px] font-mono text-slate-400">Min: ₦50 • Max: ₦200,000</span>
+                            <span className="text-[10px] font-mono text-slate-400">Min: ₦5,000 • Max: ₦200,000</span>
                           </div>
                           <input
                             id="input-transfer-amount"
                             type="number"
-                            min={50}
+                            min={5000}
                             max={200000}
                             placeholder="Min ₦5,000 - Max ₦200,000"
                             required
@@ -5365,7 +5313,7 @@ export default function App() {
                               <ShieldCheck className="h-4 w-4 text-amber-400 shrink-0" />
                               <div>
                                 <p className="font-bold">Transaction Access Locked</p>
-                                <p className="text-[9px] opacity-80 mt-0.5">Complete 5 successful referrals and make a verified KoraPay deposit of at least ₦520 before transferring wallet funds.</p>
+                                <p className="text-[9px] opacity-80 mt-0.5">Complete 5 successful referrals to unlock wallet transfers.</p>
                               </div>
                             </div>
                           ) : (
@@ -5961,7 +5909,6 @@ export default function App() {
         <WalletDepositModal
           isOpen={paymentModalOpen}
           onClose={() => setPaymentModalOpen(false)}
-          token={localStorage.getItem('nevo_auth_token') || ''}
           onToast={showToast}
           onSuccess={() => syncWithBackend()}
         />

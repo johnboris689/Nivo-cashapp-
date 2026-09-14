@@ -42,7 +42,7 @@ export const AdminLoginPage: React.FC = () => {
             <ShieldCheck className="w-7 h-7" />
           </div>
           <h1 className="text-2xl font-black text-white">Administrator Access</h1>
-          <p className="text-xs text-[#C13A5A] font-semibold mt-1">Nivo Cash App Management Portal</p>
+          <p className="text-xs text-[#C13A5A] font-semibold mt-1">Nevo Management Portal</p>
         </div>
 
         {error && (

@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { AlertCircle, ArrowRight, ExternalLink, ShieldCheck, Wallet, X } from 'lucide-react';
+import { api } from '../lib/api';
 
 interface WalletDepositModalProps {
   isOpen: boolean;
   onClose: () => void;
-  token: string;
+  token?: string;
   onToast?: (message: string, type?: 'success' | 'info' | 'error') => void;
   onSuccess?: () => void;
 }
 
-export default function WalletDepositModal({ isOpen, onClose, token, onToast }: WalletDepositModalProps) {
+export default function WalletDepositModal({ isOpen, onClose, onToast }: WalletDepositModalProps) {
   const [amount, setAmount] = useState(520);
   const [custom, setCustom] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,14 +37,9 @@ export default function WalletDepositModal({ isOpen, onClose, token, onToast }: 
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/korapay/initialize-wallet-deposit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ amount: value }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.success || !data.deposit?.checkoutUrl) {
-        throw new Error(data.error || 'Unable to create the KoraPay payment session.');
+      const data = await api.initializeKoraPayDeposit(value);
+      if (!data?.deposit?.checkoutUrl) {
+        throw new Error('Unable to create the KoraPay payment session.');
       }
       onToast?.('Opening secure KoraPay checkout...', 'info');
       window.location.assign(data.deposit.checkoutUrl);
@@ -92,7 +88,7 @@ export default function WalletDepositModal({ isOpen, onClose, token, onToast }: 
 
           <div className="rounded-2xl border border-teal-500/20 bg-teal-500/5 p-4 space-y-2">
             <div className="flex items-center gap-2 text-teal-300 text-sm font-black"><ShieldCheck className="w-4 h-4" /> KoraPay</div>
-            <p className="text-xs text-slate-400 leading-relaxed">A new secure KoraPay checkout session is created for every deposit. Your wallet is credited only after server-side payment verification.</p>
+            <p className="text-xs text-slate-400 leading-relaxed">A new secure KoraPay checkout session is created for every deposit. This is a real wallet deposit, not an activation fee. Your wallet is credited only after server-side payment verification, and the deposited amount remains your money.</p>
           </div>
 
           <button onClick={startKoraPay} disabled={loading} className="w-full py-4 rounded-xl bg-gradient-to-r from-teal-400 via-indigo-500 to-teal-400 text-slate-950 font-black text-sm uppercase flex items-center justify-center gap-2 disabled:opacity-50">

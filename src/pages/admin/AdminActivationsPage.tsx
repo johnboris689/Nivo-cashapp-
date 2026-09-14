@@ -75,9 +75,9 @@ export const AdminActivationsPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-black text-white flex items-center gap-2">
             <ShieldCheck className="w-6 h-6 text-[#8F1D3A]" />
-            Activation Fee Verification
+            Withdrawal Access Verification
           </h1>
-          <p className="text-xs text-zinc-400 mt-1">Review and approve user ₦520 activation fee bank payments</p>
+          <p className="text-xs text-zinc-400 mt-1">Review withdrawal-access eligibility and verified KoraPay wallet deposits</p>
         </div>
 
         {pendingCount > 0 && (

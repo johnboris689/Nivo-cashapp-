@@ -53,7 +53,7 @@ export const WithdrawalSuccessModal: React.FC<WithdrawalSuccessModalProps> = ({ 
     // Generate text receipt for download
     const receiptText = `
 ========================================
-       NIVO CASH - WITHDRAWAL RECEIPT
+       NEVO - WITHDRAWAL RECEIPT
 ========================================
 Status: SUBMITTED (PENDING PROCESSING)
 Reference: ${data.reference}
@@ -69,7 +69,7 @@ Time: ${data.requestTime}
 Processing Time: Instant - 15 Mins
 Remaining Balance: ₦${data.remainingBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
 ========================================
-Thank you for using Nivo Cash!
+Thank you for using Nevo!
 Support: support@nivocash.app
     `.trim();
 
@@ -83,11 +83,11 @@ Support: support@nivocash.app
   };
 
   const handleShareReceipt = async () => {
-    const text = `Nivo Cash Withdrawal Receipt: ₦${data.amount.toLocaleString()} to ${data.recipientName} (${data.bankName}). Ref: ${data.reference}`;
+    const text = `Nevo Withdrawal Receipt: ₦${data.amount.toLocaleString()} to ${data.recipientName} (${data.bankName}). Ref: ${data.reference}`;
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Nivo Cash Receipt',
+          title: 'Nevo Receipt',
           text: text,
         });
       } catch (e) {

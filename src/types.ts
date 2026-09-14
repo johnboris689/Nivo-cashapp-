@@ -185,6 +185,8 @@ export interface DepositRequest {
   adminNote?: string;
   transactionId?: string;
   rawResponse?: any;
+  checkoutUrl?: string;
+  authorizationUrl?: string;
 }
 
 export type TaskVerificationType = 'timer' | 'proof';

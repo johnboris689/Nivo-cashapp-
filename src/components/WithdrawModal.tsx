@@ -38,6 +38,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
 
   const [resolving, setResolving] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+  const [nameConfirmed, setNameConfirmed] = useState(false);
 
   const [amount, setAmount] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -47,12 +48,11 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
   const [bankOptions, setBankOptions] = useState<{ name: string; code: string }[]>([]);
 
   const minWithdrawal = settings?.minWithdrawal || 5000;
-  const activationFee = settings?.activationFeeAmount || 520;
   const withdrawalFee = 0; // ₦0 fee
 
-  const currentRefs = user?.totalReferrals || 0;
-  const isActivated = !!user?.activationPaid;
-  const isWithdrawalLocked = currentRefs < 5 || !isActivated;
+  const [eligibility, setEligibility] = useState({ successfulReferrals: 0, verifiedDeposit: false, canWithdraw: false });
+  const currentRefs = eligibility.successfulReferrals;
+  const isWithdrawalLocked = !eligibility.canWithdraw;
 
   // Fetch banks on mount
   useEffect(() => {
@@ -78,11 +78,13 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
       }
     }
     loadBanks();
+    api.getWithdrawalEligibility().then(setEligibility).catch(() => {});
   }, []);
 
   // Trigger account resolution when 10 digits entered & bank selected
   useEffect(() => {
     setIsVerified(false);
+    setNameConfirmed(false);
     setAccountName('');
     setError(null);
 
@@ -95,10 +97,11 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
     setResolving(true);
     setError(null);
     try {
-      const res = await api.resolveBankAccount({ accountNumber: accNum, bankCode: code });
+      const res = await api.resolveBankAccount({ accountNumber: accNum, bankCode: code, bankName });
       if (res && res.accountName) {
         setAccountName(res.accountName);
         setIsVerified(true);
+        setNameConfirmed(false);
       } else {
         setError('Invalid bank account.');
         setIsVerified(false);
@@ -124,6 +127,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
       setError('Please verify a valid bank account to proceed.');
       return;
     }
+    if (!nameConfirmed) { setError('Please confirm the verified account name before continuing.'); return; }
     setError(null);
     setStep(2);
   };
@@ -132,7 +136,9 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
     e.preventDefault();
 
     if (isWithdrawalLocked) {
-      setError(`Withdrawal locked. You must invite 5 real referrals (Current: ${currentRefs}/5) and pay your ₦${activationFee} activation fee.`);
+      setError(currentRefs < 5
+        ? `Withdrawal locked. Complete 5 successful referrals (${currentRefs}/5) before withdrawals are available.`
+        : `Withdrawal locked. Make a verified KoraPay wallet deposit of at least ₦520 to unlock withdrawals. This is not an activation fee; it is a real wallet deposit that remains your money.`);
       return;
     }
 
@@ -258,8 +264,8 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                   <h4 className="text-xs font-bold text-[#C13A5A]">Withdrawal Locked</h4>
                   <p className="text-[11px] text-[#E6B8C3]/90 mt-0.5 leading-relaxed">
                     {currentRefs < 5
-                      ? 'You need 5 successful referrals before account activation.'
-                      : 'Complete your first wallet deposit of ₦520 via Automated Virtual Account to activate instant withdrawals.'}
+                      ? 'Complete 5 successful referrals before withdrawals are available.'
+                      : 'Your 5 referrals are complete. Make a verified KoraPay wallet deposit of at least ₦520 to unlock withdrawals. This is not an activation fee; the deposit remains your money.'}
                   </p>
                 </div>
               </div>
@@ -289,12 +295,12 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                   <button
                     onClick={() => {
                       onClose();
-                      navigate('/activation');
+                      window.dispatchEvent(new CustomEvent('nevo-open-deposit'));
                     }}
                     className="w-full bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-black text-xs py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <CreditCard className="w-4 h-4" />
-                    <span>Deposit ₦520 to Activate</span>
+                    <span>Deposit ₦520+ via KoraPay</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -366,8 +372,16 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                     )}
                   </div>
 
+                  {isVerified && accountName && (
+                    <label className="flex items-start gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/10 cursor-pointer">
+                      <input type="checkbox" checked={nameConfirmed} onChange={(e) => setNameConfirmed(e.target.checked)} className="mt-0.5 accent-teal-400" />
+                      <span className="text-[10px] text-slate-300 leading-relaxed">I confirm that the verified account name above is correct.</span>
+                    </label>
+                  )}
+
                   <button
                     type="submit"
+                    disabled={!isVerified || !accountName || !nameConfirmed}
                     disabled={!isVerified || resolving}
                     className="w-full bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-lg shadow-[#7A1831]/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40"
                   >

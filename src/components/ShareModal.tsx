@@ -32,8 +32,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({ onClose }) => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Nivo Cash App Referral',
-          text: `🔥 Join Nivo Cash App with my link & start earning! Use my referral code: ${referralCode}`,
+          title: 'Nevo Referral',
+          text: `🔥 Join Nevo with my link & start earning! Use my referral code: ${referralCode}`,
           url: referralLink,
         });
       } catch (err) {
@@ -46,13 +46,13 @@ export const ShareModal: React.FC<ShareModalProps> = ({ onClose }) => {
 
   const shareWhatsApp = () => {
     const text = encodeURIComponent(
-      `🔥 Hey! Join me on Nivo Cash App and earn money completing tasks & referring friends! Sign up here: ${referralLink}`
+      `🔥 Hey! Join me on Nevo and earn money completing tasks & referring friends! Sign up here: ${referralLink}`
     );
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
   const shareTelegram = () => {
-    const text = encodeURIComponent(`🔥 Join Nivo Cash App today & earn ₦${bonusAmount} per referral!`);
+    const text = encodeURIComponent(`🔥 Join Nevo today & earn ₦${bonusAmount} per referral!`);
     window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${text}`, '_blank');
   };
 

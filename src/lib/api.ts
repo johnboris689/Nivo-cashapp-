@@ -8,6 +8,7 @@ export function getAuthToken(): string | null {
     localStorage.getItem('nevo_auth_token') ||
     localStorage.getItem(TOKEN_KEY) ||
     localStorage.getItem('token') ||
+    sessionStorage.getItem('nevo_auth_token') ||
     null
   );
 }
@@ -15,12 +16,14 @@ export function getAuthToken(): string | null {
 export function setAuthToken(token: string) {
   localStorage.setItem('nevo_auth_token', token);
   localStorage.setItem(TOKEN_KEY, token);
+  sessionStorage.setItem('nevo_auth_token', token);
 }
 
 export function removeAuthToken() {
   localStorage.removeItem('nevo_auth_token');
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem('token');
+  sessionStorage.removeItem('nevo_auth_token');
 }
 
 export function getAdminToken(): string | null {
@@ -93,14 +96,21 @@ export const api = {
   getSettings: () => request<SiteSettings>('/api/settings'),
   getBankDetails: () => request<BankDetails>('/api/bank-details'),
   getBanks: () => request<{ name: string; code: string }[]>('/api/banks'),
-  resolveBankAccount: async (payload: { accountNumber: string; bankCode: string }) => {
-    const token = getAuthToken();
-    const qs = new URLSearchParams({ accountNumber: payload.accountNumber, bankCode: payload.bankCode });
-    const res = await fetch(`/api/bank/resolve?${qs.toString()}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || 'Unable to resolve bank account.');
-    return data;
-  },
+  resolveBankAccount: (payload: { accountNumber: string; bankCode: string; bankName?: string }) =>
+    request<{ success: boolean; accountName?: string; accountNumber?: string; bankCode?: string }>('/api/verify-account', {
+      method: 'POST',
+      body: JSON.stringify({
+        accountNumber: payload.accountNumber,
+        bank: payload.bankName || payload.bankCode,
+        bankCode: payload.bankCode,
+      }),
+    }),
+
+  verifyBankAccount: (payload: { bank: string; accountNumber: string }) =>
+    request<{ success: boolean; accountName: string; bankName: string; accountNumber: string }>('/api/verify-account', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 
   // --- Auth ---
   register: (payload: { fullName: string; username: string; email: string; phone: string; password: string; referralCode?: string }) =>
@@ -170,8 +180,14 @@ export const api = {
   checkKoraPayDepositStatus: (reference: string) =>
     request<any>(`/api/korapay/check-status/${encodeURIComponent(reference)}`),
 
+  getTransactionEligibility: () =>
+    request<{ successfulReferrals: number; referralsRequired: number; verifiedDeposit: boolean; depositMinimum: number; canWithdraw: boolean }>('/api/transactions/eligibility'),
+
+  getWithdrawalEligibility: () =>
+    request<{ successfulReferrals: number; referralsRequired: number; verifiedDeposit: boolean; depositMinimum: number; canWithdraw: boolean }>('/api/transactions/eligibility'),
+
   submitWithdrawal: (payload: { amount: number; bankName: string; accountNumber: string; accountName: string }) =>
-    request<{ message: string; withdrawal: WithdrawalRequest }>('/api/wallet/withdraw', {
+    request<{ message: string; withdrawal?: WithdrawalRequest; transaction?: any; balance?: number }>('/api/transactions/withdraw', {
       method: 'POST',
       body: JSON.stringify(payload),
     }),

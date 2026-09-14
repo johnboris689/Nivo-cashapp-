@@ -24,7 +24,7 @@ export const AdminSettingsPage: React.FC = () => {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
   // Editable state
-  const [appName, setAppName] = useState('Nivo Cash App');
+  const [appName, setAppName] = useState('Nevo');
   const [supportEmail, setSupportEmail] = useState('support@nivocash.app');
   const [telegramChannel, setTelegramChannel] = useState('https://t.me/nivocash');
   const [minDeposit, setMinDeposit] = useState('1000');
@@ -310,7 +310,7 @@ export const AdminSettingsPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-zinc-300 mb-1">Activation Fee (₦)</label>
+              <label className="block text-xs font-bold text-zinc-300 mb-1">Withdrawal Access Deposit Minimum (₦)</label>
               <input
                 type="number"
                 required
@@ -327,7 +327,7 @@ export const AdminSettingsPage: React.FC = () => {
               type="text"
               value={announcementBanner}
               onChange={(e) => setAnnouncementBanner(e.target.value)}
-              placeholder="e.g. Welcome to Nivo Cash App! Refer friends and earn ₦1,200 per user!"
+              placeholder="e.g. Welcome to Nevo! Refer friends and earn ₦1,200 per user!"
               className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-[#8F1D3A]"
             />
           </div>

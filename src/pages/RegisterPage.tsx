@@ -77,7 +77,7 @@ export const RegisterPage: React.FC = () => {
           </Link>
           <h1 className="text-xl font-black text-white mt-1">Create Your Account</h1>
           <p className="text-xs text-slate-400 mt-1">
-            Join thousands of users earning daily on Nivo Cash App
+            Join thousands of users earning daily on Nevo
           </p>
         </div>
 

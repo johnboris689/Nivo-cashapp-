@@ -16,7 +16,7 @@ export const Sidebar: React.FC = () => {
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Wallet & Bank', path: '/wallet', icon: Wallet },
     { name: 'Refer & Earn', path: '/referrals', icon: Users, badge: '₦1,200' },
-    { name: 'Withdrawal Activation', path: '/activation', icon: Zap, badge: 'Required' },
+    { name: 'Withdrawal Access', path: '/activation', icon: Zap, badge: 'Required' },
     { name: 'Tasks & Rewards', path: '/tasks', icon: CheckSquare },
     { name: 'Transaction History', path: '/history', icon: History },
     { name: 'Profile & Account', path: '/profile', icon: User },
@@ -83,7 +83,7 @@ export const Sidebar: React.FC = () => {
 
       {/* Footer Info */}
       <div className="mt-auto pt-4 border-t border-white/10 text-center">
-        <p className="text-[11px] text-slate-500 font-medium">Nivo Cash v3.0</p>
+        <p className="text-[11px] text-slate-500 font-medium">Nevo</p>
         <p className="text-[10px] text-slate-600 mt-0.5">Premium Fintech Banking Platform</p>
       </div>
     </aside>

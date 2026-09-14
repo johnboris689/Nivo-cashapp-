@@ -42,7 +42,7 @@ export const LandingPage: React.FC = () => {
           </h1>
 
           <p className="mt-6 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Welcome to <strong className="text-white">Nivo Cash App</strong>. Earn guaranteed income by completing daily tasks and referring friends. Enjoy instant bank deposits and lightning-fast withdrawals 24/7.
+            Welcome to <strong className="text-white">Nevo</strong>. Earn guaranteed income by completing daily tasks and referring friends. Enjoy instant bank deposits and lightning-fast withdrawals 24/7.
           </p>
 
           {/* Action CTA Buttons */}
@@ -159,7 +159,7 @@ export const LandingPage: React.FC = () => {
       {/* Core Features Section */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-3xl font-black text-white">Why Choose Nivo Cash App?</h2>
+          <h2 className="text-3xl font-black text-white">Why Choose Nevo?</h2>
           <p className="text-sm text-slate-400 mt-2">
             Built with modern fintech security and automated processing to guarantee you the best experience.
           </p>
@@ -205,11 +205,11 @@ export const LandingPage: React.FC = () => {
             <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[#7A1831] to-[#C13A5A] flex items-center justify-center">
               <Zap className="w-4 h-4 text-white fill-white" />
             </div>
-            <span className="font-black text-sm text-white">NIVO CASH APP</span>
+            <span className="font-black text-sm text-white">NEVO</span>
           </div>
 
           <p className="text-xs text-slate-400">
-            © {new Date().getFullYear()} Nivo Cash App. All rights reserved. Premium Digital Fintech Platform.
+            © {new Date().getFullYear()} Nevo. All rights reserved. Premium Digital Fintech Platform.
           </p>
         </div>
       </footer>
