@@ -184,7 +184,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
     <div className="flex flex-col h-full w-full bg-[#07070c] text-white overflow-hidden font-sans relative">
       
       {/* Header */}
-      <div className="px-4 py-3 bg-[#0a0a12]/90 backdrop-blur-xl border-b border-white/[0.08] flex items-center justify-between shrink-0 z-10">
+      <div className="px-4 py-3 bg-[#0a0a12] border-b border-white/[0.08] flex items-center justify-between shrink-0 z-10">
         <div className="flex items-center gap-3">
           {onBack && (
             <button
@@ -481,10 +481,11 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
 
   if (mode === 'floating_modal') {
     return (
-      <div className="fixed inset-0 z-[200] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 animate-fade-in">
-        <div className="relative w-full max-w-lg h-[88vh] max-h-[680px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col bg-[#07070c]">
-          {content}
-        </div>
+      <div 
+        id="nevo-ai-assistant-modal"
+        className="fixed inset-0 z-[200] w-full h-full h-[100dvh] max-h-[100dvh] bg-[#07070c] flex flex-col pt-safe pb-safe overflow-hidden"
+      >
+        {content}
       </div>
     );
   }

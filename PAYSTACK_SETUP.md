@@ -1,29 +1,30 @@
-# SwiftPay WDV Voucher — Paystack Setup
+# Nevo — Paystack Wallet Deposit Setup
 
-SwiftPay now sells the WDV voucher directly from **Buy WDV Voucher**. The fixed purchase price is **₦6,500**. There is no wallet-deposit step in this flow.
+Nevo wallet deposits use Paystack's server-side Transaction API. Each deposit creates a new Paystack transaction and redirects the user to the checkout URL returned by Paystack.
 
-## Configure Paystack
-
-Add these server-side environment variables in Render (or your hosting provider):
+## Environment variables
 
 ```env
-PAYMENT_PROVIDER=paystack
+APP_URL=https://your-nevo-domain.example
 PAYSTACK_SECRET_KEY=sk_live_...
 PAYSTACK_PUBLIC_KEY=pk_live_...
 ```
 
-The secret key must never be placed in frontend code.
+`PAYSTACK_SECRET_KEY` is server-only. Never put it in React/browser code or commit a real key to Git.
 
-## Payment flow
+## Deposit flow
 
-1. User opens **Buy WDV Voucher** and taps **BUY WDV VOUCHER — ₦6,500**.
-2. SwiftPay creates a unique payment reference on the server.
-3. Paystack opens its secure checkout.
-4. SwiftPay verifies the reference directly with Paystack's API.
-5. Only a verified successful **₦6,500 NGN** payment can create a WDV voucher.
-6. The voucher is stored in the existing WDV voucher database and shown with a **Copy Voucher** button.
+1. User selects an amount of at least ₦520.
+2. User selects Paystack.
+3. Nevo creates a unique pending `wallet_funding` transaction.
+4. Nevo calls Paystack's `transaction/initialize` endpoint from the backend.
+5. Nevo redirects the user to the `authorization_url` returned by Paystack for that transaction.
+6. A browser callback never credits the wallet by itself.
+7. Nevo verifies the transaction with Paystack and processes the Paystack webhook.
+8. Only a verified successful NGN payment matching the stored amount and user can credit the wallet.
 
-Paystack webhooks are also supported at:
+Webhook endpoint:
+
 `/api/payment/webhook/paystack`
 
-The webhook does not trust the browser and cannot create a voucher for the wrong amount. Duplicate notifications are handled idempotently.
+Paystack webhook signatures are verified with `PAYSTACK_SECRET_KEY`, and duplicate events are protected by transaction idempotency.

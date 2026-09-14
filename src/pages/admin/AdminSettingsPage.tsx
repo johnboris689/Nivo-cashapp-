@@ -49,7 +49,7 @@ export const AdminSettingsPage: React.FC = () => {
       setMinWithdrawal(settingsData.minWithdrawal.toString());
       setActivationFeeAmount((settingsData.activationFeeAmount || 520).toString());
       setPaymentProvider(settingsData.paymentProvider || 'auto');
-      setMaintenanceMode(settingsData.maintenanceMode);
+      setMaintenanceMode(Boolean(settingsData.maintenanceMode));
       setAnnouncementBanner(settingsData.announcementBanner || '');
 
       if (paymentsData) {

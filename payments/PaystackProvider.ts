@@ -49,6 +49,7 @@ export class PaystackProvider implements PaymentProvider {
       amount: amountInKobo,
       reference: params.reference,
       callback_url: params.callbackUrl,
+      channels: ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer'],
       metadata: {
         custom_fields: [
           {

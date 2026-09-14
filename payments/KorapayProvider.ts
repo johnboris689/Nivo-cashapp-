@@ -41,21 +41,25 @@ export class KorapayProvider implements PaymentProvider {
       throw new Error('Korapay is not configured. Missing KORAPAY_SECRET_KEY environment variable.');
     }
 
-    const payload = {
+    const payload: Record<string, any> = {
       reference: params.reference,
       amount: params.amount,
       currency: 'NGN',
       redirect_url: params.callbackUrl,
+      channels: ['bank_transfer', 'card', 'pay_with_bank'],
       customer: {
-        name: params.name || 'SwiftPay Customer',
+        name: params.name || 'Nevo Customer',
         email: params.email
       },
-      narration: params.purpose === 'wdv_voucher' ? 'WDV Voucher Purchase' : 'SwiftPay Wallet Funding',
+      narration: params.purpose === 'wdv_voucher' ? 'Nevo Payment' : 'Nevo Wallet Funding',
       metadata: {
         purpose: params.purpose || 'wallet_funding',
         ...(params.metadata || {})
       }
     };
+    if (params.webhookUrl) {
+      payload.notification_url = params.webhookUrl;
+    }
 
     const res = await fetch(`${this.baseUrl}/charges/initialize`, {
       method: 'POST',
@@ -112,7 +116,7 @@ export class KorapayProvider implements PaymentProvider {
 
     const txData = data.data || {};
     const isSuccess = txData.status === 'success' || txData.status === 'successful';
-    const amountInNgn = Number(txData.amount || 0);
+    const amountInNgn = Number(txData.amount_paid ?? txData.amount ?? 0);
 
     let normalizedStatus: 'successful' | 'failed' | 'pending' | 'abandoned' = 'pending';
     if (isSuccess) {
@@ -170,15 +174,21 @@ export class KorapayProvider implements PaymentProvider {
 
     const event = jsonBody?.event;
     const data = jsonBody?.data || {};
-    const isSuccess = event === 'charge.success' || event === 'virtual_bank_account.payment_successful' || data.status === 'success' || data.status === 'successful';
+    const isSuccess = event === 'charge.success' && (
+      data.transaction_status === 'success' ||
+      data.status === 'success' ||
+      data.status === 'successful'
+    );
 
     return {
       isValid: true,
       event,
-      status: isSuccess ? 'successful' : 'pending',
-      reference: data.reference || data.payment_reference || data.account_reference,
-      providerReference: String(data.id || ''),
-      amount: Number(data.amount || data.amount_paid || 0),
+      status: isSuccess ? 'successful' : (event === 'charge.failed' ? 'failed' : 'pending'),
+      // Prefer Nevo's merchant/payment reference. Kora also supplies a generated
+      // charge reference, which is stored separately as providerReference.
+      reference: data.payment_reference || data.reference || data.account_reference,
+      providerReference: String(data.reference || data.id || ''),
+      amount: Number(data.amount_paid ?? data.amount ?? 0),
       customerEmail: data.customer?.email || data.payer_bank_account?.email,
       provider: this.name,
       rawData: jsonBody

@@ -46,6 +46,8 @@ interface JsonData {
   nivo_task_submissions?: any[];
   nivo_referrals?: any[];
   nivo_activations?: any[];
+  ad_reward_sessions?: any[];
+  ad_rewards?: any[];
 }
 
 // -------------------- JSON DATABASE ENGINE FALLBACK --------------------
@@ -139,7 +141,9 @@ function getJsonDb(): JsonData {
       wdv_payments: [],
       payment_transactions: [],
       ai_chat_logs: [],
-      ai_custom_faqs: [], nivo_tasks: [], nivo_task_submissions: [], nivo_referrals: [], nivo_activations: []
+      ai_custom_faqs: [], nivo_tasks: [], nivo_task_submissions: [], nivo_referrals: [], nivo_activations: [],
+      ad_reward_sessions: [],
+      ad_rewards: []
     };
     fs.writeFileSync(JSON_FILE, JSON.stringify(initial, null, 2));
     return initial;
@@ -308,7 +312,13 @@ function getJsonDb(): JsonData {
         webhookdata: pt.webhookData || pt.webhookdata || ''
       })),
       ai_chat_logs: parsed.ai_chat_logs || [],
-      ai_custom_faqs: parsed.ai_custom_faqs || []
+      ai_custom_faqs: parsed.ai_custom_faqs || [],
+      nivo_tasks: parsed.nivo_tasks || [],
+      nivo_task_submissions: parsed.nivo_task_submissions || [],
+      nivo_referrals: parsed.nivo_referrals || [],
+      nivo_activations: parsed.nivo_activations || [],
+      ad_reward_sessions: parsed.ad_reward_sessions || [],
+      ad_rewards: parsed.ad_rewards || []
     };
 
     // Migrations
@@ -358,7 +368,8 @@ function getJsonDb(): JsonData {
       wdv_payments: [],
       payment_transactions: [],
       ai_chat_logs: [],
-      ai_custom_faqs: [], nivo_tasks: [], nivo_task_submissions: [], nivo_referrals: [], nivo_activations: []
+      ai_custom_faqs: [], nivo_tasks: [], nivo_task_submissions: [], nivo_referrals: [], nivo_activations: [],
+      ad_reward_sessions: [], ad_rewards: []
     };
   }
 }
@@ -485,6 +496,12 @@ export async function initDb() {
   await execute(`CREATE TABLE IF NOT EXISTS nivo_task_submissions (id TEXT PRIMARY KEY, userId TEXT, taskId TEXT, taskTitle TEXT, rewardAmount REAL, verificationType TEXT, status TEXT, startedAt TEXT, completedAt TEXT, claimedAt TEXT, proofText TEXT, adminNote TEXT, createdAt TEXT)`);
   await execute(`CREATE TABLE IF NOT EXISTS nivo_referrals (id TEXT PRIMARY KEY, referrerEmail TEXT, referredEmail TEXT, referredUserName TEXT, bonusAmount REAL, status TEXT, createdAt TEXT)`);
   await execute(`CREATE TABLE IF NOT EXISTS nivo_activations (id TEXT PRIMARY KEY, userEmail TEXT, amount REAL, status TEXT, createdAt TEXT, processedAt TEXT, adminNote TEXT)`);
+  await execute(`CREATE TABLE IF NOT EXISTS ad_reward_sessions (id TEXT PRIMARY KEY, userEmail TEXT, adUnitPath TEXT, provider TEXT, rewardAmount REAL, status TEXT, providerToken TEXT, providerTxId TEXT, clientNonce TEXT, createdAt TEXT, completedAt TEXT, ipAddress TEXT)`);
+  await execute(`CREATE TABLE IF NOT EXISTS ad_rewards (id TEXT PRIMARY KEY, userEmail TEXT, sessionId TEXT, provider TEXT, providerTxId TEXT, rewardAmount REAL, status TEXT, reference TEXT, completedAt TEXT, createdAt TEXT)`);
+  try {
+    await execute(`CREATE INDEX IF NOT EXISTS idx_ad_reward_sessions_user ON ad_reward_sessions(userEmail)`);
+    await execute(`CREATE INDEX IF NOT EXISTS idx_ad_rewards_user ON ad_rewards(userEmail)`);
+  } catch (e) {}
   try {
     const taskCount = await getRow(`SELECT COUNT(*) as count FROM nivo_tasks`);
     if (!taskCount || Number(taskCount.count || 0) === 0) {
@@ -1234,6 +1251,49 @@ export function execute(sql: string, params: any[] = []): Promise<any> {
         } else if (sqlUpper.includes('INSERT INTO NIVO_ACTIVATIONS')) {
           db.nivo_activations=db.nivo_activations||[]; const row:any={id:params[0],useremail:(params[1]||'').toLowerCase(),amount:Number(params[2]||0),status:params[3]||'pending',createdat:params[4]||new Date().toISOString(),processedat:params[5]||'',adminnote:params[6]||''}; db.nivo_activations=db.nivo_activations.filter((x:any)=>x.id!==row.id); db.nivo_activations.push(row);
         } else if (sqlUpper.includes('UPDATE NIVO_ACTIVATIONS')) { const id=params[params.length-1]; const row=(db.nivo_activations||[]).find((x:any)=>x.id===id); if(row){row.status=params[0]; row.processedat=params[1]||new Date().toISOString();} 
+        } else if (sqlUpper.includes('INSERT INTO AD_REWARD_SESSIONS')) {
+          db.ad_reward_sessions = db.ad_reward_sessions || [];
+          const row: any = {
+            id: params[0],
+            useremail: (params[1] || '').toLowerCase(),
+            adunitpath: params[2] || '',
+            provider: params[3] || 'Google Ad Manager (GPT Web Rewarded)',
+            rewardamount: Number(params[4] || 200),
+            status: params[5] || 'pending',
+            providertoken: params[6] || '',
+            providertxid: params[7] || '',
+            clientnonce: params[8] || '',
+            createdat: params[9] || new Date().toISOString(),
+            completedat: params[10] || '',
+            ipaddress: params[11] || ''
+          };
+          db.ad_reward_sessions = db.ad_reward_sessions.filter((x: any) => x.id !== row.id);
+          db.ad_reward_sessions.push(row);
+        } else if (sqlUpper.includes('UPDATE AD_REWARD_SESSIONS')) {
+          db.ad_reward_sessions = db.ad_reward_sessions || [];
+          const id = params[params.length - 1];
+          const row = db.ad_reward_sessions.find((x: any) => x.id === id);
+          if (row) {
+            if (sqlUpper.includes('STATUS')) row.status = params[0];
+            if (sqlUpper.includes('COMPLETEDAT')) row.completedat = params[1] || new Date().toISOString();
+            if (sqlUpper.includes('PROVIDERTXID')) row.providertxid = params[2] || '';
+          }
+        } else if (sqlUpper.includes('INSERT INTO AD_REWARDS')) {
+          db.ad_rewards = db.ad_rewards || [];
+          const row: any = {
+            id: params[0],
+            useremail: (params[1] || '').toLowerCase(),
+            sessionid: params[2] || '',
+            provider: params[3] || 'Google Ad Manager (GPT Web Rewarded)',
+            providertxid: params[4] || '',
+            rewardamount: Number(params[5] || 200),
+            status: params[6] || 'verified',
+            reference: params[7] || '',
+            completedat: params[8] || new Date().toISOString(),
+            createdat: params[9] || new Date().toISOString()
+          };
+          db.ad_rewards = db.ad_rewards.filter((x: any) => x.id !== row.id);
+          db.ad_rewards.push(row);
         } else if (sqlUpper.includes('INSERT INTO PASSWORD_RESETS')) {
           const r = {
             id: params[0],
@@ -1361,6 +1421,16 @@ export function getRow(sql: string, params: any[] = []): Promise<any> {
         if (sqlUpper.includes('FROM NIVO_TASKS')) { const id = params[0]; const rows = db.nivo_tasks || []; return resolve(rows.find((x:any)=>x.id===id) || null); }
         if (sqlUpper.includes('FROM NIVO_REFERRALS')) { const id = params[0]; const rows = db.nivo_referrals || []; return resolve(rows.find((x:any)=>x.id===id) || null); }
         if (sqlUpper.includes('FROM NIVO_ACTIVATIONS')) { const id = params[0]; const rows = db.nivo_activations || []; return resolve(rows.find((x:any)=>x.id===id) || null); }
+        if (sqlUpper.includes('FROM AD_REWARD_SESSIONS')) {
+          const id = params[0];
+          const rows = db.ad_reward_sessions || [];
+          return resolve(rows.find((x: any) => x.id === id || x.sessionid === id) || null);
+        }
+        if (sqlUpper.includes('FROM AD_REWARDS')) {
+          const id = params[0];
+          const rows = db.ad_rewards || [];
+          return resolve(rows.find((x: any) => x.id === id || x.sessionid === id || x.providertxid === id) || null);
+        }
         if (sqlUpper.includes('FROM ADMIN_SETTINGS')) {
           const keyVal = params[0];
           if (keyVal && db.admin_settings[keyVal] !== undefined) {
@@ -1396,6 +1466,8 @@ export function getAllRows(sql: string, params: any[] = []): Promise<any[]> {
         if (sqlUpper.includes('FROM NIVO_TASK_SUBMISSIONS')) return resolve(db.nivo_task_submissions || []);
         if (sqlUpper.includes('FROM NIVO_REFERRALS')) return resolve(db.nivo_referrals || []);
         if (sqlUpper.includes('FROM NIVO_ACTIVATIONS')) return resolve(db.nivo_activations || []);
+        if (sqlUpper.includes('FROM AD_REWARD_SESSIONS')) return resolve(db.ad_reward_sessions || []);
+        if (sqlUpper.includes('FROM AD_REWARDS')) return resolve(db.ad_rewards || []);
         if (sqlUpper.includes('FROM ADMIN_SETTINGS')) {
           const rows = Object.entries(db.admin_settings).map(([key, value]) => ({ key, value }));
           return resolve(rows);

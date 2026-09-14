@@ -1,12 +1,18 @@
+export type UserStatus = 'active' | 'suspended';
+
 export interface User {
+  id: string;
   fullName: string;
+  username: string;
   email: string;
-  balance: number;
-  dailyTarget: number;
-  dailySpent: number;
-  pinCreated: boolean;
+  phone?: string;
+  walletBalance: number;
+  balance?: number; // Aliased to walletBalance for legacy components
+  dailyTarget?: number;
+  dailySpent?: number;
+  pinCreated?: boolean;
   pinCode?: string;
-  biometricEnabled: boolean;
+  biometricEnabled?: boolean;
   biometricRegisteredAt?: string;
   lastBiometricLogin?: string;
   lastLoginMethod?: 'password' | 'pin' | 'biometric';
@@ -16,24 +22,31 @@ export interface User {
     type?: string;
     deviceName?: string;
   };
-  phone?: string;
+  phone_number?: string;
   profilePic?: string;
+  avatarUrl?: string;
   isSuspended?: boolean;
   isFrozen?: boolean;
-  tier?: number; // Verification tier, e.g. 1, 2, 3
+  status: UserStatus;
+  tier?: number;
   is2faEnabled?: boolean;
+  emailVerified: boolean;
+  isAdmin?: boolean;
   welcomeRewardShown?: boolean;
   wdvVerified?: boolean;
   isWdvVerified?: boolean;
   notifications?: NotificationItem[];
-  username?: string;
-  referralCode?: string;
-  referralLink?: string;
+  referralCode: string;
+  referralLink: string;
+  referrerId?: string | null;
   referralCount?: number;
-  totalReferralBonus?: number;
-  totalEarnings?: number;
-  activationPaid?: boolean;
-  activationPaidAt?: string;
+  totalReferrals: number;
+  totalReferralBonus: number;
+  totalEarnings: number;
+  activationPaid: boolean;
+  activationPaidAt?: string | null;
+  createdAt: string;
+  lastLogin: string;
 }
 
 export type WdvStatus = 'unused' | 'redeemed';
@@ -48,18 +61,26 @@ export interface WdvCode {
   createdAt?: string;
   generatedAt?: string;
   status: WdvStatus;
-  redeemedFor?: string; // e.g. "Airtime to 08012345678" or "Bank Transfer"
+  redeemedFor?: string;
 }
 
 export type TransactionType = 
   | 'deposit'
   | 'withdraw'
+  | 'withdrawal'
   | 'buy_wdv'
   | 'redeem_airtime'
   | 'redeem_data'
   | 'redeem_transfer'
   | 'bank_transfer_direct'
-  | 'promotional_bonus';
+  | 'promotional_bonus'
+  | 'referral_bonus'
+  | 'task_reward'
+  | 'admin_credit'
+  | 'admin_debit'
+  | 'activation_fee';
+
+export type TransactionStatus = 'pending' | 'completed' | 'approved' | 'rejected' | 'failed' | 'success';
 
 export interface WithdrawalApprovalRecord {
   id: string;
@@ -73,14 +94,19 @@ export interface WithdrawalApprovalRecord {
 export interface WithdrawalRequest {
   id: string;
   userId: string;
-  email: string;
+  userName: string;
+  userEmail: string;
+  email?: string;
   amount: number;
   bankName: string;
   accountNumber: string;
   accountName: string;
-  status: 'pending' | 'partially_approved' | 'processing' | 'completed' | 'rejected' | 'cancelled' | string;
-  timestamp: string;
-  reference: string;
+  status: TransactionStatus | string;
+  createdAt: string;
+  timestamp?: string;
+  reference?: string;
+  processedAt?: string;
+  adminNote?: string;
   voucherCode?: string;
   notes?: string;
   posSlipPath?: string;
@@ -95,13 +121,15 @@ export interface WithdrawalRequest {
 
 export interface Transaction {
   id: string;
+  userId?: string;
   type: TransactionType;
   amount: number;
-  date: string;
-  status: 'pending' | 'success' | 'failed';
+  date?: string;
+  createdAt?: string;
+  status: TransactionStatus;
   description: string;
-  refNum?: string;
   reference?: string;
+  refNum?: string;
   wdvCodeUsed?: string;
   wdvCodeGenerated?: string;
   narration?: string;
@@ -116,6 +144,104 @@ export interface Transaction {
   dataPlan?: string;
   approvedAmount?: number;
   approvalHistory?: WithdrawalApprovalRecord[];
+  details?: Record<string, any>;
+}
+
+export interface ActivationRequest {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  amount: number;
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  paymentProofRef: string;
+  senderName: string;
+  status: TransactionStatus;
+  createdAt: string;
+  processedAt?: string;
+  adminNote?: string;
+}
+
+export interface DepositRequest {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  amount: number;
+  reference: string;
+  accountNumber: string;
+  accountName: string;
+  bankName: string;
+  accountExpiresAt?: string;
+  provider: 'paystack' | 'flutterwave' | 'korapay' | string;
+  webhookStatus: 'verified' | 'pending' | 'failed';
+  status: TransactionStatus;
+  createdAt: string;
+  processedAt?: string;
+  paymentProofRef?: string;
+  senderName?: string;
+  adminNote?: string;
+  transactionId?: string;
+  rawResponse?: any;
+}
+
+export type TaskVerificationType = 'timer' | 'proof';
+export type TaskSubmissionStatus = 'not_started' | 'in_progress' | 'pending_verification' | 'approved' | 'claimed' | 'rejected';
+
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  rewardAmount: number;
+  category: 'social' | 'survey' | 'daily' | 'download' | 'special';
+  actionUrl: string;
+  verificationType: TaskVerificationType;
+  timerSeconds?: number;
+  proofInstructions?: string;
+  enabled: boolean;
+  createdAt: string;
+  completionCount: number;
+}
+
+export interface TaskCompletion {
+  id: string;
+  userId: string;
+  taskId: string;
+  taskTitle: string;
+  rewardAmount: number;
+  completedAt: string;
+}
+
+export interface TaskSubmission {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  taskId: string;
+  taskTitle: string;
+  rewardAmount: number;
+  verificationType: TaskVerificationType;
+  status: TaskSubmissionStatus;
+  startedAt?: string;
+  completedAt?: string;
+  claimedAt?: string;
+  proofText?: string;
+  proofUrl?: string;
+  adminNote?: string;
+  createdAt: string;
+}
+
+export interface ReferralRecord {
+  id: string;
+  referrerId: string;
+  referredUserId: string;
+  referredUserName: string;
+  referredUserEmail: string;
+  bonusAmount: number;
+  status: 'successful' | 'pending';
+  createdAt: string;
 }
 
 export interface BankAccount {
@@ -124,13 +250,26 @@ export interface BankAccount {
   bankName: string;
 }
 
+export interface BankDetails {
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  instructions: string;
+  minDeposit: number;
+  maxDeposit: number;
+}
+
 export interface NotificationItem {
   id: string;
+  userId?: string;
   title: string;
-  body: string;
-  date: string;
-  unread: boolean;
-  type?: 'login' | 'airtime' | 'data' | 'transfer' | 'withdraw' | 'security' | 'system' | 'voucher' | 'balance' | string;
+  message?: string;
+  body?: string;
+  date?: string;
+  createdAt?: string;
+  unread?: boolean;
+  read?: boolean;
+  type?: string;
   category?: string;
   status?: string;
   amount?: number | string;
@@ -142,6 +281,81 @@ export interface NotificationItem {
   accountNumber?: string;
   phoneNumber?: string;
   details?: Record<string, any>;
+}
+
+export interface SiteSettings {
+  appName: string;
+  websiteName: string;
+  logoText: string;
+  maintenanceMode: boolean | string;
+  referralBonusAmount: number;
+  welcomeBonusAmount: number;
+  activationFeeAmount: number;
+  minDeposit: number;
+  minWithdrawal: number;
+  announcementBanner?: string;
+  bannerNotice: string;
+  supportEmail: string;
+  telegramChannel?: string;
+  telegramGroupUrl: string;
+  paymentProvider?: 'auto' | 'paystack' | 'flutterwave' | 'korapay';
+}
+
+export type PaymentProviderType = 'paystack' | 'flutterwave' | 'korapay';
+
+export interface PaymentProviderStatus {
+  id: PaymentProviderType;
+  name: string;
+  isConfigured: boolean;
+  missingVariables: string[];
+  requiredEnvVars: string[];
+  isDefault: boolean;
+  webhookUrl: string;
+}
+
+export interface ProviderConfigStatus {
+  id: PaymentProviderType;
+  name: string;
+  isConfigured: boolean;
+  missingCredentials?: string[];
+  missingVariables: string[];
+  requiredVariables?: string[];
+  requiredEnvVars: string[];
+  isDefault: boolean;
+  webhookUrl: string;
+}
+
+export interface PaymentOverviewResponse {
+  providers: PaymentProviderStatus[];
+  activeProvider: PaymentProviderType | null;
+  hasAnyConfigured: boolean;
+}
+
+export interface AdminStats {
+  totalUsers: number;
+  activeUsers: number;
+  totalDepositsAmount: number;
+  pendingDepositsCount: number;
+  totalWithdrawalsAmount: number;
+  pendingWithdrawalsCount: number;
+  totalReferralsCount: number;
+  totalReferralBonusPaid: number;
+  totalWalletBalances: number;
+  totalTasksCompleted: number;
+}
+
+export interface PasswordResetRequest {
+  id: string;
+  userId: string;
+  email: string;
+  otpHash: string;
+  createdAt: string;
+  expiresAt: string;
+  attempts: number;
+  verifiedAt?: string | null;
+  resetTokenHash?: string | null;
+  resetTokenExpiresAt?: string | null;
+  usedAt?: string | null;
 }
 
 export interface DeviceSession {

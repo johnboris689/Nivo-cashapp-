@@ -394,7 +394,7 @@ class Database {
     try {
       if (supabase) {
         const { data: listData } = await supabase.auth.admin.listUsers();
-        const found = listData?.users.find(u => u.email?.toLowerCase() === adminEmail);
+        const found = listData?.users.find((u: any) => u.email?.toLowerCase() === adminEmail);
         if (!found) {
           await supabase.auth.admin.createUser({
             email: adminEmail,

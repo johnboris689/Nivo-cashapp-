@@ -4,27 +4,43 @@ const TOKEN_KEY = 'nivo_auth_token';
 const ADMIN_TOKEN_KEY = 'nivo_admin_token';
 
 export function getAuthToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
+  return (
+    localStorage.getItem('swiftpay_token') ||
+    localStorage.getItem(TOKEN_KEY) ||
+    localStorage.getItem('token') ||
+    null
+  );
 }
 
 export function setAuthToken(token: string) {
+  localStorage.setItem('swiftpay_token', token);
   localStorage.setItem(TOKEN_KEY, token);
 }
 
 export function removeAuthToken() {
+  localStorage.removeItem('swiftpay_token');
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem('token');
 }
 
 export function getAdminToken(): string | null {
-  return localStorage.getItem(ADMIN_TOKEN_KEY);
+  return (
+    localStorage.getItem('swiftpay_admin_token') ||
+    localStorage.getItem(ADMIN_TOKEN_KEY) ||
+    localStorage.getItem('admin_token') ||
+    null
+  );
 }
 
 export function setAdminToken(token: string) {
+  localStorage.setItem('swiftpay_admin_token', token);
   localStorage.setItem(ADMIN_TOKEN_KEY, token);
 }
 
 export function removeAdminToken() {
+  localStorage.removeItem('swiftpay_admin_token');
   localStorage.removeItem(ADMIN_TOKEN_KEY);
+  localStorage.removeItem('admin_token');
 }
 
 async function request<T>(endpoint: string, options: RequestInit = {}, isAdmin: boolean = false): Promise<T> {
@@ -43,10 +59,30 @@ async function request<T>(endpoint: string, options: RequestInit = {}, isAdmin: 
     headers,
   });
 
-  const data = await response.json().catch(() => ({}));
+  let data: any = {};
+  try {
+    data = await response.json();
+  } catch {
+    try {
+      const text = await response.text();
+      data = { error: text || `Request failed with status ${response.status}` };
+    } catch {
+      data = {};
+    }
+  }
 
   if (!response.ok) {
-    throw new Error(data.error || 'An unexpected server error occurred.');
+    const fallbackMessage =
+      response.status === 401
+        ? 'Session expired or not logged in. Please sign in to continue.'
+        : response.status === 403
+        ? 'Access forbidden. Please check your credentials.'
+        : response.status === 404
+        ? 'Requested service is currently unavailable.'
+        : `Server error (${response.status}). Please try again shortly.`;
+
+    const errorMessage = data.error || data.message || fallbackMessage;
+    throw new Error(errorMessage);
   }
 
   return data as T;
@@ -323,4 +359,61 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ referralCount }),
     }, true),
+
+  // Rewarded Ads (Google Ad Manager / GPT Web Rewarded)
+  getAdConfig: () =>
+    request<{
+      success: boolean;
+      provider: string;
+      adUnitPath: string;
+      rewardAmount: number;
+      currency: string;
+      currencySymbol: string;
+      instruction: string;
+    }>('/api/ads/config'),
+
+  getAdStats: () =>
+    request<{
+      success: boolean;
+      rewardAmount: number;
+      totalAdsWatched: number;
+      totalEarnings: number;
+      todayEarnings: number;
+      todayAdsCount: number;
+      history: {
+        id: string;
+        sessionId: string;
+        provider: string;
+        rewardAmount: number;
+        status: string;
+        reference: string;
+        createdAt: string;
+        completedAt: string;
+      }[];
+    }>('/api/ads/stats'),
+
+  createAdSession: () =>
+    request<{
+      success: boolean;
+      sessionId: string;
+      adUnitPath: string;
+      rewardAmount: number;
+      clientNonce: string;
+      timestamp: number;
+    }>('/api/ads/session', {
+      method: 'POST',
+    }),
+
+  verifyAdReward: (payload: { sessionId: string; providerToken?: any; providerTxId?: string }) =>
+    request<{
+      success: boolean;
+      message: string;
+      rewardAmount: number;
+      newBalance?: number;
+      alreadyClaimed?: boolean;
+      reference?: string;
+    }>('/api/ads/verify', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 };

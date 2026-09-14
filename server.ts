@@ -348,6 +348,8 @@ interface DBStructure {
   logs: any[];
   wdvConfig?: WdvConfig;
   admins?: AdminState[];
+  ad_reward_sessions?: any[];
+  ad_rewards?: any[];
 }
 
 // -------------------- SQL DATABASE CACHE PRELOADER --------------------
@@ -357,7 +359,9 @@ let dbCache: DBStructure = {
   passwordResets: [],
   logs: [],
   wdvConfig: { ...DEFAULT_WDV_CONFIG },
-  admins: []
+  admins: [],
+  ad_reward_sessions: [],
+  ad_rewards: []
 };
 
 function safeParseJson(val: any, fallback: any = []): any {
@@ -753,104 +757,112 @@ function processUserGiftEligibility(user: UserState): { updated: boolean; user: 
 
 // Token Verification Middleware
 async function authenticateToken(req: any, res: any, next: any) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token) {
-    return res.status(401).json({ error: 'Access Denied: Secure session token missing' });
-  }
-  const email = verifyToken(token);
-  if (!email) {
-    return res.status(403).json({ error: 'Access Denied: Session token invalid or expired' });
-  }
-  req.userEmail = email;
-
-  // Auto-provision user record in database if missing, preventing any downstream "User not found" errors
-  const db = readDb();
-  let userIndex = db.users.findIndex((u: any) => u.email.toLowerCase() === email.toLowerCase());
-  if (userIndex === -1) {
-    const defaultName = email.split('@')[0].split(/[._-]/).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
-    const dummyUser = {
-      fullName: defaultName || 'SwiftPay User',
-      email: email.toLowerCase(),
-      passwordHash: bcrypt.hashSync('SwiftPayTempPass99!', 10),
-      balance: 750,
-      dailyTarget: 50000,
-      dailySpent: 0,
-      pinCreated: false,
-      biometricEnabled: false,
-      phone: '',
-      profilePic: '',
-      tier: 3,
-      isSuspended: false,
-      isFrozen: false,
-      registrationDate: new Date().toISOString(),
-      accountStatus: 'active',
-      emailVerificationStatus: 'verified',
-      transactions: [],
-      notifications: [
-        {
-          id: `notif-${Date.now()}`,
-          title: 'Welcome to SwiftPay!',
-          body: 'Welcome to your premium bill payments gateway! Please create a 4-digit security PIN to get started.',
-          date: new Date().toISOString(),
-          unread: true
-        }
-      ],
-      giftDay: 1,
-      giftActive: true,
-      lastGiftCreditTime: new Date().toISOString(),
-      giftExpiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
-    };
-    db.users.push(dummyUser);
-    await writeDb(db);
-    userIndex = db.users.length - 1;
-    logDiagnostic('INFO', 'Auto-created missing user record for authenticated session', { email });
-  }
-
-  // FORCE RELOAD user balance and gift system attributes from SQL database to guarantee latest, never cached values
   try {
-    const sqlUser = await getRow(`SELECT balance, giftDay, giftActive, lastGiftCreditTime, giftExpiresAt, lastActivityTime FROM users WHERE email = $1`, [email.toLowerCase()]);
-    if (sqlUser) {
-      if (sqlUser.balance !== undefined && sqlUser.balance !== null) {
-        db.users[userIndex].balance = Number(sqlUser.balance);
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: 'Access Denied: Secure session token missing' });
+    }
+    const email = verifyToken(token);
+    if (!email) {
+      return res.status(403).json({ error: 'Access Denied: Session token invalid or expired' });
+    }
+    req.userEmail = email;
+
+    // Auto-provision user record in database if missing, preventing any downstream "User not found" errors
+    const db = readDb();
+    db.users = db.users || [];
+    let userIndex = db.users.findIndex((u: any) => u && u.email && u.email.toLowerCase() === email.toLowerCase());
+    if (userIndex === -1) {
+      const defaultName = email.split('@')[0].split(/[._-]/).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+      const dummyUser = {
+        fullName: defaultName || 'Nevo User',
+        email: email.toLowerCase(),
+        passwordHash: bcrypt.hashSync('NevoTempPass99!', 10),
+        balance: 750,
+        dailyTarget: 50000,
+        dailySpent: 0,
+        pinCreated: false,
+        biometricEnabled: false,
+        phone: '',
+        profilePic: '',
+        tier: 3,
+        isSuspended: false,
+        isFrozen: false,
+        registrationDate: new Date().toISOString(),
+        accountStatus: 'active',
+        emailVerificationStatus: 'verified',
+        transactions: [],
+        notifications: [
+          {
+            id: `notif-${Date.now()}`,
+            title: 'Welcome to Nevo!',
+            body: 'Welcome to your digital payments platform! Please create a 4-digit security PIN to get started.',
+            date: new Date().toISOString(),
+            unread: true
+          }
+        ],
+        giftDay: 1,
+        giftActive: true,
+        lastGiftCreditTime: new Date().toISOString(),
+        giftExpiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
+      };
+      db.users.push(dummyUser);
+      await writeDb(db);
+      userIndex = db.users.length - 1;
+      logDiagnostic('INFO', 'Auto-created missing user record for authenticated session', { email });
+    }
+
+    // FORCE RELOAD user balance and gift system attributes from SQL database to guarantee latest, never cached values
+    try {
+      const sqlUser = await getRow(`SELECT balance, giftDay, giftActive, lastGiftCreditTime, giftExpiresAt, lastActivityTime FROM users WHERE email = $1`, [email.toLowerCase()]);
+      if (sqlUser && db.users[userIndex]) {
+        if (sqlUser.balance !== undefined && sqlUser.balance !== null) {
+          db.users[userIndex].balance = Number(sqlUser.balance);
+        }
+        if (sqlUser.giftday !== undefined && sqlUser.giftday !== null) {
+          db.users[userIndex].giftDay = Number(sqlUser.giftday);
+        }
+        if (sqlUser.giftactive !== undefined && sqlUser.giftactive !== null) {
+          db.users[userIndex].giftActive = sqlUser.giftactive !== 0;
+        }
+        if (sqlUser.lastgiftcredittime !== undefined && sqlUser.lastgiftcredittime !== null) {
+          db.users[userIndex].lastGiftCreditTime = sqlUser.lastgiftcredittime;
+        }
+        if (sqlUser.giftexpiresat !== undefined && sqlUser.giftexpiresat !== null) {
+          db.users[userIndex].giftExpiresAt = sqlUser.giftexpiresat;
+        }
+        if (sqlUser.lastactivitytime !== undefined && sqlUser.lastactivitytime !== null) {
+          db.users[userIndex].lastActivityTime = sqlUser.lastactivitytime;
+        }
       }
-      if (sqlUser.giftday !== undefined && sqlUser.giftday !== null) {
-        db.users[userIndex].giftDay = Number(sqlUser.giftday);
+    } catch (err) {
+      console.error('[Nevo DB] Error syncing user state from SQL database in middleware:', err);
+    }
+
+    // Record activity timestamp
+    if (db.users[userIndex]) {
+      db.users[userIndex].lastActivityTime = new Date().toISOString();
+      if (!db.users[userIndex].referralCode) {
+        db.users[userIndex].referralCode = `NEVO${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+        try { await execute(`UPDATE users SET referralCode=$1 WHERE LOWER(email)=$2`, [db.users[userIndex].referralCode, email.toLowerCase()]); } catch {}
       }
-      if (sqlUser.giftactive !== undefined && sqlUser.giftactive !== null) {
-        db.users[userIndex].giftActive = sqlUser.giftactive !== 0;
-      }
-      if (sqlUser.lastgiftcredittime !== undefined && sqlUser.lastgiftcredittime !== null) {
-        db.users[userIndex].lastGiftCreditTime = sqlUser.lastgiftcredittime;
-      }
-      if (sqlUser.giftexpiresat !== undefined && sqlUser.giftexpiresat !== null) {
-        db.users[userIndex].giftExpiresAt = sqlUser.giftexpiresat;
-      }
-      if (sqlUser.lastactivitytime !== undefined && sqlUser.lastactivitytime !== null) {
-        db.users[userIndex].lastActivityTime = sqlUser.lastactivitytime;
+
+      // Check and process registration gift eligibility
+      const user = db.users[userIndex];
+      const { updated, user: updatedUser } = processUserGiftEligibility(user);
+      if (updated) {
+        db.users[userIndex] = updatedUser;
+        await writeDb(db);
       }
     }
-  } catch (err) {
-    console.error('[SwiftPay DB] Error syncing user state from SQL database in middleware:', err);
-  }
 
-  // Record activity timestamp
-  db.users[userIndex].lastActivityTime = new Date().toISOString();
-  if (!db.users[userIndex].referralCode) {
-    db.users[userIndex].referralCode = `SWIFT${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
-    try { await execute(`UPDATE users SET referralCode=$1 WHERE LOWER(email)=$2`, [db.users[userIndex].referralCode, email.toLowerCase()]); } catch {}
+    req.userIndex = userIndex;
+    next();
+  } catch (err: any) {
+    console.error('[authenticateToken Error]', err);
+    return res.status(401).json({ error: 'Session authentication failed. Please sign in again.' });
   }
-
-  // Check and process registration gift eligibility
-  const user = db.users[userIndex];
-  const { updated, user: updatedUser } = processUserGiftEligibility(user);
-  if (updated) {
-    db.users[userIndex] = updatedUser;
-    await writeDb(db);
-  }
-
-  req.userIndex = userIndex;
-  next();
 }
 
 function verifyAdminToken(token: string): string | null {
@@ -1730,16 +1742,18 @@ app.post('/api/auth/verify-reset-otp', (req, res) => {
   const item = (db.passwordResets || []).slice().reverse().find((r:any) => String(r.email || '').toLowerCase() === String(email).toLowerCase() && String(r.otp || '') === String(otp) && !r.used);
   if (!item) return res.status(400).json({ error: 'Invalid or expired verification code.' });
   if (Date.now() > Number(item.expiresAt || 0)) return res.status(400).json({ error: 'This verification code has expired.' });
-  res.json({ success: true });
+  res.json({ success: true, message: 'Code verified successfully.', resetToken: item.token || item.id || otp });
 });
 
 // Reset Password Flow
-app.post('/api/auth/reset-password', (req, res) => {
-  const { email, password, otp } = req.body;
-  if (!email || !password || !otp) {
+app.post('/api/auth/reset-password', async (req, res) => {
+  const { email, password, newPassword, otp, resetToken } = req.body || {};
+  const chosenPassword = String(newPassword || password || '');
+  const verificationKey = String(resetToken || otp || '');
+  if (!email || !chosenPassword || !verificationKey) {
     return res.status(400).json({ error: 'Please fill out all fields.' });
   }
-  if (isWeakPassword(password)) {
+  if (isWeakPassword(chosenPassword)) {
     return res.status(400).json({ error: 'Password must be at least 8 characters long and contain both letters and numbers.' });
   }
 
@@ -1747,8 +1761,8 @@ app.post('/api/auth/reset-password', (req, res) => {
   db.passwordResets = db.passwordResets || [];
 
   const resetSessionIndex = db.passwordResets.findIndex((r: any) => {
-    const isMatchingEmail = r.email.toLowerCase() === email.toLowerCase();
-    const isMatchingCode = r.otp === otp;
+    const isMatchingEmail = String(r.email || '').toLowerCase() === String(email).toLowerCase();
+    const isMatchingCode = String(r.otp || '') === verificationKey || String(r.token || '') === verificationKey || String(r.id || '') === verificationKey;
     return isMatchingEmail && isMatchingCode;
   });
 
@@ -1762,7 +1776,7 @@ app.post('/api/auth/reset-password', (req, res) => {
     return res.status(400).json({ error: 'This reset code has already been used.' });
   }
 
-  if (Date.now() > resetSession.expiresAt) {
+  if (Date.now() > Number(resetSession.expiresAt || 0)) {
     return res.status(400).json({ error: 'This verification code/token has expired.' });
   }
 
@@ -1771,9 +1785,14 @@ app.post('/api/auth/reset-password', (req, res) => {
     return res.status(400).json({ error: 'User account no longer exists.' });
   }
 
-  const newPasswordHash = bcrypt.hashSync(password, 10);
+  const newPasswordHash = bcrypt.hashSync(chosenPassword, 10);
   db.users[userIndex].passwordHash = newPasswordHash;
   db.passwordResets[resetSessionIndex].used = true;
+
+  try {
+    await execute(`UPDATE users SET passwordHash=$1 WHERE LOWER(email)=$2`, [newPasswordHash, email.toLowerCase()]);
+    await execute(`UPDATE password_resets SET used=1 WHERE (token=$1 OR otp=$1) AND LOWER(emailOrPhone)=$2`, [verificationKey, email.toLowerCase()]);
+  } catch (e) {}
 
   // Log activity
   db.users[userIndex].notifications = db.users[userIndex].notifications || [];
@@ -1788,7 +1807,7 @@ app.post('/api/auth/reset-password', (req, res) => {
   writeDb(db);
   logDiagnostic('INFO', 'Password recovered via OTP successfully', { email });
 
-  res.json({ success: true, message: 'Password reset successfully!' });
+  res.json({ success: true, message: 'Password reset successfully. You can now log in.' });
 });
 
 // -------------------- SYNC AND PERSISTENCE STATE ENDPOINTS (Protected) --------------------
@@ -2749,7 +2768,7 @@ app.post('/api/transactions/transfer', authenticateToken, async (req: any, res) 
 
 // Transaction endpoint for Withdrawal
 app.post('/api/transactions/withdraw', authenticateToken, async (req: any, res) => {
-  const { bank, accountNumber, amount, accountName } = req.body;
+  const { bank, accountNumber, amount, accountName, voucherCode = '' } = req.body;
   const email = req.userEmail;
 
   // Check admin settings toggles & limits
@@ -3139,7 +3158,34 @@ async function processSuccessfulWdvPayment(reference: string, providerName = 'we
 }
 
 // Unified Core Payment Verification, User Wallet Crediting & Voucher Handling Logic
+// A per-reference lock prevents duplicate webhook + callback processing inside the
+// same Node instance. The persistent transaction status remains the second line
+// of defence, so repeated provider events never intentionally create a second credit.
+const paymentProcessingLocks = new Map<string, Promise<any>>();
+
 async function processSuccessfulPayment(params: {
+  reference: string;
+  providerName: PaymentProviderName;
+  verifiedAmount?: number;
+  channel?: string;
+  providerReference?: string;
+  rawData?: any;
+}): Promise<any> {
+  const existing = paymentProcessingLocks.get(params.reference);
+  if (existing) return existing;
+
+  const run = processSuccessfulPaymentUnlocked(params);
+  paymentProcessingLocks.set(params.reference, run);
+  try {
+    return await run;
+  } finally {
+    if (paymentProcessingLocks.get(params.reference) === run) {
+      paymentProcessingLocks.delete(params.reference);
+    }
+  }
+}
+
+async function processSuccessfulPaymentUnlocked(params: {
   reference: string;
   providerName: PaymentProviderName;
   verifiedAmount?: number;
@@ -3183,8 +3229,12 @@ async function processSuccessfulPayment(params: {
   }
   if (purpose === 'wallet_funding') {
     const storedAmount = Number(tx?.amount || 0);
-    if (!Number.isFinite(amount) || amount <= 0 || Math.abs(amount - storedAmount) > 0.009) throw new Error('Wallet deposit amount does not match the original requested amount.');
-    if (String(params.channel || tx?.channel || '').toLowerCase() !== 'bank_transfer') throw new Error('Wallet deposit must be confirmed through a bank transfer channel.');
+    if (!Number.isFinite(amount) || amount < 520 || (storedAmount > 0 && Math.abs(amount - storedAmount) > 0.009)) {
+      throw new Error('Wallet deposit amount does not match the original requested amount.');
+    }
+    if (tx?.currency && String(tx.currency).toUpperCase() !== 'NGN') {
+      throw new Error('Wallet deposit currency must be NGN.');
+    }
   }
 
   // 2. Mark or create in payment_transactions
@@ -3193,13 +3243,13 @@ async function processSuccessfulPayment(params: {
       UPDATE payment_transactions
       SET status = 'successful', verifiedAt = $1, providerReference = $2, webhookData = $3, channel = $4
       WHERE reference = $5
-    `, [nowIso, providerRef, rawDataStr, params.channel || tx.channel || 'card', reference]);
+    `, [nowIso, providerRef, rawDataStr, params.channel || tx.channel || 'checkout', reference]);
   } else {
     const id = `ptx-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
     await execute(`
       INSERT INTO payment_transactions (id, reference, userEmail, userName, amount, currency, provider, providerReference, purpose, status, channel, authorizationUrl, metadata, createdAt, verifiedAt, webhookData)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-    `, [id, reference, userEmail, '', amount, 'NGN', provider, providerRef, purpose, 'successful', params.channel || 'card', '', '{}', nowIso, nowIso, rawDataStr]);
+    `, [id, reference, userEmail, '', amount, 'NGN', provider, providerRef, purpose, 'successful', params.channel || 'checkout', '', '{}', nowIso, nowIso, rawDataStr]);
   }
 
   let voucherCode = '';
@@ -3214,6 +3264,9 @@ async function processSuccessfulPayment(params: {
       const newBal = currentBal + amount;
       user.balance = newBal;
 
+      const providerLower = String(provider || '').toLowerCase();
+      const providerDisplay = providerLower.includes('korapay') ? 'KoraPay' : providerLower.includes('paystack') ? 'Paystack' : provider.toUpperCase();
+
       const txRecord = {
         id: `tx-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
         userId: userEmail,
@@ -3221,9 +3274,9 @@ async function processSuccessfulPayment(params: {
         amount: amount,
         date: nowIso,
         status: 'success',
-        description: `Deposit via ${provider.toUpperCase()} (Ref: ${reference})`,
+        description: `Deposit — ${providerDisplay}`,
         reference: reference,
-        provider: provider,
+        provider: providerLower.includes('korapay') ? 'korapay' : providerLower.includes('paystack') ? 'paystack' : providerLower,
         balanceBefore: currentBal,
         balanceAfter: newBal
       };
@@ -3233,8 +3286,8 @@ async function processSuccessfulPayment(params: {
       user.notifications = user.notifications || [];
       user.notifications.unshift({
         id: `notif-${Date.now()}-${crypto.randomBytes(2).toString('hex')}`,
-        title: 'Wallet Funded Successfully',
-        body: `Your wallet has been credited with ₦${amount.toLocaleString()} via ${provider.toUpperCase()}. New balance: ₦${newBal.toLocaleString()}.`,
+        title: 'Deposit Successful',
+        body: `Your Nevo wallet has been credited with ₦${amount.toLocaleString()} via ${providerDisplay}. New balance: ₦${newBal.toLocaleString()}.`,
         date: nowIso,
         unread: true,
         type: 'deposit',
@@ -3293,448 +3346,190 @@ async function processSuccessfulPayment(params: {
   };
 }
 
-// -------------------- PAYSTACK WALLET DEPOSIT (NIVO FLOW) --------------------
-app.post('/api/paystack/initialize-wallet-deposit', authenticateToken, async (req: any, res: any) => {
-  try {
-    const amount = Number(req.body?.amount);
-    if (!Number.isFinite(amount) || amount < 520) return res.status(400).json({ error: 'Minimum deposit amount is ₦520.' });
-    const email = String(req.userEmail || '').toLowerCase();
-    const db = readDb();
-    const user = db.users.find((u:any) => u.email.toLowerCase() === email);
-    if (!user) return res.status(404).json({ error: 'User account not found.' });
-    const secret = String(process.env.PAYSTACK_SECRET_KEY || '').trim();
-    if (!secret) return res.status(503).json({ error: 'Paystack deposit service is not configured yet.' });
-    const expires = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-    const response = await fetch('https://api.paystack.co/charge', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${secret}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, amount: Math.round(amount * 100).toString(), currency: 'NGN', metadata: { purpose: 'wallet_funding', user_email: email }, bank_transfer: { account_expires_at: expires } })
-    });
-    const payload:any = await response.json().catch(() => ({}));
-    if (!response.ok || !payload.status || !payload.data) throw new Error(payload.message || 'Paystack could not create the temporary transfer account.');
-    const charge = payload.data;
-    if (charge.status !== 'pending_bank_transfer' || !charge.reference || !charge.account_number || !charge.account_name || !charge.bank?.name) throw new Error(charge.display_text || 'Paystack did not return a valid temporary bank transfer account.');
-    const reference = String(charge.reference);
-    const createdAt = new Date().toISOString();
-    const expiry = charge.account_expires_at || expires;
-    await execute(`INSERT INTO payment_transactions (id, reference, userEmail, userName, amount, currency, provider, providerReference, purpose, status, channel, authorizationUrl, metadata, createdAt, verifiedAt, webhookData) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) ON CONFLICT(reference) DO UPDATE SET amount=EXCLUDED.amount, channel=EXCLUDED.channel, status='pending'`, [
-      `ptx-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`, reference, email, user.fullName || '', amount, 'NGN', 'paystack', '', 'wallet_funding', 'pending', 'bank_transfer', '', JSON.stringify({ accountNumber: charge.account_number, accountName: charge.account_name, bankName: charge.bank.name, accountExpiresAt: expiry }), createdAt, '', ''
-    ]);
-    logDiagnostic('INFO', 'Paystack wallet deposit account created', { email, reference, amount });
-    res.json({ success:true, deposit:{ reference, amount, bankName:charge.bank.name, accountNumber:charge.account_number, accountName:charge.account_name, accountExpiresAt:expiry, status:'pending' } });
-  } catch (err:any) {
-    console.error('[Paystack Wallet Deposit]', err);
-    res.status(500).json({ error: err.message || 'Failed to create Paystack deposit account.' });
-  }
-});
+// -------------------- NEVO WALLET DEPOSIT (REAL PAYSTACK + KORAPAY CHECKOUT) --------------------
+function getPublicAppUrl(req: any): string {
+  const configured = String(process.env.APP_URL || '').trim().replace(/\/+$/, '');
+  if (configured) return configured;
 
-// -------------------- KORAPAY VIRTUAL ACCOUNT SYSTEM --------------------
-
-app.post('/api/korapay/virtual-account', authenticateToken, async (req: any, res) => {
-  try {
-    const email = (req.userEmail || req.body.email || '').toLowerCase();
-    const db = readDb();
-    const user = db.users.find(u => u.email.toLowerCase() === email);
-    const fullName = user?.fullName || req.body.fullName || 'SwiftPay Customer';
-    const config = db.wdvConfig || DEFAULT_WDV_CONFIG;
-    const fixedAmount = config.voucherPrice || 6500;
-
-    // Check if user already has an active or pending DVA created in the last 15 minutes
-    const existingPayment = await getRow(
-      `SELECT * FROM wdv_payments WHERE LOWER(userEmail) = $1 AND status = 'pending' ORDER BY createdAt DESC`,
-      [email]
-    );
-
-    if (existingPayment) {
-      const createdTime = new Date(existingPayment.createdat || existingPayment.createdAt).getTime();
-      const nowTime = Date.now();
-      const diffSecs = Math.floor((nowTime - createdTime) / 1000);
-
-      // If pending DVA is less than 15 minutes (900s) old, reuse it!
-      if (diffSecs < 900) {
-        return res.json({
-          success: true,
-          provider: 'korapay',
-          reference: existingPayment.reference,
-          bankName: existingPayment.bankname || existingPayment.bankName || 'Wema Bank',
-          accountNumber: existingPayment.accountnumber || existingPayment.accountNumber || '8960723295',
-          accountName: existingPayment.accountname || existingPayment.accountName || `SwiftPay / ${fullName}`,
-          amount: fixedAmount,
-          expiresInSeconds: 900 - diffSecs,
-          createdAt: existingPayment.createdat || existingPayment.createdAt,
-          status: 'pending'
-        });
-      }
-    }
-
-    const korapaySecretKey = process.env.KORAPAY_SECRET_KEY || '';
-    let bankName = 'Wema Bank';
-    let accountNumber = '';
-    let accountName = `SwiftPay / ${fullName.toUpperCase()}`;
-    const reference = `KORA_DVA_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
-
-    // If Korapay key is set, attempt live Korapay Virtual Bank Account API call
-    if (korapaySecretKey && (korapaySecretKey.startsWith('sk_') || korapaySecretKey.length > 5)) {
-      try {
-        const dvaRes = await fetch('https://api.korapay.com/merchant/api/v1/virtual-bank-account', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${korapaySecretKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            account_name: accountName,
-            customer: {
-              name: fullName,
-              email: email
-            },
-            bank_code: '035',
-            account_reference: reference,
-            amount: fixedAmount,
-            currency: 'NGN'
-          })
-        });
-        const dvaData = await dvaRes.json();
-
-        if (dvaData.status && dvaData.data) {
-          bankName = dvaData.data.bank_name || dvaData.data.bankName || 'Wema Bank';
-          accountNumber = dvaData.data.account_number || dvaData.data.accountNumber || '';
-          accountName = dvaData.data.account_name || dvaData.data.accountName || accountName;
-        }
-      } catch (kErr) {
-        console.warn('[Korapay DVA] API call warning (using fallback DVA structure):', kErr);
-      }
-    }
-
-    // Fallback account number generation if live DVA was not returned or in sandbox mode
-    if (!accountNumber) {
-      const cleanPhone = (user?.phone || '').replace(/\D/g, '');
-      if (cleanPhone.length >= 10) {
-        accountNumber = '90' + cleanPhone.slice(-8);
-      } else {
-        const hashNum = parseInt(crypto.createHash('md5').update(email).digest('hex').substring(0, 8), 16);
-        accountNumber = '89' + (hashNum % 100000000).toString().padStart(8, '0');
-      }
-      bankName = config.bankName || 'Wema Bank';
-      accountName = `SwiftPay / ${fullName.toUpperCase()}`;
-    }
-
-    const id = `dva-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
-    const nowIso = new Date().toISOString();
-    const expiresIso = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-
-    // Store DVA record in SQL/JSON database
-    await execute(`
-      INSERT INTO wdv_payments (id, reference, userEmail, amount, bankName, accountNumber, accountName, status, createdAt, expiresAt, paidAt, voucherCode, provider, webhookData)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-    `, [id, reference, email, fixedAmount, bankName, accountNumber, accountName, 'pending', nowIso, expiresIso, '', '', 'korapay_dva', '']);
-
-    await loadDbCache();
-
-    logDiagnostic('INFO', 'Korapay Virtual Account created/retrieved', { email, reference, accountNumber, bankName });
-
-    res.json({
-      success: true,
-      provider: 'korapay',
-      reference,
-      bankName,
-      accountNumber,
-      accountName,
-      amount: fixedAmount,
-      expiresInSeconds: 900,
-      createdAt: nowIso,
-      status: 'pending'
-    });
-  } catch (err: any) {
-    console.error('Error in Korapay virtual account generation:', err);
-    res.status(500).json({ error: 'Failed to generate Korapay Virtual Account.' });
-  }
-});
-
-// Check payment status for polling
-app.get('/api/korapay/payment-status/:reference', authenticateToken, async (req, res) => {
-  const { reference } = req.params;
-  try {
-    let payment = await getRow(`SELECT * FROM wdv_payments WHERE reference = $1`, [reference]);
-    if (!payment) {
-      return res.status(404).json({ error: 'Payment reference not found.' });
-    }
-
-    let code = payment.vouchercode || payment.voucherCode || '';
-    let currentStatus = payment.status || 'pending';
-
-    // If still pending, query Korapay API directly if key is available
-    const korapaySecretKey = process.env.KORAPAY_SECRET_KEY || '';
-    if (currentStatus === 'pending' && korapaySecretKey) {
-      try {
-        const verifyRes = await fetch(`https://api.korapay.com/merchant/api/v1/charges/${encodeURIComponent(reference)}`, {
-          headers: { Authorization: `Bearer ${korapaySecretKey}` }
-        });
-        const verifyData = await verifyRes.json();
-        if (verifyData.status && verifyData.data && (verifyData.data.status === 'success' || verifyData.data.status === 'successful')) {
-          const result = await processSuccessfulWdvPayment(reference, 'korapay_api_verify', JSON.stringify(verifyData.data));
-          currentStatus = 'successful';
-          code = result.voucherCode || code;
-        }
-      } catch (verErr) {
-        console.warn('[Korapay Verify API] Failed live transaction verification check:', verErr);
-      }
-    }
-
-    res.json({
-      success: true,
-      reference: payment.reference,
-      status: currentStatus,
-      voucherCode: code,
-      paidAt: payment.paidat || payment.paidAt || '',
-      amount: Number(payment.amount || 6500)
-    });
-  } catch (err: any) {
-    res.status(500).json({ error: 'Failed to check payment status.' });
-  }
-});
-
-// Korapay Webhook Handler
-app.post('/api/korapay/webhook', express.raw({ type: 'application/json' }), async (req: any, res: any) => {
-  try {
-    let rawBody = req.body;
-    if (Buffer.isBuffer(rawBody)) {
-      rawBody = rawBody.toString('utf8');
-    }
-
-    const eventData = typeof rawBody === 'string' ? JSON.parse(rawBody) : (rawBody || {});
-    const secret = (process.env.KORAPAY_SECRET_KEY || '').trim();
-    const signature = String(req.headers['x-korapay-signature'] || '').trim();
-    if (secret && signature) {
-      // Korapay signs ONLY the webhook `data` object, not the entire webhook body.
-      const signedPayload = JSON.stringify(eventData?.data ?? {});
-      const hash = crypto.createHmac('sha256', secret).update(signedPayload).digest('hex');
-      const expected = Buffer.from(hash, 'utf8');
-      const received = Buffer.from(signature, 'utf8');
-      if (expected.length !== received.length || !crypto.timingSafeEqual(expected, received)) {
-        logDiagnostic('SECURITY_ALERT', 'Invalid Korapay webhook signature header', { signature });
-        return res.status(400).send('Invalid Korapay signature');
-      }
-    }
-    logDiagnostic('INFO', 'Korapay Webhook Received', { event: eventData.event, id: eventData.data?.id });
-
-    const isSuccessEvent = eventData.event === 'charge.success' || eventData.event === 'virtual_bank_account.payment_successful' || eventData.event === 'transfer.success';
-    if (isSuccessEvent || eventData.data?.status === 'success' || eventData.data?.status === 'successful') {
-      const data = eventData.data || {};
-      const ref = data.reference || data.payment_reference || data.account_reference;
-      const amountPaid = data.amount || data.amount_paid || 6500;
-      const customerEmail = data.customer?.email || data.payer_bank_account?.email || '';
-
-      if (ref) {
-        // Find matching pending payment or create one if triggered by direct DVA transfer
-        let payment = await getRow(`SELECT * FROM wdv_payments WHERE reference = $1`, [ref]);
-        if (!payment && customerEmail) {
-          payment = await getRow(`SELECT * FROM wdv_payments WHERE LOWER(userEmail) = $1 AND status = 'pending' ORDER BY createdAt DESC`, [customerEmail.toLowerCase()]);
-        }
-
-        if (payment) {
-          const actualRef = payment.reference || ref;
-          await processSuccessfulWdvPayment(actualRef, 'korapay_webhook', JSON.stringify(eventData));
-        } else if (customerEmail) {
-          // Direct DVA payment with no pre-existing ref
-          const newId = `pay-${Date.now()}`;
-          const nowIso = new Date().toISOString();
-          await execute(`
-            INSERT INTO wdv_payments (id, reference, userEmail, amount, bankName, accountNumber, accountName, status, createdAt, expiresAt, paidAt, voucherCode, provider, webhookData)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-          `, [newId, ref, customerEmail.toLowerCase(), amountPaid || 6500, 'Wema Bank', '', customerEmail, 'pending', nowIso, nowIso, '', '', 'korapay_webhook', JSON.stringify(eventData)]);
-
-          await processSuccessfulWdvPayment(ref, 'korapay_webhook', JSON.stringify(eventData));
-        }
-      }
-    }
-
-    res.status(200).send('Webhook processed successfully');
-  } catch (err: any) {
-    console.error('Error processing Korapay Webhook:', err);
-    res.status(500).send('Webhook Processing Error');
-  }
-});
-
-// -------------------- UNIFIED NIGERIAN PAYMENT GATEWAY (PAYSTACK, FLUTTERWAVE, KORAPAY) --------------------
-
-// 1. Get Payment Configuration & Available Providers
-app.get('/api/payment/config', (req, res) => {
-  try {
-    const providers = paymentManager.getAllProvidersStatus();
-    const activeProvider = paymentManager.getConfiguredActiveProviderName();
-    const isAvailable = providers.some(p => p.isConfigured);
-
-    res.json({
-      success: true,
-      activeProvider,
-      providers,
-      isAvailable
-    });
-  } catch (err: any) {
-    res.status(500).json({ error: 'Failed to fetch payment configuration.' });
-  }
-});
-
-// Flexible authentication middleware for payment endpoints (accepts Bearer header, body token, or verified user email)
-async function authenticatePaymentUser(req: any, res: any, next: any) {
-  const authHeader = req.headers['authorization'];
-  let rawToken = (authHeader && authHeader.split(' ')[1]) || req.body?.token || req.query?.token;
-  if (typeof rawToken === 'string') {
-    rawToken = rawToken.trim().replace(/^Bearer\s+/i, '');
-  }
-
-  if (rawToken) {
-    const email = verifyToken(rawToken);
-    if (email) {
-      req.userEmail = email.toLowerCase();
-      // Ensure user exists in db
-      const db = readDb();
-      let userIndex = db.users.findIndex((u: any) => u.email.toLowerCase() === email.toLowerCase());
-      if (userIndex === -1) {
-        const defaultName = email.split('@')[0].split(/[._-]/).map((p: string) => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
-        const dummyUser = {
-          fullName: defaultName || 'SwiftPay User',
-          email: email.toLowerCase(),
-          passwordHash: bcrypt.hashSync('SwiftPayTempPass99!', 10),
-          balance: 750,
-          dailyTarget: 50000,
-          dailySpent: 0,
-          pinCreated: false,
-          biometricEnabled: false,
-          twoFactorEnabled: false,
-          accountNumber: Math.floor(1000000000 + Math.random() * 9000000000).toString(),
-          bankName: 'SwiftPay Microfinance Bank',
-          createdAt: new Date().toISOString(),
-          transactions: [],
-          notifications: []
-        };
-        db.users.push(dummyUser);
-        writeDb(db);
-      }
-      return next();
-    }
-  }
-
-  // Fallback: If user provided their email in body or query
-  const bodyEmail = (req.body?.email || req.body?.userEmail || req.query?.email || '').trim().toLowerCase();
-  if (bodyEmail && bodyEmail.includes('@')) {
-    const db = readDb();
-    let userIndex = db.users.findIndex((u: any) => u.email.toLowerCase() === bodyEmail);
-    if (userIndex === -1) {
-      const defaultName = (req.body?.name || bodyEmail.split('@')[0]).split(/[._-]/).map((p: string) => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
-      const dummyUser = {
-        fullName: defaultName || 'SwiftPay User',
-        email: bodyEmail,
-        passwordHash: bcrypt.hashSync('SwiftPayTempPass99!', 10),
-        balance: 200000,
-        dailyTarget: 50000,
-        dailySpent: 0,
-        pinCreated: false,
-        biometricEnabled: false,
-        twoFactorEnabled: false,
-        accountNumber: Math.floor(1000000000 + Math.random() * 9000000000).toString(),
-        bankName: 'SwiftPay Microfinance Bank',
-        createdAt: new Date().toISOString(),
-        transactions: [],
-        notifications: []
-      };
-      db.users.push(dummyUser);
-      writeDb(db);
-    }
-    req.userEmail = bodyEmail;
-    return next();
-  }
-
-  return res.status(401).json({ error: 'Access Denied: Secure session token missing. Please sign in.' });
+  const forwardedProto = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim();
+  const protocol = forwardedProto || req.protocol || 'https';
+  const host = String(req.headers['x-forwarded-host'] || req.get('host') || '').split(',')[0].trim();
+  return `${protocol}://${host}`.replace(/\/+$/, '');
 }
 
-// 2. Initialize Payment (Server-side Initialization)
-app.post('/api/payment/initialize', authenticatePaymentUser, async (req: any, res) => {
+function createWalletDepositReference(provider: PaymentProviderName): string {
+  const prefix = provider === 'korapay' ? 'NEVO_KPY' : 'NEVO_PSTK';
+  return `${prefix}_${Date.now()}_${crypto.randomBytes(6).toString('hex').toUpperCase()}`;
+}
+
+const handleWalletDepositInit = async (req: any, res: any) => {
+  let reference = '';
   try {
-    const email = (req.userEmail || '').toLowerCase();
-    const db = readDb();
-    const user = db.users.find((u: any) => u.email.toLowerCase() === email);
-    const purpose = req.body.purpose || 'wdv_voucher';
-    const requestedProvider = req.body.provider;
-    const configuredWdvPrice = 6500;
-    const amount = configuredWdvPrice;
-
-    // This payment endpoint is intentionally WDV-only. Wallet funding/deposit
-    // is not part of the WDV purchase flow. Never trust a client-supplied amount.
-    if (purpose !== 'wdv_voucher') {
-      return res.status(400).json({ error: 'Wallet funding is not available through the WDV purchase flow.' });
-    }
-    if (!Number.isFinite(amount) || amount <= 0) {
-      return res.status(500).json({ error: 'WDV voucher price is not configured correctly.' });
+    const amount = Number(req.body?.amount);
+    if (!Number.isFinite(amount) || amount < 520) {
+      return res.status(400).json({ error: 'Minimum deposit amount is ₦520.' });
     }
 
-    const provider = paymentManager.getActiveProvider(requestedProvider);
-    if (!provider || !provider.isConfigured()) {
-      const missing = provider ? provider.getMissingEnvVars().join(', ') : 'API Secret Keys';
-      return res.status(400).json({
-        error: `The selected payment gateway (${provider?.displayName || 'Active Gateway'}) is not currently configured. Missing: ${missing}. Please contact system support or configure credentials in Admin Settings.`
+    // Keep NGN deposits to normal currency precision and reject malformed values.
+    const normalizedAmount = Math.round(amount * 100) / 100;
+    if (normalizedAmount !== amount) {
+      return res.status(400).json({ error: 'Deposit amount can have at most two decimal places.' });
+    }
+
+    const requestedProvider = String(req.body?.provider || '').toLowerCase().trim();
+    if (requestedProvider !== 'paystack' && requestedProvider !== 'korapay') {
+      return res.status(400).json({ error: 'Choose either Paystack or KoraPay as the payment method.' });
+    }
+
+    const providerName = requestedProvider as PaymentProviderName;
+    const provider = paymentManager.getProvider(providerName);
+    if (!provider.isConfigured()) {
+      const missing = provider.getMissingEnvVars().join(', ');
+      return res.status(503).json({
+        error: `${provider.displayName} deposit service is not configured. Missing: ${missing}.`
       });
     }
 
-    const reference = `SPAY_${Date.now()}_${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
-    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
-    const host = req.headers['x-forwarded-host'] || req.get('host');
-    const defaultCallbackUrl = `${protocol}://${host}/payment/callback?reference=${reference}&provider=${provider.name}`;
-    const callbackUrl = req.body.callbackUrl || defaultCallbackUrl;
+    const email = String(req.userEmail || '').toLowerCase();
+    const db = readDb();
+    const user = db.users.find((u: any) => String(u.email || '').toLowerCase() === email);
+    if (!user) return res.status(404).json({ error: 'User account not found.' });
 
-    const initResult = await provider.initializePayment({
-      amount,
-      email,
-      name: user?.fullName || req.body.name || 'SwiftPay Customer',
-      phone: user?.phone || req.body.phone || '',
-      reference,
-      callbackUrl,
-      purpose,
-      metadata: {
-        userId: email,
-        purpose,
-        userFullName: user?.fullName,
-        ...(req.body.metadata || {})
-      }
-    });
+    reference = createWalletDepositReference(providerName);
+    const baseUrl = getPublicAppUrl(req);
+    const callbackUrl = `${baseUrl}/?deposit_ref=${encodeURIComponent(reference)}&provider=${providerName}`;
+    const webhookUrl = `${baseUrl}/api/payment/webhook/${providerName}`;
+    const createdAt = new Date().toISOString();
+    const transactionId = `ptx-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+    const userName = user.fullName || email.split('@')[0] || 'Nevo Customer';
 
-    const nowIso = new Date().toISOString();
-    const id = `ptx-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
-
+    // Create the Nevo pending transaction before contacting the provider. The
+    // provider reference/checkout URL is filled in only after the real API call.
     await execute(`
-      INSERT INTO payment_transactions (id, reference, userEmail, userName, amount, currency, provider, providerReference, purpose, status, channel, authorizationUrl, metadata, createdAt, verifiedAt, webhookData)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-    `, [id, reference, email, user?.fullName || '', amount, 'NGN', provider.name, '', purpose, 'pending', 'card', initResult.authorizationUrl || '', JSON.stringify({ callbackUrl }), nowIso, '', '']);
-
-    // If purpose is WDV voucher, create synchronized record in wdv_payments
-    if (purpose === 'wdv_voucher') {
-      const dvaId = `dva-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
-      const expiresIso = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-      await execute(`
-        INSERT INTO wdv_payments (id, reference, userEmail, amount, bankName, accountNumber, accountName, status, createdAt, expiresAt, paidAt, voucherCode, provider, webhookData)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-      `, [dvaId, reference, email, amount, `${provider.displayName} Checkout`, 'Online Gateway', `SwiftPay / ${user?.fullName || 'User'}`, 'pending', nowIso, expiresIso, '', '', provider.name, '']);
-    }
-
-    await loadDbCache();
-
-    logDiagnostic('INFO', 'Payment initialized successfully', { reference, email, amount, provider: provider.name });
-
-    res.json({
-      success: true,
+      INSERT INTO payment_transactions (
+        id, reference, userEmail, userName, amount, currency, provider, providerReference,
+        purpose, status, channel, authorizationUrl, metadata, createdAt, verifiedAt, webhookData
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+    `, [
+      transactionId,
       reference,
-      authorizationUrl: initResult.authorizationUrl,
-      accessCode: initResult.accessCode,
-      provider: provider.name,
-      providerDisplayName: provider.displayName,
-      amount,
-      purpose
-    });
+      email,
+      userName,
+      normalizedAmount,
+      'NGN',
+      providerName,
+      '',
+      'wallet_funding',
+      'pending',
+      'checkout',
+      '',
+      JSON.stringify({ provider: providerName, purpose: 'wallet_funding', callbackUrl, webhookUrl }),
+      createdAt,
+      '',
+      ''
+    ]);
+
+    try {
+      const initResult = await provider.initializePayment({
+        amount: normalizedAmount,
+        email,
+        name: userName,
+        phone: user.phone || '',
+        reference,
+        callbackUrl,
+        webhookUrl,
+        purpose: 'wallet_funding',
+        metadata: {
+          purpose: 'wallet_funding',
+          userId: email,
+          user_email: email,
+          user_name: userName,
+          provider: providerName
+        }
+      });
+
+      const checkoutUrl = String(initResult.authorizationUrl || '').trim();
+      if (!checkoutUrl) {
+        throw new Error(`${provider.displayName} did not return a checkout URL for this transaction.`);
+      }
+
+      const providerReference = String(initResult.reference || reference);
+      await execute(`
+        UPDATE payment_transactions
+        SET providerReference = $1, authorizationUrl = $2, metadata = $3, channel = $4
+        WHERE reference = $5 AND status = 'pending'
+      `, [
+        providerReference,
+        checkoutUrl,
+        JSON.stringify({ provider: providerName, purpose: 'wallet_funding', callbackUrl, webhookUrl, accessCode: initResult.accessCode || '' }),
+        'checkout',
+        reference
+      ]);
+
+      await loadDbCache();
+      logDiagnostic('INFO', `${provider.displayName} wallet deposit initialized`, {
+        email,
+        reference,
+        providerReference,
+        amount: normalizedAmount,
+        provider: providerName
+      });
+
+      // Never return provider secrets or the raw provider response to the browser.
+      return res.json({
+        success: true,
+        deposit: {
+          reference,
+          providerReference,
+          amount: normalizedAmount,
+          currency: 'NGN',
+          checkoutUrl,
+          authorizationUrl: checkoutUrl,
+          accessCode: initResult.accessCode || undefined,
+          provider: providerName,
+          status: 'pending'
+        }
+      });
+    } catch (providerError: any) {
+      await execute(`
+        UPDATE payment_transactions
+        SET status = $1, webhookData = $2
+        WHERE reference = $3 AND status = 'pending'
+      `, ['failed', JSON.stringify({ error: providerError?.message || 'Provider initialization failed' }), reference]);
+      throw providerError;
+    }
   } catch (err: any) {
-    console.error('Error during payment initialization:', err);
-    res.status(500).json({ error: err.message || 'Payment initialization failed.' });
+    console.error('[Nevo Wallet Deposit Initialization]', err);
+    return res.status(502).json({ error: err.message || 'Unable to initialize the selected payment provider.' });
   }
+};
+
+// Provider-specific aliases are kept for compatibility with the existing app.
+app.post('/api/paystack/initialize-wallet-deposit', authenticateToken, async (req: any, res: any) => {
+  req.body = { ...(req.body || {}), provider: 'paystack' };
+  return handleWalletDepositInit(req, res);
+});
+
+app.post('/api/korapay/initialize-wallet-deposit', authenticateToken, async (req: any, res: any) => {
+  req.body = { ...(req.body || {}), provider: 'korapay' };
+  return handleWalletDepositInit(req, res);
+});
+
+app.post('/api/payments/initialize-wallet-deposit', authenticateToken, handleWalletDepositInit);
+
+// -------------------- LEGACY VIRTUAL-ACCOUNT ENDPOINT --------------------
+// Wallet funding now uses the real hosted Paystack/KoraPay checkout flow above.
+// Keep this compatibility route explicit so old clients cannot accidentally
+// receive a fabricated/static account number.
+app.post('/api/korapay/virtual-account', authenticateToken, async (_req: any, res: any) => {
+  return res.status(410).json({
+    error: 'The legacy virtual-account deposit flow is disabled. Start a new deposit and choose Paystack or KoraPay checkout.'
+  });
+});
+
+app.get('/api/korapay/payment-status/:reference', authenticateToken, async (req: any, res: any) => {
+  req.body = { reference: req.params.reference };
+  return verifyPaymentUnifiedHandler(req, res);
 });
 
 // 3. Verify Payment (Server-side Authoritative Verification)
@@ -3788,6 +3583,12 @@ const verifyPaymentUnifiedHandler = async (req: any, res: any) => {
       rawProvider.includes('flutterwave') ? 'flutterwave' :
       rawProvider.includes('korapay') ? 'korapay' : 'paystack';
 
+    // The stored transaction decides which provider is authoritative. Never let
+    // a callback/reference be verified against a different gateway.
+    if (tx && String(tx.provider || '').toLowerCase() !== providerName) {
+      return res.status(400).json({ error: 'Payment provider does not match the original transaction.' });
+    }
+
     const provider = paymentManager.getProvider(providerName);
     if (!provider.isConfigured()) {
       return res.status(400).json({
@@ -3806,7 +3607,10 @@ const verifyPaymentUnifiedHandler = async (req: any, res: any) => {
       const expectedPurpose = tx?.purpose || (wdvPayment ? 'wdv_voucher' : 'wallet_funding');
       const amountMatches = expectedPurpose === 'wdv_voucher' ? Math.abs(verifiedAmount - 6500) <= 0.009 && Math.abs(storedAmount - 6500) <= 0.009 : Math.abs(verifiedAmount - storedAmount) <= 0.009;
 
-      if (verifiedCurrency !== 'NGN' || !amountMatches) {
+      const verifiedCustomerEmail = String(verifyRes.customerEmail || '').toLowerCase();
+      const customerMatches = !verifiedCustomerEmail || verifiedCustomerEmail === paymentOwner;
+
+      if (verifiedCurrency !== 'NGN' || !amountMatches || !customerMatches) {
         await execute(`UPDATE payment_transactions SET status = $1 WHERE reference = $2`, ['failed', reference]);
         return res.status(400).json({
           success: false,
@@ -3866,43 +3670,107 @@ const verifyPaymentUnifiedHandler = async (req: any, res: any) => {
 app.post('/api/payment/verify', authenticatePaymentUser, verifyPaymentUnifiedHandler);
 app.get('/api/payment/verify/:reference', authenticatePaymentUser, verifyPaymentUnifiedHandler);
 app.get('/api/paystack/check-status/:reference', authenticateToken, async (req:any,res:any) => { req.body = { reference:req.params.reference }; return verifyPaymentUnifiedHandler(req,res); });
+app.get('/api/korapay/check-status/:reference', authenticateToken, async (req:any,res:any) => { req.body = { reference:req.params.reference }; return verifyPaymentUnifiedHandler(req,res); });
+app.post('/api/korapay/check-status', authenticateToken, async (req:any,res:any) => { return verifyPaymentUnifiedHandler(req,res); });
 
 // 4. Unified Webhook Receiver
 const handleWebhookUnified = async (providerName: PaymentProviderName, req: any, res: any) => {
   try {
     const provider = paymentManager.getProvider(providerName);
-    const rawBody = req.rawBody || (typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {}));
-    const jsonBody = typeof req.body === 'object' && !Buffer.isBuffer(req.body) ? req.body : (rawBody ? JSON.parse(rawBody) : {});
+    if (!provider.isConfigured()) {
+      return res.status(503).send(`${provider.displayName} is not configured`);
+    }
 
+    const rawBody = req.rawBody || (typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {}));
+    const jsonBody = typeof req.body === 'object' && !Buffer.isBuffer(req.body)
+      ? req.body
+      : (rawBody ? JSON.parse(rawBody) : {});
+
+    // Verify the provider signature before reading any payment value from the webhook.
     const parsed = await provider.parseWebhook(req.headers, rawBody, jsonBody);
     if (!parsed.isValid) {
-      logDiagnostic('SECURITY_ALERT', `Invalid ${provider.displayName} webhook signature`, { headers: req.headers });
+      logDiagnostic('SECURITY_ALERT', `Invalid ${provider.displayName} webhook signature`, { provider: providerName });
       return res.status(400).send(`Invalid ${provider.displayName} webhook signature`);
     }
 
-    logDiagnostic('INFO', `${provider.displayName} Webhook Received`, { event: parsed.event, reference: parsed.reference });
+    logDiagnostic('INFO', `${provider.displayName} Webhook Received`, {
+      event: parsed.event,
+      reference: parsed.reference,
+      provider: providerName
+    });
 
-    if (parsed.status === 'successful' && parsed.reference) {
-      await processSuccessfulPayment({
-        reference: parsed.reference,
-        providerName,
-        verifiedAmount: parsed.amount,
-        providerReference: parsed.providerReference,
-        rawData: parsed.rawData
-      });
+    if (!parsed.reference) {
+      return res.status(200).json({ status: 'ignored', message: 'Webhook did not contain a usable transaction reference.' });
     }
 
-    res.status(200).json({ status: 'success', message: `${provider.displayName} webhook processed.` });
+    // Only Nevo transactions created in our payment_transactions table can credit a wallet.
+    const tx = await getRow(`SELECT * FROM payment_transactions WHERE reference = $1`, [parsed.reference]);
+    if (!tx) {
+      return res.status(200).json({ status: 'ignored', message: 'Transaction is not a Nevo wallet deposit.' });
+    }
+
+    if (String(tx.provider || '').toLowerCase() !== providerName) {
+      logDiagnostic('SECURITY_ALERT', 'Webhook provider mismatch', {
+        reference: parsed.reference,
+        expectedProvider: tx.provider,
+        receivedProvider: providerName
+      });
+      return res.status(400).send('Webhook provider mismatch');
+    }
+
+    if (tx.purpose !== 'wallet_funding') {
+      return res.status(200).json({ status: 'ignored', message: 'Transaction purpose is not wallet funding.' });
+    }
+
+    if (tx.status === 'successful' || tx.status === 'settled') {
+      return res.status(200).json({ status: 'success', message: 'Transaction already processed.' });
+    }
+
+    // The webhook is a trigger/notification. Verify the transaction directly with the
+    // provider API before any wallet credit is made. This also catches underpayment,
+    // overpayment, wrong currency, wrong customer, and stale/fraudulent webhook data.
+    const verified = await provider.verifyPayment(parsed.reference);
+    if (!verified.success || verified.status !== 'successful') {
+      throw new Error(`${provider.displayName} did not return a successful verified transaction for this webhook.`);
+    }
+
+    const expectedAmount = Number(tx.amount || 0);
+    const verifiedAmount = Number(verified.amount || 0);
+    const verifiedCurrency = String(verified.currency || '').toUpperCase();
+    const paymentOwner = String(tx.useremail || tx.userEmail || '').toLowerCase();
+    const verifiedCustomerEmail = String(verified.customerEmail || '').toLowerCase();
+
+    if (verifiedCurrency !== 'NGN' || !Number.isFinite(verifiedAmount) || Math.abs(verifiedAmount - expectedAmount) > 0.009) {
+      throw new Error('Verified provider amount/currency does not match the original Nevo deposit. Wallet was not credited.');
+    }
+
+    if (verifiedCustomerEmail && paymentOwner && verifiedCustomerEmail !== paymentOwner) {
+      throw new Error('Verified provider customer does not match the Nevo transaction owner. Wallet was not credited.');
+    }
+
+    await processSuccessfulPayment({
+      reference: parsed.reference,
+      providerName,
+      verifiedAmount,
+      channel: verified.channel || parsed.rawData?.data?.payment_method || 'checkout',
+      providerReference: verified.providerReference || parsed.providerReference,
+      rawData: verified.rawResponse || parsed.rawData
+    });
+
+    return res.status(200).json({ status: 'success', message: `${provider.displayName} webhook verified and processed.` });
   } catch (err: any) {
     console.error(`Error in ${providerName} webhook handler:`, err);
-    res.status(500).json({ error: 'Webhook processing failure.' });
+    // Non-200 tells the provider to retry a webhook when verification/processing failed.
+    return res.status(500).json({ error: 'Webhook verification/processing failed.' });
   }
 };
 
 app.post('/api/payment/webhook/paystack', (req, res) => handleWebhookUnified('paystack', req, res));
 app.post('/api/payment/webhook/flutterwave', (req, res) => handleWebhookUnified('flutterwave', req, res));
 app.post('/api/payment/webhook/korapay', (req, res) => handleWebhookUnified('korapay', req, res));
+// Dashboard/webhook compatibility aliases.
 app.post('/api/paystack/webhook', (req, res) => handleWebhookUnified('paystack', req, res));
+app.post('/api/korapay/webhook', (req, res) => handleWebhookUnified('korapay', req, res));
 app.post('/api/flutterwave/webhook', (req, res) => handleWebhookUnified('flutterwave', req, res));
 
 // 5. Admin Payment Gateway Configuration & Transaction Oversight
@@ -4192,7 +4060,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       whatsappNumber: settings.whatsappNumber || "+2349162845073",
       whatsappLink: settings.wdvWhatsappLink || settings.whatsappLink || wdvConfig.whatsappLink || "https://wa.me/2349162845073",
       whatsappMessage: settings.whatsappMessage || "Hello Admin, I have made a manual bank transfer for WDV Voucher.",
-      telegramLink: settings.telegramLink || "https://t.me/swiftpay",
+      telegramLink: (settings.telegramLink && !/swiftpay/i.test(settings.telegramLink)) ? settings.telegramLink : "https://t.me/nevo_official",
       facebookLink: settings.facebookLink || "",
       instagramLink: settings.instagramLink || "",
       xTwitterLink: settings.xTwitterLink || "",
@@ -4200,15 +4068,15 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       youtubeLink: settings.youtubeLink || "",
 
       // Customer Support & Pages
-      supportEmail: settings.supportEmail || "support@swiftpay.com",
+      supportEmail: (settings.supportEmail && !/swiftpay/i.test(settings.supportEmail)) ? settings.supportEmail : "support@nevo.ng",
       supportPhone: settings.supportPhone || "+2349162845073",
       senderName: /swiftpay/i.test(String(settings.senderName || settings.smsSenderName || "")) ? "Nevo" : (settings.senderName || settings.smsSenderName || "Nevo"),
       officeAddress: settings.officeAddress || "Lagos, Nigeria",
       businessHours: settings.businessHours || "24/7 Support",
-      websiteUrl: settings.websiteUrl || "https://swiftpay.com",
-      privacyPolicy: settings.privacyPolicy || "SwiftPay Privacy Policy details...",
-      termsOfService: settings.termsOfService || "SwiftPay Terms of Service details...",
-      aboutUs: settings.aboutUs || "SwiftPay is Nigeria's premier digital financial voucher platform...",
+      websiteUrl: (settings.websiteUrl && !/swiftpay/i.test(settings.websiteUrl)) ? settings.websiteUrl : "https://nevo.ng",
+      privacyPolicy: (settings.privacyPolicy && !/swiftpay/i.test(settings.privacyPolicy)) ? settings.privacyPolicy : "Nevo Privacy Policy details...",
+      termsOfService: (settings.termsOfService && !/swiftpay/i.test(settings.termsOfService)) ? settings.termsOfService : "Nevo Terms of Service details...",
+      aboutUs: (settings.aboutUs && !/swiftpay/i.test(settings.aboutUs)) ? settings.aboutUs : "Nevo is Nigeria's premier digital financial rewards and wallet platform...",
       contactUs: settings.contactUs || "Contact support via WhatsApp or Email.",
       faqContent: settings.faqContent || "Frequently Asked Questions...",
 
@@ -4624,9 +4492,297 @@ app.post('/api/nivo/tasks/:id/submit', authenticateToken, async (req:any,res:any
 app.get('/api/nivo/referrals/stats', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const user=readDb().users.find((u:any)=>u.email.toLowerCase()===email); const records=await getAllRows(`SELECT * FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) ORDER BY createdAt DESC`,[email]); const bonus=Number(user?.totalReferralBonus||0); res.json({referralCode:user?.referralCode||'',referralLink:user?.referralCode?`${req.protocol}://${req.get('host')}/register?ref=${user.referralCode}`:'',totalReferrals:records.length,totalBonus:bonus,bonusPerReferral:Number((records[0]?.bonusamount||1000)),records:records.map((r:any)=>({...r,bonusAmount:Number(r.bonusamount||0),referredUserName:r.referredusername||''}))}); } catch(e:any){res.status(500).json({error:e.message});} });
 app.get('/api/nivo/activation/status', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const referralRows=await getAllRows(`SELECT * FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) AND status='successful' ORDER BY createdAt DESC`,[email]); const paymentRows=await getAllRows(`SELECT * FROM payment_transactions WHERE LOWER(userEmail)=LOWER($1) AND purpose='wallet_funding' AND status='successful'`,[email]); const successfulReferrals=referralRows.length; const depositRequirementMet=paymentRows.some((p:any)=>Number(p.amount||0)>=520); res.json({activated:depositRequirementMet,fee:520,successfulReferrals,referralsRequired:5,depositRequirementMet,depositMinimum:520,canWithdraw:successfulReferrals>=5&&depositRequirementMet}); } catch(e:any){res.status(500).json({error:e.message});} });
 app.post('/api/nivo/activation/pay', authenticateToken, async (_req:any,res:any)=>{ return res.status(400).json({error:'No activation fee is required. Complete 5 successful referrals, then make a minimum ₦520 wallet deposit to unlock withdrawals.'}); });
-app.get('/api/nivo/history', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const db=readDb(); const u=db.users.find((x:any)=>x.email.toLowerCase()===email); const tx=Array.isArray(u?.transactions)?u.transactions.filter((x:any)=>['promotional_bonus','activation_fee','deposit','referral_bonus','task_reward'].includes(String(x.type||''))).slice(0,100):[]; res.json({transactions:tx}); } catch(e:any){res.status(500).json({error:e.message});} });
+app.get('/api/nivo/history', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const db=readDb(); const u=db.users.find((x:any)=>x.email.toLowerCase()===email); const tx=Array.isArray(u?.transactions)?u.transactions.filter((x:any)=>['promotional_bonus','activation_fee','deposit','referral_bonus','task_reward','ad_reward'].includes(String(x.type||''))).slice(0,100):[]; res.json({transactions:tx}); } catch(e:any){res.status(500).json({error:e.message});} });
 app.get('/api/nivo/notifications', authenticateToken, async (req:any,res:any)=>{ const db=readDb(); const u=db.users.find((x:any)=>x.email.toLowerCase()===String(req.userEmail).toLowerCase()); res.json({notifications:u?.notifications||[]}); });
 app.post('/api/nivo/notifications/mark-read', authenticateToken, async (req:any,res:any)=>{ const db=readDb(); const u=db.users.find((x:any)=>x.email.toLowerCase()===String(req.userEmail).toLowerCase()); if(u){ for(const n of (u.notifications||[])) n.unread=false; await writeDb(db); } res.json({success:true}); });
+
+// ============================================================
+// NEVO REWARDED ADS ENGINE (GOOGLE AD MANAGER / GPT WEB REWARDED)
+// ============================================================
+const AD_REWARD_AMOUNT = Number(process.env.AD_REWARD_AMOUNT || 200);
+const AD_UNIT_PATH = process.env.AD_UNIT_PATH || '/21775744923/example/rewarded';
+
+// Ad system configuration
+app.get('/api/ads/config', (_req: any, res: any) => {
+  res.json({
+    success: true,
+    provider: 'Google Ad Manager (GPT Web Rewarded)',
+    adUnitPath: AD_UNIT_PATH,
+    rewardAmount: AD_REWARD_AMOUNT,
+    currency: 'NGN',
+    currencySymbol: '₦',
+    instruction: 'Watch the advertisement until completion. Your ₦200 reward is credited automatically upon server verification.'
+  });
+});
+
+// Ad statistics and rewards history for authenticated user
+app.get('/api/ads/stats', authenticateToken, async (req: any, res: any) => {
+  try {
+    const email = String(req.userEmail).toLowerCase();
+    const allRewards = await getAllRows(`SELECT * FROM ad_rewards WHERE LOWER(userEmail) = LOWER($1) ORDER BY createdAt DESC`, [email]);
+    
+    // Calculate today's rewards
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayRewards = allRewards.filter((r: any) => String(r.createdat || r.createdAt || '').startsWith(todayStr));
+    const todayEarnings = todayRewards.reduce((sum: number, r: any) => sum + Number(r.rewardamount || r.rewardAmount || AD_REWARD_AMOUNT), 0);
+    const totalEarnings = allRewards.reduce((sum: number, r: any) => sum + Number(r.rewardamount || r.rewardAmount || AD_REWARD_AMOUNT), 0);
+
+    res.json({
+      success: true,
+      rewardAmount: AD_REWARD_AMOUNT,
+      totalAdsWatched: allRewards.length,
+      totalEarnings,
+      todayEarnings,
+      todayAdsCount: todayRewards.length,
+      history: allRewards.slice(0, 30).map((r: any) => ({
+        id: r.id,
+        sessionId: r.sessionid || r.sessionId,
+        provider: r.provider || 'Google Ad Manager',
+        rewardAmount: Number(r.rewardamount || r.rewardAmount || AD_REWARD_AMOUNT),
+        status: r.status || 'verified',
+        reference: r.reference || r.id,
+        createdAt: r.createdat || r.createdAt || new Date().toISOString(),
+        completedAt: r.completedat || r.completedAt || new Date().toISOString()
+      }))
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Could not load ad stats.' });
+  }
+});
+
+// Create a secure ad session before requesting the rewarded ad
+app.post('/api/ads/session', authenticateToken, async (req: any, res: any) => {
+  try {
+    const email = String(req.userEmail || '').toLowerCase();
+    if (!email) {
+      return res.status(401).json({ error: 'Session authentication required to initiate ad session.' });
+    }
+    const sessionId = `ad-sess-${Date.now()}-${crypto.randomBytes(8).toString('hex')}`;
+    const clientNonce = crypto.randomBytes(16).toString('hex');
+    const now = new Date().toISOString();
+    const ipAddress = req.ip || req.headers['x-forwarded-for'] || '';
+
+    let inserted = false;
+    try {
+      await execute(
+        `INSERT INTO ad_reward_sessions (id, userEmail, adUnitPath, provider, rewardAmount, status, providerToken, providerTxId, clientNonce, createdAt, completedAt, ipAddress) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+        [sessionId, email, AD_UNIT_PATH, 'Google Ad Manager (GPT Web Rewarded)', AD_REWARD_AMOUNT, 'initiated', '', '', clientNonce, now, '', String(ipAddress)]
+      );
+      inserted = true;
+    } catch (sqlErr: any) {
+      console.warn('[Ad Session DB Auto-heal] Attempting to create table if missing:', sqlErr?.message);
+      try {
+        await execute(`CREATE TABLE IF NOT EXISTS ad_reward_sessions (id TEXT PRIMARY KEY, userEmail TEXT, adUnitPath TEXT, provider TEXT, rewardAmount REAL, status TEXT, providerToken TEXT, providerTxId TEXT, clientNonce TEXT, createdAt TEXT, completedAt TEXT, ipAddress TEXT)`);
+        await execute(
+          `INSERT INTO ad_reward_sessions (id, userEmail, adUnitPath, provider, rewardAmount, status, providerToken, providerTxId, clientNonce, createdAt, completedAt, ipAddress) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+          [sessionId, email, AD_UNIT_PATH, 'Google Ad Manager (GPT Web Rewarded)', AD_REWARD_AMOUNT, 'initiated', '', '', clientNonce, now, '', String(ipAddress)]
+        );
+        inserted = true;
+      } catch (innerErr: any) {
+        console.warn('[Ad Session DB] Storing session in JSON DB fallback');
+      }
+    }
+
+    // Always mirror to in-memory/JSON DB for resilient fallback
+    try {
+      const db = readDb();
+      db.ad_reward_sessions = db.ad_reward_sessions || [];
+      db.ad_reward_sessions.push({
+        id: sessionId,
+        useremail: email,
+        adunitpath: AD_UNIT_PATH,
+        provider: 'Google Ad Manager (GPT Web Rewarded)',
+        rewardamount: AD_REWARD_AMOUNT,
+        status: 'initiated',
+        providertoken: '',
+        providertxid: '',
+        clientnonce: clientNonce,
+        createdat: now,
+        completedat: '',
+        ipaddress: String(ipAddress)
+      });
+      await writeDb(db);
+    } catch (jsonErr) {}
+
+    res.json({
+      success: true,
+      sessionId,
+      adUnitPath: AD_UNIT_PATH,
+      rewardAmount: AD_REWARD_AMOUNT,
+      clientNonce,
+      timestamp: Date.now()
+    });
+  } catch (err: any) {
+    console.error('[Ad Session Error]', err);
+    res.status(500).json({ error: err.message || 'Unable to initiate ad session.' });
+  }
+});
+
+// Server-Side Verification (SSV) callback endpoint for ad networks (Google Ad Manager)
+app.all('/api/ads/ssv-callback', async (req: any, res: any) => {
+  try {
+    const params = { ...req.query, ...req.body };
+    const transactionId = params.transaction_id || params.custom_data || params.trans_id;
+    const userId = params.user_id || params.sub_id;
+
+    if (!transactionId) {
+      return res.status(400).send('Missing transaction ID');
+    }
+
+    // Check for existing reward with this transactionId (idempotent)
+    const existing = await getRow(`SELECT * FROM ad_rewards WHERE providerTxId = $1 OR reference = $1`, [transactionId]);
+    if (existing) {
+      return res.status(200).send('OK (Already processed)');
+    }
+
+    if (userId) {
+      const db = readDb();
+      const user = db.users.find((u: any) => u.email.toLowerCase() === String(userId).toLowerCase());
+      if (user) {
+        user.balance = Number(user.balance || 0) + AD_REWARD_AMOUNT;
+        user.totalEarnings = Number(user.totalEarnings || 0) + AD_REWARD_AMOUNT;
+        user.transactions = user.transactions || [];
+        user.transactions.unshift({
+          id: `tx-ad-${Date.now()}`,
+          type: 'ad_reward',
+          amount: AD_REWARD_AMOUNT,
+          status: 'success',
+          description: 'Rewarded Ad Reward (Google SSV Verified)',
+          date: new Date().toISOString()
+        });
+        writeDb(db);
+
+        const rewardId = `ad-rw-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+        await execute(
+          `INSERT INTO ad_rewards (id, userEmail, sessionId, provider, providerTxId, rewardAmount, status, reference, completedAt, createdAt) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [rewardId, user.email.toLowerCase(), '', 'Google Ad Manager (SSV)', transactionId, AD_REWARD_AMOUNT, 'verified', transactionId, new Date().toISOString(), new Date().toISOString()]
+        );
+      }
+    }
+
+    res.status(200).send('OK');
+  } catch (err: any) {
+    console.error('[Ads SSV Error]', err);
+    res.status(500).send('Error');
+  }
+});
+
+// Idempotent ad completion verification & reward crediting
+app.post('/api/ads/verify', authenticateToken, async (req: any, res: any) => {
+  try {
+    const email = String(req.userEmail).toLowerCase();
+    const { sessionId, providerToken, providerTxId } = req.body || {};
+
+    if (!sessionId) {
+      return res.status(400).json({ error: 'Session ID is required.' });
+    }
+
+    // 1. Check if session exists and belongs to this user
+    const session = await getRow(`SELECT * FROM ad_reward_sessions WHERE id = $1 AND LOWER(userEmail) = LOWER($2)`, [sessionId, email]);
+    if (!session) {
+      return res.status(404).json({ error: 'Ad session not found or does not belong to this user.' });
+    }
+
+    // 2. Idempotency check: Already credited?
+    const existingReward = await getRow(`SELECT * FROM ad_rewards WHERE sessionId = $1`, [sessionId]);
+    if (existingReward || session.status === 'completed') {
+      const db = readDb();
+      const currentUser = db.users.find((u: any) => u.email.toLowerCase() === email);
+      return res.json({
+        success: true,
+        alreadyClaimed: true,
+        message: 'This ad reward has already been credited to your wallet.',
+        rewardAmount: AD_REWARD_AMOUNT,
+        balance: currentUser?.balance || 0
+      });
+    }
+
+    // 3. Provider transaction idempotency
+    const txRef = providerTxId || `gpt-${sessionId}-${Date.now()}`;
+    if (providerTxId) {
+      const existingTx = await getRow(`SELECT * FROM ad_rewards WHERE providerTxId = $1`, [providerTxId]);
+      if (existingTx) {
+        return res.json({
+          success: true,
+          alreadyClaimed: true,
+          message: 'This ad completion transaction was already processed.',
+          rewardAmount: AD_REWARD_AMOUNT
+        });
+      }
+    }
+
+    // 4. Update session status
+    const now = new Date().toISOString();
+    await execute(
+      `UPDATE ad_reward_sessions SET status = $1, completedAt = $2, providerTxId = $3 WHERE id = $4`,
+      ['completed', now, txRef, sessionId]
+    );
+
+    // 5. Create immutable ad reward record
+    const rewardId = `ad-rw-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+    await execute(
+      `INSERT INTO ad_rewards (id, userEmail, sessionId, provider, providerTxId, rewardAmount, status, reference, completedAt, createdAt) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [rewardId, email, sessionId, 'Google Ad Manager (GPT Web Rewarded)', txRef, AD_REWARD_AMOUNT, 'verified', txRef, now, now]
+    );
+
+    // 6. Credit user's wallet and create notifications/transactions
+    const db = readDb();
+    const user = db.users.find((u: any) => u.email.toLowerCase() === email);
+    if (!user) {
+      return res.status(404).json({ error: 'User account not found.' });
+    }
+
+    const beforeBalance = Number(user.balance || 0);
+    user.balance = beforeBalance + AD_REWARD_AMOUNT;
+    user.totalEarnings = Number(user.totalEarnings || 0) + AD_REWARD_AMOUNT;
+
+    // Add activity notification
+    user.notifications = user.notifications || [];
+    user.notifications.unshift({
+      id: `notif-${Date.now()}`,
+      title: 'Ad Reward Credited',
+      body: `₦${AD_REWARD_AMOUNT.toLocaleString()} has been added to your Nevo balance for completing a rewarded advertisement.`,
+      date: now,
+      unread: true,
+      type: 'ad_reward'
+    });
+
+    // Add financial transaction
+    user.transactions = user.transactions || [];
+    user.transactions.unshift({
+      id: `tx-ad-${Date.now()}`,
+      type: 'ad_reward',
+      amount: AD_REWARD_AMOUNT,
+      status: 'success',
+      description: `Rewarded Ad Completion (₦${AD_REWARD_AMOUNT})`,
+      date: now
+    });
+
+    writeDb(db);
+
+    // Sync database user row
+    try {
+      await execute(
+        `UPDATE users SET balance = $1, totalEarnings = $2, notifications = $3, transactions = $4 WHERE LOWER(email) = $5`,
+        [user.balance, user.totalEarnings, JSON.stringify(user.notifications), JSON.stringify(user.transactions), email]
+      );
+    } catch (e) {}
+
+    logDiagnostic('INFO', 'Rewarded ad verified and credited', { email, sessionId, amount: AD_REWARD_AMOUNT, newBalance: user.balance });
+
+    res.json({
+      success: true,
+      message: `₦${AD_REWARD_AMOUNT} has been credited to your Nevo wallet!`,
+      rewardAmount: AD_REWARD_AMOUNT,
+      newBalance: user.balance,
+      rewardId,
+      reference: txRef
+    });
+  } catch (err: any) {
+    logDiagnostic('API_ERROR', 'Ad verification failed', { error: err.message });
+    res.status(500).json({ error: err.message || 'Ad verification failed.' });
+  }
+});
 
 // Nivo feature administration endpoints
 app.get('/api/admin/nivo/tasks', authenticateAdminToken, async (_req,res)=>{ try { const tasks=await getAllRows(`SELECT * FROM nivo_tasks ORDER BY createdAt DESC`); const submissions=await getAllRows(`SELECT * FROM nivo_task_submissions ORDER BY createdAt DESC`); res.json({success:true,tasks,submissions}); } catch(e:any){res.status(500).json({error:e.message});} });

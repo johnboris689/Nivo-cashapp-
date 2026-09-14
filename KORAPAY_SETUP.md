@@ -1,27 +1,30 @@
-# SwiftPay WDV Voucher — Korapay Setup
+# Nevo — KoraPay Wallet Deposit Setup
 
-SwiftPay supports Korapay as an online gateway for the **Buy WDV Voucher** flow. The fixed purchase price is **₦6,500**.
+Nevo wallet deposits use KoraPay Checkout Redirect. Each deposit creates a new KoraPay charge through the backend and redirects the user to the checkout URL returned by KoraPay.
 
-## Configure Korapay
-
-Add these server-side environment variables:
+## Environment variables
 
 ```env
-PAYMENT_PROVIDER=korapay
+APP_URL=https://your-nevo-domain.example
 KORAPAY_SECRET_KEY=sk_live_...
 KORAPAY_PUBLIC_KEY=pk_live_...
 ```
 
-Keep the Secret Key server-side. Korapay webhook signatures are verified with `KORAPAY_SECRET_KEY`; no separate webhook-secret environment variable is required.
+`KORAPAY_SECRET_KEY` is server-only. Never put it in React/browser code or commit a real key to Git.
 
-## Payment flow
+## Deposit flow
 
-1. User selects **Buy WDV Voucher**.
-2. SwiftPay starts a ₦6,500 Korapay checkout.
-3. Korapay processes the payment.
-4. SwiftPay verifies the transaction server-side.
-5. A WDV voucher is generated only after a successful ₦6,500 NGN verification.
-6. The existing WDV voucher ledger stores the generated voucher.
+1. User selects an amount of at least ₦520.
+2. User selects KoraPay.
+3. Nevo creates a unique pending `wallet_funding` transaction.
+4. Nevo calls KoraPay's official charge initialization API from the backend.
+5. KoraPay returns the hosted checkout URL for that newly-created transaction.
+6. Nevo redirects the user to that returned URL; no static checkout URL is used.
+7. KoraPay sends a signed webhook to Nevo.
+8. Nevo verifies the transaction with KoraPay, including status, NGN currency, amount, and transaction ownership, before crediting the wallet.
 
-Webhook endpoints:
-`/api/payment/webhook/korapay` and the legacy `/api/korapay/webhook` endpoint.
+Webhook endpoint:
+
+`/api/payment/webhook/korapay`
+
+The compatibility endpoint `/api/korapay/webhook` is also routed to the same verified webhook handler.

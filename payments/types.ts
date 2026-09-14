@@ -7,6 +7,7 @@ export interface InitializePaymentParams {
   phone?: string;
   reference: string;
   callbackUrl: string;
+  webhookUrl?: string;
   purpose?: string; // 'wallet_funding' | 'wdv_voucher'
   metadata?: Record<string, any>;
 }

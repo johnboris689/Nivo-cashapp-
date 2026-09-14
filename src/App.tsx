@@ -44,8 +44,11 @@ import {
   Fingerprint,
   Bot,
   RefreshCw,
-  PlusCircle
+  PlusCircle,
+  PlayCircle
 } from 'lucide-react';
+
+import { AdsPage } from './pages/AdsPage';
 
 import { registerDeviceBiometric, loginWithBiometric, isWebAuthnSupported } from './lib/webauthn';
 import { User, WdvCode, Transaction, NotificationItem } from './types';
@@ -207,6 +210,8 @@ export default function App() {
       if (!path.startsWith('/boris')) {
         if (path === '/dashboard/withdraw' || path === '/withdraw') {
           setCurrentScreen('withdraw');
+        } else if (path === '/ads' || path === '/dashboard/ads') {
+          setCurrentScreen('ads');
         } else if (path === '/dashboard/transfer' || path === '/transfer') {
           setTransferStep(1);
           setCurrentScreen('transfer_bank');
@@ -228,6 +233,8 @@ export default function App() {
     if (!currentPath.startsWith('/boris')) {
       if (currentPath === '/dashboard/withdraw' || currentPath === '/withdraw') {
         setCurrentScreen('withdraw');
+      } else if (currentPath === '/ads' || currentPath === '/dashboard/ads') {
+        setCurrentScreen('ads');
       } else if (currentPath === '/dashboard/transfer' || currentPath === '/transfer') {
         setTransferStep(1);
         setCurrentScreen('transfer_bank');
@@ -411,7 +418,7 @@ export default function App() {
     dashboardBanner: "Get started with fast manual voucher activation & seamless transfers",
     whatsappNumber: "+2349162845073",
     whatsappLink: "https://wa.me/2349162845073",
-    supportEmail: "support@swiftpay.com",
+    supportEmail: "support@nevo.ng",
     supportPhone: "+2349162845073",
     maintenanceMode: "false"
   });
@@ -763,7 +770,50 @@ export default function App() {
   const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'laptop' | 'desktop' | 'large'>('mobile');
   const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 375);
 
-  useEffect(() => { const ref = new URLSearchParams(window.location.search).get('ref'); if (ref) setReferralCodeInput(ref.toUpperCase()); }, []);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) setReferralCodeInput(ref.toUpperCase());
+
+    // Providers return the browser to this callback after checkout. The URL is
+    // never treated as proof of payment; it only gives us the reference to ask
+    // the Nevo backend to perform authoritative provider verification. KoraPay
+    // may append `reference` itself, so accept either callback form.
+    const depositRef = params.get('deposit_ref') || params.get('reference');
+    const depositProvider = params.get('provider') || (depositRef?.startsWith('NEVO_KPY_') ? 'korapay' : 'paystack');
+    if (depositRef) {
+      const token = localStorage.getItem('swiftpay_token');
+      if (token) {
+        showToast('Verifying payment with payment provider...', 'info');
+        const verifyEndpoint = depositProvider === 'korapay'
+          ? `/api/korapay/check-status/${encodeURIComponent(depositRef)}`
+          : `/api/paystack/check-status/${encodeURIComponent(depositRef)}`;
+        fetch(verifyEndpoint, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.status === 'successful' || data.status === 'approved' || data.status === 'completed') {
+              showToast('Deposit confirmed! Your Nevo wallet has been credited.', 'success');
+              syncWithBackend();
+            } else if (data.status === 'pending') {
+              showToast('Payment is still pending. We will update your balance once confirmed.', 'info');
+            } else {
+              showToast(data.message || 'Payment was not completed.', 'error');
+            }
+          })
+          .catch(() => {
+            showToast('Unable to check payment status right now.', 'info');
+          })
+          .finally(() => {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('deposit_ref');
+            url.searchParams.delete('provider');
+            window.history.replaceState({}, document.title, url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : ''));
+          });
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -1832,7 +1882,7 @@ export default function App() {
       doc.setTextColor(148, 163, 184);
       doc.text('Nevo Security System • Automatically Verified', 105, 170, { align: 'center' });
 
-      doc.save(`swiftpay-deposit-${generatedWdv.code || 'code'}.pdf`);
+      doc.save(`nevo-deposit-${generatedWdv.code || 'code'}.pdf`);
       showToast('Deposit PDF Receipt Downloaded!', 'success');
     } catch (err) {
       console.error('Error generating WDV PDF:', err);
@@ -2088,7 +2138,7 @@ export default function App() {
           bank: transferBank,
           accountNumber: transferAccNum,
           amount: price,
-          voucherCode: codeToUse,
+          voucherCode: '',
           accountName: transferAccName
         })
       });
@@ -2183,7 +2233,7 @@ export default function App() {
           bank: withdrawBank,
           accountNumber: withdrawAccount,
           amount: price,
-          voucherCode: codeToUse,
+          voucherCode: '',
           accountName: withdrawAccName
         })
       });
@@ -2579,7 +2629,7 @@ export default function App() {
           <div className="w-full flex-1 flex flex-col">
             <ErrorBoundary fallbackTitle="Admin Panel Error">
               <AdminPanel
-                currentUserEmail="admin@swiftpay.com"
+                currentUserEmail="admin@nevo.ng"
                 transactions={transactions}
                 adminPath={adminPath}
                 navigateTo={navigateTo}
@@ -2614,7 +2664,7 @@ export default function App() {
             <div className="w-full bg-[#0c0c14] border border-white/10 rounded-2xl p-4 sm:p-6 shadow-2xl backdrop-blur-xl flex-1 flex flex-col">
               <ErrorBoundary fallbackTitle="Admin Panel Error">
                 <AdminPanel
-                  currentUserEmail="admin@swiftpay.com"
+                  currentUserEmail="admin@nevo.ng"
                   transactions={transactions}
                   adminPath={adminPath}
                   navigateTo={navigateTo}
@@ -2663,7 +2713,7 @@ export default function App() {
       <div className="w-full min-h-screen bg-[#0c0c14] text-white flex flex-col font-sans">
         {/* Main Core Viewport Container */}
         <div
-          id="swiftpay-mobile-container"
+          id="nevo-mobile-container"
           className={getContainerClasses()}
         >
         {/* Offline Banner Indicator (Point 5) */}
@@ -3354,10 +3404,22 @@ export default function App() {
                           {[
                             { id: 'tasks' as const, label: 'Tasks', icon: CheckCircle2, bg: 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20' },
                             { id: 'referrals' as const, label: 'Referrals', icon: Share2, bg: 'bg-teal-500/15 text-teal-400 border border-teal-500/20' },
-                            { id: 'activation' as const, label: 'Withdrawal', icon: ShieldCheck, bg: 'bg-violet-500/15 text-violet-400 border border-violet-500/20' },
+                            { id: 'ads' as const, label: 'Ads', icon: PlayCircle, bg: 'bg-amber-500/15 text-amber-400 border border-amber-500/20' },
                             { id: 'history' as const, label: 'Rewards', icon: Clock, bg: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' }
                           ].map((item) => (
-                            <button key={item.id} onClick={() => { setRewardsTab(item.id); setActiveTab('social'); }} className="p-1.5 sm:p-2.5 rounded-xl bg-[#0a0a14] border border-white/5 hover:border-white/15 flex flex-col items-center hover:bg-[#10101f] active:scale-95 transition-all text-center w-full min-w-0 shadow-sm">
+                            <button 
+                              id={`btn-earn-${item.id}`}
+                              key={item.id} 
+                              onClick={() => { 
+                                if (item.id === 'ads') {
+                                  changeScreen('ads');
+                                } else {
+                                  setRewardsTab(item.id as any); 
+                                  setActiveTab('social'); 
+                                }
+                              }} 
+                              className="p-1.5 sm:p-2.5 rounded-xl bg-[#0a0a14] border border-white/5 hover:border-white/15 flex flex-col items-center hover:bg-[#10101f] active:scale-95 transition-all text-center w-full min-w-0 shadow-sm cursor-pointer"
+                            >
                               <div className={`p-1.5 rounded-lg mb-1 shrink-0 ${item.bg}`}><item.icon className="h-4 w-4" /></div>
                               <span className="text-[9px] font-bold text-slate-300 uppercase leading-none truncate w-full block">{item.label}</span>
                             </button>
@@ -5096,6 +5158,18 @@ export default function App() {
                 </div>
               )}
 
+              {/* -------------------- FLOW 5.6: WATCH & EARN REWARDED ADS (/ads) -------------------- */}
+              {currentScreen === 'ads' && (
+                <div className="animate-[fadeIn_0.2s_ease-out] w-full max-w-full">
+                  <AdsPage
+                    onBack={() => {
+                      changeScreen('dashboard');
+                      navigateTo('/');
+                    }}
+                  />
+                </div>
+              )}
+
               {/* -------------------- FLOW 6: BANK CASHOUT TRANSFER (/dashboard/transfer) -------------------- */}
               {currentScreen === 'transfer_bank' && (
                 <div className="p-4 sm:p-6 space-y-6 animate-[fadeIn_0.2s_ease-out] max-w-3xl mx-auto w-full">
@@ -5527,7 +5601,7 @@ export default function App() {
                 <div className="animate-[fadeIn_0.2s_ease-out] w-full min-h-screen pb-10">
                   <ErrorBoundary fallbackTitle="Admin Panel Module Error">
                     <AdminPanel
-                      currentUserEmail={user?.email || 'admin@swiftpay.com'}
+                      currentUserEmail={user?.email || 'admin@nevo.ng'}
                       transactions={transactions}
                       adminPath={adminPath}
                       navigateTo={navigateTo}
@@ -5893,7 +5967,7 @@ export default function App() {
         {/* -------------------- REGISTRATION CONGRATULATIONS PAGE -------------------- */}
         {isAuthenticated && currentScreen === 'congratulations' && (
           <CongratulationsScreen
-            userEmail={user?.email || 'user@swiftpay.com'}
+            userEmail={user?.email || 'user@nevo.ng'}
             onContinue={async () => {
               await syncWithBackend();
               setCurrentScreen('dashboard');
@@ -5907,6 +5981,7 @@ export default function App() {
           onClose={() => setPaymentModalOpen(false)}
           token={localStorage.getItem('swiftpay_token') || ''}
           onToast={showToast}
+          onSuccess={() => syncWithBackend()}
         />
 
 
