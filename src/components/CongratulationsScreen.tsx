@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Check, Sparkles, ArrowRight, ArrowUpRight, Smartphone, Wifi, Zap, ShieldCheck, Gift, Fingerprint, CheckCircle2 } from 'lucide-react';
+import { Check, Sparkles, ArrowRight, ArrowUpRight, Smartphone, Wifi, Zap, ShieldCheck, Fingerprint, CheckCircle2 } from 'lucide-react';
 import { registerDeviceBiometric } from '../lib/webauthn';
 import { getCachedSettings } from '../services/settingsService';
 
@@ -19,7 +19,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
   const handleRegisterBiometric = async () => {
     setIsBioLoading(true);
     setBioError('');
-    const token = localStorage.getItem('swiftpay_token');
+    const token = localStorage.getItem('nevo_token');
     if (!token) {
       setBioError('Session invalid. Please continue to login.');
       setIsBioLoading(false);
@@ -83,7 +83,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('swiftpay_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('nevo_token')}`
         }
       });
       if (response.ok) {
@@ -101,28 +101,28 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
 
   const featureCards = [
     {
-      icon: ArrowUpRight,
-      title: "Withdraw Funds",
-      desc: "Instant bank payout",
+      icon: CheckCircle2,
+      title: "Complete Tasks",
+      desc: "Complete tasks and earn rewards",
       color: "text-teal-400 bg-teal-500/10 border-teal-500/20"
     },
     {
-      icon: Smartphone,
-      title: "Buy Airtime",
-      desc: "All Nigerian networks",
+      icon: Sparkles,
+      title: "Watch Adverts",
+      desc: "Watch rewarded adverts and earn",
       color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20"
     },
     {
-      icon: Wifi,
-      title: "Buy Data",
-      desc: "Instant high-speed data",
+      icon: ArrowRight,
+      title: "Refer Friends",
+      desc: "Invite friends and earn bonuses",
       color: "text-sky-400 bg-sky-500/10 border-sky-500/20"
     },
     {
-      icon: Zap,
-      title: "Pay Bills",
-      desc: "TV, Power & Utilities",
-      color: "text-amber-400 bg-amber-500/10 border-amber-500/20"
+      icon: ArrowUpRight,
+      title: "Withdraw Funds",
+      desc: "Cash out your eligible earnings",
+      color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
     },
   ];
 
@@ -263,52 +263,12 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
           {/* Title and Subtitle */}
           <div className="space-y-1">
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white font-display">
-              Congratulations!
+              Welcome to Nevo!
             </h1>
             <p className="text-sm font-semibold text-teal-300 tracking-wide">
-              Your {getCachedSettings().websiteName || 'Nevo'} account is now active.
+              Your {getCachedSettings().websiteName || 'Nevo'} account is ready. Start completing tasks, watching adverts and earning rewards.
             </p>
           </div>
-
-          {/* Floating Glassmorphism Reward Card */}
-          <motion.div
-            animate={{ y: [0, -4, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-full bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-5 text-center shadow-2xl relative overflow-hidden space-y-2 border-t-white/20"
-          >
-            {/* Subtle background glow */}
-            <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 via-indigo-500/5 to-transparent pointer-events-none" />
-
-            <div className="flex items-center justify-center gap-2 text-indigo-300 font-bold text-xs uppercase tracking-wider">
-              <Gift className="w-4 h-4 text-teal-400" />
-              <span>Welcome Reward</span>
-            </div>
-
-            <div className="py-1">
-              <span className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-teal-300 via-emerald-200 to-white bg-clip-text text-transparent font-mono tracking-tight drop-shadow-[0_2px_15px_rgba(45,212,191,0.3)]">
-                ₦200,000
-              </span>
-            </div>
-
-            <div className="inline-block px-3 py-1 rounded-full bg-teal-500/15 border border-teal-500/30 text-teal-300 text-[11px] font-bold tracking-wider uppercase">
-              Business Capital Support
-            </div>
-
-            <p className="text-[11px] text-slate-300 font-medium pt-1 border-t border-white/5">
-              Available every 24 hours for 3 consecutive days.
-            </p>
-          </motion.div>
-
-        {/* Information Section */}
-        <div className="w-full bg-white/[0.02] border border-white/5 rounded-xl p-3.5 text-left text-xs text-slate-300 leading-relaxed space-y-1">
-          <p className="font-semibold text-white flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
-            Reward Activation Notice
-          </p>
-          <p className="text-[11px] text-slate-300">
-            Your welcome reward has been successfully activated. You can access up to ₦200,000 every 24 hours for three consecutive days after completing the required verification process.
-          </p>
-        </div>
 
         {/* Biometric Fingerprint / Passkey Setup Card */}
         <div className="w-full bg-slate-900/80 border border-teal-500/30 rounded-2xl p-3.5 text-left space-y-2.5 backdrop-blur-md shadow-xl">

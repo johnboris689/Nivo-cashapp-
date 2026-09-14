@@ -263,7 +263,7 @@ export default function AdminPanel({
 
   // WhatsApp & Communication
   const [whatsappMessage, setWhatsappMessage] = useState('Hello Admin, I have made a wallet deposit via Paystack.');
-  const [telegramLink, setTelegramLink] = useState('https://t.me/swiftpay');
+  const [telegramLink, setTelegramLink] = useState('https://t.me/nevo');
   const [facebookLink, setFacebookLink] = useState('');
   const [instagramLink, setInstagramLink] = useState('');
   const [xTwitterLink, setXTwitterLink] = useState('');
@@ -289,12 +289,12 @@ export default function AdminPanel({
   const [youtubeLink, setYouTubeLink] = useState('');
 
   // Customer Support & Content
-  const [supportEmail, setSupportEmail] = useState('support@swiftpay.com');
+  const [supportEmail, setSupportEmail] = useState('support@nevo.com');
   const [supportPhone, setSupportPhone] = useState('+2349162845073');
   const [whatsappNumber, setWhatsappNumber] = useState('+2349162845073');
   const [officeAddress, setOfficeAddress] = useState('Lagos, Nigeria');
   const [businessHours, setBusinessHours] = useState('24/7 Support');
-  const [websiteUrl, setWebsiteUrl] = useState('https://swiftpay.com');
+  const [websiteUrl, setWebsiteUrl] = useState('https://nevo.com');
   const [privacyPolicy, setPrivacyPolicy] = useState('Nevo Privacy Policy details...');
   const [termsOfService, setTermsOfService] = useState('Nevo Terms of Service details...');
   const [aboutUs, setAboutUs] = useState('Nevo is Nigeria\'s premier digital financial voucher platform...');
@@ -355,7 +355,7 @@ export default function AdminPanel({
   };
 
   const getAdminHeaders = (extraHeaders = {}) => {
-    const token = localStorage.getItem('swiftpay_admin_token') || '';
+    const token = localStorage.getItem('nevo_admin_token') || '';
     return {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -680,7 +680,7 @@ export default function AdminPanel({
       const res = await fetch('/api/admin/video/upload', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('swiftpay_admin_token') || ''}`
+          'Authorization': `Bearer ${localStorage.getItem('nevo_admin_token') || ''}`
         },
         body: formData
       });
@@ -1024,7 +1024,7 @@ export default function AdminPanel({
     if (!selectedWithdrawal) return;
     setRemovingSlip(true);
     try {
-      const token = localStorage.getItem('swiftpay_admin_token') || '';
+      const token = localStorage.getItem('nevo_admin_token') || '';
       const res = await fetch(`/api/admin/withdrawals/${selectedWithdrawal.id}/remove-slip`, {
         method: 'POST',
         headers: {
@@ -1086,7 +1086,7 @@ export default function AdminPanel({
       const formData = new FormData();
       formData.append('slip', file);
 
-      const token = localStorage.getItem('swiftpay_admin_token') || '';
+      const token = localStorage.getItem('nevo_admin_token') || '';
       const res = await fetch(`/api/admin/withdrawals/${selectedWithdrawal.id}/upload-slip`, {
         method: 'POST',
         headers: {
@@ -1765,7 +1765,7 @@ export default function AdminPanel({
   }
 
   if (activeTab === 'nivo_rewards') {
-    return <NivoAdminFeatures token={localStorage.getItem('swiftpay_admin_token') || ''} onToast={onToast} />;
+    return <NivoAdminFeatures token={localStorage.getItem('nevo_admin_token') || ''} onToast={onToast} />;
   }
 
   if (activeTab === 'overview') {

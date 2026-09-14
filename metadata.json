@@ -1,6 +1,8 @@
 {
   "name": "Nevo",
-  "description": "Mobile-first Nigerian fintech digital wallet with multi-provider Paystack, Flutterwave, and Korapay payment gateways, instant wallet funding, and secure withdrawal system.",
+  "description": "Mobile-first Nigerian rewards and digital wallet platform for completing tasks, watching rewarded adverts, earning referral rewards, funding wallets through Paystack or KoraPay, and withdrawing eligible earnings.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

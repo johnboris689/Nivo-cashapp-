@@ -1,4 +1,4 @@
-# SwiftPay Enterprise Update Changelog — Korapay Virtual Account & Automatic WDV Voucher Delivery
+# Nevo Enterprise Update Changelog — Korapay Virtual Account & Automatic WDV Voucher Delivery
 
 ## Summary of Changes
 
@@ -12,10 +12,10 @@
 - **Bank Account Resolution**:
   - Updated `verifyBankAccountService` in `server.ts` to automatically attempt Korapay resolution when `KORAPAY_SECRET_KEY` is present.
 - **ZIP Download Endpoints**:
-  - Added public download routes for `/swiftpay_complete_source_v2.zip` and `/download-source-v2`.
+  - Added public download routes for `/nevo_complete_source_v2.zip` and `/download-source-v2`.
 
 ### 2. Database Schema (`db.ts`)
-- Added/verified `wdv_payments` table schema with PostgreSQL dual-engine support and JSON file fallback (`swiftpay_db.json`).
+- Added/verified `wdv_payments` table schema with PostgreSQL dual-engine support and JSON file fallback (`nevo_db.json`).
 - Added helper functions for creating, updating, and querying WDV payment records.
 
 ### 3. Frontend Application (`src/App.tsx`)

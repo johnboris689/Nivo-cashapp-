@@ -23,16 +23,16 @@ async function getSettings(): Promise<Record<string, string>> {
   }
 
   // Fallback / override with process.env
-  settings.supportEmail = settings.supportEmail || process.env.SUPPORT_EMAIL || 'support@swiftpay.com';
+  settings.supportEmail = settings.supportEmail || process.env.SUPPORT_EMAIL || 'support@nevo.com';
   settings.supportPhone = settings.supportPhone || process.env.SUPPORT_PHONE || '+2349162845073';
   settings.whatsappNumber = settings.whatsappNumber || process.env.WHATSAPP_NUMBER || '+2349162845073';
-  settings.senderName = settings.senderName || process.env.SENDER_NAME || 'SwiftPay';
+  settings.senderName = settings.senderName || process.env.SENDER_NAME || 'Nevo';
   
   return settings;
 }
 
-// Generate the fully branded SwiftPay email HTML template
-function getSwiftPayEmailTemplate(title: string, greeting: string, bodyText: string, actionCode: string, supportEmail: string, supportPhone: string, whatsappNumber: string) {
+// Generate the fully branded Nevo email HTML template
+function getNevoEmailTemplate(title: string, greeting: string, bodyText: string, actionCode: string, supportEmail: string, supportPhone: string, whatsappNumber: string) {
   return `
     <!DOCTYPE html>
     <html>
@@ -142,7 +142,7 @@ function getSwiftPayEmailTemplate(title: string, greeting: string, bodyText: str
       <div class="container">
         <!-- Header -->
         <div class="header">
-          <span class="logo">⚡ SWIFTPAY</span>
+          <span class="logo">⚡ NEVO</span>
         </div>
         
         <!-- Content -->
@@ -167,12 +167,12 @@ function getSwiftPayEmailTemplate(title: string, greeting: string, bodyText: str
             <a href="https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}">WhatsApp</a>
           </div>
           <div class="support-info">
-            Need urgent help? Reach out to SwiftPay Support 24/7.<br>
+            Need urgent help? Reach out to Nevo Support 24/7.<br>
             Email: ${supportEmail} | Tel: ${supportPhone}
           </div>
           <div class="copyright">
-            This email was sent by SwiftPay.<br>
-            SwiftPay Secured Vault © 2026. All rights reserved.
+            This email was sent by Nevo.<br>
+            Nevo Secured Vault © 2026. All rights reserved.
           </div>
         </div>
       </div>
@@ -185,16 +185,16 @@ function getSwiftPayEmailTemplate(title: string, greeting: string, bodyText: str
 export async function sendEmail(to: string, subject: string, title: string, greeting: string, bodyText: string, otp: string): Promise<boolean> {
   const settings = await getSettings();
 
-  console.log(`[SWIFTPAY EMAIL DISPATCH] To: ${to} | Subject: "${subject}" | OTP: ${otp}`);
-  console.log(`[SWIFTPAY EMAIL BODY] ${title} - Hello ${greeting}, ${bodyText}`);
+  console.log(`[NEVO EMAIL DISPATCH] To: ${to} | Subject: "${subject}" | OTP: ${otp}`);
+  console.log(`[NEVO EMAIL BODY] ${title} - Hello ${greeting}, ${bodyText}`);
 
   return true;
 }
 
 // Send SMS (Simulated / In-App Logger)
 export async function sendSms(phoneNumber: string, message: string): Promise<boolean> {
-  const finalMessage = `SwiftPay: ${message}`;
-  console.log(`[SWIFTPAY SMS DISPATCH] To: ${phoneNumber} | Message: "${finalMessage}"`);
+  const finalMessage = `Nevo: ${message}`;
+  console.log(`[NEVO SMS DISPATCH] To: ${phoneNumber} | Message: "${finalMessage}"`);
 
   return true;
 }

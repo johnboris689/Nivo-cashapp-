@@ -17,7 +17,7 @@ function hasPostgresConfig(): boolean {
 
 let pgPool: pg.Pool | null = null;
 
-const JSON_FILE = path.join(process.cwd(), 'swiftpay_db.json');
+const JSON_FILE = path.join(process.cwd(), 'nevo_db.json');
 
 // Default WDV config values
 const DEFAULT_WDV_CONFIG = {
@@ -83,7 +83,7 @@ function safeStringifyJsonField(val: any): string {
 function getJsonDb(): JsonData {
   if (!fs.existsSync(JSON_FILE)) {
     const defaultSettings: Record<string, string> = {
-      supportEmail: "support@swiftpay.com",
+      supportEmail: "support@nevo.com",
       supportPhone: "+2349162845073",
       whatsappNumber: "+2349162845073",
       senderName: "Nevo",
@@ -325,7 +325,7 @@ function getJsonDb(): JsonData {
     if (Object.keys(data.admin_settings).length === 0 && (parsed.bpcConfig || parsed.wdvConfig)) {
       const c = parsed.wdvConfig || parsed.bpcConfig;
       data.admin_settings = {
-        supportEmail: "support@swiftpay.com",
+        supportEmail: "support@nevo.com",
         supportPhone: "+2349162845073",
         whatsappNumber: "+2349162845073",
         senderName: "Nevo",
@@ -391,9 +391,9 @@ function normVCode(codeStr: string | undefined): string {
 // -------------------- DATABASE INITIALIZATION --------------------
 export async function initDb() {
   if (hasPostgresConfig()) {
-    console.log('[SwiftPay DB] Connecting to PostgreSQL database (Admin privileges for Schema setup)...');
+    console.log('[Nevo DB] Connecting to PostgreSQL database (Admin privileges for Schema setup)...');
     if (process.env.SQL_HOST) {
-      console.log('[SwiftPay DB] Using Cloud SQL socket/host connection params with ADMIN privileges...');
+      console.log('[Nevo DB] Using Cloud SQL socket/host connection params with ADMIN privileges...');
       pgPool = new Pool({
         host: process.env.SQL_HOST,
         user: process.env.SQL_ADMIN_USER || process.env.SQL_USER,
@@ -402,21 +402,21 @@ export async function initDb() {
         connectionTimeoutMillis: 15000,
       });
       pgPool.on('error', (err) => {
-        console.error('[SwiftPay DB Admin Pool Error]', err.message);
+        console.error('[Nevo DB Admin Pool Error]', err.message);
       });
     } else {
-      console.log('[SwiftPay DB] Using DATABASE_URL connection string...');
+      console.log('[Nevo DB] Using DATABASE_URL connection string...');
       pgPool = new Pool({
         connectionString: getDatabaseUrl(),
         connectionTimeoutMillis: 15000,
         ssl: getDatabaseUrl() && !getDatabaseUrl().includes('localhost') ? { rejectUnauthorized: false } : false
       });
       pgPool.on('error', (err) => {
-        console.error('[SwiftPay DB Admin Pool Error]', err.message);
+        console.error('[Nevo DB Admin Pool Error]', err.message);
       });
     }
   } else {
-    console.log(`[SwiftPay DB] No DATABASE_URL or SQL_HOST found. Initializing pure JS JSON database fallback at ${JSON_FILE}...`);
+    console.log(`[Nevo DB] No DATABASE_URL or SQL_HOST found. Initializing pure JS JSON database fallback at ${JSON_FILE}...`);
     getJsonDb(); // ensure initialized
   }
 
@@ -506,14 +506,14 @@ export async function initDb() {
     const taskCount = await getRow(`SELECT COUNT(*) as count FROM nivo_tasks`);
     if (!taskCount || Number(taskCount.count || 0) === 0) {
       const tasks = [
-        ['task-1','Follow Nevo on X','Follow the official SwiftPay social account for product updates and announcements.',500,'social','https://x.com/SwiftPay','proof',0,'Enter your X username or profile link.'],
-        ['task-2','Join the SwiftPay Telegram Community','Join the official community to receive updates and reward announcements.',600,'social','https://t.me/SwiftPay','proof',0,'Enter your Telegram username.'],
+        ['task-1','Follow Nevo on X','Follow the official Nevo social account for product updates and announcements.',500,'social','https://x.com/Nevo','proof',0,'Enter your X username or profile link.'],
+        ['task-2','Join the Nevo Telegram Community','Join the official community to receive updates and reward announcements.',600,'social','https://t.me/Nevo','proof',0,'Enter your Telegram username.'],
         ['task-3','Daily Check-In','Visit the featured Nevo page for 30 seconds to complete today’s check-in.',300,'daily','/','timer',30,''],
         ['task-4','Watch Advert & Earn','Watch the featured advert for 45 seconds and submit completion.',500,'special','/','timer',45,'']
       ];
       for (const t of tasks) await execute(`INSERT INTO nivo_tasks (id,title,description,rewardAmount,category,actionUrl,verificationType,timerSeconds,proofInstructions,enabled,createdAt,completionCount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,1,$10,0)`, [...t, new Date().toISOString()]);
     }
-  } catch (e) { console.warn('[SwiftPay] Nivo feature seed skipped:', e); }
+  } catch (e) { console.warn('[Nevo] Nivo feature seed skipped:', e); }
   try {
     await execute(`ALTER TABLE vouchers ADD COLUMN IF NOT EXISTS redeemedBy TEXT DEFAULT '[]'`);
   } catch (e) {}
@@ -817,7 +817,7 @@ export async function initDb() {
       `INSERT INTO admins (email, passwordHash) VALUES ($1, $2)`,
       ['talkdavidjohn@gmail.com', secureAdminPasswordHash]
     );
-    console.log('[SwiftPay DB] Default secure admin seeded.');
+    console.log('[Nevo DB] Default secure admin seeded.');
   }
 
   // Seed initial user if database is empty
@@ -837,14 +837,14 @@ export async function initDb() {
         new Date().toISOString(), 'active', '[]', '[]', '[]', '[]', '[]'
       ]
     );
-    console.log('[SwiftPay DB] Default user seeded.');
+    console.log('[Nevo DB] Default user seeded.');
   }
 
   // Seed default admin settings if not present
   const settingsCount = await getRow(`SELECT COUNT(*) as count FROM admin_settings`);
   if (!settingsCount || Number(settingsCount.count || 0) === 0) {
     const defaultSettings: Record<string, string> = {
-      supportEmail: "support@swiftpay.com",
+      supportEmail: "support@nevo.com",
       supportPhone: "+2349162845073",
       whatsappNumber: "+2349162845073",
       senderName: "Nevo",
@@ -866,18 +866,18 @@ export async function initDb() {
         try { await execute(`UPDATE admin_settings SET value = $1 WHERE key = $2`, [value, key]); } catch (e2) {}
       }
     }
-    console.log('[SwiftPay DB] Default admin settings seeded.');
+    console.log('[Nevo DB] Default admin settings seeded.');
   }
 
   // Reinitialize the pool with App user (least privilege) for runtime database access
   if (hasPostgresConfig()) {
-    console.log('[SwiftPay DB] Schema setup and seeding complete. Switching database connection pool to App user (least privilege)...');
+    console.log('[Nevo DB] Schema setup and seeding complete. Switching database connection pool to App user (least privilege)...');
     try {
       if (pgPool) {
         await pgPool.end();
       }
     } catch (err) {
-      console.error('[SwiftPay DB] Error closing Admin pool:', err);
+      console.error('[Nevo DB] Error closing Admin pool:', err);
     }
     
     if (process.env.SQL_HOST) {
@@ -889,7 +889,7 @@ export async function initDb() {
         connectionTimeoutMillis: 15000,
       });
       pgPool.on('error', (err) => {
-        console.error('[SwiftPay DB Pool Error]', err.message);
+        console.error('[Nevo DB Pool Error]', err.message);
       });
     } else {
       pgPool = new Pool({
@@ -898,7 +898,7 @@ export async function initDb() {
         ssl: getDatabaseUrl() && !getDatabaseUrl().includes('localhost') ? { rejectUnauthorized: false } : false
       });
       pgPool.on('error', (err) => {
-        console.error('[SwiftPay DB Pool Error]', err.message);
+        console.error('[Nevo DB Pool Error]', err.message);
       });
     }
   }

@@ -167,7 +167,7 @@ const BETTING_PROVIDERS = [
 export default function App() {
   // Theme & App Settings (Light, Dark, System Default)
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
-    const saved = localStorage.getItem('swiftpay_theme_pref');
+    const saved = localStorage.getItem('nevo_theme_pref');
     return (saved as 'light' | 'dark' | 'system') || 'system';
   });
 
@@ -176,13 +176,13 @@ export default function App() {
 
   // State Management
   const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('swiftpay_user');
+    const saved = localStorage.getItem('nevo_user');
     if (saved) return JSON.parse(saved);
     return null;
   });
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('swiftpay_auth') === 'true';
+    return localStorage.getItem('nevo_auth') === 'true';
   });
 
   const [hasSetupPin, setHasSetupPin] = useState<boolean>(true);
@@ -192,10 +192,10 @@ export default function App() {
   // Secure URL-driven Routing for Admin Dashboard (Point 1, 2, 3, 4)
   const [adminPath, setAdminPath] = useState(() => window.location.pathname);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
-    return localStorage.getItem('swiftpay_admin_auth') === 'true';
+    return localStorage.getItem('nevo_admin_auth') === 'true';
   });
   const [adminToken, setAdminToken] = useState(() => {
-    return localStorage.getItem('swiftpay_admin_token') || '';
+    return localStorage.getItem('nevo_admin_token') || '';
   });
 
   const navigateTo = (path: string) => {
@@ -285,8 +285,8 @@ export default function App() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        localStorage.setItem('swiftpay_admin_token', data.token);
-        localStorage.setItem('swiftpay_admin_auth', 'true');
+        localStorage.setItem('nevo_admin_token', data.token);
+        localStorage.setItem('nevo_admin_auth', 'true');
         setIsAdminAuthenticated(true);
         setAdminToken(data.token);
         showToast('Admin logged in successfully', 'success');
@@ -375,17 +375,17 @@ export default function App() {
 
   // Transactions & Vouchers Persistence
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
-    const saved = localStorage.getItem('swiftpay_transactions');
+    const saved = localStorage.getItem('nevo_transactions');
     return saved ? JSON.parse(saved) : INITIAL_TRANSACTIONS;
   });
 
   const [vouchers, setVouchers] = useState<WdvCode[]>(() => {
-    const saved = localStorage.getItem('swiftpay_vouchers');
+    const saved = localStorage.getItem('nevo_vouchers');
     return saved ? JSON.parse(saved) : [];
   });
 
   const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
-    const saved = localStorage.getItem('swiftpay_notifications');
+    const saved = localStorage.getItem('nevo_notifications');
     return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
   });
 
@@ -695,12 +695,12 @@ export default function App() {
   // New Upgraded States for Fintech Compliance
   const [isEmailSimulatorOpen, setIsEmailSimulatorOpen] = useState(false);
   const [emails, setEmails] = useState<SimulatedEmail[]>(() => {
-    const saved = localStorage.getItem('swiftpay_simulated_emails');
+    const saved = localStorage.getItem('nevo_simulated_emails');
     return saved ? JSON.parse(saved) : [];
   });
 
   const [devices, setDevices] = useState<DeviceSession[]>(() => {
-    const saved = localStorage.getItem('swiftpay_devices');
+    const saved = localStorage.getItem('nevo_devices');
     return saved ? JSON.parse(saved) : [
       { id: 'dev-1', name: 'Chrome Desktop', os: 'macOS', browser: 'Chrome 125', loginDate: new Date().toLocaleDateString(), lastActivity: 'Just now', isCurrent: true },
       { id: 'dev-2', name: 'iPhone 15 Pro', os: 'iOS 17', browser: 'Safari Mobile', loginDate: '2026-07-08', lastActivity: '1 day ago', isCurrent: false }
@@ -708,7 +708,7 @@ export default function App() {
   });
 
   const [loginHistory, setLoginHistory] = useState<LoginHistoryItem[]>(() => {
-    const saved = localStorage.getItem('swiftpay_login_history');
+    const saved = localStorage.getItem('nevo_login_history');
     return saved ? JSON.parse(saved) : [
       { id: 'log-1', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString(), device: 'Chrome Desktop', browser: 'Chrome 125', ip: '197.210.64.12', location: 'Lagos, Nigeria', status: 'success' },
       { id: 'log-2', date: '2026-07-08', time: '14:22:10', device: 'iPhone 15 Pro', browser: 'Safari Mobile', ip: '102.89.33.45', location: 'Abuja, Nigeria', status: 'success' },
@@ -717,7 +717,7 @@ export default function App() {
   });
 
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>(() => {
-    const saved = localStorage.getItem('swiftpay_beneficiaries');
+    const saved = localStorage.getItem('nevo_beneficiaries');
     return saved ? JSON.parse(saved) : [
       { id: 'ben-1', name: 'Alhaji Yusuf Dangote', accountNumber: '0123456789', bankName: 'Access Bank Limited' },
       { id: 'ben-2', name: 'Chioma Sandra Okafor', accountNumber: '8960723295', bankName: 'OPay' },
@@ -726,7 +726,7 @@ export default function App() {
   });
 
   const [phoneBeneficiaries, setPhoneBeneficiaries] = useState<any[]>(() => {
-    const saved = localStorage.getItem('swiftpay_phone_beneficiaries');
+    const saved = localStorage.getItem('nevo_phone_beneficiaries');
     return saved ? JSON.parse(saved) : [
       { id: 'pben-1', name: 'Mom', phone: '08034567890', network: 'mtn' },
       { id: 'pben-2', name: 'Office', phone: '09012345678', network: 'airtel' },
@@ -782,7 +782,7 @@ export default function App() {
     const depositRef = params.get('deposit_ref') || params.get('reference');
     const depositProvider = params.get('provider') || (depositRef?.startsWith('NEVO_KPY_') ? 'korapay' : 'paystack');
     if (depositRef) {
-      const token = localStorage.getItem('swiftpay_token');
+      const token = localStorage.getItem('nevo_token');
       if (token) {
         showToast('Verifying payment with payment provider...', 'info');
         const verifyEndpoint = depositProvider === 'korapay'
@@ -871,7 +871,7 @@ export default function App() {
     };
 
     applyTheme();
-    localStorage.setItem('swiftpay_theme_pref', theme);
+    localStorage.setItem('nevo_theme_pref', theme);
 
     if (theme === 'system') {
       const listener = () => applyTheme();
@@ -883,36 +883,36 @@ export default function App() {
   // Sync state changes to LocalStorage
   useEffect(() => {
     if (user) {
-      localStorage.setItem('swiftpay_user', JSON.stringify(user));
+      localStorage.setItem('nevo_user', JSON.stringify(user));
     }
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('swiftpay_transactions', JSON.stringify(transactions));
+    localStorage.setItem('nevo_transactions', JSON.stringify(transactions));
   }, [transactions]);
 
   useEffect(() => {
-    localStorage.setItem('swiftpay_vouchers', JSON.stringify(vouchers));
+    localStorage.setItem('nevo_vouchers', JSON.stringify(vouchers));
   }, [vouchers]);
 
   useEffect(() => {
-    localStorage.setItem('swiftpay_notifications', JSON.stringify(notifications));
+    localStorage.setItem('nevo_notifications', JSON.stringify(notifications));
   }, [notifications]);
 
   useEffect(() => {
-    localStorage.setItem('swiftpay_simulated_emails', JSON.stringify(emails));
+    localStorage.setItem('nevo_simulated_emails', JSON.stringify(emails));
   }, [emails]);
 
   useEffect(() => {
-    localStorage.setItem('swiftpay_devices', JSON.stringify(devices));
+    localStorage.setItem('nevo_devices', JSON.stringify(devices));
   }, [devices]);
 
   useEffect(() => {
-    localStorage.setItem('swiftpay_login_history', JSON.stringify(loginHistory));
+    localStorage.setItem('nevo_login_history', JSON.stringify(loginHistory));
   }, [loginHistory]);
 
   useEffect(() => {
-    localStorage.setItem('swiftpay_beneficiaries', JSON.stringify(beneficiaries));
+    localStorage.setItem('nevo_beneficiaries', JSON.stringify(beneficiaries));
   }, [beneficiaries]);
 
   // Online/Offline Event Listeners (Point 5)
@@ -982,7 +982,7 @@ export default function App() {
 
   // Centralized Dynamic Backend State Sync Engine
   const syncWithBackend = async (force: boolean = false) => {
-    const token = localStorage.getItem('swiftpay_token');
+    const token = localStorage.getItem('nevo_token');
     if (!token) return;
 
     try {
@@ -993,9 +993,9 @@ export default function App() {
       });
       if (res.status === 401 || res.status === 403) {
         setIsAuthenticated(false);
-        localStorage.removeItem('swiftpay_auth');
-        localStorage.removeItem('swiftpay_token');
-        localStorage.removeItem('swiftpay_user');
+        localStorage.removeItem('nevo_auth');
+        localStorage.removeItem('nevo_token');
+        localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         return;
       }
@@ -1007,7 +1007,7 @@ export default function App() {
             console.log("[Sync Engine] Skipping user and transaction sync to prevent overwrite of recent transaction state.");
           } else {
             setUser(data.user);
-            localStorage.setItem('swiftpay_user', JSON.stringify(data.user));
+            localStorage.setItem('nevo_user', JSON.stringify(data.user));
             if (data.user.transactions) {
               setTransactions(data.user.transactions);
             }
@@ -1017,7 +1017,7 @@ export default function App() {
                 const merged = data.user.notifications.map((n: any) => 
                   readSet.has(n.id) ? { ...n, unread: false } : n
                 );
-                localStorage.setItem('swiftpay_notifications', JSON.stringify(merged));
+                localStorage.setItem('nevo_notifications', JSON.stringify(merged));
                 return merged;
               });
             }
@@ -1044,7 +1044,7 @@ export default function App() {
         const vouchersData = await vouchersRes.json();
         if (vouchersData.success && vouchersData.vouchers) {
           setVouchers(vouchersData.vouchers);
-          localStorage.setItem('swiftpay_vouchers', JSON.stringify(vouchersData.vouchers));
+          localStorage.setItem('nevo_vouchers', JSON.stringify(vouchersData.vouchers));
         }
       }
     } catch (err) {
@@ -1136,8 +1136,8 @@ export default function App() {
       }
 
       setUser(data.user);
-      localStorage.setItem('swiftpay_token', data.token);
-      localStorage.setItem('swiftpay_auth', 'true');
+      localStorage.setItem('nevo_token', data.token);
+      localStorage.setItem('nevo_auth', 'true');
       setIsAuthenticated(true);
       setHasSetupPin(true);
       setIsPinUnlocked(true);
@@ -1174,8 +1174,8 @@ export default function App() {
       }
 
       setUser(data.user);
-      localStorage.setItem('swiftpay_token', data.token);
-      localStorage.setItem('swiftpay_auth', 'true');
+      localStorage.setItem('nevo_token', data.token);
+      localStorage.setItem('nevo_auth', 'true');
       setIsAuthenticated(true);
       setHasSetupPin(true);
       setIsPinUnlocked(true);
@@ -1219,8 +1219,8 @@ export default function App() {
       }
 
       setUser(data.user);
-      localStorage.setItem('swiftpay_token', data.token);
-      localStorage.setItem('swiftpay_auth', 'true');
+      localStorage.setItem('nevo_token', data.token);
+      localStorage.setItem('nevo_auth', 'true');
       setIsAuthenticated(true);
       setHasSetupPin(true);
       setIsPinUnlocked(true);
@@ -1253,8 +1253,8 @@ export default function App() {
       }
 
       setUser(result.user);
-      localStorage.setItem('swiftpay_token', result.token);
-      localStorage.setItem('swiftpay_auth', 'true');
+      localStorage.setItem('nevo_token', result.token);
+      localStorage.setItem('nevo_auth', 'true');
       setIsAuthenticated(true);
       setHasSetupPin(true);
       setIsPinUnlocked(true);
@@ -1401,8 +1401,8 @@ export default function App() {
 
   // Log out flow
   const handleLogout = () => {
-    localStorage.removeItem('swiftpay_auth');
-    localStorage.removeItem('swiftpay_pin_setup');
+    localStorage.removeItem('nevo_auth');
+    localStorage.removeItem('nevo_pin_setup');
     setIsAuthenticated(false);
     setIsPinUnlocked(false);
     setUser(null);
@@ -1434,7 +1434,7 @@ export default function App() {
             // Verify
             setTimeout(async () => {
               if (pinEntry === newConfirm) {
-                const token = localStorage.getItem('swiftpay_token');
+                const token = localStorage.getItem('nevo_token');
                 if (token) {
                   try {
                     const res = await fetch('/api/auth/pin/setup', {
@@ -1455,7 +1455,7 @@ export default function App() {
                 } else if (user) {
                   setUser({ ...user, pinCreated: true, pinCode: pinEntry });
                 }
-                localStorage.setItem('swiftpay_pin_setup', 'true');
+                localStorage.setItem('nevo_pin_setup', 'true');
                 setHasSetupPin(true);
                 setIsPinUnlocked(true);
                 showToast('Wallet PIN configured securely!', 'success');
@@ -1476,7 +1476,7 @@ export default function App() {
         setPinEntry(newPin);
         if (newPin.length === 4) {
           setTimeout(async () => {
-            const token = localStorage.getItem('swiftpay_token');
+            const token = localStorage.getItem('nevo_token');
             if (user?.email) {
               try {
                 const res = await fetch('/api/auth/pin/login', {
@@ -1533,7 +1533,7 @@ export default function App() {
     if (biometricStatus !== 'idle') return;
     setBiometricStatus('reading');
 
-    const token = localStorage.getItem('swiftpay_token');
+    const token = localStorage.getItem('nevo_token');
 
     if (currentScreen === 'pin_setup' || currentScreen === 'dashboard') {
       if (token) {
@@ -1558,7 +1558,7 @@ export default function App() {
         const result = await loginWithBiometric(targetEmail);
         if (result.success && result.user) {
           setUser(result.user);
-          if (result.token) localStorage.setItem('swiftpay_token', result.token);
+          if (result.token) localStorage.setItem('nevo_token', result.token);
           setBiometricStatus('success');
           setIsAuthenticated(true);
           setIsPinUnlocked(true);
@@ -1619,7 +1619,7 @@ export default function App() {
     setTransferVerified(false);
 
     const controller = new AbortController();
-    const token = localStorage.getItem('swiftpay_token');
+    const token = localStorage.getItem('nevo_token');
 
     fetch('/api/verify-account', {
       method: 'POST',
@@ -1716,7 +1716,7 @@ export default function App() {
     setWithdrawVerified(false);
 
     const controller = new AbortController();
-    const token = localStorage.getItem('swiftpay_token');
+    const token = localStorage.getItem('nevo_token');
 
     fetch('/api/verify-account', {
       method: 'POST',
@@ -1951,7 +1951,7 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('swiftpay_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('nevo_token')}`
         },
         body: JSON.stringify({
           phoneNumber: airtimePhone,
@@ -1964,9 +1964,9 @@ export default function App() {
       if (res.status === 401 || res.status === 403) {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
-        localStorage.removeItem('swiftpay_auth');
-        localStorage.removeItem('swiftpay_token');
-        localStorage.removeItem('swiftpay_user');
+        localStorage.removeItem('nevo_auth');
+        localStorage.removeItem('nevo_token');
+        localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
         return;
@@ -1982,7 +1982,7 @@ export default function App() {
       lastTxTime.current = Date.now();
       setUser(prev => prev ? { ...prev, balance: data.balance } : null);
       if (user) {
-        localStorage.setItem('swiftpay_user', JSON.stringify({ ...user, balance: data.balance }));
+        localStorage.setItem('nevo_user', JSON.stringify({ ...user, balance: data.balance }));
       }
       setTransactions([data.transaction, ...transactions]);
 
@@ -2042,7 +2042,7 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('swiftpay_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('nevo_token')}`
         },
         body: JSON.stringify({
           phoneNumber: dataPhone,
@@ -2055,9 +2055,9 @@ export default function App() {
       if (res.status === 401 || res.status === 403) {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
-        localStorage.removeItem('swiftpay_auth');
-        localStorage.removeItem('swiftpay_token');
-        localStorage.removeItem('swiftpay_user');
+        localStorage.removeItem('nevo_auth');
+        localStorage.removeItem('nevo_token');
+        localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
         return;
@@ -2073,7 +2073,7 @@ export default function App() {
       lastTxTime.current = Date.now();
       setUser(prev => prev ? { ...prev, balance: data.balance } : null);
       if (user) {
-        localStorage.setItem('swiftpay_user', JSON.stringify({ ...user, balance: data.balance }));
+        localStorage.setItem('nevo_user', JSON.stringify({ ...user, balance: data.balance }));
       }
       setTransactions([data.transaction, ...transactions]);
 
@@ -2132,7 +2132,7 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('swiftpay_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('nevo_token')}`
         },
         body: JSON.stringify({
           bank: transferBank,
@@ -2147,9 +2147,9 @@ export default function App() {
       if (res.status === 401 || res.status === 403) {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
-        localStorage.removeItem('swiftpay_auth');
-        localStorage.removeItem('swiftpay_token');
-        localStorage.removeItem('swiftpay_user');
+        localStorage.removeItem('nevo_auth');
+        localStorage.removeItem('nevo_token');
+        localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
         return;
@@ -2165,7 +2165,7 @@ export default function App() {
       lastTxTime.current = Date.now();
       setUser(prev => prev ? { ...prev, balance: data.balance } : null);
       if (user) {
-        localStorage.setItem('swiftpay_user', JSON.stringify({ ...user, balance: data.balance }));
+        localStorage.setItem('nevo_user', JSON.stringify({ ...user, balance: data.balance }));
       }
       setTransactions([data.transaction, ...transactions]);
 
@@ -2227,7 +2227,7 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('swiftpay_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('nevo_token')}`
         },
         body: JSON.stringify({
           bank: withdrawBank,
@@ -2242,9 +2242,9 @@ export default function App() {
       if (res.status === 401 || res.status === 403) {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
-        localStorage.removeItem('swiftpay_auth');
-        localStorage.removeItem('swiftpay_token');
-        localStorage.removeItem('swiftpay_user');
+        localStorage.removeItem('nevo_auth');
+        localStorage.removeItem('nevo_token');
+        localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
         return;
@@ -2260,7 +2260,7 @@ export default function App() {
       lastTxTime.current = Date.now();
       setUser(prev => prev ? { ...prev, balance: data.balance } : null);
       if (user) {
-        localStorage.setItem('swiftpay_user', JSON.stringify({ ...user, balance: data.balance }));
+        localStorage.setItem('nevo_user', JSON.stringify({ ...user, balance: data.balance }));
       }
       setTransactions([data.transaction, ...transactions]);
 
@@ -2328,7 +2328,7 @@ export default function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('swiftpay_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('nevo_token')}`
         },
         body: JSON.stringify({
           type: billsType,
@@ -2342,9 +2342,9 @@ export default function App() {
       if (res.status === 401 || res.status === 403) {
         showToast('Your session has expired. Please log in again.', 'error');
         setIsAuthenticated(false);
-        localStorage.removeItem('swiftpay_auth');
-        localStorage.removeItem('swiftpay_token');
-        localStorage.removeItem('swiftpay_user');
+        localStorage.removeItem('nevo_auth');
+        localStorage.removeItem('nevo_token');
+        localStorage.removeItem('nevo_user');
         setCurrentScreen('onboarding');
         setIsSubmitting(false);
         return;
@@ -2360,7 +2360,7 @@ export default function App() {
       lastTxTime.current = Date.now();
       setUser(prev => prev ? { ...prev, balance: data.balance } : null);
       if (user) {
-        localStorage.setItem('swiftpay_user', JSON.stringify({ ...user, balance: data.balance }));
+        localStorage.setItem('nevo_user', JSON.stringify({ ...user, balance: data.balance }));
       }
       setTransactions([data.transaction, ...transactions]);
 
@@ -2460,7 +2460,7 @@ export default function App() {
     setNotifications(prev => {
       const updated = prev.map(n => n.id === id ? { ...n, unread: false } : n);
       try {
-        localStorage.setItem('swiftpay_notifications', JSON.stringify(updated));
+        localStorage.setItem('nevo_notifications', JSON.stringify(updated));
       } catch (e) {
         console.error("Failed to save notifications to localStorage", e);
       }
@@ -2473,7 +2473,7 @@ export default function App() {
     setNotifications(prev => {
       const updated = prev.map(n => ({ ...n, unread: false }));
       try {
-        localStorage.setItem('swiftpay_notifications', JSON.stringify(updated));
+        localStorage.setItem('nevo_notifications', JSON.stringify(updated));
       } catch (e) {
         console.error("Failed to save notifications to localStorage", e);
       }
@@ -2634,8 +2634,8 @@ export default function App() {
                 adminPath={adminPath}
                 navigateTo={navigateTo}
                 onBack={() => {
-                  localStorage.removeItem('swiftpay_admin_auth');
-                  localStorage.removeItem('swiftpay_admin_token');
+                  localStorage.removeItem('nevo_admin_auth');
+                  localStorage.removeItem('nevo_admin_token');
                   setIsAdminAuthenticated(false);
                   navigateTo('/Boris/login');
                 }}
@@ -2653,7 +2653,7 @@ export default function App() {
                   };
                   const updated = [newNotif, ...notifications];
                   setNotifications(updated);
-                  localStorage.setItem('swiftpay_notifications', JSON.stringify(updated));
+                  localStorage.setItem('nevo_notifications', JSON.stringify(updated));
                 }}
                 onSendSimulatedEmail={(to, subject, body) => sendSimulatedEmail(to, subject, body)}
               />
@@ -2669,8 +2669,8 @@ export default function App() {
                   adminPath={adminPath}
                   navigateTo={navigateTo}
                   onBack={() => {
-                    localStorage.removeItem('swiftpay_admin_auth');
-                    localStorage.removeItem('swiftpay_admin_token');
+                    localStorage.removeItem('nevo_admin_auth');
+                    localStorage.removeItem('nevo_admin_token');
                     setIsAdminAuthenticated(false);
                     navigateTo('/Boris/login');
                   }}
@@ -2685,7 +2685,7 @@ export default function App() {
                     };
                     const updated = [newNotif, ...notifications];
                     setNotifications(updated);
-                    localStorage.setItem('swiftpay_notifications', JSON.stringify(updated));
+                    localStorage.setItem('nevo_notifications', JSON.stringify(updated));
                   }}
                   onSendSimulatedEmail={(to, subject, body) => sendSimulatedEmail(to, subject, body)}
                 />
@@ -3496,7 +3496,7 @@ export default function App() {
               {currentScreen === 'dashboard' && activeTab === 'social' && (
                 <NivoFeaturesPanel
                   user={user}
-                  token={localStorage.getItem('swiftpay_token') || ''}
+                  token={localStorage.getItem('nevo_token') || ''}
                   onToast={showToast}
                   initialTab={rewardsTab}
                 />
@@ -3602,7 +3602,7 @@ export default function App() {
                                 id="btn-disable-biometric"
                                 type="button"
                                 onClick={async () => {
-                                  const token = localStorage.getItem('swiftpay_token');
+                                  const token = localStorage.getItem('nevo_token');
                                   if (!token) return;
                                   try {
                                     const res = await fetch('/api/auth/webauthn/disable', {
@@ -3631,7 +3631,7 @@ export default function App() {
                                 type="button"
                                 disabled={isActivatingBiometric}
                                 onClick={async () => {
-                                  const token = localStorage.getItem('swiftpay_token');
+                                  const token = localStorage.getItem('nevo_token');
                                   if (!token) {
                                     showToast('Please log in again to register biometric.', 'error');
                                     return;
@@ -3679,7 +3679,7 @@ export default function App() {
                                 showToast('PIN must be a 4-digit or 6-digit numeric code.', 'error');
                                 return;
                               }
-                              const token = localStorage.getItem('swiftpay_token');
+                              const token = localStorage.getItem('nevo_token');
                               if (!token) {
                                 showToast('Session expired. Please log in again.', 'error');
                                 return;
@@ -4288,7 +4288,7 @@ export default function App() {
                                 const newBen = { id: `pben-${Date.now()}`, name: nickname, phone: airtimePhone, network: airtimeNetwork };
                                 const updated = [newBen, ...phoneBeneficiaries];
                                 setPhoneBeneficiaries(updated);
-                                localStorage.setItem('swiftpay_phone_beneficiaries', JSON.stringify(updated));
+                                localStorage.setItem('nevo_phone_beneficiaries', JSON.stringify(updated));
                                 showToast('Added to favourites!', 'success');
                               }
                             }}
@@ -4516,7 +4516,7 @@ export default function App() {
                                 const newBen = { id: `pben-${Date.now()}`, name: nickname, phone: dataPhone, network: dataNetwork };
                                 const updated = [newBen, ...phoneBeneficiaries];
                                 setPhoneBeneficiaries(updated);
-                                localStorage.setItem('swiftpay_phone_beneficiaries', JSON.stringify(updated));
+                                localStorage.setItem('nevo_phone_beneficiaries', JSON.stringify(updated));
                                 showToast('Added to favourites!', 'success');
                               }
                             }}
@@ -5620,7 +5620,7 @@ export default function App() {
                         };
                         const updated = [newNotif, ...notifications];
                         setNotifications(updated);
-                        localStorage.setItem('swiftpay_notifications', JSON.stringify(updated));
+                        localStorage.setItem('nevo_notifications', JSON.stringify(updated));
                       }}
                       onSendSimulatedEmail={(to, subject, body) => sendSimulatedEmail(to, subject, body)}
                     />
@@ -5979,7 +5979,7 @@ export default function App() {
         <WalletDepositModal
           isOpen={paymentModalOpen}
           onClose={() => setPaymentModalOpen(false)}
-          token={localStorage.getItem('swiftpay_token') || ''}
+          token={localStorage.getItem('nevo_token') || ''}
           onToast={showToast}
           onSuccess={() => syncWithBackend()}
         />

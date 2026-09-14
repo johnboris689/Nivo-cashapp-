@@ -51,13 +51,13 @@ export class FlutterwaveProvider implements PaymentProvider {
       redirect_url: params.callbackUrl,
       customer: {
         email: params.email,
-        name: params.name || 'SwiftPay Customer',
+        name: params.name || 'Nevo Customer',
         phonenumber: params.phone || ''
       },
       customizations: {
-        title: 'SwiftPay Nigeria',
+        title: 'Nevo Nigeria',
         description: params.purpose === 'wdv_voucher' ? 'WDV Voucher Purchase' : 'Digital Wallet Funding',
-        logo: 'https://swiftpay.ng/logo.png'
+        logo: 'https://nevo.ng/logo.png'
       },
       meta: {
         purpose: params.purpose || 'wallet_funding',

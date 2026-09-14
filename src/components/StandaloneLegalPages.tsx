@@ -15,8 +15,8 @@ export function StandaloneTermsPage({ navigateTo }: StandalonePageProps) {
   }, []);
 
   const brandName = settings.websiteName || 'Nevo';
-  const supportEmail = settings.supportEmail || 'support@swiftpay.com';
-  const telegramLink = settings.telegramLink || 'https://t.me/swiftpay';
+  const supportEmail = settings.supportEmail || 'support@nevo.com';
+  const telegramLink = settings.telegramLink || 'https://t.me/nevo';
   const officeAddress = settings.officeAddress || 'Lagos, Nigeria';
 
   useEffect(() => {
@@ -200,8 +200,8 @@ export function StandalonePrivacyPage({ navigateTo }: StandalonePageProps) {
   }, []);
 
   const brandName = settings.websiteName || 'Nevo';
-  const supportEmail = settings.supportEmail || 'support@swiftpay.com';
-  const telegramLink = settings.telegramLink || 'https://t.me/swiftpay';
+  const supportEmail = settings.supportEmail || 'support@nevo.com';
+  const telegramLink = settings.telegramLink || 'https://t.me/nevo';
   const officeAddress = settings.officeAddress || 'Lagos, Nigeria';
 
   useEffect(() => {

@@ -218,7 +218,7 @@ export default function TransactionReceipt({
       doc.setFontSize(8.5);
       doc.setTextColor(textMuted[0], textMuted[1], textMuted[2]);
       doc.text('• End-to-end encrypted transaction settlement record.', 28, footerY + 17);
-      doc.text('• Support: support@swiftpay.com | Website: www.swiftpay.com', 28, footerY + 23);
+      doc.text('• Support: support@nevo.com | Website: www.nevo.com', 28, footerY + 23);
 
       // Bottom Watermark & Time
       doc.setFontSize(7.5);

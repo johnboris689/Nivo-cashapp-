@@ -1,17 +1,17 @@
-# SwiftPay Enterprise Update — Installation Guide
+# Nevo Enterprise Update — Installation Guide
 
 ## Package Name
-`swiftpay_complete_source_v2.zip`
+`nevo_complete_source_v2.zip`
 
 ---
 
 ## How to Install this Update
 
 1. **Extract the ZIP Archive**
-   Unzip `swiftpay_complete_source_v2.zip` on your computer.
+   Unzip `nevo_complete_source_v2.zip` on your computer.
 
 2. **Overwrite Project Files**
-   Copy all extracted files directly into the root directory of your existing SwiftPay project repository, overwriting existing files:
+   Copy all extracted files directly into the root directory of your existing Nevo project repository, overwriting existing files:
    - `server.ts`
    - `db.ts`
    - `.env.example`
@@ -29,7 +29,7 @@
 4. **Git Commit & Push**
    ```bash
    git add .
-   git commit -m "Apply SwiftPay Korapay Virtual Account & Auto WDV Voucher update"
+   git commit -m "Apply Nevo Korapay Virtual Account & Auto WDV Voucher update"
    git push origin main
    ```
 

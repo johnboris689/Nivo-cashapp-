@@ -24,7 +24,7 @@ const ai = new GoogleGenAI({
 
 const app = express();
 const PORT = Number(process.env.PORT) || 10000;
-const DB_FILE = path.join(process.cwd(), 'swiftpay_db.json');
+const DB_FILE = path.join(process.cwd(), 'nevo_db.json');
 
 app.use(express.json({
   verify: (req: any, _res, buf) => {
@@ -34,19 +34,19 @@ app.use(express.json({
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/public', express.static(path.join(process.cwd(), 'public')));
 
-app.get('/swiftpay_complete_source_v2.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'public', 'swiftpay_complete_source_v2.zip');
+app.get('/nevo_complete_source_v2.zip', (req, res) => {
+  const zipPath = path.join(process.cwd(), 'public', 'nevo_complete_source_v2.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay_complete_source_v2.zip');
+    res.download(zipPath, 'nevo_complete_source_v2.zip');
   } else {
     res.status(404).send('Archive not found');
   }
 });
 
-app.get('/swiftpay_complete_source.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'public', 'swiftpay_complete_source_v2.zip');
+app.get('/nevo_complete_source.zip', (req, res) => {
+  const zipPath = path.join(process.cwd(), 'public', 'nevo_complete_source_v2.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay_complete_source_v2.zip');
+    res.download(zipPath, 'nevo_complete_source_v2.zip');
   } else {
     res.status(404).send('Archive not found');
   }
@@ -54,21 +54,21 @@ app.get('/swiftpay_complete_source.zip', (req, res) => {
 
 // Download complete source code ZIP archive route
 app.get('/download-source', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'public', 'swiftpay_complete_source_v2.zip');
-  const fallbackPath = path.join(process.cwd(), 'public', 'swiftpay_complete_source.zip');
+  const zipPath = path.join(process.cwd(), 'public', 'nevo_complete_source_v2.zip');
+  const fallbackPath = path.join(process.cwd(), 'public', 'nevo_complete_source.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay_complete_source_v2.zip');
+    res.download(zipPath, 'nevo_complete_source_v2.zip');
   } else if (fs.existsSync(fallbackPath)) {
-    res.download(fallbackPath, 'swiftpay_complete_source.zip');
+    res.download(fallbackPath, 'nevo_complete_source.zip');
   } else {
     res.status(404).json({ error: 'Source code archive is being generated. Please refresh in a moment.' });
   }
 });
 
 app.get('/download-source-v2', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'public', 'swiftpay_complete_source_v2.zip');
+  const zipPath = path.join(process.cwd(), 'public', 'nevo_complete_source_v2.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay_complete_source_v2.zip');
+    res.download(zipPath, 'nevo_complete_source_v2.zip');
   } else {
     res.status(404).json({ error: 'Archive v2 not found.' });
   }
@@ -80,7 +80,7 @@ app.use('/api', async (req, res, next) => {
   try {
     await loadDbCache();
   } catch (err) {
-    console.error('[SwiftPay DB] Failed to reload database cache:', err);
+    console.error('[Nevo DB] Failed to reload database cache:', err);
   }
 
   // 2. Ensure write-through consistency: intercept response to await any active database writes
@@ -89,7 +89,7 @@ app.use('/api', async (req, res, next) => {
     pendingWritePromise.then(() => {
       originalSend.call(this, body);
     }).catch((err) => {
-      console.error('[SwiftPay DB] Error waiting for database write:', err);
+      console.error('[Nevo DB] Error waiting for database write:', err);
       originalSend.call(this, body);
     });
     return this;
@@ -104,100 +104,100 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-app.get('/swiftpay_complete_source.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'swiftpay_complete_source.zip');
+app.get('/nevo_complete_source.zip', (req, res) => {
+  const zipPath = path.join(process.cwd(), 'nevo_complete_source.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay_complete_source.zip');
+    res.download(zipPath, 'nevo_complete_source.zip');
   } else {
     res.status(404).send('ZIP file not found');
   }
 });
 
-app.get('/swiftpay_complete_source_v2.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'swiftpay_complete_source_v2.zip');
+app.get('/nevo_complete_source_v2.zip', (req, res) => {
+  const zipPath = path.join(process.cwd(), 'nevo_complete_source_v2.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay_complete_source_v2.zip');
+    res.download(zipPath, 'nevo_complete_source_v2.zip');
   } else {
     res.status(404).send('ZIP file not found');
   }
 });
 
-app.get('/download/swiftpay_complete_source_v2.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'swiftpay_complete_source_v2.zip');
+app.get('/download/nevo_complete_source_v2.zip', (req, res) => {
+  const zipPath = path.join(process.cwd(), 'nevo_complete_source_v2.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay_complete_source_v2.zip');
+    res.download(zipPath, 'nevo_complete_source_v2.zip');
   } else {
     res.status(404).send('ZIP file not found');
   }
 });
 
-app.get('/download/swiftpay_complete_source.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'swiftpay_complete_source.zip');
+app.get('/download/nevo_complete_source.zip', (req, res) => {
+  const zipPath = path.join(process.cwd(), 'nevo_complete_source.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay_complete_source.zip');
+    res.download(zipPath, 'nevo_complete_source.zip');
   } else {
     res.status(404).send('ZIP file not found');
   }
 });
 
-app.get('/download/swiftpay_latest_updates.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'swiftpay_latest_updates.zip');
+app.get('/download/nevo_latest_updates.zip', (req, res) => {
+  const zipPath = path.join(process.cwd(), 'nevo_latest_updates.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay_latest_updates.zip');
+    res.download(zipPath, 'nevo_latest_updates.zip');
   } else {
     res.status(404).send('ZIP file not found');
   }
 });
 
-app.get('/swiftpay-final-transfer-dashboard-update.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'swiftpay-final-transfer-dashboard-update.zip');
+app.get('/nevo-final-transfer-dashboard-update.zip', (req, res) => {
+  const zipPath = path.join(process.cwd(), 'nevo-final-transfer-dashboard-update.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay-final-transfer-dashboard-update.zip');
+    res.download(zipPath, 'nevo-final-transfer-dashboard-update.zip');
   } else {
     res.status(404).send('ZIP file not found');
   }
 });
 
-app.get('/download/swiftpay-final-transfer-dashboard-update.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'swiftpay-final-transfer-dashboard-update.zip');
+app.get('/download/nevo-final-transfer-dashboard-update.zip', (req, res) => {
+  const zipPath = path.join(process.cwd(), 'nevo-final-transfer-dashboard-update.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay-final-transfer-dashboard-update.zip');
+    res.download(zipPath, 'nevo-final-transfer-dashboard-update.zip');
   } else {
     res.status(404).send('ZIP file not found');
   }
 });
 
-app.get('/swiftpay-transfer-download-fix.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'swiftpay-transfer-download-fix.zip');
+app.get('/nevo-transfer-download-fix.zip', (req, res) => {
+  const zipPath = path.join(process.cwd(), 'nevo-transfer-download-fix.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay-transfer-download-fix.zip');
+    res.download(zipPath, 'nevo-transfer-download-fix.zip');
   } else {
     res.status(404).send('ZIP file not found');
   }
 });
 
-app.get('/download/swiftpay-transfer-download-fix.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'swiftpay-transfer-download-fix.zip');
+app.get('/download/nevo-transfer-download-fix.zip', (req, res) => {
+  const zipPath = path.join(process.cwd(), 'nevo-transfer-download-fix.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay-transfer-download-fix.zip');
+    res.download(zipPath, 'nevo-transfer-download-fix.zip');
   } else {
     res.status(404).send('ZIP file not found');
   }
 });
 
-app.get('/swiftpay-update.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'swiftpay-update.zip');
+app.get('/nevo-update.zip', (req, res) => {
+  const zipPath = path.join(process.cwd(), 'nevo-update.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay-update.zip');
+    res.download(zipPath, 'nevo-update.zip');
   } else {
     res.status(404).send('ZIP file not found');
   }
 });
 
-app.get('/download/swiftpay-update.zip', (req, res) => {
-  const zipPath = path.join(process.cwd(), 'swiftpay-update.zip');
+app.get('/download/nevo-update.zip', (req, res) => {
+  const zipPath = path.join(process.cwd(), 'nevo-update.zip');
   if (fs.existsSync(zipPath)) {
-    res.download(zipPath, 'swiftpay-update.zip');
+    res.download(zipPath, 'nevo-update.zip');
   } else {
     res.status(404).send('ZIP file not found');
   }
@@ -370,7 +370,7 @@ function safeParseJson(val: any, fallback: any = []): any {
   try {
     return JSON.parse(val);
   } catch (err) {
-    console.error('[SwiftPay DB] Failed to parse JSON field:', val, err);
+    console.error('[Nevo DB] Failed to parse JSON field:', val, err);
     return fallback;
   }
 }
@@ -379,7 +379,7 @@ async function loadDbCache() {
   // Ensure we wait for any pending database writes to complete first
   await pendingWritePromise;
   try {
-    console.log('[SwiftPay DB] Preloading database cache from SQL database...');
+    console.log('[Nevo DB] Preloading database cache from SQL database...');
     
     // Fetch settings
     const settingRows = await getAllRows(`SELECT key, value FROM admin_settings`);
@@ -486,9 +486,9 @@ async function loadDbCache() {
         }
       ]
     };
-    console.log(`[SwiftPay DB] Successfully preloaded ${users.length} users, ${vouchers.length} vouchers, and ${logs.length} diagnostic logs.`);
+    console.log(`[Nevo DB] Successfully preloaded ${users.length} users, ${vouchers.length} vouchers, and ${logs.length} diagnostic logs.`);
   } catch (err) {
-    console.error('[SwiftPay DB] Failed to preload database cache:', err);
+    console.error('[Nevo DB] Failed to preload database cache:', err);
   }
 }
 
@@ -662,7 +662,7 @@ async function persistDbCache(data: DBStructure) {
       }
     }
   } catch (err) {
-    console.error('[SwiftPay DB] Background persistence error:', err);
+    console.error('[Nevo DB] Background persistence error:', err);
   }
 }
 
@@ -675,14 +675,14 @@ function readDb(): DBStructure {
 async function writeDb(data: DBStructure): Promise<void> {
   dbCache = data;
   const currentWrite = persistDbCache(data).catch(err => {
-    console.error('[SwiftPay DB] Error during database persistence:', err);
+    console.error('[Nevo DB] Error during database persistence:', err);
   });
   pendingWritePromise = Promise.all([pendingWritePromise, currentWrite]);
   await currentWrite;
 }
 
 // -------------------- SECURE AUTHENTICATION TOKENS (JWT-like) --------------------
-const TOKEN_SECRET = 'swiftpay_secured_vault_key_2026_salt_88';
+const TOKEN_SECRET = 'nevo_secured_vault_key_2026_salt_88';
 
 function generateToken(email: string): string {
   const base64Email = Buffer.from(email.toLowerCase()).toString('base64');
@@ -707,7 +707,7 @@ function verifyToken(token: string): string | null {
   return null;
 }
 
-// -------------------- 24-HOUR DAILY ₦200,000 WALLET SYSTEM ENGINE --------------------
+// -------------------- WELCOME BONUS / WALLET INITIALIZATION --------------------
 function processUserGiftEligibility(user: UserState): { updated: boolean; user: UserState } {
   const now = new Date();
   const nowMs = now.getTime();
@@ -869,7 +869,7 @@ function verifyAdminToken(token: string): string | null {
   const email = verifyToken(token);
   if (!email) return null;
   const lower = email.toLowerCase();
-  if (lower === 'talkdavidjohn@gmail.com' || lower === 'admin@swiftpay.com' || lower.includes('admin')) {
+  if (lower === 'talkdavidjohn@gmail.com' || lower === 'admin@nevo.com' || lower.includes('admin')) {
     return email;
   }
   return null;
@@ -1071,7 +1071,7 @@ app.post('/api/auth/register', async (req, res) => {
       }] : []),
       {
         id: `notif-${Date.now()}`,
-        title: `Welcome to ${settings.websiteName || 'SwiftPay'}!`,
+        title: `Welcome to ${settings.websiteName || 'Nevo'}!`,
         body: 'Welcome to your premium bill payments gateway! Please create a 4-digit security PIN to get started.',
         date: new Date().toISOString(),
         unread: true
@@ -1111,7 +1111,7 @@ app.post('/api/auth/register', async (req, res) => {
       }
     }
     await execute(`UPDATE users SET referralCode=$1, referralCount=0, totalReferralBonus=0, totalEarnings=0, activationPaid=0, activationPaidAt='' WHERE LOWER(email)=$2`, [newUser.referralCode, newUser.email.toLowerCase()]);
-  } catch (e) { console.warn('[SwiftPay] Referral persistence warning:', e); }
+  } catch (e) { console.warn('[Nevo] Referral persistence warning:', e); }
 
   const token = generateToken(newUser.email);
   logDiagnostic('INFO', 'User account registered', { email: newUser.email });
@@ -1274,7 +1274,7 @@ app.post('/api/auth/webauthn/register-options', authenticateToken, (req: any, re
     success: true,
     options: {
       challenge,
-      rp: { name: 'SwiftPay', id: req.hostname || 'localhost' },
+      rp: { name: 'Nevo', id: req.hostname || 'localhost' },
       user: {
         id: Buffer.from(user.email).toString('base64url'),
         name: user.email,
@@ -1706,25 +1706,25 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   // Dispatch branded email & SMS notifications asynchronously
   sendEmail(
     user.email,
-    'SwiftPay Password Recovery OTP Code',
+    'Nevo Password Recovery OTP Code',
     'Password Reset Security OTP Request',
-    `Hello, ${user.fullName || 'SwiftPay User'}`,
-    'We received a request to reset your SwiftPay password. Please use the secure 6-digit OTP code below to complete the verification step. If you did not request this, please disregard this email or contact support immediately.',
+    `Hello, ${user.fullName || 'Nevo User'}`,
+    'We received a request to reset your Nevo password. Please use the secure 6-digit OTP code below to complete the verification step. If you did not request this, please disregard this email or contact support immediately.',
     otp
   ).then(success => {
-    console.log(`[SwiftPay Notify] Branded password recovery email dispatched: ${success}`);
+    console.log(`[Nevo Notify] Branded password recovery email dispatched: ${success}`);
   }).catch(err => {
-    console.error('[SwiftPay Notify] Branded password recovery email dispatch failed:', err);
+    console.error('[Nevo Notify] Branded password recovery email dispatch failed:', err);
   });
 
   if (user.phone) {
     sendSms(
       user.phone,
-      `[SwiftPay Security Alert] Do not share! Your 6-digit password recovery OTP code is ${otp}. It expires in 10 minutes.`
+      `[Nevo Security Alert] Do not share! Your 6-digit password recovery OTP code is ${otp}. It expires in 10 minutes.`
     ).then(success => {
-      console.log(`[SwiftPay Notify] Password recovery SMS dispatched: ${success}`);
+      console.log(`[Nevo Notify] Password recovery SMS dispatched: ${success}`);
     }).catch(err => {
-      console.error('[SwiftPay Notify] Password recovery SMS dispatch failed:', err);
+      console.error('[Nevo Notify] Password recovery SMS dispatch failed:', err);
     });
   }
 
@@ -1918,7 +1918,7 @@ app.post('/api/user/update-profile', authenticateToken, (req: any, res) => {
   db.users[userIndex].notifications.unshift({
     id: `notif-${Date.now()}`,
     title: 'Account Settings Updated',
-    body: 'Your SwiftPay personal profile parameters have been updated successfully.',
+    body: 'Your Nevo personal profile parameters have been updated successfully.',
     date: new Date().toISOString(),
     unread: true
   });
@@ -2186,7 +2186,7 @@ app.post('/api/transactions/airtime', authenticateToken, async (req: any, res) =
 
   // VERIFY AND CONSUME VOUCHER IN SQL
   // WDV vouchers are no longer required. Transactions are authorized directly
-  // from the user's SwiftPay wallet balance.
+  // from the user's Nevo wallet balance.
 
   const refreshedDb = readDb();
   const refreshedUser = refreshedDb.users[req.userIndex];
@@ -2340,7 +2340,7 @@ app.post('/api/transactions/data', authenticateToken, async (req: any, res) => {
 
   // VERIFY AND CONSUME VOUCHER IN SQL
   // WDV vouchers are no longer required. Transactions are authorized directly
-  // from the user's SwiftPay wallet balance.
+  // from the user's Nevo wallet balance.
 
   const refreshedDb = readDb();
   const refreshedUser = refreshedDb.users[req.userIndex];
@@ -2711,7 +2711,7 @@ app.post('/api/transactions/transfer', authenticateToken, async (req: any, res) 
 
   // VERIFY AND CONSUME VOUCHER IN SQL
   // WDV vouchers are no longer required. Transactions are authorized directly
-  // from the user's SwiftPay wallet balance.
+  // from the user's Nevo wallet balance.
 
   const refreshedDb = readDb();
   const refreshedUser = refreshedDb.users[req.userIndex];
@@ -2859,7 +2859,7 @@ app.post('/api/transactions/withdraw', authenticateToken, async (req: any, res) 
 
   // VERIFY AND CONSUME VOUCHER IN SQL
   // WDV vouchers are no longer required. Transactions are authorized directly
-  // from the user's SwiftPay wallet balance.
+  // from the user's Nevo wallet balance.
 
   const refreshedDb = readDb();
   const refreshedUser = refreshedDb.users[req.userIndex];
@@ -2929,7 +2929,7 @@ app.post('/api/transactions/withdraw', authenticateToken, async (req: any, res) 
       ''
     ]);
   } catch (err) {
-    console.error('[SwiftPay DB] Error saving withdrawal request to SQL table:', err);
+    console.error('[Nevo DB] Error saving withdrawal request to SQL table:', err);
   }
 
   await writeDb(refreshedDb);
@@ -2974,7 +2974,7 @@ app.post('/api/transactions/bills', authenticateToken, async (req: any, res) => 
 
   // VERIFY AND CONSUME VOUCHER IN SQL
   // WDV vouchers are no longer required. Transactions are authorized directly
-  // from the user's SwiftPay wallet balance.
+  // from the user's Nevo wallet balance.
 
   const refreshedDb = readDb();
   const refreshedUser = refreshedDb.users[req.userIndex];
@@ -3321,7 +3321,7 @@ async function processSuccessfulPaymentUnlocked(params: {
         await execute(`
           INSERT INTO wdv_payments (id, reference, userEmail, amount, bankName, accountNumber, accountName, status, createdAt, expiresAt, paidAt, voucherCode, provider, webhookData)
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-        `, [id, reference, userEmail, amount, `${provider.toUpperCase()} Checkout`, 'Online Gateway', `SwiftPay / Customer`, 'pending', nowIso, nowIso, '', '', provider, '']);
+        `, [id, reference, userEmail, amount, `${provider.toUpperCase()} Checkout`, 'Online Gateway', `Nevo / Customer`, 'pending', nowIso, nowIso, '', '', provider, '']);
       }
       const vResult = await processSuccessfulWdvPayment(reference, provider, rawDataStr);
       voucherCode = vResult.voucherCode || '';
@@ -4015,7 +4015,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
     const wdvConfig = db.wdvConfig || DEFAULT_WDV_CONFIG;
 
     const mergedSettings = {
-      websiteName: /swiftpay/i.test(String(settings.websiteName || "")) ? "Nevo" : (settings.websiteName || "Nevo"),
+      websiteName: "Nevo",
       websiteLogo: settings.websiteLogo || "",
       websiteFavicon: settings.websiteFavicon || "",
       primaryColor: settings.primaryColor || "#0d9488",
@@ -4060,7 +4060,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       whatsappNumber: settings.whatsappNumber || "+2349162845073",
       whatsappLink: settings.wdvWhatsappLink || settings.whatsappLink || wdvConfig.whatsappLink || "https://wa.me/2349162845073",
       whatsappMessage: settings.whatsappMessage || "Hello Admin, I have made a manual bank transfer for WDV Voucher.",
-      telegramLink: (settings.telegramLink && !/swiftpay/i.test(settings.telegramLink)) ? settings.telegramLink : "https://t.me/nevo_official",
+      telegramLink: settings.telegramLink || "https://t.me/nevo_official",
       facebookLink: settings.facebookLink || "",
       instagramLink: settings.instagramLink || "",
       xTwitterLink: settings.xTwitterLink || "",
@@ -4068,15 +4068,15 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       youtubeLink: settings.youtubeLink || "",
 
       // Customer Support & Pages
-      supportEmail: (settings.supportEmail && !/swiftpay/i.test(settings.supportEmail)) ? settings.supportEmail : "support@nevo.ng",
+      supportEmail: settings.supportEmail || "support@nevo.ng",
       supportPhone: settings.supportPhone || "+2349162845073",
-      senderName: /swiftpay/i.test(String(settings.senderName || settings.smsSenderName || "")) ? "Nevo" : (settings.senderName || settings.smsSenderName || "Nevo"),
+      senderName: "Nevo",
       officeAddress: settings.officeAddress || "Lagos, Nigeria",
       businessHours: settings.businessHours || "24/7 Support",
-      websiteUrl: (settings.websiteUrl && !/swiftpay/i.test(settings.websiteUrl)) ? settings.websiteUrl : "https://nevo.ng",
-      privacyPolicy: (settings.privacyPolicy && !/swiftpay/i.test(settings.privacyPolicy)) ? settings.privacyPolicy : "Nevo Privacy Policy details...",
-      termsOfService: (settings.termsOfService && !/swiftpay/i.test(settings.termsOfService)) ? settings.termsOfService : "Nevo Terms of Service details...",
-      aboutUs: (settings.aboutUs && !/swiftpay/i.test(settings.aboutUs)) ? settings.aboutUs : "Nevo is Nigeria's premier digital financial rewards and wallet platform...",
+      websiteUrl: settings.websiteUrl || "https://nevo.ng",
+      privacyPolicy: settings.privacyPolicy || "Nevo Privacy Policy details...",
+      termsOfService: settings.termsOfService || "Nevo Terms of Service details...",
+      aboutUs: settings.aboutUs || "Nevo is Nigeria's digital financial rewards and wallet platform...",
       contactUs: settings.contactUs || "Contact support via WhatsApp or Email.",
       faqContent: settings.faqContent || "Frequently Asked Questions...",
 
@@ -4131,14 +4131,14 @@ app.post('/api/support/chat', async (req, res) => {
     }
 
     const aiSupportEnabled = settings.aiSupportEnabled !== 'false';
-    const websiteName = /swiftpay/i.test(String(settings.websiteName || '')) ? 'Nevo' : (settings.websiteName || 'Nevo');
+    const websiteName = 'Nevo';
     const bankName = settings.wdvBankName || settings.bpcBankName || 'PalmPay';
     const accountNumber = settings.wdvAccountNumber || settings.bpcAccountNumber || '8960723295';
     const accountName = settings.wdvAccountName || settings.bpcAccountName || 'pwamunadi ishaku';
     const voucherPrice = Number(settings.wdvVoucherPrice || settings.bpcVoucherPrice || 6500);
     const whatsappLink = settings.whatsappLink || settings.wdvWhatsappLink || settings.bpcWhatsappLink || 'https://wa.me/2349162845073';
     const whatsappNumber = settings.whatsappNumber || settings.supportPhone || '+2349162845073';
-    const supportEmail = settings.supportEmail || 'support@swiftpay.com';
+    const supportEmail = settings.supportEmail || 'support@nevo.com';
 
     // If AI is disabled by Admin in settings
     if (!aiSupportEnabled) {
@@ -4422,28 +4422,28 @@ app.get('/api/admin/ai-conversations', authenticateAdminToken, async (req, res) 
 });
 
 // Download updates ZIP route
-app.get('/swiftpay_updates.zip', (req, res) => {
-  const filePath = path.join(process.cwd(), 'swiftpay_updates.zip');
-  res.download(filePath, 'swiftpay_updates.zip');
+app.get('/nevo_updates.zip', (req, res) => {
+  const filePath = path.join(process.cwd(), 'nevo_updates.zip');
+  res.download(filePath, 'nevo_updates.zip');
 });
 
-app.get('/swiftpay-complete-three-updates.zip', (req, res) => {
-  const filePath = path.join(process.cwd(), 'swiftpay-complete-three-updates.zip');
+app.get('/nevo-complete-three-updates.zip', (req, res) => {
+  const filePath = path.join(process.cwd(), 'nevo-complete-three-updates.zip');
   if (fs.existsSync(filePath)) {
-    res.download(filePath, 'swiftpay-complete-three-updates.zip');
+    res.download(filePath, 'nevo-complete-three-updates.zip');
   } else {
-    const fallbackPath = path.join(process.cwd(), 'swiftpay_updates.zip');
-    res.download(fallbackPath, 'swiftpay-complete-three-updates.zip');
+    const fallbackPath = path.join(process.cwd(), 'nevo_updates.zip');
+    res.download(fallbackPath, 'nevo-complete-three-updates.zip');
   }
 });
 
-app.get('/swiftpay-admin-complete-upgrade.zip', (req, res) => {
-  const filePath = path.join(process.cwd(), 'swiftpay-admin-complete-upgrade.zip');
+app.get('/nevo-admin-complete-upgrade.zip', (req, res) => {
+  const filePath = path.join(process.cwd(), 'nevo-admin-complete-upgrade.zip');
   if (fs.existsSync(filePath)) {
-    res.download(filePath, 'swiftpay-admin-complete-upgrade.zip');
+    res.download(filePath, 'nevo-admin-complete-upgrade.zip');
   } else {
-    const fallbackPath = path.join(process.cwd(), 'swiftpay_updates.zip');
-    res.download(fallbackPath, 'swiftpay-admin-complete-upgrade.zip');
+    const fallbackPath = path.join(process.cwd(), 'nevo_updates.zip');
+    res.download(fallbackPath, 'nevo-admin-complete-upgrade.zip');
   }
 });
 
@@ -4806,8 +4806,8 @@ app.post('/api/admin/login', checkAdminLoginRateLimit, (req, res) => {
   const db = readDb();
   let admin = db.admins?.find(a => a.email.toLowerCase() === email.toLowerCase());
   
-  // Auto-provision admin@swiftpay.com or talkdavidjohn@gmail.com if missing
-  if (!admin && (email.toLowerCase() === 'admin@swiftpay.com' || email.toLowerCase() === 'talkdavidjohn@gmail.com')) {
+  // Auto-provision admin@nevo.com or talkdavidjohn@gmail.com if missing
+  if (!admin && (email.toLowerCase() === 'admin@nevo.com' || email.toLowerCase() === 'talkdavidjohn@gmail.com')) {
     admin = {
       email: email.toLowerCase(),
       passwordHash: bcrypt.hashSync(password || 'admin', 10)
@@ -4837,7 +4837,7 @@ app.post('/api/admin/login', checkAdminLoginRateLimit, (req, res) => {
     }
   } else {
     // Default fallback password check
-    isAdminPasswordCorrect = (password === 'admin' || password === 'admin123' || password === 'SwiftPay2025');
+    isAdminPasswordCorrect = (password === 'admin' || password === 'admin123' || password === 'Nevo2025');
   }
 
   if (!isAdminPasswordCorrect) {
@@ -5175,7 +5175,7 @@ app.post('/api/admin/withdrawals/:transactionId/approve-partial', authenticateAd
       id: `appr-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       amount: approveAmt,
       approvedAt: new Date().toISOString(),
-      approvedBy: (req as any).adminEmail || 'admin@swiftpay.ng',
+      approvedBy: (req as any).adminEmail || 'admin@nevo.ng',
       remainingAfter: newRemainingAmount,
       note: note ? String(note).trim() : ''
     };
@@ -5306,7 +5306,7 @@ app.post('/api/admin/withdrawals/:transactionId/status', authenticateAdminToken,
             id: `appr-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
             amount: currentRemaining,
             approvedAt: new Date().toISOString(),
-            approvedBy: (req as any).adminEmail || 'admin@swiftpay.ng',
+            approvedBy: (req as any).adminEmail || 'admin@nevo.ng',
             remainingAfter: 0,
             note: notes ? String(notes).trim() : 'Full disbursement authorized'
           }
@@ -5357,7 +5357,7 @@ app.post('/api/admin/withdrawals/:transactionId/status', authenticateAdminToken,
         }
       }
 
-      // Push real-time notification in user's SwiftPay account
+      // Push real-time notification in user's Nevo account
       user.notifications = user.notifications || [];
 
       if (status === 'completed' || status === 'Completed') {
@@ -5836,7 +5836,7 @@ app.post('/api/admin/users/reset-password', authenticateAdminToken, (req, res) =
     return res.status(404).json({ error: 'User not found.' });
   }
 
-  const tempPass = 'SwiftPayAdmin99!';
+  const tempPass = 'NevoAdmin99!';
   const hash = bcrypt.hashSync(tempPass, 10);
   db.users[userIndex].passwordHash = hash;
   writeDb(db);
@@ -5904,15 +5904,15 @@ app.post('/api/admin/logs/clear', authenticateAdminToken, (req, res) => {
 });
 
 // Payment provider return page. It does not mark a payment successful; the
-// authenticated SwiftPay tab continues server-side verification and issues the
+// authenticated Nevo tab continues server-side verification and issues the
 // voucher only after the provider confirms the transaction.
 app.get('/payment/callback', (req, res) => {
   const reference = String(req.query.reference || '');
   res.type('html').send(`<!doctype html>
-<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>SwiftPay Payment</title>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nevo Payment</title>
 <style>body{margin:0;background:#0c0c14;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh}.card{max-width:420px;margin:20px;padding:28px;border:1px solid #243044;border-radius:24px;background:#111827;text-align:center}.ok{color:#2dd4bf;font-size:42px}.muted{color:#94a3b8;line-height:1.6;font-size:14px}button{margin-top:18px;padding:12px 18px;border:0;border-radius:12px;background:#2dd4bf;color:#0c0c14;font-weight:800}</style></head>
-<body><main class="card"><div class="ok">✓</div><h2>Payment window completed</h2><p class="muted">Return to your SwiftPay tab. SwiftPay will verify the payment with the gateway before generating your WDV voucher.</p><button onclick="window.close()">Close Window</button></main>
-<script>try{if(window.opener){window.opener.postMessage({type:'SWIFTPAY_PAYMENT_RETURN',reference:${JSON.stringify(reference)}},window.location.origin);}}catch(e){}</script></body></html>`);
+<body><main class="card"><div class="ok">✓</div><h2>Payment window completed</h2><p class="muted">Return to your Nevo tab. Nevo will verify the payment with the gateway before generating your WDV voucher.</p><button onclick="window.close()">Close Window</button></main>
+<script>try{if(window.opener){window.opener.postMessage({type:'NEVO_PAYMENT_RETURN',reference:${JSON.stringify(reference)}},window.location.origin);}}catch(e){}</script></body></html>`);
 });
 
 // -------------------- VITE STATIC SERVER HANDLER --------------------
@@ -5923,7 +5923,7 @@ let databaseRetryTimer: NodeJS.Timeout | null = null;
 app.get('/api/health', (_req, res) => {
   res.status(200).json({
     success: true,
-    service: 'SwiftPay',
+    service: 'Nevo',
     status: databaseReady ? 'ready' : 'starting',
     database: databaseReady ? 'ready' : 'initializing',
     timestamp: new Date().toISOString()
@@ -5935,7 +5935,7 @@ async function initializeDatabaseWithRetry() {
   databaseInitializing = true;
 
   try {
-    console.log('[SwiftPay DB] Starting database initialization...');
+    console.log('[Nevo DB] Starting database initialization...');
     await initDb();
     await loadDbCache();
 
@@ -5943,7 +5943,7 @@ async function initializeDatabaseWithRetry() {
     const savedProvider = await getRow(`SELECT value FROM admin_settings WHERE key = $1`, ['payment_provider']);
     if (savedProvider && savedProvider.value) {
       paymentManager.setActiveProviderName(savedProvider.value as PaymentProviderName);
-      console.log(`[SwiftPay Payment] Restored active payment provider from database: ${savedProvider.value}`);
+      console.log(`[Nevo Payment] Restored active payment provider from database: ${savedProvider.value}`);
     }
 
     databaseReady = true;
@@ -5952,12 +5952,12 @@ async function initializeDatabaseWithRetry() {
       clearInterval(databaseRetryTimer);
       databaseRetryTimer = null;
     }
-    console.log('[SwiftPay DB] Database is ready. SwiftPay API is fully operational.');
+    console.log('[Nevo DB] Database is ready. Nevo API is fully operational.');
   } catch (err) {
     databaseInitializing = false;
     databaseReady = false;
-    console.error('[SwiftPay DB] Database initialization failed; server will remain online and retry automatically:', err);
-    console.error('[SwiftPay DB] Check Render DATABASE_URL and make sure it belongs to the currently running Render PostgreSQL database/service region.');
+    console.error('[Nevo DB] Database initialization failed; server will remain online and retry automatically:', err);
+    console.error('[Nevo DB] Check Render DATABASE_URL and make sure it belongs to the currently running Render PostgreSQL database/service region.');
   }
 }
 
@@ -5979,7 +5979,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[SwiftPay Server] Enhanced Full-Stack listening at http://0.0.0.0:${PORT}`);
+    console.log(`[Nevo Server] Enhanced Full-Stack listening at http://0.0.0.0:${PORT}`);
     void initializeDatabaseWithRetry();
     databaseRetryTimer = setInterval(() => {
       if (!databaseReady) void initializeDatabaseWithRetry();
@@ -5988,6 +5988,6 @@ async function startServer() {
 }
 
 startServer().catch((err) => {
-  console.error('[SwiftPay Server] Fatal startup error:', err);
+  console.error('[Nevo Server] Fatal startup error:', err);
   process.exit(1);
 });

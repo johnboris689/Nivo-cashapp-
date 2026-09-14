@@ -1,154 +1,243 @@
-# 🚀 SwiftPay - Next-Generation Fintech Platform
+# Nevo — Digital Rewards & Wallet Platform
 
-SwiftPay is a complete, production-ready full-stack fintech web application featuring digital wallet management, WDV (Withdrawal Voucher) code processing, automated bank transfers, a cyber withdrawal terminal, a level-1 Gemini AI customer support assistant, real-time admin control panel, and robust security protocols.
+Nevo is a full-stack Nigerian digital rewards and wallet platform built around **tasks, rewarded adverts, referrals, wallet deposits, withdrawals, and everyday wallet services**.
 
----
+Users can create an account, complete eligible tasks, watch supported rewarded adverts, invite friends, fund their wallet through real payment gateways, and withdraw when the platform's eligibility requirements are satisfied.
 
-## 🛠️ Tech Stack & Architecture
+This repository contains the existing Nevo application source. It is not a demo-only frontend: payment initialization, provider verification, webhook handling, wallet crediting, authentication, rewards, and administrative controls are implemented on the server.
 
-- **Frontend**: React 19, TypeScript, Tailwind CSS v4, Lucide Icons, Framer Motion
-- **Backend**: Express.js (Node.js runtime), ESBuild bundled CommonJS server
-- **AI Support Engine**: Google `@google/genai` SDK (Gemini 3.6 Flash) with smart fallback rule engine
-- **Database Layer**: Dual-mode storage engine — native PostgreSQL (`pg`) with automatic fallback to JSON file storage (`swiftpay_db.json`)
-- **Authentication**: Biometric WebAuthn (Fingerprint/FaceID), 4-digit Security PINs, OTP verification via SMTP/Resend/SendGrid/Twilio/Termii
+## Core Features
 
----
+- User registration and authentication
+- Secure password reset with OTP verification
+- Wallet balance and transaction history
+- Real wallet deposits through **Paystack** or **KoraPay**
+- Fresh provider transaction generated for every deposit
+- Server-side payment verification and webhook processing
+- Idempotent wallet crediting to prevent duplicate deposits
+- Minimum wallet deposit of **₦520**
+- Task-based rewards
+- Rewarded advert experience with server-side reward verification
+- Referral tracking and referral rewards
+- Withdrawal eligibility based on the configured Nevo requirements
+- Airtime, data, transfer, and bill-payment services
+- In-app notifications
+- Fingerprint / Face ID / passkey support where supported by the device
+- Nevo Assistant customer-support experience
+- Admin dashboard for users, rewards, referrals, deposits, withdrawals, and settings
 
-## 📁 Project Structure
+## Payment Architecture
 
+Nevo keeps payment credentials on the backend. Browser code never receives provider secret keys.
+
+### Paystack
+
+When a user selects Paystack, the Nevo backend creates a new transaction through the Paystack API using `PAYSTACK_SECRET_KEY`. The checkout/authorization URL returned by Paystack is then sent to the browser for redirection.
+
+### KoraPay
+
+When a user selects KoraPay, the Nevo backend creates a new checkout transaction through the KoraPay API using `KORAPAY_SECRET_KEY`. The checkout URL returned by KoraPay is used for the current transaction.
+
+No permanent checkout URL, fake transaction reference, fake account number, or simulated payment is used for wallet deposits.
+
+A successful redirect is **not** treated as proof of payment. Nevo verifies the provider transaction and processes the provider webhook before crediting the wallet.
+
+## Deposit Flow
+
+1. User opens **Deposit**.
+2. User selects an amount of at least ₦520.
+3. User chooses **Paystack** or **KoraPay**.
+4. Nevo creates a fresh pending payment transaction.
+5. Nevo calls the selected provider API from the backend.
+6. The provider returns the real checkout information.
+7. User completes payment on the provider's hosted checkout.
+8. The provider notifies Nevo through its webhook and/or verification API.
+9. Nevo verifies the provider, reference, user, currency, amount, and successful status.
+10. Nevo credits the wallet exactly once.
+
+## Environment Variables
+
+Create a local `.env` from `.env.example` and provide real values through your deployment platform in production.
+
+Important variables include:
+
+```env
+NODE_ENV=production
+PORT=3000
+APP_URL=https://your-nevo-domain.example
+
+PAYSTACK_SECRET_KEY=your_paystack_secret_key
+PAYSTACK_PUBLIC_KEY=your_paystack_public_key
+
+KORAPAY_SECRET_KEY=your_korapay_secret_key
+KORAPAY_PUBLIC_KEY=your_korapay_public_key
+
+GEMINI_API_KEY=your_gemini_api_key
+DATABASE_URL=your_postgresql_connection_string
+
+SENDER_NAME=Nevo
+SUPPORT_EMAIL=your_support_email
+SUPPORT_PHONE=your_support_phone
+WHATSAPP_NUMBER=your_whatsapp_number
 ```
-swiftpay/
-├── server.ts               # Express API backend & Vite dev server middleware
-├── db.ts                   # SQLite/JSON/Postgres database initialization & schema
-├── email_sms_service.ts    # Transports for Email (SMTP/Resend) & SMS (Twilio/Termii)
-├── index.html              # SPA entry point
-├── package.json            # Scripts and npm dependencies
-├── tsconfig.json           # TypeScript configuration
-├── vite.config.ts          # Vite build & bundler configuration
-├── .env.example            # Environment variables template
-├── public/                 # Static public assets & export ZIP archive
-├── src/
-│   ├── App.tsx             # Main React application component & state router
-│   ├── main.tsx            # React application mounting
-│   ├── index.css           # Tailwind v4 CSS imports & keyframe animations
-│   ├── types.ts            # Shared TypeScript interfaces
-│   ├── components/
-│   │   ├── AdminPanel.tsx            # Admin dashboard with 8 control sections & AI settings
-│   │   ├── AiSupportChat.tsx         # AI customer support chat interface (Embedded & Floating)
-│   │   ├── CyberWithdrawalTerminal.tsx# High-security cyber withdrawal terminal
-│   │   ├── WdvVoucher.tsx            # WDV Voucher purchase & generator modal
-│   │   ├── DevicesHistory.tsx        # Biometrics & active device sessions tracker
-│   │   ├── GlassCard.tsx             # Reusable frosted glass card UI wrapper
-│   │   ├── LiveTicker.tsx            # Live transaction ticker banner
-│   │   ├── QuickFabMenu.tsx          # Floating action button navigation menu
-│   │   ├── TransactionReceipt.tsx    # Downloadable/Shareable PDF-style transaction receipt
-│   │   └── StandaloneLegalPages.tsx  # Terms of Service & Privacy Policy views
+
+**Never commit real secret keys to GitHub and never place provider secret keys in React/browser code.**
+
+## Payment Webhooks
+
+Configure the provider dashboards to send successful payment notifications to the deployed Nevo service using the webhook routes implemented by the backend:
+
+- Paystack: `/api/payment/webhook/paystack`
+- KoraPay: `/api/payment/webhook/korapay`
+
+The public webhook endpoint must be reachable over HTTPS in production.
+
+## Technology Stack
+
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS v4
+- Express.js
+- Node.js
+- PostgreSQL support through `pg`
+- JSON persistence fallback for environments without PostgreSQL
+- Google Gemini SDK for the Nevo Assistant
+- WebAuthn/passkey browser APIs
+- Lucide icons
+- Motion animations
+
+## Project Structure
+
+```text
+nevo/
+├── server.ts
+├── db.ts
+├── email_sms_service.ts
+├── index.html
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+├── .env.example
+├── payments/
+├── server/payments/
+├── public/
+├── data/
+├── nevo_db.json
+└── src/
+    ├── App.tsx
+    ├── main.tsx
+    ├── index.css
+    ├── data.ts
+    ├── types.ts
+    ├── components/
+    ├── pages/
+    ├── services/
+    └── lib/
 ```
 
----
+## Local Development
 
-## 💻 Local Development Setup
+### Requirements
 
-### Prerequisites
-- **Node.js**: v18.0.0 or higher
-- **npm**: v9.0.0 or higher
+- Node.js 18+
+- npm 9+
 
-### Step-by-Step Instructions
+### Install
 
-1. **Extract / Navigate to Project Directory**:
-   ```bash
-   cd swiftpay
-   ```
+```bash
+npm install
+```
 
-2. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
+### Configure
 
-3. **Configure Environment Variables**:
-   Copy the template `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-   Open `.env` and fill in your configuration:
-   - Set `GEMINI_API_KEY` (Get a free key from [Google AI Studio](https://aistudio.google.com))
-   - (Optional) Set `DATABASE_URL` if connecting to a PostgreSQL server, otherwise leave blank to use the built-in local JSON database.
+```bash
+cp .env.example .env
+```
 
-4. **Start Development Server**:
-   ```bash
-   npm run dev
-   ```
+Fill in the required environment variables. Do not put production secrets into source files.
 
-5. **Access Application**:
-   Open your browser and navigate to:
-   `http://localhost:3000`
+### Start development
 
----
+```bash
+npm run dev
+```
 
-## ☁️ Production Deployment to Render
+The development server runs on the configured port, normally `3000`.
 
-Deploying SwiftPay on **Render.com** is straightforward:
+### Production build
 
-### Step 1: Repository Push
-Push your project code to a private or public repository on GitHub or GitLab.
+```bash
+npm run build
+npm start
+```
 
-### Step 2: Create Web Service on Render
-1. Log in to [Render Dashboard](https://dashboard.render.com).
-2. Click **New +** > **Web Service**.
-3. Connect your GitHub repository containing the SwiftPay code.
+The build creates the Vite frontend and bundles the Express server into `dist/server.cjs`.
 
-### Step 3: Configure Web Service
-- **Name**: `swiftpay-app` (or your preferred name)
-- **Region**: Choose your nearest region (e.g. Frankfurt, Oregon)
-- **Branch**: `main`
-- **Runtime**: `Node`
-- **Build Command**:
-  ```bash
-  npm run build
-  ```
-- **Start Command**:
-  ```bash
-  npm run start
-  ```
+## Render Deployment
 
-### Step 4: Add Environment Variables on Render
-In the **Environment** section of your Web Service configuration, add the following variables:
-- `NODE_ENV`: `production`
-- `PORT`: `3000`
-- `GEMINI_API_KEY`: *Your Google Gemini API Key*
-- `APP_URL`: *https://your-service-name.onrender.com*
-- `DATABASE_URL`: *(Optional) Render PostgreSQL Connection String*
+Use a Render Web Service connected to the Nevo GitHub repository.
 
-### Step 5: (Optional) Attach a PostgreSQL Database
-1. On Render, click **New +** > **PostgreSQL**.
-2. Once created, copy the **Internal Database URL**.
-3. Paste it as `DATABASE_URL` in your Web Service environment variables.
-4. Render will automatically migrate tables on app startup.
+Recommended commands:
 
-### Step 6: Deploy
-Click **Create Web Service**. Render will run `npm run build` and launch `npm run start`. Once complete, your live URL will be active.
+**Build Command**
 
----
+```bash
+npm run build
+```
 
-## 🔑 Admin Dashboard Access
+**Start Command**
 
-- **Admin URL**: `http://localhost:3000/admin/login` or click **Admin Login** in the footer menu.
-- **Features in Admin Panel**:
-  1. **Overview**: Total users, withdrawal statistics, deposit volumes, live charts.
-  2. **User Management**: View, edit, freeze/unfreeze accounts, credit/debit balances.
-  3. **Withdrawal Terminal**: Approve or reject pending bank withdrawals with instant receipts.
-  4. **WDV Voucher Generator**: Issue and search unique 10-digit voucher codes.
-  5. **AI Support Settings**: Enable/disable AI assistant, set welcome message, add custom FAQs, view real-time conversation logs & escalation analytics.
-  6. **Security & System Center**: Master feature toggles, limits, maintenance mode, WhatsApp support phone links.
+```bash
+npm start
+```
 
----
+Add the production environment variables in the Render service settings. In particular, configure the database, application URL, Paystack credentials, KoraPay credentials, and Gemini key before testing production payment or assistant functionality.
 
-## 📦 Export & Source Archive
+## Security Principles
 
-You can export this codebase at any time in two ways:
-1. **Direct Download**: Download `swiftpay_complete_source.zip` directly from the `/public` folder or via the download link generated inside the app.
-2. **AI Studio Export Menu**: Click **Settings / Export** in the AI Studio top navigation bar and select **Download ZIP** or **Push to GitHub**.
+- Provider secret keys stay server-side.
+- Payment initialization is performed by the backend.
+- The frontend cannot declare that a payment succeeded.
+- Wallet credits are based on verified provider transactions.
+- Provider amount and currency are checked before crediting.
+- Duplicate webhook delivery does not create duplicate wallet credits.
+- Failed, cancelled, or expired payments do not credit the wallet.
+- Authentication tokens are handled through the application's authenticated API flow.
+- OTP values and payment secrets are not intended to be exposed in the browser.
 
----
+## Rewards Model
 
-© 2026 SwiftPay Technologies. All rights reserved.
+Nevo's earning experience is centered on:
+
+- Completing available tasks
+- Watching eligible rewarded adverts
+- Referring other users
+- Viewing reward history
+
+Reward amounts and eligibility are controlled by the application/backend configuration rather than by a fake client-side balance update.
+
+## Administration
+
+The admin area provides controls for the operational parts of Nevo, including users, deposits/payments, withdrawals, tasks, submissions, referrals, activations/eligibility, notifications, support settings, and other configured platform settings.
+
+## Important Deployment Notes
+
+Before going live:
+
+1. Add production PostgreSQL credentials if PostgreSQL is being used.
+2. Add real Paystack credentials.
+3. Add real KoraPay credentials.
+4. Set `APP_URL` to the exact HTTPS Nevo deployment URL.
+5. Configure Paystack and KoraPay webhook URLs.
+6. Confirm webhook requests can reach the service.
+7. Test a small real deposit with each provider.
+8. Confirm the wallet is credited only after provider confirmation.
+9. Confirm a duplicate webhook does not duplicate the credit.
+10. Keep all secret values out of GitHub.
+
+## License / Ownership
+
+This source is the Nevo application codebase and is intended to be maintained as the existing project rather than recreated as a separate demo application.
+
+© 2026 Nevo. All rights reserved.

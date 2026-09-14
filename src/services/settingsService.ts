@@ -175,8 +175,7 @@ export function hexToRgb(hex: string, defaultRgb = '13, 148, 136'): string {
 export function applyGlobalTheme(settings: SystemSettings) {
   if (!settings) return;
 
-  const rawBrandName = settings.websiteName || DEFAULT_SETTINGS.websiteName;
-  const brandName = /swiftpay/i.test(rawBrandName) ? 'Nevo' : rawBrandName;
+  const brandName = 'Nevo';
   const primary = settings.primaryColor || DEFAULT_SETTINGS.primaryColor;
   const secondary = settings.secondaryColor || DEFAULT_SETTINGS.secondaryColor;
   const accent = settings.accentColor || DEFAULT_SETTINGS.accentColor;
@@ -268,8 +267,8 @@ export async function fetchMasterSettings(): Promise<SystemSettings> {
       const data = await res.json();
       if (data.success && data.settings) {
         cachedSettings = { ...DEFAULT_SETTINGS, ...data.settings };
-        if (/swiftpay/i.test(String(cachedSettings.websiteName || ''))) cachedSettings.websiteName = 'Nevo';
-        if (/swiftpay/i.test(String(cachedSettings.senderName || ''))) cachedSettings.senderName = 'Nevo';
+        cachedSettings.websiteName = 'Nevo';
+        cachedSettings.senderName = 'Nevo';
         localStorage.setItem('master_system_settings', JSON.stringify(cachedSettings));
         applyGlobalTheme(cachedSettings);
         return cachedSettings;
@@ -288,8 +287,8 @@ export function getCachedSettings(): SystemSettings {
 
 export function updateCachedSettings(newSettings: Partial<SystemSettings>) {
   cachedSettings = { ...cachedSettings, ...newSettings };
-  if (/swiftpay/i.test(String(cachedSettings.websiteName || ''))) cachedSettings.websiteName = 'Nevo';
-  if (/swiftpay/i.test(String(cachedSettings.senderName || ''))) cachedSettings.senderName = 'Nevo';
+  cachedSettings.websiteName = 'Nevo';
+  cachedSettings.senderName = 'Nevo';
   localStorage.setItem('master_system_settings', JSON.stringify(cachedSettings));
   applyGlobalTheme(cachedSettings);
 }

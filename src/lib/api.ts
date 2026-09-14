@@ -5,7 +5,7 @@ const ADMIN_TOKEN_KEY = 'nivo_admin_token';
 
 export function getAuthToken(): string | null {
   return (
-    localStorage.getItem('swiftpay_token') ||
+    localStorage.getItem('nevo_token') ||
     localStorage.getItem(TOKEN_KEY) ||
     localStorage.getItem('token') ||
     null
@@ -13,19 +13,19 @@ export function getAuthToken(): string | null {
 }
 
 export function setAuthToken(token: string) {
-  localStorage.setItem('swiftpay_token', token);
+  localStorage.setItem('nevo_token', token);
   localStorage.setItem(TOKEN_KEY, token);
 }
 
 export function removeAuthToken() {
-  localStorage.removeItem('swiftpay_token');
+  localStorage.removeItem('nevo_token');
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem('token');
 }
 
 export function getAdminToken(): string | null {
   return (
-    localStorage.getItem('swiftpay_admin_token') ||
+    localStorage.getItem('nevo_admin_token') ||
     localStorage.getItem(ADMIN_TOKEN_KEY) ||
     localStorage.getItem('admin_token') ||
     null
@@ -33,12 +33,12 @@ export function getAdminToken(): string | null {
 }
 
 export function setAdminToken(token: string) {
-  localStorage.setItem('swiftpay_admin_token', token);
+  localStorage.setItem('nevo_admin_token', token);
   localStorage.setItem(ADMIN_TOKEN_KEY, token);
 }
 
 export function removeAdminToken() {
-  localStorage.removeItem('swiftpay_admin_token');
+  localStorage.removeItem('nevo_admin_token');
   localStorage.removeItem(ADMIN_TOKEN_KEY);
   localStorage.removeItem('admin_token');
 }

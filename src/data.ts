@@ -191,8 +191,8 @@ export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
   },
   {
     id: 'notif-bal-103',
-    title: 'Daily Wallet Allocation',
-    body: 'Your daily wallet allocation has been refreshed successfully. Any unused balance from the previous cycle has expired according to platform policy.',
+    title: 'Daily Rewards Update',
+    body: 'Your Nevo rewards activity is up to date. Complete tasks and watch rewarded adverts to earn more.',
     date: '2026-08-04T08:00:00Z',
     unread: false,
     type: 'balance',

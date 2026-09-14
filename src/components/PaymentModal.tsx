@@ -58,7 +58,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   const getAuthToken = (): string => {
     if (token) return token;
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('swiftpay_token') || localStorage.getItem('token') || '';
+      return localStorage.getItem('nevo_token') || localStorage.getItem('token') || '';
     }
     return '';
   };
