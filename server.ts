@@ -3798,7 +3798,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       timezone: settings.timezone || "Africa/Lagos",
       country: settings.country || "Nigeria",
       scrollingAnnouncement: settings.scrollingAnnouncement || "Welcome to Nevo! Complete tasks, watch adverts and earn money.",
-      liveFeedText: settings.liveFeedText || "Chioma O. just completed a task • Yusuf D. earned ₦750",
+      liveFeedText: settings.liveFeedText || "Verified live activity will appear here automatically.",
       welcomeMessage: settings.welcomeMessage || "Welcome to Nevo",
       dashboardBanner: settings.dashboardBanner || "Get started with fast manual voucher activation & seamless transfers",
       noticeBarText: settings.noticeBarText || "",
@@ -3833,7 +3833,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       websiteUrl: (settings.websiteUrl && !/nevo/i.test(settings.websiteUrl)) ? settings.websiteUrl : "https://nevo.ng",
       privacyPolicy: (settings.privacyPolicy && !/nevo/i.test(settings.privacyPolicy)) ? settings.privacyPolicy : "Nevo Privacy Policy details...",
       termsOfService: (settings.termsOfService && !/nevo/i.test(settings.termsOfService)) ? settings.termsOfService : "Nevo Terms of Service details...",
-      aboutUs: (settings.aboutUs && !/nevo/i.test(settings.aboutUs)) ? settings.aboutUs : "Nevo is Nigeria's premier digital financial rewards and wallet platform...",
+      aboutUs: (settings.aboutUs && !/(swiftpay|legacy_voucher|settlement voucher|cashout)/i.test(settings.aboutUs)) ? settings.aboutUs : "Nevo is a digital rewards and wallet platform built to give users simple, transparent ways to earn through verified tasks, referrals and other available opportunities.",
       contactUs: settings.contactUs || "Contact support via WhatsApp or Email.",
       faqContent: settings.faqContent || "Frequently Asked Questions...",
 
@@ -4563,8 +4563,8 @@ app.post('/api/ads/verify', authenticateToken, async (req: any, res: any) => {
 
 // Nivo feature administration endpoints
 app.get('/api/admin/nivo/tasks', authenticateAdminToken, async (_req,res)=>{ try { const tasks=await getAllRows(`SELECT * FROM nivo_tasks ORDER BY createdAt DESC`); const submissions=await getAllRows(`SELECT * FROM nivo_task_submissions ORDER BY createdAt DESC`); res.json({success:true,tasks,submissions}); } catch(e:any){res.status(500).json({error:e.message});} });
-app.post('/api/admin/nivo/tasks', authenticateAdminToken, async (req,res)=>{ try { const b=req.body||{}; if(!b.title||!Number.isFinite(Number(b.rewardAmount))) return res.status(400).json({error:'Title and reward are required.'}); const id=`task-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`; await execute(`INSERT INTO nivo_tasks (id,title,description,rewardAmount,category,actionUrl,verificationType,timerSeconds,proofInstructions,enabled,createdAt,completionCount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,0)`,[id,b.title,b.description||'',Number(b.rewardAmount),b.category||'special',b.actionUrl||'/',b.verificationType||'timer',Number(b.timerSeconds||0),b.proofInstructions||'',b.enabled===false?0:1,new Date().toISOString()]); res.json({success:true,id}); } catch(e:any){res.status(400).json({error:e.message});} });
-app.patch('/api/admin/nivo/tasks/:id', authenticateAdminToken, async (req,res)=>{ try { const b=req.body||{}; if(b.enabled!==undefined) await execute(`UPDATE nivo_tasks SET enabled=$1 WHERE id=$2`,[b.enabled?1:0,req.params.id]); if(b.rewardAmount!==undefined) await execute(`UPDATE nivo_tasks SET rewardAmount=$1 WHERE id=$2`,[Number(b.rewardAmount),req.params.id]); res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
+app.post('/api/admin/nivo/tasks', authenticateAdminToken, async (req,res)=>{ try { const b=req.body||{}; if(!String(b.title||'').trim()||!String(b.description||'').trim()||!Number.isFinite(Number(b.rewardAmount))) return res.status(400).json({error:'Title, description and reward are required.'}); const actionUrl=String(b.actionUrl||'').trim(); let parsed:URL; try{ parsed=new URL(actionUrl); }catch{ return res.status(400).json({error:'A valid task destination URL is required.'}); } if(!['http:','https:'].includes(parsed.protocol)) return res.status(400).json({error:'Task link must use http or https.'}); const id=`task-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`; await execute(`INSERT INTO nivo_tasks (id,title,description,rewardAmount,category,actionUrl,verificationType,timerSeconds,proofInstructions,enabled,createdAt,completionCount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,0)`,[id,String(b.title).trim(),String(b.description),Number(b.rewardAmount),b.category||'special',parsed.toString(),b.verificationType||'timer',Math.max(0,Number(b.timerSeconds)||0),b.proofInstructions||'',b.enabled===false?0:1,new Date().toISOString()]); res.json({success:true,id}); } catch(e:any){res.status(400).json({error:e.message});} });
+app.patch('/api/admin/nivo/tasks/:id', authenticateAdminToken, async (req,res)=>{ try { const b=req.body||{}; const current=await getRow(`SELECT * FROM nivo_tasks WHERE id=$1`,[req.params.id]); if(!current) return res.status(404).json({error:'Task not found.'}); if(b.actionUrl!==undefined){ const value=String(b.actionUrl||'').trim(); let parsed:URL; try{ parsed=new URL(value); }catch{ return res.status(400).json({error:'Task link must be a valid URL.'}); } if(!['http:','https:'].includes(parsed.protocol)) return res.status(400).json({error:'Task link must use http or https.'}); await execute(`UPDATE nivo_tasks SET actionUrl=$1 WHERE id=$2`,[parsed.toString(),req.params.id]); } if(b.title!==undefined) await execute(`UPDATE nivo_tasks SET title=$1 WHERE id=$2`,[String(b.title).trim(),req.params.id]); if(b.description!==undefined) await execute(`UPDATE nivo_tasks SET description=$1 WHERE id=$2`,[String(b.description),req.params.id]); if(b.category!==undefined) await execute(`UPDATE nivo_tasks SET category=$1 WHERE id=$2`,[String(b.category),req.params.id]); if(b.verificationType!==undefined) await execute(`UPDATE nivo_tasks SET verificationType=$1 WHERE id=$2`,[String(b.verificationType),req.params.id]); if(b.timerSeconds!==undefined) await execute(`UPDATE nivo_tasks SET timerSeconds=$1 WHERE id=$2`,[Math.max(0,Number(b.timerSeconds)||0),req.params.id]); if(b.proofInstructions!==undefined) await execute(`UPDATE nivo_tasks SET proofInstructions=$1 WHERE id=$2`,[String(b.proofInstructions),req.params.id]); if(b.enabled!==undefined) await execute(`UPDATE nivo_tasks SET enabled=$1 WHERE id=$2`,[b.enabled?1:0,req.params.id]); if(b.rewardAmount!==undefined){ const reward=Number(b.rewardAmount); if(!Number.isFinite(reward)||reward<0) return res.status(400).json({error:'Reward must be a valid non-negative number.'}); await execute(`UPDATE nivo_tasks SET rewardAmount=$1 WHERE id=$2`,[reward,req.params.id]); } res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
 app.delete('/api/admin/nivo/tasks/:id', authenticateAdminToken, async (req,res)=>{ try { await execute(`DELETE FROM nivo_tasks WHERE id=$1`,[req.params.id]); res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
 app.post('/api/admin/nivo/submissions/:id/approve', authenticateAdminToken, async (req,res)=>{ try { const sub=await getRow(`SELECT * FROM nivo_task_submissions WHERE id=$1`,[req.params.id]); if(!sub) return res.status(404).json({error:'Submission not found.'}); if(['approved','claimed'].includes(String(sub.status))) return res.json({success:true,alreadyProcessed:true}); const email=String(sub.userid||sub.userId).toLowerCase(); const db=readDb(); const idx=db.users.findIndex((u:any)=>u.email.toLowerCase()===email); if(idx<0) return res.status(404).json({error:'User not found.'}); const reward=Number(sub.rewardamount||0); db.users[idx].balance=Number(db.users[idx].balance||0)+reward; db.users[idx].totalEarnings=Number(db.users[idx].totalEarnings||0)+reward; db.users[idx].notifications=db.users[idx].notifications||[]; db.users[idx].notifications.unshift({id:`notif-${Date.now()}`,title:'Task Reward Approved',body:`₦${reward.toLocaleString()} has been credited to your wallet.`,date:new Date().toISOString(),unread:true,type:'task'}); db.users[idx].transactions=db.users[idx].transactions||[]; db.users[idx].transactions.unshift({id:`tx-${Date.now()}`,type:'promotional_bonus',amount:reward,date:new Date().toISOString(),status:'success',description:`Task Reward: ${sub.tasktitle||sub.taskTitle}`}); await writeDb(db); await execute(`UPDATE users SET balance=$1,totalEarnings=$2,notifications=$3,transactions=$4 WHERE LOWER(email)=$5`,[db.users[idx].balance,db.users[idx].totalEarnings,JSON.stringify(db.users[idx].notifications),JSON.stringify(db.users[idx].transactions),email]); await execute(`UPDATE nivo_task_submissions SET status='claimed',claimedAt=$1 WHERE id=$2`,[new Date().toISOString(),req.params.id]); await execute(`UPDATE nivo_tasks SET completionCount=COALESCE(completionCount,0)+1 WHERE id=$1`,[sub.taskid||sub.taskId]); res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
 app.post('/api/admin/nivo/submissions/:id/reject', authenticateAdminToken, async (req,res)=>{ try { await execute(`UPDATE nivo_task_submissions SET status='rejected',adminNote=$1 WHERE id=$2`,[String(req.body?.reason||'Rejected by admin'),req.params.id]); res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
@@ -4636,6 +4636,10 @@ app.get('/api/admin/settings', authenticateAdminToken, async (req, res) => {
     for (const r of settingRows) {
       settings[r.key] = r.value;
     }
+    settings.websiteName = 'Nevo';
+    if (/swiftpay|legacy_voucher|settlement voucher|cashout/i.test(String(settings.aboutUs || ''))) {
+      settings.aboutUs = 'Nevo is a digital rewards and wallet platform built to give users simple, transparent ways to earn through verified tasks, referrals and other available opportunities.';
+    }
     res.json({ success: true, settings });
   } catch (err) {
     res.status(500).json({ error: 'Failed to retrieve admin settings' });
@@ -4652,10 +4656,12 @@ const updateAdminSettingsHandler = async (req: any, res: any) => {
   try {
     const settingsToSave: Record<string, string> = {};
     for (const [k, v] of Object.entries(payload)) {
-      if (k !== 'token' && v !== undefined && v !== null) {
+      if (k !== 'token' && k !== 'websiteName' && v !== undefined && v !== null) {
         settingsToSave[k] = String(v);
       }
     }
+    // Nevo is the permanent application brand; legacy brand names cannot be saved.
+    settingsToSave.websiteName = 'Nevo';
 
     for (const [key, val] of Object.entries(settingsToSave)) {
       try {
@@ -5507,7 +5513,7 @@ app.get('/api/admin/users', authenticateAdminToken, (req, res) => {
       fullName: u.fullName || 'User',
       username: u.username || (u.email ? u.email.split('@')[0] : `user${idx}`),
       email: u.email || '',
-      phone: u.phone || '+2348000000000',
+      phone: u.phone || '',
       balance: u.balance || 0,
       bonusBalance: u.bonusBalance || 0,
       dailyTarget: u.dailyTarget || 50000,
@@ -5518,9 +5524,9 @@ app.get('/api/admin/users', authenticateAdminToken, (req, res) => {
       isFrozen: !!u.isFrozen,
       withdrawalStatus: u.withdrawalStatus || (u.withdrawalBlocked ? 'Blocked' : 'Allowed'),
       referralCount: u.referralCount || u.referrals || 0,
-      registeredAt: u.registeredAt || u.createdAt || u.date || '2026-01-15T10:00:00Z',
-      lastLogin: u.lastLogin || u.registeredAt || '2026-07-28T06:00:00Z',
-      ipAddress: u.ipAddress || '102.89.23.14',
+      registeredAt: u.registeredAt || u.createdAt || u.date || '',
+      lastLogin: u.lastLogin || u.registeredAt || '',
+      ipAddress: u.ipAddress || '',
       tier: u.tier || 3,
       accountLevel: u.accountLevel || `Tier ${u.tier || 3} Verified`,
       profilePic: u.profilePic || '',
@@ -5591,12 +5597,29 @@ app.post('/api/admin/users/edit-balance', authenticateAdminToken, (req, res) => 
     return res.status(404).json({ error: 'User not found.' });
   }
 
-  db.users[userIndex].balance = Number(balance);
+  const previousBalance = Number(db.users[userIndex].balance || 0);
+  const newBalance = Number(balance);
+  if (!Number.isFinite(newBalance) || newBalance < 0) return res.status(400).json({ error: 'Balance must be a valid non-negative number.' });
+  db.users[userIndex].balance = newBalance;
+  db.users[userIndex].transactions = Array.isArray(db.users[userIndex].transactions) ? db.users[userIndex].transactions : [];
+  if (newBalance !== previousBalance) {
+    db.users[userIndex].transactions.unshift({
+      id: `admin-balance-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
+      type: 'admin_balance_adjustment',
+      amount: newBalance - previousBalance,
+      previousBalance,
+      newBalance,
+      date: new Date().toISOString(),
+      status: 'success',
+      description: `Admin wallet balance adjustment`,
+      narration: `Balance changed from ₦${previousBalance.toLocaleString()} to ₦${newBalance.toLocaleString()}`
+    });
+  }
   writeDb(db);
 
-  logDiagnostic('SECURITY_ALERT', `Admin modified user balance directly`, { email, balance: Number(balance) });
+  logDiagnostic('SECURITY_ALERT', `Admin modified user balance`, { email, previousBalance, newBalance, difference: newBalance - previousBalance });
 
-  res.json({ success: true, balance: db.users[userIndex].balance });
+  res.json({ success: true, balance: newBalance, previousBalance });
 });
 
 // Reset password by Admin

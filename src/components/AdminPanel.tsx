@@ -254,7 +254,7 @@ export default function AdminPanel({
   const [timezone, setTimezone] = useState('Africa/Lagos');
   const [country, setCountry] = useState('Nigeria');
   const [scrollingAnnouncement, setScrollingAnnouncement] = useState('Welcome to Nevo! Fast and secure manual transactions with 24/7 support.');
-  const [liveFeedText, setLiveFeedText] = useState('Chioma O. just completed a task • Yusuf D. earned ₦750');
+  const [liveFeedText, setLiveFeedText] = useState('Verified live activity will appear here automatically.');
   const [welcomeMessage, setWelcomeMessage] = useState('Welcome to Nevo');
   const [dashboardBanner, setDashboardBanner] = useState('Get started with fast manual voucher activation & seamless transfers');
   const [noticeBarText, setNoticeBarText] = useState('');
@@ -297,7 +297,7 @@ export default function AdminPanel({
   const [websiteUrl, setWebsiteUrl] = useState('https://nevo.com');
   const [privacyPolicy, setPrivacyPolicy] = useState('Nevo Privacy Policy details...');
   const [termsOfService, setTermsOfService] = useState('Nevo Terms of Service details...');
-  const [aboutUs, setAboutUs] = useState('Nevo is Nigeria\'s premier digital financial voucher platform...');
+  const [aboutUs, setAboutUs] = useState('Nevo is a digital rewards and wallet platform built to give users simple, transparent ways to earn through verified tasks, referrals and other available opportunities.');
   const [contactUs, setContactUs] = useState('Contact support via WhatsApp or Email.');
   const [faqContent, setFaqContent] = useState('Frequently Asked Questions...');
 
@@ -502,7 +502,7 @@ export default function AdminPanel({
           if (s.recoveryEnabled) setRecoveryEnabled(s.recoveryEnabled === 'true');
           if (s.smsRecoveryEnabled) setSmsRecoveryEnabled(s.smsRecoveryEnabled === 'true');
 
-          if (s.websiteName) setWebsiteName(s.websiteName);
+          setWebsiteName('Nevo');
           if (s.websiteLogo) setWebsiteLogo(s.websiteLogo);
           if (s.websiteFavicon) setWebsiteFavicon(s.websiteFavicon);
           if (s.primaryColor) setPrimaryColor(s.primaryColor);
@@ -587,7 +587,7 @@ export default function AdminPanel({
         recoveryEnabled: String(recoveryEnabled),
         smsRecoveryEnabled: String(smsRecoveryEnabled),
 
-        websiteName,
+        websiteName: 'Nevo',
         websiteLogo,
         websiteFavicon,
         primaryColor,
@@ -740,6 +740,17 @@ export default function AdminPanel({
     fetchWithdrawals();
     fetchPayments();
   }, []);
+
+  // Keep overview metrics live while the admin dashboard is open.
+  React.useEffect(() => {
+    if (adminPath?.toLowerCase().startsWith('/boris/withdrawals/')) return;
+    const interval = setInterval(() => {
+      fetchAllUsers();
+      fetchWithdrawals();
+      fetchPayments();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [adminPath]);
 
   const fetchPayments = async () => {
     setLoadingPayments(true);
@@ -1303,20 +1314,10 @@ export default function AdminPanel({
   const frozenUsersCount = users.filter(u => u.isFrozen).length;
   const totalSystemBalance = users.reduce((sum, u) => sum + (u.balance || 0), 0);
   
-  const totalTxsCount = transactions.length;
   const airtimeTxs = transactions.filter(t => t.type === 'redeem_airtime');
   const transferTxs = transactions.filter(t => t.type === 'bank_transfer_direct' || t.type === 'withdraw');
   const legacyVoucherTxs = transactions.filter(t => t.type === 'buy_legacyVoucher');
   
-  const totalRevenue = transactions
-    .filter(t => t.status === 'success')
-    .reduce((sum, t) => {
-      // Revenue from network charges or buy fees
-      if (t.type === 'bank_transfer_direct' || t.type === 'withdraw') {
-        return sum + 10; // ₦10 charge per transfer
-      }
-      return sum;
-    }, 0);
 
   // User database modifiers
   const handleUpdateUserStatus = async (email: string, field: 'isSuspended' | 'isFrozen', val: boolean) => {
@@ -1589,62 +1590,74 @@ export default function AdminPanel({
     return num.slice(0, 3) + '*'.repeat(num.length - 6) + num.slice(-3);
   };
 
-  // Calculate live stats from the database (Section 8)
+  // Calculate dashboard statistics from the actual loaded database records.
+  // Never use presentation/demo fallback numbers for financial or user metrics.
   const stats = React.useMemo(() => {
-    let total = withdrawals.length;
-    let pendingCount = 0;
-    let processingCount = 0;
-    let completedCount = 0;
-    let rejectedCount = 0;
-    
-    let amountToday = 0;
-    let amountWeek = 0;
-    let amountMonth = 0;
+    const safeUsers = Array.isArray(users) ? users : [];
+    const safeWithdrawals = Array.isArray(withdrawals) ? withdrawals : [];
+    const allUserTransactions = safeUsers.flatMap((u: any) =>
+      Array.isArray(u?.transactions) ? u.transactions.map((t: any) => ({ ...t, user: u.fullName || u.username || u.email, email: u.email })) : []
+    );
+    const transactionRows = allUserTransactions.length ? allUserTransactions : (Array.isArray(transactions) ? transactions : []);
 
+    let pendingCount = 0, processingCount = 0, completedCount = 0, rejectedCount = 0;
+    let amountToday = 0, amountWeek = 0, amountMonth = 0;
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    
-    // Get start of week
     const weekStart = new Date(now);
     weekStart.setDate(now.getDate() - now.getDay());
     weekStart.setHours(0,0,0,0);
     const weekStartTime = weekStart.getTime();
-
-    // Get start of month
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
 
-    for (const w of (Array.isArray(withdrawals) ? withdrawals : [])) {
-      if (!w) continue;
-      const amt = Number(w.amount || 0);
-      const statusLower = toSafeLower(w.status);
-      
+    for (const w of safeWithdrawals) {
+      const statusLower = toSafeLower(w?.status);
       if (statusLower === 'pending') pendingCount++;
       else if (statusLower === 'processing') processingCount++;
-      else if (statusLower === 'completed' || statusLower === 'success') completedCount++;
-      else if (statusLower === 'rejected' || statusLower === 'failed' || statusLower === 'cancelled') rejectedCount++;
-
-      const rawDate = w.timestamp || w.created_at;
-      const parsedDate = rawDate ? new Date(rawDate) : null;
-      const wTime = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getTime() : 0;
-      
-      if (statusLower === 'completed' || statusLower === 'success') {
-        if (wTime >= todayStart) amountToday += amt;
-        if (wTime >= weekStartTime) amountWeek += amt;
-        if (wTime >= monthStart) amountMonth += amt;
+      else if (['completed','success'].includes(statusLower)) completedCount++;
+      else if (['rejected','failed','cancelled'].includes(statusLower)) rejectedCount++;
+      const rawDate = w?.timestamp || w?.created_at || w?.createdAt;
+      const time = rawDate ? new Date(rawDate).getTime() : 0;
+      const amt = Number(w?.amount || 0);
+      if (['completed','success'].includes(statusLower) && Number.isFinite(time)) {
+        if (time >= todayStart) amountToday += amt;
+        if (time >= weekStartTime) amountWeek += amt;
+        if (time >= monthStart) amountMonth += amt;
       }
     }
 
+    const newUsersToday = safeUsers.filter((u: any) => {
+      const raw = u?.registeredAt || u?.createdAt || u?.date;
+      if (!raw) return false;
+      const d = new Date(raw);
+      return !Number.isNaN(d.getTime()) && d >= new Date(todayStart);
+    }).length;
+
+    const failedTransactions = transactionRows.filter((t: any) => ['failed','failure','rejected','cancelled'].includes(toSafeLower(t?.status))).length;
+    const successfulOrCompletedTransactions = transactionRows.filter((t: any) => ['success','successful','completed','settled','claimed'].includes(toSafeLower(t?.status))).length;
+    const systemHealth = transactionRows.length === 0 ? 100 : Math.max(0, Math.min(100, Math.round(((transactionRows.length - failedTransactions) / transactionRows.length) * 100)));
+
+    // Only count an actual recorded fee/charge. Never invent a fee from the transaction type.
+    const totalRecordedCharges = transactionRows.reduce((sum: number, t: any) => {
+      const fee = Number(t?.fee ?? t?.fees ?? t?.charge ?? t?.charges ?? 0);
+      return Number.isFinite(fee) && fee > 0 ? sum + fee : sum;
+    }, 0);
+
     return {
-      total,
-      pendingCount,
-      processingCount,
-      completedCount,
-      rejectedCount,
-      amountToday,
-      amountWeek,
-      amountMonth
+      total: safeWithdrawals.length,
+      pendingCount, processingCount, completedCount, rejectedCount,
+      amountToday, amountWeek, amountMonth,
+      newUsersToday,
+      failedTransactions,
+      successfulOrCompletedTransactions,
+      systemHealth,
+      totalTransactions: transactionRows.length,
+      totalRecordedCharges
     };
-  }, [withdrawals]);
+  }, [users, withdrawals, transactions]);
+
+  const totalTxsCount = stats.totalTransactions;
+  const totalRevenue = stats.totalRecordedCharges;
 
   // Search and status filters for withdrawal request console (Section 1)
   const filteredWithdrawals = React.useMemo(() => {
@@ -1775,7 +1788,7 @@ export default function AdminPanel({
         totalSystemBalance={totalSystemBalance}
         totalRevenue={totalRevenue}
         totalTxsCount={totalTxsCount}
-        transactions={transactions}
+        transactions={users.flatMap((u: any) => Array.isArray(u?.transactions) ? u.transactions.map((t: any) => ({ ...t, user: u.fullName || u.username || u.email, email: u.email })) : [])}
         users={users}
         logs={logs}
         stats={stats}
@@ -3724,7 +3737,8 @@ export default function AdminPanel({
                 <input
                   type="text"
                   value={websiteName}
-                  onChange={(e) => setWebsiteName(e.target.value)}
+                  onChange={() => setWebsiteName('Nevo')}
+                  readOnly
                   className="w-full text-xs bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-teal-400"
                 />
               </div>

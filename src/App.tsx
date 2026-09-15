@@ -350,6 +350,17 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const openReferrals = () => {
+      setCurrentScreen('dashboard');
+      setActiveTab('social');
+      setRewardsTab('referrals');
+      navigateTo('/referrals');
+    };
+    window.addEventListener('nevo-open-referrals', openReferrals);
+    return () => window.removeEventListener('nevo-open-referrals', openReferrals);
+  }, []);
+
+  useEffect(() => {
     const name = user?.fullName?.split(' ')[0] || 'there';
     const text = `Hi, ${name}`;
     setTypedGreeting('');
@@ -440,7 +451,7 @@ export default function App() {
   const [systemSettings, setSystemSettings] = useState<Record<string, string>>({
     websiteName: "Nevo",
     scrollingAnnouncement: "Welcome to Nevo! Fast and secure manual transactions with 24/7 support.",
-    liveFeedText: "Chioma O. just purchased a Deposit code • Yusuf D. withdrew ₦25,000",
+    liveFeedText: "Verified live activity will appear here automatically.",
     welcomeMessage: "Welcome to Nevo",
     dashboardBanner: "Get started with fast manual voucher activation & seamless transfers",
     whatsappNumber: "+2349162845073",
@@ -5557,7 +5568,7 @@ export default function App() {
                     
                     <h5 className="text-base font-extrabold font-display">Nevo Digital Platform</h5>
                     <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                      Nevo is a premium digital banking platform offering enhanced features, better security, and a more streamlined user experience. We utilize a glowing glassmorphism system with zero downtime.
+                      Nevo is a digital rewards and wallet platform built to give users simple, transparent ways to earn through verified tasks, referrals and other available opportunities. Your wallet activity and eligible rewards are recorded in your Nevo account.
                     </p>
                   </div>
 
@@ -5565,7 +5576,7 @@ export default function App() {
                   <div className="space-y-2.5">
                     <h5 className="text-xs font-bold uppercase tracking-wider text-slate-400">Our Mission</h5>
                     <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                      To empower young professionals, merchants, and remote workers across Nigeria to perform immediate cashouts, settlement vouchers, and airtime loading with zero maintenance fees.
+                      To make digital earning opportunities easier to discover, complete and track while giving users a clear view of their wallet activity and rewards.
                     </p>
                   </div>
 
@@ -5575,9 +5586,9 @@ export default function App() {
                     <GlassCard className="p-5 space-y-3">
                       {[
                         'Daily instant withdrawal limits up to ₦100,000.',
-                        'Premium LEGACY_VOUCHER (Withdrawal Voucher) token discount system.',
-                        'Cheaper airtime & data package recharges.',
-                        'Encrypted passcode entry and biometric fingerprint scanners.',
+                        'Verified earning tasks and promotional opportunities managed through Nevo.',
+                        'Clear wallet and reward history for completed eligible activities.',
+                        'Secure account access with password and supported device authentication.',
                         '24/7 dedicated Telegram, WhatsApp, and email support operators.'
                       ].map((bullet, index) => (
                         <div key={index} className="flex gap-2.5 items-start">
