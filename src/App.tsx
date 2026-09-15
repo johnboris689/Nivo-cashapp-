@@ -806,34 +806,57 @@ export default function App() {
     const ref = params.get('ref');
     if (ref) setReferralCodeInput(ref.toUpperCase());
 
-    const depositRef = params.get('deposit_ref');
+    // KoraPay's checkout redirect appends ?reference=<reference>.
+    // Keep support for the older deposit_ref parameter so existing sessions
+    // can still be reconciled. The browser is never trusted as proof of payment.
+    const depositRef = params.get('reference') || params.get('deposit_ref') || params.get('payment_reference');
     if (depositRef) {
       const token = getAuthToken();
       if (token) {
         showToast('Verifying your KoraPay payment...', 'info');
-        const verifyEndpoint = `/api/korapay/check-status/${encodeURIComponent(depositRef)}`;
-        fetch(verifyEndpoint, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-          .then((res) => res.json())
-          .then((data) => {
+        let attempts = 0;
+        let finished = false;
+        const maxAttempts = 10;
+        const cleanup = () => {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('reference');
+          url.searchParams.delete('deposit_ref');
+          url.searchParams.delete('payment_reference');
+          window.history.replaceState({}, document.title, url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : ''));
+        };
+        const verify = async () => {
+          if (finished) return;
+          attempts += 1;
+          try {
+            const data = await api.checkKoraPayDepositStatus(depositRef);
             if (data.status === 'successful' || data.status === 'approved' || data.status === 'completed') {
+              finished = true;
               showToast('Deposit confirmed! Your Nevo wallet has been credited.', 'success');
-              syncWithBackend();
-            } else if (data.status === 'pending') {
-              showToast('Payment is still pending. We will update your balance once confirmed.', 'info');
-            } else {
-              showToast(data.message || 'Payment was not completed.', 'error');
+              await syncWithBackend(true);
+              cleanup();
+              return;
             }
-          })
-          .catch(() => {
-            showToast('Unable to check payment status right now.', 'info');
-          })
-          .finally(() => {
-            const url = new URL(window.location.href);
-            url.searchParams.delete('deposit_ref');
-                window.history.replaceState({}, document.title, url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : ''));
-          });
+            if (data.status === 'failed') {
+              finished = true;
+              showToast(data.message || 'KoraPay reports that this payment failed.', 'error');
+              cleanup();
+              return;
+            }
+            if (attempts < maxAttempts) {
+              window.setTimeout(verify, 3000);
+            } else {
+              showToast('Payment received by KoraPay is still being confirmed. Your balance will update automatically once Nevo receives final confirmation.', 'info');
+              cleanup();
+            }
+          } catch {
+            if (attempts < maxAttempts) window.setTimeout(verify, 3000);
+            else {
+              showToast('Unable to check payment status right now. Nevo will continue checking automatically.', 'info');
+              cleanup();
+            }
+          }
+        };
+        void verify();
       }
     }
   }, []);

@@ -29,7 +29,7 @@ async function configureNevoPostgresPool(pool: pg.Pool, createSchema = false) {
   await pool.query('SET search_path TO nevo, public');
 }
 
-const JSON_FILE = path.join(process.cwd(), 'nevo_db.json');
+const JSON_FILE = process.env.NEVO_DB_FILE?.trim() || path.join(process.cwd(), 'nevo_db.json');
 
 const DEFAULT_WDV_CONFIG = {};
 
@@ -388,6 +388,9 @@ export async function initDb() {
       });
     }
   } else {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('[Nevo DB] WARNING: production has no DATABASE_URL/SQL_HOST. JSON storage will only survive redeploys if NEVO_DB_FILE points to a persistent mounted disk. Render PostgreSQL is strongly recommended for user/payment data.');
+    }
     console.log(`[Nevo DB] No DATABASE_URL or SQL_HOST found. Initializing pure JS JSON database fallback at ${JSON_FILE}...`);
     getJsonDb(); // ensure initialized
   }
@@ -654,9 +657,11 @@ export async function initDb() {
       metadata TEXT,
       createdAt TEXT,
       verifiedAt TEXT,
-      webhookData TEXT
+      webhookData TEXT,
+      walletCreditedAt TEXT
     )
   `);
+  try { await execute(`ALTER TABLE payment_transactions ADD COLUMN IF NOT EXISTS walletCreditedAt TEXT`); } catch (e) {}
 
   await execute(`
     CREATE TABLE IF NOT EXISTS vouchers (
@@ -828,6 +833,14 @@ export async function initDb() {
       }
     }
     console.log('[Nevo DB] Default admin settings seeded.');
+  }
+
+  // Nevo is the canonical product brand. Normalize any legacy SwiftPay setting
+  // so old persisted configuration cannot reintroduce the previous brand.
+  try {
+    await execute(`INSERT INTO admin_settings (key, value) VALUES ($1, $2) ON CONFLICT(key) DO UPDATE SET value = EXCLUDED.value`, ['websiteName', 'Nevo']);
+  } catch (e) {
+    try { await execute(`UPDATE admin_settings SET value = $1 WHERE key = $2`, ['Nevo', 'websiteName']); } catch (_) {}
   }
 
   // Reinitialize the pool with App user (least privilege) for runtime database access

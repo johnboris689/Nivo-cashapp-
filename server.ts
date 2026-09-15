@@ -3171,7 +3171,7 @@ async function processSuccessfulPaymentUnsafe(params: {
   let tx = await getRow(`SELECT * FROM payment_transactions WHERE reference = $1`, [reference]);
   let wdvPayment = await getRow(`SELECT * FROM wdv_payments WHERE reference = $1`, [reference]);
 
-  if (tx && (tx.status === 'successful' || tx.status === 'settled')) {
+  if (tx && (tx.status === 'successful' || tx.status === 'settled') && (tx.purpose !== 'wallet_funding' || tx.walletcreditedat || tx.walletCreditedAt)) {
     const existingWdv = await getRow(`SELECT * FROM wdv_payments WHERE reference = $1`, [reference]);
     return {
       success: true,
@@ -3278,9 +3278,13 @@ async function processSuccessfulPaymentUnsafe(params: {
           userEmail
         ]);
         await execute(`UPDATE wallets SET balance = $1 WHERE LOWER(userId) = $2`, [newBal, userEmail]);
+        await execute(`UPDATE payment_transactions SET walletCreditedAt = $1 WHERE reference = $2`, [nowIso, reference]);
       } catch (sqlErr) {
         console.warn('[Payment Credit] SQL update error:', sqlErr);
+        throw sqlErr;
       }
+    } else {
+      throw new Error(`Wallet user ${userEmail} was not found while processing successful deposit.`);
     }
   } else if (purpose === 'wdv_voucher') {
     if (Math.abs(amount - 6500) > 0.009) {
@@ -3339,7 +3343,10 @@ const handleKorapayWalletDepositInit = async (req: any, res: any) => {
     const reference = createNevoKoraReference();
     const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
     const host = req.headers['x-forwarded-host'] || req.get('host');
-    const callbackUrl = `${protocol}://${host}/?deposit_ref=${encodeURIComponent(reference)}`;
+    const callbackUrl = `${protocol}://${host}/`;
+    // KoraPay appends ?reference=<transaction-reference> to the redirect URL.
+    // Keep the redirect URL clean so the provider's canonical reference is received.
+
     const notificationUrl = `${protocol}://${host}/api/payment/webhook/korapay`;
     const createdAt = new Date().toISOString();
 
@@ -3765,7 +3772,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
     const wdvConfig = db.wdvConfig || DEFAULT_WDV_CONFIG;
 
     const mergedSettings = {
-      websiteName: /nevo/i.test(String(settings.websiteName || "")) ? "Nevo" : (settings.websiteName || "Nevo"),
+      websiteName: 'Nevo',
       websiteLogo: settings.websiteLogo || "",
       websiteFavicon: settings.websiteFavicon || "",
       primaryColor: settings.primaryColor || "#0d9488",
@@ -5688,6 +5695,49 @@ app.get('/payment/callback', (req, res) => {
 let databaseReady = false;
 let databaseInitializing = false;
 let databaseRetryTimer: NodeJS.Timeout | null = null;
+let paymentReconcileTimer: NodeJS.Timeout | null = null;
+let paymentReconcileRunning = false;
+
+// Webhooks are the primary confirmation mechanism. This reconciliation loop
+// is a safety net for delayed/missed webhooks or an early browser return. It
+// never trusts the browser: it asks KoraPay's server-side API for final status.
+async function reconcilePendingKorapayDeposits() {
+  if (paymentReconcileRunning || !databaseReady) return;
+  paymentReconcileRunning = true;
+  try {
+    const provider = paymentManager.getProvider('korapay');
+    if (!provider || !provider.isConfigured()) return;
+    const rows = await getAllRows(`SELECT * FROM payment_transactions WHERE provider='korapay' AND purpose='wallet_funding' AND status='pending' ORDER BY createdAt ASC LIMIT 20`);
+    for (const tx of rows || []) {
+      try {
+        const reference = String(tx.providerreference || tx.providerReference || tx.reference || '').trim();
+        if (!reference) continue;
+        const verification = await provider.verifyPayment(reference);
+        if (verification.status === 'successful' && String(verification.currency || '').toUpperCase() === 'NGN') {
+          const expected = Number(tx.amount || 0);
+          const paid = Number(verification.amount || 0);
+          if (Number.isFinite(paid) && Math.abs(paid - expected) <= 0.009) {
+            await processSuccessfulPayment({
+              reference: String(tx.reference),
+              providerName: 'korapay',
+              verifiedAmount: paid,
+              providerReference: verification.providerReference || reference,
+              rawData: verification.rawResponse || {}
+            });
+          }
+        } else if (verification.status === 'failed') {
+          await execute(`UPDATE payment_transactions SET status='failed', verifiedAt=$1, webhookData=$2 WHERE reference=$3`, [new Date().toISOString(), JSON.stringify(verification.rawResponse || {}), tx.reference]);
+        }
+      } catch (txErr) {
+        console.warn('[Nevo Payment Reconcile] Could not reconcile', tx.reference, txErr);
+      }
+    }
+  } catch (err) {
+    console.warn('[Nevo Payment Reconcile] Sweep failed:', err);
+  } finally {
+    paymentReconcileRunning = false;
+  }
+}
 
 app.get('/api/health', (_req, res) => {
   res.status(200).json({
@@ -5717,6 +5767,10 @@ async function initializeDatabaseWithRetry() {
 
     databaseReady = true;
     databaseInitializing = false;
+    if (!paymentReconcileTimer) {
+      void reconcilePendingKorapayDeposits();
+      paymentReconcileTimer = setInterval(() => void reconcilePendingKorapayDeposits(), 15000);
+    }
     if (databaseRetryTimer) {
       clearInterval(databaseRetryTimer);
       databaseRetryTimer = null;

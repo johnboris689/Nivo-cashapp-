@@ -119,7 +119,7 @@ export class KorapayProvider implements IPaymentProvider {
       provider: 'korapay',
       reference: txData.reference || reference,
       providerReference: txData.payment_reference || txData.transaction_reference,
-      amount: Number(txData.amount) || 0,
+      amount: Number(txData.amount_paid ?? txData.amount) || 0,
       currency: txData.currency || 'NGN',
       status: isSuccessful ? 'successful' : txData.status === 'failed' ? 'failed' : 'pending',
       success: isSuccessful,
@@ -146,7 +146,7 @@ export class KorapayProvider implements IPaymentProvider {
       return { isValid: false, provider: 'korapay' };
     }
 
-    const event = payload?.event;
+    const event = String(payload?.event || '').toLowerCase();
     const data = payload?.data;
 
     const isSuccessEvent =
