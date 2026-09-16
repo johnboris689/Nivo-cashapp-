@@ -483,15 +483,19 @@ export async function initDb() {
     await execute(`CREATE INDEX IF NOT EXISTS idx_ad_rewards_user ON ad_rewards(userEmail)`);
   } catch (e) {}
   try {
-    const taskCount = await getRow(`SELECT COUNT(*) as count FROM nivo_tasks`);
-    if (!taskCount || Number(taskCount.count || 0) === 0) {
-      const tasks = [
-        ['task-1','Follow Nevo on X','Follow the official Nevo social account for product updates and announcements.',500,'social','https://x.com/Nevo','proof',0,'Enter your X username or profile link.'],
-        ['task-2','Join the Nevo Telegram Community','Join the official community to receive updates and reward announcements.',600,'social','https://t.me/Nevo','proof',0,'Enter your Telegram username.'],
-        ['task-3','Daily Check-In','Visit the featured Nevo page for 30 seconds to complete today’s check-in.',300,'daily','/','timer',30,''],
-        ['task-4','Watch Advert & Earn','Watch the featured advert for 45 seconds and submit completion.',500,'special','/','timer',45,'']
-      ];
-      for (const t of tasks) await execute(`INSERT INTO nivo_tasks (id,title,description,rewardAmount,category,actionUrl,verificationType,timerSeconds,proofInstructions,enabled,createdAt,completionCount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,1,$10,0)`, [...t, new Date().toISOString()]);
+    // Ensure the standard Nevo tasks exist individually so the task wall and
+    // admin task manager always use the same database-backed task records.
+    const tasks = [
+      ['task-1','Follow Nevo on X','Follow the official Nevo social account for product updates and announcements.',500,'social','https://x.com/Nevo','proof',0,'Enter your X username or profile link.'],
+      ['task-2','Join the Nevo Telegram Community','Join the official community to receive updates and reward announcements.',600,'social','https://t.me/Nevo','proof',0,'Enter your Telegram username.'],
+      ['task-3','Daily Check-In','Visit the featured Nevo page for 30 seconds to complete today’s check-in.',300,'daily','/','timer',30,''],
+      ['task-4','Watch Advert & Earn','Watch the featured advert for 45 seconds and submit completion.',500,'special','/','timer',45,'']
+    ];
+    for (const t of tasks) {
+      const existing = await getRow(`SELECT id FROM nivo_tasks WHERE id=$1`, [t[0]]);
+      if (!existing) {
+        await execute(`INSERT INTO nivo_tasks (id,title,description,rewardAmount,category,actionUrl,verificationType,timerSeconds,proofInstructions,enabled,createdAt,completionCount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,1,$10,0)`, [...t, new Date().toISOString()]);
+      }
     }
   } catch (e) { console.warn('[Nevo] Nivo feature seed skipped:', e); }
   try {

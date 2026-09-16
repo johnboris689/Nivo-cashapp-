@@ -131,51 +131,19 @@ export const INITIAL_NOTIFICATIONS: NotificationItem[] = [];
 
 export const FAQS = [
   {
-    question: 'How do I create a Nevo account?',
-    answer: 'Tap Sign Up and enter the requested information. Use an email address you can access and keep your Nevo password private. After registration, your account and any applicable registration bonus are shown in your wallet.'
+    question: 'How do I fund my Nevo wallet?',
+    answer: 'Tap Deposit, choose an amount of at least ₦520, and continue to the fresh KoraPay hosted checkout. Nevo credits your wallet only after KoraPay confirms the payment server-side.'
   },
   {
-    question: 'How do I fund my Nevo wallet?',
-    answer: 'Tap Deposit, choose an amount of at least ₦520, and continue to the KoraPay checkout. Your Nevo wallet is credited only after the payment is successfully confirmed.'
+    question: 'When can I withdraw or spend my wallet balance?',
+    answer: 'Complete at least 5 successful referrals and make a verified KoraPay wallet deposit of at least ₦520. Both requirements are required before wallet-spending and cash-out services are unlocked.'
   },
   {
     question: 'How do I earn on Nevo?',
-    answer: 'You can earn by completing available tasks, taking part in eligible rewarded adverts, and referring genuine new users. Each task or opportunity shows its own instructions and reward before you start.'
+    answer: 'Complete available tasks, watch eligible rewarded adverts, and refer friends. Rewards are recorded in your Nevo account history.'
   },
   {
-    question: 'How do Nevo tasks work?',
-    answer: 'Open the Tasks section, choose an available task, read the instructions carefully, and tap Start. If a task includes an external link, Nevo will open the destination provided for that task. Complete the required action and submit any requested proof.'
-  },
-  {
-    question: 'How do rewarded adverts work?',
-    answer: 'Open the Adverts section and choose an eligible advert. Follow the instructions shown for that advert. Rewards are added only when the required advert activity is successfully completed and accepted.'
-  },
-  {
-    question: 'How do referrals work?',
-    answer: 'Share your personal referral link or code with people you know. Referral rewards depend on genuine users joining through your referral and meeting the requirements shown in Nevo. Duplicate or abusive referrals do not qualify.'
-  },
-  {
-    question: 'When can I withdraw my balance?',
-    answer: 'Withdrawal access requires the eligibility requirements displayed in your Nevo account, including the required successful referrals and verified wallet deposit where applicable. Once eligible, the withdrawal page will show the available options and limits.'
-  },
-  {
-    question: 'What is the minimum withdrawal amount?',
-    answer: 'The normal minimum withdrawal amount is ₦5,000 once your Nevo withdrawal eligibility requirements have been completed.'
-  },
-  {
-    question: 'How does Nevo protect my privacy?',
-    answer: 'Nevo uses account information only for legitimate account, service, transaction, security, and support purposes. We do not sell your personal information to advertisers. See the Privacy Policy for a clear explanation of how your information is handled.'
-  },
-  {
-    question: 'What should I do if I see an incorrect transaction or balance?',
-    answer: 'Check your transaction history first. If the information still appears incorrect, contact Nevo support through an official support channel and provide the relevant transaction details. Never send your password or verification code to anyone.'
-  },
-  {
-    question: 'What should I do if I cannot log in?',
-    answer: 'Use the Forgot Password option to reset your password if available. Make sure you are using the email or username associated with your Nevo account. If you still cannot access the account, contact official Nevo support.'
-  },
-  {
-    question: 'How can I contact Nevo support?',
-    answer: 'Use the official support contact shown on Nevo, including the support email or official Telegram channel. Never trust a person asking for your password, OTP, PIN, or full payment credentials.'
+    question: 'What is the minimum withdrawal?',
+    answer: 'The minimum withdrawal amount is ₦5,000 once your transaction eligibility requirements have been completed.'
   }
 ];

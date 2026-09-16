@@ -4971,7 +4971,6 @@ export default function App() {
                       </button>
                       <div>
                         <h2 className="text-lg font-black font-display text-white">Bank Withdrawal</h2>
-                        <p className="text-[10px] font-mono text-slate-400">Route: /dashboard/withdraw</p>
                       </div>
                     </div>
                     <div className="bg-teal-500/10 border border-teal-500/20 px-3 py-1 rounded-full text-[10px] font-mono font-bold text-teal-400">

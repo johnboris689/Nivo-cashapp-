@@ -139,7 +139,7 @@ export const AdminTasksPage: React.FC = () => {
     try {
       setProcessingSubmissionId(sub.id);
       const res = await api.approveTaskSubmission(sub.id, 'Verified and approved by admin');
-      setMsg({ type: 'success', text: res.message });
+      setMsg({ type: 'success', text: res.message || 'Task submission approved and the reward was credited.' });
       fetchData();
     } catch (err: any) {
       setMsg({ type: 'error', text: err.message || 'Failed to approve submission.' });
@@ -155,7 +155,7 @@ export const AdminTasksPage: React.FC = () => {
     try {
       setProcessingSubmissionId(sub.id);
       const res = await api.rejectTaskSubmission(sub.id, reason);
-      setMsg({ type: 'success', text: res.message });
+      setMsg({ type: 'success', text: res.message || 'Task submission rejected.' });
       fetchData();
     } catch (err: any) {
       setMsg({ type: 'error', text: err.message || 'Failed to reject submission.' });
@@ -510,10 +510,10 @@ export const AdminTasksPage: React.FC = () => {
               <div>
                 <label className="block text-xs font-bold text-zinc-300 mb-1">Action URL (External Target Link)</label>
                 <input
-                  type="url"
+                  type="text"
                   value={actionUrl}
                   onChange={(e) => setActionUrl(e.target.value)}
-                  placeholder="https://..."
+                  placeholder="https://... or /internal-path"
                   className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#8F1D3A]"
                 />
               </div>
