@@ -8,149 +8,81 @@ interface LegalPageProps {
 }
 
 export function TermsOfService({ onBack }: LegalPageProps) {
-  const settings = getCachedSettings();
-  const brandName = settings.websiteName || 'Nevo';
-  const supportPhone = settings.supportPhone || '+2349162845073';
-
   return (
     <div className="flex-1 flex flex-col bg-slate-950 text-white overflow-y-auto no-scrollbar p-6 space-y-6">
       <div className="flex items-center gap-3">
-        <button
-          onClick={onBack}
-          className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white"
-        >
+        <button onClick={onBack} className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white">
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <h4 className="text-base font-bold font-display flex items-center gap-2">
-          <Scale className="h-4 w-4 text-teal-400" />
-          Terms of Service
-        </h4>
+        <h4 className="text-base font-bold font-display flex items-center gap-2"><Scale className="h-4 w-4 text-teal-400" /> Terms of Service</h4>
       </div>
-
-      <p className="text-[11px] text-slate-400">
-        Last updated: July 2026. Please read these terms carefully before utilizing {brandName} services.
-      </p>
-
-      <GlassCard className="p-4 space-y-4 text-[11px] text-slate-300 leading-relaxed font-sans max-h-[600px] overflow-y-auto border-white/5 bg-slate-900/40">
-        <div>
-          <h5 className="font-bold text-white uppercase text-xs mb-1">1. Acceptance of Terms</h5>
-          <p>
-            By accessing or using the {brandName} mobile application ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, you must immediately terminate use of the app.
-          </p>
-        </div>
-
-        <div>
-          <h5 className="font-bold text-white uppercase text-xs mb-1">2. Wallet Balances and Account Funding</h5>
-          <p>
-            {brandName} operates digital wallet balances for Nigeria (Naira). Balances can be used for virtual payments. All direct wallet balances are stored in persistent state. Account funding must be conducted via authorized channels, including manual peer-to-peer transfers or confirmed Withdrawal Voucher (deposit) vouchers.
-          </p>
-        </div>
-
-        <div>
-          <h5 className="font-bold text-white uppercase text-xs mb-1">3. Wallet Deposits</h5>
-          <p>
-            Wallet Deposits are unique cryptographic voucher tokens purchased by users. A deposit voucher is strictly non-refundable and has a fixed face value of ₦6,500. Verification of the deposit code is performed server-side. Users are solely responsible for keeping their active voucher codes secure. Sharing voucher codes is strictly at your own risk.
-          </p>
-        </div>
-
-        <div>
-          <h5 className="font-bold text-white uppercase text-xs mb-1">4. Forbidden Actions & Limits</h5>
-          <p>
-            You agree not to bypass, hack, or simulate voucher codes or verification routines. {brandName} reserves the right to freeze, deduct, or lock user accounts suspected of fraudulent voucher manipulation or fake transfer submissions.
-          </p>
-        </div>
-
-        <div>
-          <h5 className="font-bold text-white uppercase text-xs mb-1">5. Limitation of Liability</h5>
-          <p>
-            {brandName} provides services "as is" and "as available" without any warranty of any kind, either express or implied. Under no circumstances shall {brandName} or its operators be liable for financial loss, direct or indirect, arising from internet disruptions, bank downtime, or user negligence.
-          </p>
-        </div>
-
-        <div>
-          <h5 className="font-bold text-white uppercase text-xs mb-1">6. Contact & Support</h5>
-          <p>
-            For any billing disputes or transfer queries, users must contact official {brandName} representatives through our support live chat or verified WhatsApp link at {supportPhone}.
-          </p>
-        </div>
+      <p className="text-[11px] text-slate-400">Last updated: September 2026. Please read these terms before using Nevo.</p>
+      <GlassCard className="p-4 space-y-5 text-[11px] text-slate-300 leading-relaxed font-sans max-h-[600px] overflow-y-auto border-white/5 bg-slate-900/40">
+        <div><h5 className="font-bold text-white uppercase text-xs mb-1">1. Acceptance</h5><p>By creating or using a Nevo account, you agree to these terms. If you do not agree, please stop using the service.</p></div>
+        <div><h5 className="font-bold text-white uppercase text-xs mb-1">2. Your Account</h5><p>Provide accurate information and keep your password, OTP, PIN, and other security credentials private. Do not share your account with another person.</p></div>
+        <div><h5 className="font-bold text-white uppercase text-xs mb-1">3. Wallet & Deposits</h5><p>Your Nevo wallet shows the balance recorded for your account. Deposits must use the payment option provided by Nevo and are credited after successful confirmation. Do not send money to unofficial accounts.</p></div>
+        <div><h5 className="font-bold text-white uppercase text-xs mb-1">4. Tasks, Adverts & Rewards</h5><p>Tasks, rewarded adverts, referrals, and other earning opportunities have their own instructions and eligibility rules. Rewards are credited after the required activity is successfully completed and accepted.</p></div>
+        <div><h5 className="font-bold text-white uppercase text-xs mb-1">5. Referrals</h5><p>Referral rewards require genuine users who join through your referral information and meet the stated requirements. Duplicate, false, or abusive referrals may not qualify.</p></div>
+        <div><h5 className="font-bold text-white uppercase text-xs mb-1">6. Withdrawals</h5><p>Withdrawals are subject to the eligibility requirements, limits, and account verification shown by Nevo. Provide correct bank details and review them before submitting a withdrawal.</p></div>
+        <div><h5 className="font-bold text-white uppercase text-xs mb-1">7. Fair Use</h5><p>Do not manipulate rewards, submit false information, interfere with the service, abuse task or referral systems, or attempt unauthorized access.</p></div>
+        <div><h5 className="font-bold text-white uppercase text-xs mb-1">8. Account Restrictions</h5><p>Nevo may restrict an account while reviewing suspicious activity, security concerns, or possible violations of these terms. Contact official support if you need assistance.</p></div>
+        <div><h5 className="font-bold text-white uppercase text-xs mb-1">9. Service Changes</h5><p>Features, rewards, limits, and requirements may change as Nevo develops its services. Important changes will be communicated through the platform where appropriate.</p></div>
+        <div><h5 className="font-bold text-white uppercase text-xs mb-1">10. Contact</h5><p>For account or transaction questions, contact Nevo through an official support channel shown on the platform. Never send your password, OTP, or PIN to support or to another user.</p></div>
       </GlassCard>
-
-      <button
-        onClick={onBack}
-        className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
-      >
-        Acknowledge & Close
-      </button>
+      <button onClick={onBack} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-teal-500 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer">Acknowledge & Close</button>
     </div>
   );
 }
 
 export function PrivacyPolicy({ onBack }: LegalPageProps) {
-  const settings = getCachedSettings();
-  const brandName = settings.websiteName || 'Nevo';
+  const brandName = 'Nevo';
 
   return (
     <div className="flex-1 flex flex-col bg-slate-950 text-white overflow-y-auto no-scrollbar p-6 space-y-6">
       <div className="flex items-center gap-3">
-        <button
-          onClick={onBack}
-          className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white"
-        >
+        <button onClick={onBack} className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white">
           <ArrowLeft className="h-4 w-4" />
         </button>
         <h4 className="text-base font-bold font-display flex items-center gap-2">
-          <Shield className="h-4 w-4 text-teal-400" />
-          Privacy Policy
+          <Shield className="h-4 w-4 text-teal-400" /> Privacy Policy
         </h4>
       </div>
 
-      <p className="text-[11px] text-slate-400">
-        Last updated: July 2026. Your privacy and secure data processing is our primary concern.
-      </p>
+      <p className="text-[11px] text-slate-400">Last updated: September 2026. Your privacy matters to Nevo.</p>
 
-      <GlassCard className="p-4 space-y-4 text-[11px] text-slate-300 leading-relaxed font-sans max-h-[600px] overflow-y-auto border-white/5 bg-slate-900/40">
+      <GlassCard className="p-4 space-y-5 text-[11px] text-slate-300 leading-relaxed font-sans max-h-[600px] overflow-y-auto border-white/5 bg-slate-900/40">
         <div>
           <h5 className="font-bold text-white uppercase text-xs mb-1">1. Information We Collect</h5>
-          <p>
-            We collect personal identifier information to establish your {brandName} digital wallet account: Full Name, email address, password hash, and set passcode credentials.
-          </p>
+          <p>Nevo may collect information you provide when you create and use your account, including your name, email address, phone number, account details, and information needed for wallet activity. We may also keep records of tasks, rewards, referrals, deposits, withdrawals, and other activity on your account.</p>
         </div>
-
         <div>
-          <h5 className="font-bold text-white uppercase text-xs mb-1">2. Secure Cryptographic Passwords</h5>
-          <p>
-            All account passwords are encrypted and securely hashed server-side using cryptographic SHA-256 protocols. Your actual password string is never stored in plain text or exposed to operators, ensuring complete safety.
-          </p>
+          <h5 className="font-bold text-white uppercase text-xs mb-1">2. How We Use Your Information</h5>
+          <p>We use your information to provide Nevo services, maintain your account, keep wallet and reward records accurate, process transactions, provide support, protect accounts, prevent abuse, and send important service communications.</p>
         </div>
-
         <div>
-          <h5 className="font-bold text-white uppercase text-xs mb-1">3. Local Biometric Data Handling</h5>
-          <p>
-            We utilize standard web biometric credential APIs to enable secure finger logins. Your physical fingerprint coordinates and biometric maps are strictly retained locally by your device’s secure hardware enclave (Android Keystore / iOS Secure Enclave) and are NEVER sent to or stored on our servers.
-          </p>
+          <h5 className="font-bold text-white uppercase text-xs mb-1">3. Your Account Security</h5>
+          <p>Your password and security credentials are private. Nevo does not ask you to share your password, OTP, PIN, or other security credentials with another person. You should contact official support if you believe your account has been accessed without permission.</p>
         </div>
-
         <div>
-          <h5 className="font-bold text-white uppercase text-xs mb-1">4. How We Use Your Data</h5>
-          <p>
-            Your information is processed to authorize login sessions, compute and persist active balances, display secure transaction receipts, verify manual bank deposits, and facilitate bill settlement operations.
-          </p>
+          <h5 className="font-bold text-white uppercase text-xs mb-1">4. Payments & Transactions</h5>
+          <p>Information needed to complete and verify deposits or withdrawals may be processed for those transactions and for maintaining an accurate account history. Only use the payment options presented by Nevo.</p>
         </div>
-
         <div>
-          <h5 className="font-bold text-white uppercase text-xs mb-1">5. Third-Party Sharing</h5>
-          <p>
-            {brandName} does not trade, sell, or disclose user data to marketing corporations. Account verification matches are shared solely with authorized banking APIs to confirm recipient names before routing transaction cashouts.
-          </p>
+          <h5 className="font-bold text-white uppercase text-xs mb-1">5. Sharing Information</h5>
+          <p>Nevo does not sell your personal information to advertisers. Information may be shared with trusted service providers when necessary to provide a requested service, complete a transaction, protect users, prevent fraud, or meet a lawful requirement.</p>
+        </div>
+        <div>
+          <h5 className="font-bold text-white uppercase text-xs mb-1">6. Your Choices</h5>
+          <p>You can contact Nevo about correcting account information or raising a privacy concern. Some records may need to be retained for legitimate transaction, security, or legal purposes.</p>
+        </div>
+        <div>
+          <h5 className="font-bold text-white uppercase text-xs mb-1">7. Updates</h5>
+          <p>If our services or privacy practices change, we may update this policy. The latest version will be available on Nevo.</p>
         </div>
       </GlassCard>
 
-      <button
-        onClick={onBack}
-        className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
-      >
-        Acknowledge & Close
-      </button>
+      <button onClick={onBack} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer">Acknowledge & Close</button>
     </div>
   );
 }
+
