@@ -206,7 +206,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
               <span className="text-white font-black text-xs tracking-tighter">NV</span>
             </div>
             <span className="text-sm font-black tracking-tight bg-gradient-to-r from-teal-400 to-indigo-300 bg-clip-text text-transparent">
-              Nevo
+              {getCachedSettings().websiteName || 'Nevo'}
             </span>
           </div>
 
@@ -246,7 +246,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
               Congratulations!
             </h1>
             <p className="text-sm font-semibold text-teal-300 tracking-wide">
-              Your Nevo account is ready, and your ₦750 registration bonus has been credited to your account. Start earning with tasks and adverts.
+              Your Nevo account is ready. Start earning with tasks and adverts.
             </p>
           </div>
 

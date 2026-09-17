@@ -11,11 +11,13 @@ import {
   Bot,
   FileText,
   Gift,
+  Megaphone,
   LogOut
 } from 'lucide-react';
 
 export type AdminTab =
   | 'overview'
+  | 'adverts'
   | 'users'
   | 'voucher_generator'
   | 'payments'
@@ -59,6 +61,7 @@ export default function AdminSidebar({
     badgeColor?: string;
   }[] = [
     { id: 'overview', label: 'Dashboard Overview', icon: BarChart3 },
+    { id: 'adverts', label: 'Advert Management', icon: Megaphone },
     { id: 'nivo_rewards', label: 'Tasks & Rewards', icon: Gift },
     {
       id: 'users',

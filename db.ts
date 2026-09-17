@@ -51,6 +51,7 @@ interface JsonData {
   nivo_activations?: any[];
   ad_reward_sessions?: any[];
   ad_rewards?: any[];
+  nevo_adverts?: any[];
 }
 
 // -------------------- JSON DATABASE ENGINE FALLBACK --------------------
@@ -115,7 +116,8 @@ function getJsonDb(): JsonData {
       ai_chat_logs: [],
       ai_custom_faqs: [], nivo_tasks: [], nivo_task_submissions: [], nivo_referrals: [], nivo_activations: [],
       ad_reward_sessions: [],
-      ad_rewards: []
+      ad_rewards: [],
+      nevo_adverts: []
     };
     fs.writeFileSync(JSON_FILE, JSON.stringify(initial, null, 2));
     return initial;
@@ -290,7 +292,8 @@ function getJsonDb(): JsonData {
       nivo_referrals: parsed.nivo_referrals || [],
       nivo_activations: parsed.nivo_activations || [],
       ad_reward_sessions: parsed.ad_reward_sessions || [],
-      ad_rewards: parsed.ad_rewards || []
+      ad_rewards: parsed.ad_rewards || [],
+      nevo_adverts: parsed.nevo_adverts || []
     };
 
     // Migrations
@@ -483,21 +486,53 @@ export async function initDb() {
     await execute(`CREATE INDEX IF NOT EXISTS idx_ad_rewards_user ON ad_rewards(userEmail)`);
   } catch (e) {}
   try {
-    // Ensure the standard Nevo tasks exist individually so the task wall and
-    // admin task manager always use the same database-backed task records.
-    const tasks = [
-      ['task-1','Follow Nevo on X','Follow the official Nevo social account for product updates and announcements.',500,'social','https://x.com/Nevo','proof',0,'Enter your X username or profile link.'],
-      ['task-2','Join the Nevo Telegram Community','Join the official community to receive updates and reward announcements.',600,'social','https://t.me/Nevo','proof',0,'Enter your Telegram username.'],
-      ['task-3','Daily Check-In','Visit the featured Nevo page for 30 seconds to complete today’s check-in.',300,'daily','/','timer',30,''],
-      ['task-4','Watch Advert & Earn','Watch the featured advert for 45 seconds and submit completion.',500,'special','/','timer',45,'']
-    ];
-    for (const t of tasks) {
-      const existing = await getRow(`SELECT id FROM nivo_tasks WHERE id=$1`, [t[0]]);
-      if (!existing) {
-        await execute(`INSERT INTO nivo_tasks (id,title,description,rewardAmount,category,actionUrl,verificationType,timerSeconds,proofInstructions,enabled,createdAt,completionCount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,1,$10,0)`, [...t, new Date().toISOString()]);
-      }
+    const taskCount = await getRow(`SELECT COUNT(*) as count FROM nivo_tasks`);
+    if (!taskCount || Number(taskCount.count || 0) === 0) {
+      const tasks = [
+        ['task-1','Follow Nevo on X','Follow the official Nevo social account for product updates and announcements.',500,'social','https://x.com/Nevo','proof',0,'Enter your X username or profile link.'],
+        ['task-2','Join the Nevo Telegram Community','Join the official community to receive updates and reward announcements.',600,'social','https://t.me/Nevo','proof',0,'Enter your Telegram username.'],
+        ['task-3','Daily Check-In','Visit the featured Nevo page for 30 seconds to complete today’s check-in.',300,'daily','/','timer',30,''],
+        ['task-4','Watch Advert & Earn','Watch the featured advert for 45 seconds and submit completion.',500,'special','/','timer',45,'']
+      ];
+      for (const t of tasks) await execute(`INSERT INTO nivo_tasks (id,title,description,rewardAmount,category,actionUrl,verificationType,timerSeconds,proofInstructions,enabled,createdAt,completionCount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,1,$10,0)`, [...t, new Date().toISOString()]);
     }
   } catch (e) { console.warn('[Nevo] Nivo feature seed skipped:', e); }
+
+  await execute(`CREATE TABLE IF NOT EXISTS nevo_adverts (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    destinationUrl TEXT NOT NULL,
+    rewardAmount REAL DEFAULT 200,
+    bannerUrl TEXT,
+    category TEXT DEFAULT 'sponsored',
+    clicks INTEGER DEFAULT 0,
+    impressions INTEGER DEFAULT 0,
+    isActive INTEGER DEFAULT 1,
+    createdAt TEXT,
+    updatedAt TEXT
+  )`);
+  try {
+    const advertCount = await getRow(`SELECT COUNT(*) as count FROM nevo_adverts`);
+    if (!advertCount || Number(advertCount.count || 0) === 0) {
+      const defaultAdverts = [
+        ['adv-1', 'Kuda Digital Bank', 'Open a zero-fee smart bank account with free monthly interbank transfers, automatic budgeting, and virtual debit cards.', 'https://kuda.com', 250, 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop&q=80', 'Fintech', 145, 1200, 1],
+        ['adv-2', 'OPay Daily Rewards & Cashback', 'Experience lightning-fast bill payments, daily cashback rewards, and flexible high-yield savings plans.', 'https://opayweb.com', 200, 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&auto=format&fit=crop&q=80', 'Finance', 98, 850, 1],
+        ['adv-3', 'Jumia Nigeria Mega Deals', 'Shop verified gadgets, smartphones, home electronics, and trendy fashion with swift doorstep delivery nationwide.', 'https://www.jumia.com.ng', 200, 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=600&auto=format&fit=crop&q=80', 'Shopping', 210, 1940, 1],
+        ['adv-4', 'MTN 5G Broadband', 'Supercharge your daily remote work and streaming with lightning-speed 5G broadband and bundled data packages.', 'https://www.mtn.ng', 300, 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80', 'Telecom', 167, 1420, 1],
+        ['adv-5', 'PiggyVest SafeLock & Savings', 'Lock your funds safely, earn up to 13% p.a. interest, and build ironclad financial discipline with automated targets.', 'https://www.piggyvest.com', 250, 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=600&auto=format&fit=crop&q=80', 'Investment', 189, 1650, 1]
+      ];
+      for (const ad of defaultAdverts) {
+        await execute(
+          `INSERT INTO nevo_adverts (id, title, description, destinationUrl, rewardAmount, bannerUrl, category, clicks, impressions, isActive, createdAt, updatedAt) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+          [...ad, new Date().toISOString(), new Date().toISOString()]
+        );
+      }
+    }
+  } catch (adSeedErr) {
+    console.warn('[Nevo DB] Adverts seed warning:', adSeedErr);
+  }
+
   try {
     await execute(`ALTER TABLE vouchers ADD COLUMN IF NOT EXISTS redeemedBy TEXT DEFAULT '[]'`);
   } catch (e) {}

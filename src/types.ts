@@ -398,3 +398,21 @@ export interface SimulatedEmail {
   date: string;
   read: boolean;
 }
+
+export interface Advert {
+  id: string;
+  title: string;
+  description: string;
+  destinationUrl: string;
+  rewardAmount: number;
+  bannerUrl?: string;
+  category?: string;
+  clicks: number;
+  impressions: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export type AdminAdvert = Advert;
+

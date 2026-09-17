@@ -310,7 +310,81 @@ interface DBStructure {
   admins?: AdminState[];
   ad_reward_sessions?: any[];
   ad_rewards?: any[];
+  nevo_adverts?: any[];
 }
+
+const DEFAULT_ADVERTS = [
+  {
+    id: 'adv-1',
+    title: 'Kuda Digital Bank',
+    description: 'Open a zero-fee smart bank account with free monthly interbank transfers, automatic budgeting, and virtual debit cards.',
+    destinationUrl: 'https://kuda.com',
+    rewardAmount: 250,
+    bannerUrl: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop&q=80',
+    category: 'Fintech',
+    clicks: 145,
+    impressions: 1200,
+    isActive: true,
+    createdAt: '2026-01-10T10:00:00Z',
+    updatedAt: '2026-01-10T10:00:00Z'
+  },
+  {
+    id: 'adv-2',
+    title: 'OPay Daily Rewards & Cashback',
+    description: 'Experience lightning-fast bill payments, daily cashback rewards, and flexible high-yield savings plans.',
+    destinationUrl: 'https://opayweb.com',
+    rewardAmount: 200,
+    bannerUrl: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&auto=format&fit=crop&q=80',
+    category: 'Finance',
+    clicks: 98,
+    impressions: 850,
+    isActive: true,
+    createdAt: '2026-01-12T10:00:00Z',
+    updatedAt: '2026-01-12T10:00:00Z'
+  },
+  {
+    id: 'adv-3',
+    title: 'Jumia Nigeria Mega Deals',
+    description: 'Shop verified gadgets, smartphones, home electronics, and trendy fashion with swift doorstep delivery nationwide.',
+    destinationUrl: 'https://www.jumia.com.ng',
+    rewardAmount: 200,
+    bannerUrl: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=600&auto=format&fit=crop&q=80',
+    category: 'Shopping',
+    clicks: 210,
+    impressions: 1940,
+    isActive: true,
+    createdAt: '2026-01-15T10:00:00Z',
+    updatedAt: '2026-01-15T10:00:00Z'
+  },
+  {
+    id: 'adv-4',
+    title: 'MTN 5G Broadband',
+    description: 'Supercharge your daily remote work and streaming with lightning-speed 5G broadband and bundled data packages.',
+    destinationUrl: 'https://www.mtn.ng',
+    rewardAmount: 300,
+    bannerUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
+    category: 'Telecom',
+    clicks: 167,
+    impressions: 1420,
+    isActive: true,
+    createdAt: '2026-01-18T10:00:00Z',
+    updatedAt: '2026-01-18T10:00:00Z'
+  },
+  {
+    id: 'adv-5',
+    title: 'PiggyVest SafeLock & Savings',
+    description: 'Lock your funds safely, earn up to 13% p.a. interest, and build ironclad financial discipline with automated targets.',
+    destinationUrl: 'https://www.piggyvest.com',
+    rewardAmount: 250,
+    bannerUrl: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=600&auto=format&fit=crop&q=80',
+    category: 'Investment',
+    clicks: 189,
+    impressions: 1650,
+    isActive: true,
+    createdAt: '2026-01-20T10:00:00Z',
+    updatedAt: '2026-01-20T10:00:00Z'
+  }
+];
 
 // -------------------- SQL DATABASE CACHE PRELOADER --------------------
 let dbCache: DBStructure = {
@@ -321,7 +395,8 @@ let dbCache: DBStructure = {
   wdvConfig: { ...DEFAULT_WDV_CONFIG },
   admins: [],
   ad_reward_sessions: [],
-  ad_rewards: []
+  ad_rewards: [],
+  nevo_adverts: [...DEFAULT_ADVERTS]
 };
 
 function safeParseJson(val: any, fallback: any = []): any {
@@ -435,6 +510,29 @@ async function loadDbCache() {
       type: row.type
     }));
 
+    // Fetch adverts
+    let adverts: any[] = [];
+    try {
+      const advertRows = await getAllRows(`SELECT * FROM nevo_adverts ORDER BY createdAt DESC`);
+      adverts = advertRows.map((row: any) => ({
+        id: row.id,
+        title: row.title,
+        description: row.description || '',
+        destinationUrl: row.destinationurl || row.destinationUrl,
+        rewardAmount: Number(row.rewardamount ?? row.rewardAmount ?? 200),
+        bannerUrl: row.bannerurl || row.bannerUrl || '',
+        category: row.category || 'sponsored',
+        clicks: Number(row.clicks || 0),
+        impressions: Number(row.impressions || 0),
+        isActive: row.isactive === 1 || row.isActive === 1 || row.isActive === true || row.isactive === true,
+        createdAt: row.createdat || row.createdAt || new Date().toISOString(),
+        updatedAt: row.updatedat || row.updatedAt || new Date().toISOString()
+      }));
+    } catch (_) {}
+    if (adverts.length === 0) {
+      adverts = [...DEFAULT_ADVERTS];
+    }
+
     dbCache = {
       users,
       vouchers,
@@ -443,7 +541,8 @@ async function loadDbCache() {
       wdvConfig,
       admins,
       ad_reward_sessions: [],
-      ad_rewards: []
+      ad_rewards: [],
+      nevo_adverts: adverts
     };
     console.log(`[Nevo DB] Successfully preloaded ${users.length} users, ${vouchers.length} vouchers, and ${logs.length} diagnostic logs.`);
   } catch (err) {
@@ -618,6 +717,43 @@ async function persistDbCache(data: DBStructure) {
             await execute(`UPDATE admin_settings SET value = $1 WHERE key = $2`, [value, key]);
           } catch (_) {}
         }
+      }
+    }
+
+    // 5. Save Adverts to nevo_adverts
+    if (data.nevo_adverts && Array.isArray(data.nevo_adverts)) {
+      for (const ad of data.nevo_adverts) {
+        try {
+          await execute(`
+            INSERT INTO nevo_adverts (
+              id, title, description, destinationUrl, rewardAmount, bannerUrl, category, clicks, impressions, isActive, createdAt, updatedAt
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+            ON CONFLICT(id) DO UPDATE SET
+              title = EXCLUDED.title,
+              description = EXCLUDED.description,
+              destinationUrl = EXCLUDED.destinationUrl,
+              rewardAmount = EXCLUDED.rewardAmount,
+              bannerUrl = EXCLUDED.bannerUrl,
+              category = EXCLUDED.category,
+              clicks = EXCLUDED.clicks,
+              impressions = EXCLUDED.impressions,
+              isActive = EXCLUDED.isActive,
+              updatedAt = EXCLUDED.updatedAt
+          `, [
+            ad.id,
+            ad.title,
+            ad.description || '',
+            ad.destinationUrl,
+            Number(ad.rewardAmount || 200),
+            ad.bannerUrl || '',
+            ad.category || 'sponsored',
+            Number(ad.clicks || 0),
+            Number(ad.impressions || 0),
+            ad.isActive ? 1 : 0,
+            ad.createdAt || new Date().toISOString(),
+            ad.updatedAt || new Date().toISOString()
+          ]);
+        } catch (_) {}
       }
     }
   } catch (err) {
@@ -3798,7 +3934,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       timezone: settings.timezone || "Africa/Lagos",
       country: settings.country || "Nigeria",
       scrollingAnnouncement: settings.scrollingAnnouncement || "Welcome to Nevo! Complete tasks, watch adverts and earn money.",
-      liveFeedText: settings.liveFeedText || "Verified live activity will appear here automatically.",
+      liveFeedText: settings.liveFeedText || "Chioma O. just completed a task • Yusuf D. earned ₦750",
       welcomeMessage: settings.welcomeMessage || "Welcome to Nevo",
       dashboardBanner: settings.dashboardBanner || "Get started with fast manual voucher activation & seamless transfers",
       noticeBarText: settings.noticeBarText || "",
@@ -3833,7 +3969,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       websiteUrl: (settings.websiteUrl && !/nevo/i.test(settings.websiteUrl)) ? settings.websiteUrl : "https://nevo.ng",
       privacyPolicy: (settings.privacyPolicy && !/nevo/i.test(settings.privacyPolicy)) ? settings.privacyPolicy : "Nevo Privacy Policy details...",
       termsOfService: (settings.termsOfService && !/nevo/i.test(settings.termsOfService)) ? settings.termsOfService : "Nevo Terms of Service details...",
-      aboutUs: (settings.aboutUs && !/(swiftpay|legacy_voucher|settlement voucher|cashout)/i.test(settings.aboutUs)) ? settings.aboutUs : "Nevo is a digital rewards and wallet platform built to give users simple, transparent ways to earn through verified tasks, referrals and other available opportunities.",
+      aboutUs: (settings.aboutUs && !/nevo/i.test(settings.aboutUs)) ? settings.aboutUs : "Nevo is Nigeria's premier digital financial rewards and wallet platform...",
       contactUs: settings.contactUs || "Contact support via WhatsApp or Email.",
       faqContent: settings.faqContent || "Frequently Asked Questions...",
 
@@ -4264,7 +4400,7 @@ app.post('/api/nivo/tasks/:id/start', authenticateToken, async (req:any,res:any)
   try { const task=await getRow(`SELECT * FROM nivo_tasks WHERE id=$1 AND enabled=1`,[req.params.id]); if(!task) return res.status(404).json({error:'Task not found.'}); const email=String(req.userEmail).toLowerCase(); const existing=await getRow(`SELECT * FROM nivo_task_submissions WHERE LOWER(userId)=LOWER($1) AND taskId=$2 AND status NOT IN ('rejected') ORDER BY createdAt DESC`,[email,req.params.id]); const now=new Date().toISOString(); if(existing){await execute(`UPDATE nivo_task_submissions SET startedAt=$1 WHERE id=$2`,[now,existing.id]); return res.json({message:'Task timer started.',submission:{...existing,startedAt:now}});} const id=`sub-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`; await execute(`INSERT INTO nivo_task_submissions (id,userId,taskId,taskTitle,rewardAmount,verificationType,status,startedAt,completedAt,claimedAt,proofText,adminNote,createdAt) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'','','','',$9)`,[id,email,task.id,task.title,Number(task.rewardamount||0),task.verificationtype||'timer','in_progress',now,now]); res.json({message:'Task started.',submission:{id,taskId:task.id,status:'in_progress',startedAt:now}}); } catch(e:any){res.status(400).json({error:e.message||'Could not start task.'});}
 });
 app.post('/api/nivo/tasks/:id/submit', authenticateToken, async (req:any,res:any)=>{
-  try { const task=await getRow(`SELECT * FROM nivo_tasks WHERE id=$1 AND enabled=1`,[req.params.id]); if(!task) return res.status(404).json({error:'Task not found.'}); const email=String(req.userEmail).toLowerCase(); const sub=await getRow(`SELECT * FROM nivo_task_submissions WHERE LOWER(userId)=LOWER($1) AND taskId=$2 ORDER BY createdAt DESC`,[email,req.params.id]); if(!sub) return res.status(400).json({error:'Start the task first.'}); const now=Date.now(); const started=new Date(sub.startedat||sub.startedAt).getTime(); const seconds=Number(task.timerseconds||0); if((task.verificationtype||'timer')==='timer' && now-started < seconds*1000) return res.status(400).json({error:`Please complete the ${seconds}-second task before submitting.`}); const proof=String(req.body?.proofText||'').trim(); if((task.verificationtype||'timer')==='proof' && !proof) return res.status(400).json({error:'Please provide the requested proof.'}); const status=(task.verificationtype||'timer')==='timer'?'approved':'pending_verification'; await execute(`UPDATE nivo_task_submissions SET status=$1, completedAt=$2, proofText=$3 WHERE id=$4`,[status,new Date().toISOString(),proof,sub.id]); if(status==='approved'){ const db=readDb(); const user=db.users.find((u:any)=>u.email.toLowerCase()===email); if(user){ const reward=Number(task.rewardamount||0); const before=Number(user.balance||0); user.balance=before+reward; user.totalEarnings=Number(user.totalEarnings||0)+reward; user.notifications=user.notifications||[]; user.notifications.unshift({id:`notif-${Date.now()}`,title:'Task Reward Earned',body:`₦${reward.toLocaleString()} has been added to your wallet for completing ${task.title}.`,date:new Date().toISOString(),unread:true,type:'task'}); user.transactions=user.transactions||[]; user.transactions.unshift({id:`tx-${Date.now()}`,type:'promotional_bonus',amount:reward,date:new Date().toISOString(),status:'success',description:`Task Reward: ${task.title}`}); await writeDb(db); await execute(`UPDATE users SET balance=$1,totalEarnings=$2,notifications=$3,transactions=$4 WHERE LOWER(email)=$5`,[user.balance,user.totalEarnings,JSON.stringify(user.notifications),JSON.stringify(user.transactions),email]); await execute(`UPDATE nivo_tasks SET completionCount=COALESCE(completionCount,0)+1 WHERE id=$1`,[task.id]); await execute(`UPDATE nivo_task_submissions SET claimedAt=$1,status='claimed' WHERE id=$2`,[new Date().toISOString(),sub.id]); }} res.json({success:true,status,credited:status==='approved',message:status==='approved'?'Task completed and reward credited.':'Task submitted for admin verification.'}); } catch(e:any){res.status(400).json({error:e.message||'Could not submit task.'});}
+  try { const task=await getRow(`SELECT * FROM nivo_tasks WHERE id=$1 AND enabled=1`,[req.params.id]); if(!task) return res.status(404).json({error:'Task not found.'}); const email=String(req.userEmail).toLowerCase(); const sub=await getRow(`SELECT * FROM nivo_task_submissions WHERE LOWER(userId)=LOWER($1) AND taskId=$2 ORDER BY createdAt DESC`,[email,req.params.id]); if(!sub) return res.status(400).json({error:'Start the task first.'}); const now=Date.now(); const started=new Date(sub.startedat||sub.startedAt).getTime(); const seconds=Number(task.timerseconds||0); if((task.verificationtype||'timer')==='timer' && now-started < seconds*1000) return res.status(400).json({error:`Please complete the ${seconds}-second task before submitting.`}); const proof=String(req.body?.proofText||'').trim(); if((task.verificationtype||'timer')==='proof' && !proof) return res.status(400).json({error:'Please provide the requested proof.'}); const status=(task.verificationtype||'timer')==='timer'?'approved':'pending_verification'; await execute(`UPDATE nivo_task_submissions SET status=$1, completedAt=$2, proofText=$3 WHERE id=$4`,[status,new Date().toISOString(),proof,sub.id]); if(status==='approved'){ const db=readDb(); const user=db.users.find((u:any)=>u.email.toLowerCase()===email); if(user){ const reward=Number(task.rewardamount||0); const before=Number(user.balance||0); user.balance=before+reward; user.totalEarnings=Number(user.totalEarnings||0)+reward; user.notifications=user.notifications||[]; user.notifications.unshift({id:`notif-${Date.now()}`,title:'Task Reward Earned',body:`₦${reward.toLocaleString()} has been added to your wallet for completing ${task.title}.`,date:new Date().toISOString(),unread:true,type:'task'}); user.transactions=user.transactions||[]; user.transactions.unshift({id:`tx-${Date.now()}`,type:'promotional_bonus',amount:reward,date:new Date().toISOString(),status:'success',description:`Task Reward: ${task.title}`}); await writeDb(db); await execute(`UPDATE users SET balance=$1,totalEarnings=$2,notifications=$3,transactions=$4 WHERE LOWER(email)=$5`,[user.balance,user.totalEarnings,JSON.stringify(user.notifications),JSON.stringify(user.transactions),email]); await execute(`UPDATE nivo_tasks SET completionCount=COALESCE(completionCount,0)+1 WHERE id=$1`,[task.id]); await execute(`UPDATE nivo_task_submissions SET claimedAt=$1,status='claimed' WHERE id=$2`,[new Date().toISOString(),sub.id]); }} res.json({success:true,status,message:status==='approved'?'Task completed and reward credited.':'Task submitted for admin verification.'}); } catch(e:any){res.status(400).json({error:e.message||'Could not submit task.'});}
 });
 app.get('/api/nivo/referrals/stats', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const user=readDb().users.find((u:any)=>u.email.toLowerCase()===email); const records=await getAllRows(`SELECT * FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) ORDER BY createdAt DESC`,[email]); const bonus=Number(user?.totalReferralBonus||0); const forwardedProto=String(req.get('x-forwarded-proto')||'').split(',')[0].trim(); const protocol=forwardedProto || req.protocol || 'https'; res.json({referralCode:user?.referralCode||'',referralLink:user?.referralCode?`${protocol}://${req.get('host')}/register?ref=${user.referralCode}`:'',totalReferrals:records.length,totalBonus:bonus,bonusPerReferral:Number((records[0]?.bonusamount||1000)),records:records.map((r:any)=>({...r,bonusAmount:Number(r.bonusamount||0),referredUserName:r.referredusername||''}))}); } catch(e:any){res.status(500).json({error:e.message});} });
 app.get('/api/nivo/activation/status', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const referralRows=await getAllRows(`SELECT * FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) AND status='successful' ORDER BY createdAt DESC`,[email]); const paymentRows=await getAllRows(`SELECT * FROM payment_transactions WHERE LOWER(userEmail)=LOWER($1) AND purpose='wallet_funding' AND provider='korapay' AND status IN ('successful','settled')`,[email]); const successfulReferrals=referralRows.length; const depositRequirementMet=paymentRows.some((p:any)=>Number(p.amount||0)>=520); res.json({successfulReferrals,referralsRequired:5,depositRequirementMet,depositMinimum:520,canWithdraw:successfulReferrals>=5&&depositRequirementMet}); } catch(e:any){res.status(500).json({error:e.message});} });
@@ -4563,8 +4699,8 @@ app.post('/api/ads/verify', authenticateToken, async (req: any, res: any) => {
 
 // Nivo feature administration endpoints
 app.get('/api/admin/nivo/tasks', authenticateAdminToken, async (_req,res)=>{ try { const tasks=await getAllRows(`SELECT * FROM nivo_tasks ORDER BY createdAt DESC`); const submissions=await getAllRows(`SELECT * FROM nivo_task_submissions ORDER BY createdAt DESC`); res.json({success:true,tasks,submissions}); } catch(e:any){res.status(500).json({error:e.message});} });
-app.post('/api/admin/nivo/tasks', authenticateAdminToken, async (req,res)=>{ try { const b=req.body||{}; if(!String(b.title||'').trim()||!String(b.description||'').trim()||!Number.isFinite(Number(b.rewardAmount))) return res.status(400).json({error:'Title, description and reward are required.'}); const actionUrl=String(b.actionUrl||'/').trim(); let normalizedUrl=actionUrl; if(actionUrl.startsWith('/')) normalizedUrl=actionUrl; else { let parsed:URL; try{ parsed=new URL(actionUrl); }catch{ return res.status(400).json({error:'Enter a valid task URL (https://... or an internal /path).'}); } if(!['http:','https:'].includes(parsed.protocol)) return res.status(400).json({error:'Task link must use http or https.'}); normalizedUrl=parsed.toString(); } const id=`task-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`; await execute(`INSERT INTO nivo_tasks (id,title,description,rewardAmount,category,actionUrl,verificationType,timerSeconds,proofInstructions,enabled,createdAt,completionCount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,0)`,[id,String(b.title).trim(),String(b.description),Number(b.rewardAmount),b.category||'special',normalizedUrl,b.verificationType||'timer',Math.max(0,Number(b.timerSeconds)||0),b.proofInstructions||'',b.enabled===false?0:1,new Date().toISOString()]); res.json({success:true,id}); } catch(e:any){res.status(400).json({error:e.message});} });
-app.patch('/api/admin/nivo/tasks/:id', authenticateAdminToken, async (req,res)=>{ try { const b=req.body||{}; const current=await getRow(`SELECT * FROM nivo_tasks WHERE id=$1`,[req.params.id]); if(!current) return res.status(404).json({error:'Task not found.'}); if(b.actionUrl!==undefined){ const value=String(b.actionUrl||'/').trim(); let normalizedUrl=value; if(!value.startsWith('/')) { let parsed:URL; try{ parsed=new URL(value); }catch{ return res.status(400).json({error:'Task link must be a valid URL or internal /path.'}); } if(!['http:','https:'].includes(parsed.protocol)) return res.status(400).json({error:'Task link must use http or https.'}); normalizedUrl=parsed.toString(); } await execute(`UPDATE nivo_tasks SET actionUrl=$1 WHERE id=$2`,[normalizedUrl,req.params.id]); } if(b.title!==undefined) await execute(`UPDATE nivo_tasks SET title=$1 WHERE id=$2`,[String(b.title).trim(),req.params.id]); if(b.description!==undefined) await execute(`UPDATE nivo_tasks SET description=$1 WHERE id=$2`,[String(b.description),req.params.id]); if(b.category!==undefined) await execute(`UPDATE nivo_tasks SET category=$1 WHERE id=$2`,[String(b.category),req.params.id]); if(b.verificationType!==undefined) await execute(`UPDATE nivo_tasks SET verificationType=$1 WHERE id=$2`,[String(b.verificationType),req.params.id]); if(b.timerSeconds!==undefined) await execute(`UPDATE nivo_tasks SET timerSeconds=$1 WHERE id=$2`,[Math.max(0,Number(b.timerSeconds)||0),req.params.id]); if(b.proofInstructions!==undefined) await execute(`UPDATE nivo_tasks SET proofInstructions=$1 WHERE id=$2`,[String(b.proofInstructions),req.params.id]); if(b.enabled!==undefined) await execute(`UPDATE nivo_tasks SET enabled=$1 WHERE id=$2`,[b.enabled?1:0,req.params.id]); if(b.rewardAmount!==undefined){ const reward=Number(b.rewardAmount); if(!Number.isFinite(reward)||reward<0) return res.status(400).json({error:'Reward must be a valid non-negative number.'}); await execute(`UPDATE nivo_tasks SET rewardAmount=$1 WHERE id=$2`,[reward,req.params.id]); } res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
+app.post('/api/admin/nivo/tasks', authenticateAdminToken, async (req,res)=>{ try { const b=req.body||{}; if(!b.title||!Number.isFinite(Number(b.rewardAmount))) return res.status(400).json({error:'Title and reward are required.'}); const id=`task-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`; await execute(`INSERT INTO nivo_tasks (id,title,description,rewardAmount,category,actionUrl,verificationType,timerSeconds,proofInstructions,enabled,createdAt,completionCount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,0)`,[id,b.title,b.description||'',Number(b.rewardAmount),b.category||'special',b.actionUrl||'/',b.verificationType||'timer',Number(b.timerSeconds||0),b.proofInstructions||'',b.enabled===false?0:1,new Date().toISOString()]); res.json({success:true,id}); } catch(e:any){res.status(400).json({error:e.message});} });
+app.patch('/api/admin/nivo/tasks/:id', authenticateAdminToken, async (req,res)=>{ try { const b=req.body||{}; if(b.enabled!==undefined) await execute(`UPDATE nivo_tasks SET enabled=$1 WHERE id=$2`,[b.enabled?1:0,req.params.id]); if(b.rewardAmount!==undefined) await execute(`UPDATE nivo_tasks SET rewardAmount=$1 WHERE id=$2`,[Number(b.rewardAmount),req.params.id]); res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
 app.delete('/api/admin/nivo/tasks/:id', authenticateAdminToken, async (req,res)=>{ try { await execute(`DELETE FROM nivo_tasks WHERE id=$1`,[req.params.id]); res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
 app.post('/api/admin/nivo/submissions/:id/approve', authenticateAdminToken, async (req,res)=>{ try { const sub=await getRow(`SELECT * FROM nivo_task_submissions WHERE id=$1`,[req.params.id]); if(!sub) return res.status(404).json({error:'Submission not found.'}); if(['approved','claimed'].includes(String(sub.status))) return res.json({success:true,alreadyProcessed:true}); const email=String(sub.userid||sub.userId).toLowerCase(); const db=readDb(); const idx=db.users.findIndex((u:any)=>u.email.toLowerCase()===email); if(idx<0) return res.status(404).json({error:'User not found.'}); const reward=Number(sub.rewardamount||0); db.users[idx].balance=Number(db.users[idx].balance||0)+reward; db.users[idx].totalEarnings=Number(db.users[idx].totalEarnings||0)+reward; db.users[idx].notifications=db.users[idx].notifications||[]; db.users[idx].notifications.unshift({id:`notif-${Date.now()}`,title:'Task Reward Approved',body:`₦${reward.toLocaleString()} has been credited to your wallet.`,date:new Date().toISOString(),unread:true,type:'task'}); db.users[idx].transactions=db.users[idx].transactions||[]; db.users[idx].transactions.unshift({id:`tx-${Date.now()}`,type:'promotional_bonus',amount:reward,date:new Date().toISOString(),status:'success',description:`Task Reward: ${sub.tasktitle||sub.taskTitle}`}); await writeDb(db); await execute(`UPDATE users SET balance=$1,totalEarnings=$2,notifications=$3,transactions=$4 WHERE LOWER(email)=$5`,[db.users[idx].balance,db.users[idx].totalEarnings,JSON.stringify(db.users[idx].notifications),JSON.stringify(db.users[idx].transactions),email]); await execute(`UPDATE nivo_task_submissions SET status='claimed',claimedAt=$1 WHERE id=$2`,[new Date().toISOString(),req.params.id]); await execute(`UPDATE nivo_tasks SET completionCount=COALESCE(completionCount,0)+1 WHERE id=$1`,[sub.taskid||sub.taskId]); res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
 app.post('/api/admin/nivo/submissions/:id/reject', authenticateAdminToken, async (req,res)=>{ try { await execute(`UPDATE nivo_task_submissions SET status='rejected',adminNote=$1 WHERE id=$2`,[String(req.body?.reason||'Rejected by admin'),req.params.id]); res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
@@ -4636,10 +4772,6 @@ app.get('/api/admin/settings', authenticateAdminToken, async (req, res) => {
     for (const r of settingRows) {
       settings[r.key] = r.value;
     }
-    settings.websiteName = 'Nevo';
-    if (/swiftpay|legacy_voucher|settlement voucher|cashout/i.test(String(settings.aboutUs || ''))) {
-      settings.aboutUs = 'Nevo is a digital rewards and wallet platform built to give users simple, transparent ways to earn through verified tasks, referrals and other available opportunities.';
-    }
     res.json({ success: true, settings });
   } catch (err) {
     res.status(500).json({ error: 'Failed to retrieve admin settings' });
@@ -4656,12 +4788,10 @@ const updateAdminSettingsHandler = async (req: any, res: any) => {
   try {
     const settingsToSave: Record<string, string> = {};
     for (const [k, v] of Object.entries(payload)) {
-      if (k !== 'token' && k !== 'websiteName' && v !== undefined && v !== null) {
+      if (k !== 'token' && v !== undefined && v !== null) {
         settingsToSave[k] = String(v);
       }
     }
-    // Nevo is the permanent application brand; legacy brand names cannot be saved.
-    settingsToSave.websiteName = 'Nevo';
 
     for (const [key, val] of Object.entries(settingsToSave)) {
       try {
@@ -5493,54 +5623,365 @@ app.post('/api/admin/wdv/verify', async (req, res) => {
   }
 });
 
+// -------------------- ADMIN USER MANAGEMENT ENDPOINTS --------------------
+
+function serializeAdminUser(u: any, idx = 0) {
+  const txs = u.transactions || [];
+  const totalDeposits = txs
+    .filter((t: any) => t.type === 'credit' || t.type === 'deposit' || t.type === 'voucher_redemption' || t.type === 'promotional_bonus')
+    .reduce((sum: number, t: any) => sum + (t.amount || 0), 0);
+  const totalWithdrawals = txs
+    .filter((t: any) => t.type === 'withdraw' || t.type === 'transfer')
+    .reduce((sum: number, t: any) => sum + (t.amount || 0), 0);
+  const wdvPurchases = txs
+    .filter((t: any) => t.type === 'wdv_purchase' || (t.description && t.description.includes('WDV')) || (t.description && t.description.includes('LEGACY_VOUCHER')))
+    .length;
+
+  const isSuspended = !!(u.isSuspended || u.accountStatus === 'suspended');
+  const balance = Number(u.balance || 0);
+
+  return {
+    id: u.id || u.userId || u.email.toLowerCase(),
+    fullName: u.fullName || 'User',
+    username: u.username || (u.email ? u.email.split('@')[0] : `user${idx}`),
+    email: u.email || '',
+    phone: u.phone || '+2348000000000',
+    balance,
+    walletBalance: balance,
+    bonusBalance: Number(u.bonusBalance || 0),
+    dailyTarget: u.dailyTarget || 50000,
+    dailySpent: u.dailySpent || 0,
+    pinCreated: !!u.pinCreated,
+    biometricEnabled: !!u.biometricEnabled,
+    isSuspended,
+    isFrozen: !!u.isFrozen,
+    status: isSuspended ? 'suspended' : 'active',
+    withdrawalStatus: u.withdrawalStatus || (u.withdrawalBlocked ? 'Blocked' : 'Allowed'),
+    referralCode: u.referralCode || (u.email ? u.email.split('@')[0].toUpperCase() : `NV${idx}`),
+    referralLink: u.referralLink || `https://nevo.ng/ref/${u.referralCode || (u.email ? u.email.split('@')[0].toUpperCase() : `NV${idx}`)}`,
+    referralCount: Number(u.referralCount || u.referrals || 0),
+    totalReferrals: Number(u.referralCount || u.referrals || 0),
+    totalReferralBonus: Number(u.totalReferralBonus || 0),
+    totalEarnings: Number(u.totalEarnings || 0),
+    activationPaid: !!u.activationPaid,
+    activationPaidAt: u.activationPaidAt || null,
+    createdAt: u.registeredAt || u.createdAt || u.date || '2026-01-15T10:00:00Z',
+    registeredAt: u.registeredAt || u.createdAt || u.date || '2026-01-15T10:00:00Z',
+    lastLogin: u.lastLogin || u.registeredAt || '2026-07-28T06:00:00Z',
+    ipAddress: u.ipAddress || '102.89.23.14',
+    tier: u.tier || 3,
+    accountLevel: u.accountLevel || `Tier ${u.tier || 3} Verified`,
+    profilePic: u.profilePic || '',
+    totalDeposits,
+    totalWithdrawals,
+    wdvPurchases,
+    transactions: txs,
+    notifications: u.notifications || []
+  };
+}
+
 // List all users
 app.get('/api/admin/users', authenticateAdminToken, (req, res) => {
   const db = readDb();
-  const safeUsers = db.users.map((u: any, idx: number) => {
-    const txs = u.transactions || [];
-    const totalDeposits = txs
-      .filter((t: any) => t.type === 'credit' || t.type === 'deposit' || t.type === 'voucher_redemption' || t.type === 'promotional_bonus')
-      .reduce((sum: number, t: any) => sum + (t.amount || 0), 0);
-    const totalWithdrawals = txs
-      .filter((t: any) => t.type === 'withdraw' || t.type === 'transfer')
-      .reduce((sum: number, t: any) => sum + (t.amount || 0), 0);
-    const wdvPurchases = txs
-      .filter((t: any) => t.type === 'wdv_purchase' || (t.description && t.description.includes('WDV')))
-      .length;
-
-    return {
-      id: u.id || u.userId || `USR-${(1000 + idx).toString()}`,
-      fullName: u.fullName || 'User',
-      username: u.username || (u.email ? u.email.split('@')[0] : `user${idx}`),
-      email: u.email || '',
-      phone: u.phone || '',
-      balance: u.balance || 0,
-      bonusBalance: u.bonusBalance || 0,
-      dailyTarget: u.dailyTarget || 50000,
-      dailySpent: u.dailySpent || 0,
-      pinCreated: !!u.pinCreated,
-      biometricEnabled: !!u.biometricEnabled,
-      isSuspended: !!u.isSuspended,
-      isFrozen: !!u.isFrozen,
-      withdrawalStatus: u.withdrawalStatus || (u.withdrawalBlocked ? 'Blocked' : 'Allowed'),
-      referralCount: u.referralCount || u.referrals || 0,
-      registeredAt: u.registeredAt || u.createdAt || u.date || '',
-      lastLogin: u.lastLogin || u.registeredAt || '',
-      ipAddress: u.ipAddress || '',
-      tier: u.tier || 3,
-      accountLevel: u.accountLevel || `Tier ${u.tier || 3} Verified`,
-      profilePic: u.profilePic || '',
-      totalDeposits,
-      totalWithdrawals,
-      wdvPurchases,
-      transactions: txs
-    };
-  });
+  const safeUsers = db.users.map((u: any, idx: number) => serializeAdminUser(u, idx));
   res.json({ success: true, users: safeUsers });
 });
 
-// Edit user profile by Admin
-app.post('/api/admin/users/edit', authenticateAdminToken, (req, res) => {
+// Get single user
+app.get('/api/admin/users/:userId', authenticateAdminToken, (req, res) => {
+  const db = readDb();
+  const targetId = req.params.userId.toLowerCase();
+  const user = db.users.find((u: any) => (u.id && String(u.id).toLowerCase() === targetId) || (u.email && u.email.toLowerCase() === targetId));
+  if (!user) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+  res.json(serializeAdminUser(user));
+});
+
+// Balance Adjustment Core Helper with ironclad ledger recording
+async function executeBalanceAdjustment(req: any, res: any, targetIdentifier: string, amountInput: any, typeInput: any, reasonInput: any, balanceDirectInput?: any) {
+  const db = readDb();
+  const target = String(targetIdentifier).toLowerCase();
+  const userIndex = db.users.findIndex((u: any) => (u.id && String(u.id).toLowerCase() === target) || (u.email && u.email.toLowerCase() === target));
+
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found in system directory.' });
+  }
+
+  const user = db.users[userIndex];
+  const oldBalance = Number(user.balance || 0);
+
+  let finalAmount = 0;
+  let finalType: 'credit' | 'debit' = 'credit';
+  let newBalance = oldBalance;
+  const reason = String(reasonInput || '').trim();
+
+  if (balanceDirectInput !== undefined && !isNaN(Number(balanceDirectInput))) {
+    // Direct balance set
+    newBalance = Number(balanceDirectInput);
+    if (newBalance < 0) newBalance = 0;
+    const diff = newBalance - oldBalance;
+    finalType = diff >= 0 ? 'credit' : 'debit';
+    finalAmount = Math.abs(diff);
+  } else {
+    // Delta adjustment
+    finalAmount = Number(amountInput);
+    if (isNaN(finalAmount) || finalAmount < 0) {
+      return res.status(400).json({ error: 'Please supply a valid non-negative adjustment amount.' });
+    }
+    finalType = String(typeInput || '').toLowerCase() === 'debit' ? 'debit' : 'credit';
+    newBalance = finalType === 'credit' ? oldBalance + finalAmount : Math.max(0, oldBalance - finalAmount);
+  }
+
+  // Update user state
+  user.balance = newBalance;
+  if (finalType === 'credit') {
+    user.totalEarnings = Number(user.totalEarnings || 0) + finalAmount;
+  }
+
+  const adminActor = req.adminEmail || 'admin@nevo.ng';
+  const now = new Date().toISOString();
+  const txId = `tx-adm-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
+  const auditReference = `ADJ-${Date.now()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+
+  // 1. Record in user transactions ledger
+  const txRecord = {
+    id: txId,
+    type: finalType === 'credit' ? 'credit' : 'debit',
+    amount: finalAmount,
+    date: now,
+    status: 'success',
+    description: reason ? `Admin ${finalType === 'credit' ? 'Credit' : 'Debit'}: ${reason}` : `Administrative Balance ${finalType === 'credit' ? 'Credit' : 'Debit'}`,
+    narration: `Administrative balance adjustment: ${reason || 'Manual correction'} (authorized by ${adminActor})`,
+    adminEmail: adminActor,
+    balanceAfter: newBalance,
+    reference: auditReference
+  };
+  user.transactions = user.transactions || [];
+  user.transactions.unshift(txRecord);
+
+  // 2. Persist audit ledger record into payment_transactions
+  try {
+    await execute(`
+      INSERT INTO payment_transactions (
+        id, reference, userEmail, userName, amount, currency, provider, providerReference, purpose, status, channel, authorizationUrl, metadata, createdAt, verifiedAt, webhookData
+      ) VALUES ($1, $2, $3, $4, $5, 'NGN', 'admin_ledger', $6, $7, 'successful', 'admin_override', '', $8, $9, $10, '')
+      ON CONFLICT(reference) DO NOTHING
+    `, [
+      `pt-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
+      auditReference,
+      user.email.toLowerCase(),
+      user.fullName || user.username || user.email,
+      finalAmount,
+      auditReference,
+      `admin_${finalType}`,
+      JSON.stringify({
+        adjustedBy: adminActor,
+        reason: reason || 'Manual administrative balance adjustment',
+        previousBalance: oldBalance,
+        newBalance,
+        adjustmentType: finalType
+      }),
+      now,
+      now
+    ]);
+  } catch (auditErr) {
+    console.warn('[Nevo Admin] Audit insertion error:', auditErr);
+  }
+
+  // 3. User notification
+  user.notifications = user.notifications || [];
+  user.notifications.unshift({
+    id: `notif-${Date.now()}`,
+    title: `Wallet Balance ${finalType === 'credit' ? 'Credited' : 'Debited'}`,
+    body: `Your wallet balance was ${finalType === 'credit' ? 'credited with' : 'debited by'} ₦${finalAmount.toLocaleString()}. Reason: ${reason || 'Administrative adjustment'}. New Balance: ₦${newBalance.toLocaleString()}.`,
+    date: now,
+    unread: true,
+    type: 'balance_adjustment'
+  });
+
+  // 4. Save to persistent database
+  await writeDb(db);
+  try {
+    await execute(`UPDATE users SET balance = $1, totalEarnings = $2, transactions = $3, notifications = $4 WHERE LOWER(email) = $5`, [
+      user.balance,
+      user.totalEarnings || 0,
+      JSON.stringify(user.transactions),
+      JSON.stringify(user.notifications),
+      user.email.toLowerCase()
+    ]);
+  } catch (_) {}
+
+  // 5. Log security audit
+  logDiagnostic('SECURITY_ALERT', `Admin ${finalType}ed user balance by ₦${finalAmount}. New Balance: ₦${newBalance}`, {
+    targetUser: user.email,
+    admin: adminActor,
+    finalType,
+    finalAmount,
+    oldBalance,
+    newBalance,
+    reason,
+    auditReference
+  });
+
+  return res.json({
+    success: true,
+    balance: newBalance,
+    user: serializeAdminUser(user, userIndex),
+    transaction: txRecord
+  });
+}
+
+// Adjust user balance (RESTful with userId)
+app.post('/api/admin/users/:userId/adjust-balance', authenticateAdminToken, async (req, res) => {
+  const { amount, type, reason, balance } = req.body;
+  await executeBalanceAdjustment(req, res, req.params.userId, amount, type, reason, balance);
+});
+
+// Adjust user balance (legacy endpoint)
+app.post('/api/admin/users/edit-balance', authenticateAdminToken, async (req, res) => {
+  const { email, balance, amount, type, reason } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: 'Please supply user email.' });
+  }
+  await executeBalanceAdjustment(req, res, email, amount, type, reason, balance);
+});
+
+// Update user status (RESTful with userId)
+app.post('/api/admin/users/:userId/status', authenticateAdminToken, async (req, res) => {
+  const { status } = req.body;
+  const target = req.params.userId.toLowerCase();
+  const db = readDb();
+  const userIndex = db.users.findIndex((u: any) => (u.id && String(u.id).toLowerCase() === target) || (u.email && u.email.toLowerCase() === target));
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  const isSuspended = status === 'suspended';
+  db.users[userIndex].isSuspended = isSuspended;
+  db.users[userIndex].accountStatus = status;
+  await writeDb(db);
+  try {
+    await execute(`UPDATE users SET isSuspended = $1, accountStatus = $2 WHERE LOWER(email) = $3`, [
+      isSuspended ? 1 : 0,
+      status,
+      db.users[userIndex].email.toLowerCase()
+    ]);
+  } catch (_) {}
+
+  logDiagnostic('SECURITY_ALERT', `Admin changed account status of @${db.users[userIndex].email} to ${status}`, {
+    email: db.users[userIndex].email,
+    status
+  });
+
+  res.json(serializeAdminUser(db.users[userIndex], userIndex));
+});
+
+// Update user status flag (legacy endpoint)
+app.post('/api/admin/users/update-status', authenticateAdminToken, async (req, res) => {
+  const { email, field, value } = req.body;
+  if (!email || !field || value === undefined) {
+    return res.status(400).json({ error: 'Please supply email, status parameter, and toggle value.' });
+  }
+
+  const db = readDb();
+  const userIndex = db.users.findIndex((u: any) => u.email.toLowerCase() === email.toLowerCase());
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  db.users[userIndex][field] = !!value;
+  if (field === 'isSuspended') {
+    db.users[userIndex].accountStatus = value ? 'suspended' : 'active';
+  }
+  await writeDb(db);
+
+  logDiagnostic('SECURITY_ALERT', `Admin modified status flag ${field} for user`, { email, flag: field, value });
+
+  res.json({ success: true, user: serializeAdminUser(db.users[userIndex], userIndex) });
+});
+
+// Update activation status (RESTful with userId)
+app.post('/api/admin/users/:userId/activation-status', authenticateAdminToken, async (req, res) => {
+  const { activationPaid } = req.body;
+  const target = req.params.userId.toLowerCase();
+  const db = readDb();
+  const userIndex = db.users.findIndex((u: any) => (u.id && String(u.id).toLowerCase() === target) || (u.email && u.email.toLowerCase() === target));
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  db.users[userIndex].activationPaid = !!activationPaid;
+  db.users[userIndex].activationPaidAt = activationPaid ? new Date().toISOString() : null;
+  await writeDb(db);
+  try {
+    await execute(`UPDATE users SET activationPaid = $1, activationPaidAt = $2 WHERE LOWER(email) = $3`, [
+      activationPaid ? 1 : 0,
+      db.users[userIndex].activationPaidAt,
+      db.users[userIndex].email.toLowerCase()
+    ]);
+  } catch (_) {}
+
+  logDiagnostic('SECURITY_ALERT', `Admin updated activation status for @${db.users[userIndex].email}`, {
+    email: db.users[userIndex].email,
+    activationPaid
+  });
+
+  res.json({ success: true, user: serializeAdminUser(db.users[userIndex], userIndex) });
+});
+
+// Update referral count (RESTful with userId)
+app.post('/api/admin/users/:userId/referral-count', authenticateAdminToken, async (req, res) => {
+  const { referralCount } = req.body;
+  const target = req.params.userId.toLowerCase();
+  const db = readDb();
+  const userIndex = db.users.findIndex((u: any) => (u.id && String(u.id).toLowerCase() === target) || (u.email && u.email.toLowerCase() === target));
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  const count = Number(referralCount) || 0;
+  db.users[userIndex].referralCount = count;
+  (db.users[userIndex] as any).totalReferrals = count;
+  await writeDb(db);
+  try {
+    await execute(`UPDATE users SET referralCount = $1 WHERE LOWER(email) = $2`, [
+      count,
+      db.users[userIndex].email.toLowerCase()
+    ]);
+  } catch (_) {}
+
+  logDiagnostic('SECURITY_ALERT', `Admin updated referral count for @${db.users[userIndex].email}`, {
+    email: db.users[userIndex].email,
+    count
+  });
+
+  res.json({ success: true, user: serializeAdminUser(db.users[userIndex], userIndex) });
+});
+
+// Edit user profile (RESTful with userId)
+app.post('/api/admin/users/:userId/edit', authenticateAdminToken, async (req, res) => {
+  const updatedData = req.body;
+  const target = req.params.userId.toLowerCase();
+  const db = readDb();
+  const userIndex = db.users.findIndex((u: any) => (u.id && String(u.id).toLowerCase() === target) || (u.email && u.email.toLowerCase() === target));
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  db.users[userIndex] = {
+    ...db.users[userIndex],
+    ...updatedData
+  };
+  await writeDb(db);
+
+  logDiagnostic('SECURITY_ALERT', `Admin updated user profile data`, { target, updatedData });
+
+  res.json(serializeAdminUser(db.users[userIndex], userIndex));
+});
+
+// Edit user profile (legacy endpoint)
+app.post('/api/admin/users/edit', authenticateAdminToken, async (req, res) => {
   const { email, updatedData } = req.body;
   if (!email || !updatedData) {
     return res.status(400).json({ error: 'Please supply user email and updatedData object.' });
@@ -5556,74 +5997,37 @@ app.post('/api/admin/users/edit', authenticateAdminToken, (req, res) => {
     ...db.users[userIndex],
     ...updatedData
   };
-  writeDb(db);
+  await writeDb(db);
 
   logDiagnostic('SECURITY_ALERT', `Admin updated user record profile data`, { email, updatedData });
 
-  res.json({ success: true, user: db.users[userIndex] });
+  res.json({ success: true, user: serializeAdminUser(db.users[userIndex], userIndex) });
 });
 
-// Update status flags
-app.post('/api/admin/users/update-status', authenticateAdminToken, (req, res) => {
-  const { email, field, value } = req.body;
-  if (!email || !field || value === undefined) {
-    return res.status(400).json({ error: 'Please supply email, status parameter, and toggle value.' });
-  }
-
+// Reset password by Admin (RESTful with userId)
+app.post('/api/admin/users/:userId/reset-password', authenticateAdminToken, async (req, res) => {
+  const target = req.params.userId.toLowerCase();
   const db = readDb();
-  const userIndex = db.users.findIndex((u: any) => u.email.toLowerCase() === email.toLowerCase());
+  const userIndex = db.users.findIndex((u: any) => (u.id && String(u.id).toLowerCase() === target) || (u.email && u.email.toLowerCase() === target));
   if (userIndex === -1) {
     return res.status(404).json({ error: 'User not found.' });
   }
 
-  db.users[userIndex][field] = !!value;
-  writeDb(db);
+  const tempPass = 'NevoAdmin99!';
+  const hash = bcrypt.hashSync(tempPass, 10);
+  db.users[userIndex].passwordHash = hash;
+  await writeDb(db);
+  try {
+    await execute(`UPDATE users SET passwordHash = $1 WHERE LOWER(email) = $2`, [hash, db.users[userIndex].email.toLowerCase()]);
+  } catch (_) {}
 
-  logDiagnostic('SECURITY_ALERT', `Admin modified status flag ${field} for user`, { email, flag: field, value });
+  logDiagnostic('SECURITY_ALERT', `Admin reset password for user`, { email: db.users[userIndex].email });
 
-  res.json({ success: true });
+  res.json({ success: true, message: 'Password reset to default temporary password.' });
 });
 
-// Adjust balance
-app.post('/api/admin/users/edit-balance', authenticateAdminToken, (req, res) => {
-  const { email, balance } = req.body;
-  if (!email || balance === undefined || isNaN(Number(balance))) {
-    return res.status(400).json({ error: 'Please supply valid user email and numerical balance.' });
-  }
-
-  const db = readDb();
-  const userIndex = db.users.findIndex((u: any) => u.email.toLowerCase() === email.toLowerCase());
-  if (userIndex === -1) {
-    return res.status(404).json({ error: 'User not found.' });
-  }
-
-  const previousBalance = Number(db.users[userIndex].balance || 0);
-  const newBalance = Number(balance);
-  if (!Number.isFinite(newBalance) || newBalance < 0) return res.status(400).json({ error: 'Balance must be a valid non-negative number.' });
-  db.users[userIndex].balance = newBalance;
-  db.users[userIndex].transactions = Array.isArray(db.users[userIndex].transactions) ? db.users[userIndex].transactions : [];
-  if (newBalance !== previousBalance) {
-    db.users[userIndex].transactions.unshift({
-      id: `admin-balance-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
-      type: 'admin_balance_adjustment',
-      amount: newBalance - previousBalance,
-      previousBalance,
-      newBalance,
-      date: new Date().toISOString(),
-      status: 'success',
-      description: `Admin wallet balance adjustment`,
-      narration: `Balance changed from ₦${previousBalance.toLocaleString()} to ₦${newBalance.toLocaleString()}`
-    });
-  }
-  writeDb(db);
-
-  logDiagnostic('SECURITY_ALERT', `Admin modified user balance`, { email, previousBalance, newBalance, difference: newBalance - previousBalance });
-
-  res.json({ success: true, balance: newBalance, previousBalance });
-});
-
-// Reset password by Admin
-app.post('/api/admin/users/reset-password', authenticateAdminToken, (req, res) => {
+// Reset password by Admin (legacy endpoint)
+app.post('/api/admin/users/reset-password', authenticateAdminToken, async (req, res) => {
   const { email } = req.body;
   if (!email) {
     return res.status(400).json({ error: 'Please supply email.' });
@@ -5638,15 +6042,40 @@ app.post('/api/admin/users/reset-password', authenticateAdminToken, (req, res) =
   const tempPass = 'NevoAdmin99!';
   const hash = bcrypt.hashSync(tempPass, 10);
   db.users[userIndex].passwordHash = hash;
-  writeDb(db);
+  await writeDb(db);
+  try {
+    await execute(`UPDATE users SET passwordHash = $1 WHERE LOWER(email) = $2`, [hash, db.users[userIndex].email.toLowerCase()]);
+  } catch (_) {}
 
   logDiagnostic('SECURITY_ALERT', `Admin performed hard credentials override`, { email });
 
-  res.json({ success: true });
+  res.json({ success: true, message: 'Password reset to default temporary password.' });
 });
 
-// Reset user PIN by Admin
-app.post('/api/admin/users/reset-pin', authenticateAdminToken, (req, res) => {
+// Reset user PIN by Admin (RESTful with userId)
+app.post('/api/admin/users/:userId/reset-pin', authenticateAdminToken, async (req, res) => {
+  const target = req.params.userId.toLowerCase();
+  const db = readDb();
+  const userIndex = db.users.findIndex((u: any) => (u.id && String(u.id).toLowerCase() === target) || (u.email && u.email.toLowerCase() === target));
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  db.users[userIndex].pinCreated = false;
+  delete db.users[userIndex].pinHash;
+  delete db.users[userIndex].pinCode;
+  await writeDb(db);
+  try {
+    await execute(`UPDATE users SET pinCreated = 0, pinCode = '' WHERE LOWER(email) = $1`, [db.users[userIndex].email.toLowerCase()]);
+  } catch (_) {}
+
+  logDiagnostic('SECURITY_ALERT', `Admin reset security PIN for user`, { email: db.users[userIndex].email });
+
+  res.json({ success: true, message: 'User security PIN reset successfully.' });
+});
+
+// Reset user PIN by Admin (legacy endpoint)
+app.post('/api/admin/users/reset-pin', authenticateAdminToken, async (req, res) => {
   const { email } = req.body;
   if (!email) {
     return res.status(400).json({ error: 'Please supply email.' });
@@ -5660,15 +6089,40 @@ app.post('/api/admin/users/reset-pin', authenticateAdminToken, (req, res) => {
 
   db.users[userIndex].pinCreated = false;
   delete db.users[userIndex].pinHash;
-  writeDb(db);
+  delete db.users[userIndex].pinCode;
+  await writeDb(db);
+  try {
+    await execute(`UPDATE users SET pinCreated = 0, pinCode = '' WHERE LOWER(email) = $1`, [db.users[userIndex].email.toLowerCase()]);
+  } catch (_) {}
 
   logDiagnostic('SECURITY_ALERT', `Admin reset security PIN for user`, { email });
 
   res.json({ success: true, message: 'User security PIN reset successfully.' });
 });
 
-// Delete account by Admin
-app.post('/api/admin/users/delete', authenticateAdminToken, (req, res) => {
+// Delete account by Admin (RESTful with userId)
+app.delete('/api/admin/users/:userId', authenticateAdminToken, async (req, res) => {
+  const target = req.params.userId.toLowerCase();
+  const db = readDb();
+  const userIndex = db.users.findIndex((u: any) => (u.id && String(u.id).toLowerCase() === target) || (u.email && u.email.toLowerCase() === target));
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  const targetEmail = db.users[userIndex].email.toLowerCase();
+  db.users.splice(userIndex, 1);
+  await writeDb(db);
+  try {
+    await execute(`DELETE FROM users WHERE LOWER(email) = $1`, [targetEmail]);
+  } catch (_) {}
+
+  logDiagnostic('SECURITY_ALERT', 'Admin permanently deleted user account record', { targetEmail });
+
+  res.json({ success: true });
+});
+
+// Delete account by Admin (legacy endpoint)
+app.post('/api/admin/users/delete', authenticateAdminToken, async (req, res) => {
   const { email } = req.body;
   if (!email) {
     return res.status(400).json({ error: 'Please supply email.' });
@@ -5680,12 +6134,297 @@ app.post('/api/admin/users/delete', authenticateAdminToken, (req, res) => {
     return res.status(404).json({ error: 'User not found.' });
   }
 
+  const targetEmail = db.users[userIndex].email.toLowerCase();
   db.users.splice(userIndex, 1);
-  writeDb(db);
+  await writeDb(db);
+  try {
+    await execute(`DELETE FROM users WHERE LOWER(email) = $1`, [targetEmail]);
+  } catch (_) {}
 
-  logDiagnostic('SECURITY_ALERT', 'Admin permanently deleted user account record', { email });
+  logDiagnostic('SECURITY_ALERT', 'Admin permanently deleted user account record', { email: targetEmail });
 
   res.json({ success: true });
+});
+
+// -------------------- ADMIN ADVERT MANAGEMENT ENDPOINTS --------------------
+
+function sanitizeDestinationUrl(rawUrl: string): string {
+  let url = String(rawUrl || '').trim();
+  if (!url) return 'https://nevo.ng';
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = `https://${url}`;
+  }
+  return url;
+}
+
+// 1. Get all adverts (Admin)
+app.get('/api/admin/adverts', authenticateAdminToken, (req, res) => {
+  const db = readDb();
+  const adverts = (db.nevo_adverts || []).map((ad: any) => ({
+    id: ad.id,
+    title: ad.title || 'Untitled Advert',
+    description: ad.description || '',
+    destinationUrl: sanitizeDestinationUrl(ad.destinationUrl),
+    rewardAmount: Number(ad.rewardAmount || 200),
+    bannerUrl: ad.bannerUrl || 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop&q=80',
+    category: ad.category || 'sponsored',
+    clicks: Number(ad.clicks || 0),
+    impressions: Number(ad.impressions || 0),
+    isActive: ad.isActive !== false,
+    createdAt: ad.createdAt || new Date().toISOString(),
+    updatedAt: ad.updatedAt || new Date().toISOString()
+  }));
+  res.json(adverts);
+});
+
+// 2. Create new advert (Admin)
+app.post('/api/admin/adverts', authenticateAdminToken, async (req, res) => {
+  const { title, description, destinationUrl, rewardAmount, bannerUrl, category, isActive } = req.body;
+
+  if (!title || !destinationUrl) {
+    return res.status(400).json({ error: 'Advert title and destination URL are required.' });
+  }
+
+  const db = readDb();
+  db.nevo_adverts = db.nevo_adverts || [];
+
+  const newId = `adv-${Date.now()}-${crypto.randomBytes(2).toString('hex')}`;
+  const now = new Date().toISOString();
+
+  const newAdvert = {
+    id: newId,
+    title: String(title).trim(),
+    description: String(description || '').trim(),
+    destinationUrl: sanitizeDestinationUrl(destinationUrl),
+    rewardAmount: Math.max(0, Number(rewardAmount) || 200),
+    bannerUrl: String(bannerUrl || 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop&q=80').trim(),
+    category: String(category || 'sponsored').trim(),
+    clicks: 0,
+    impressions: 0,
+    isActive: isActive !== false,
+    createdAt: now,
+    updatedAt: now
+  };
+
+  db.nevo_adverts.unshift(newAdvert);
+  await writeDb(db);
+
+  logDiagnostic('SECURITY_ALERT', `Admin created advert campaign: "${newAdvert.title}"`, {
+    advertId: newId,
+    title: newAdvert.title,
+    destinationUrl: newAdvert.destinationUrl,
+    rewardAmount: newAdvert.rewardAmount
+  });
+
+  res.status(201).json(newAdvert);
+});
+
+// 3. Update existing advert (Admin)
+app.put('/api/admin/adverts/:id', authenticateAdminToken, async (req, res) => {
+  const { id } = req.params;
+  const { title, description, destinationUrl, rewardAmount, bannerUrl, category, isActive } = req.body;
+
+  const db = readDb();
+  db.nevo_adverts = db.nevo_adverts || [];
+  const adIndex = db.nevo_adverts.findIndex((a: any) => a.id === id);
+
+  if (adIndex === -1) {
+    return res.status(404).json({ error: 'Advert not found.' });
+  }
+
+  const existing = db.nevo_adverts[adIndex];
+  const now = new Date().toISOString();
+
+  const updatedAdvert = {
+    ...existing,
+    title: title !== undefined ? String(title).trim() : existing.title,
+    description: description !== undefined ? String(description).trim() : existing.description,
+    destinationUrl: destinationUrl !== undefined ? sanitizeDestinationUrl(destinationUrl) : existing.destinationUrl,
+    rewardAmount: rewardAmount !== undefined ? Math.max(0, Number(rewardAmount)) : existing.rewardAmount,
+    bannerUrl: bannerUrl !== undefined ? String(bannerUrl).trim() : existing.bannerUrl,
+    category: category !== undefined ? String(category).trim() : existing.category,
+    isActive: isActive !== undefined ? !!isActive : existing.isActive,
+    updatedAt: now
+  };
+
+  db.nevo_adverts[adIndex] = updatedAdvert;
+  await writeDb(db);
+
+  logDiagnostic('SECURITY_ALERT', `Admin updated advert campaign ${id}: "${updatedAdvert.title}"`, {
+    advertId: id,
+    title: updatedAdvert.title
+  });
+
+  res.json(updatedAdvert);
+});
+
+// 4. Toggle advert status: activate / deactivate (Admin)
+app.patch('/api/admin/adverts/:id/status', authenticateAdminToken, async (req, res) => {
+  const { id } = req.params;
+  const { isActive } = req.body;
+
+  const db = readDb();
+  db.nevo_adverts = db.nevo_adverts || [];
+  const adIndex = db.nevo_adverts.findIndex((a: any) => a.id === id);
+
+  if (adIndex === -1) {
+    return res.status(404).json({ error: 'Advert not found.' });
+  }
+
+  db.nevo_adverts[adIndex].isActive = !!isActive;
+  db.nevo_adverts[adIndex].updatedAt = new Date().toISOString();
+  await writeDb(db);
+
+  logDiagnostic('SECURITY_ALERT', `Admin set advert ${id} status to ${isActive ? 'ACTIVE' : 'INACTIVE'}`, {
+    advertId: id,
+    isActive
+  });
+
+  res.json({ success: true, advert: db.nevo_adverts[adIndex] });
+});
+
+// 5. Delete advert (Admin)
+app.delete('/api/admin/adverts/:id', authenticateAdminToken, async (req, res) => {
+  const { id } = req.params;
+  const db = readDb();
+  db.nevo_adverts = db.nevo_adverts || [];
+  const adIndex = db.nevo_adverts.findIndex((a: any) => a.id === id);
+
+  if (adIndex === -1) {
+    return res.status(404).json({ error: 'Advert not found.' });
+  }
+
+  const deletedAd = db.nevo_adverts.splice(adIndex, 1)[0];
+  await writeDb(db);
+  try {
+    await execute(`DELETE FROM nevo_adverts WHERE id = $1`, [id]);
+  } catch (_) {}
+
+  logDiagnostic('SECURITY_ALERT', `Admin permanently deleted advert campaign ${id}`, {
+    advertId: id,
+    title: deletedAd?.title
+  });
+
+  res.json({ success: true, message: 'Advert campaign deleted successfully.' });
+});
+
+// -------------------- USER / PUBLIC ADVERT ENDPOINTS --------------------
+
+// 6. Get active adverts for users
+app.get('/api/adverts', (req, res) => {
+  const db = readDb();
+  const activeAdverts = (db.nevo_adverts || [])
+    .filter((a: any) => a.isActive !== false)
+    .map((ad: any) => ({
+      id: ad.id,
+      title: ad.title,
+      description: ad.description,
+      destinationUrl: sanitizeDestinationUrl(ad.destinationUrl),
+      rewardAmount: Number(ad.rewardAmount || 200),
+      bannerUrl: ad.bannerUrl,
+      category: ad.category || 'sponsored',
+      clicks: Number(ad.clicks || 0),
+      impressions: Number(ad.impressions || 0),
+      isActive: true,
+      createdAt: ad.createdAt
+    }));
+  res.json(activeAdverts);
+});
+
+// 7. Track advert click & return destination URL
+app.post('/api/adverts/:id/click', async (req, res) => {
+  const { id } = req.params;
+  const db = readDb();
+  db.nevo_adverts = db.nevo_adverts || [];
+  const advert = db.nevo_adverts.find((a: any) => a.id === id);
+
+  if (!advert) {
+    return res.status(404).json({ error: 'Advert not found.' });
+  }
+
+  advert.clicks = Number(advert.clicks || 0) + 1;
+  advert.updatedAt = new Date().toISOString();
+  await writeDb(db);
+
+  res.json({
+    success: true,
+    destinationUrl: sanitizeDestinationUrl(advert.destinationUrl)
+  });
+});
+
+// 8. User advert interaction completion with reward
+app.post('/api/adverts/:id/complete', authenticateToken, async (req: any, res) => {
+  const { id } = req.params;
+  const userEmail = req.userEmail;
+
+  const db = readDb();
+  db.nevo_adverts = db.nevo_adverts || [];
+  const advert = db.nevo_adverts.find((a: any) => a.id === id);
+
+  if (!advert) {
+    return res.status(404).json({ error: 'Advert not found.' });
+  }
+
+  const userIndex = db.users.findIndex((u: any) => u.email.toLowerCase() === userEmail.toLowerCase());
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  const user = db.users[userIndex];
+  const reward = Number(advert.rewardAmount || 200);
+  const newBalance = Number(user.balance || 0) + reward;
+
+  user.balance = newBalance;
+  user.totalEarnings = Number(user.totalEarnings || 0) + reward;
+
+  const now = new Date().toISOString();
+  user.transactions = user.transactions || [];
+  user.transactions.unshift({
+    id: `tx-adv-${Date.now()}-${crypto.randomBytes(2).toString('hex')}`,
+    type: 'promotional_bonus',
+    amount: reward,
+    date: now,
+    status: 'success',
+    description: `Advert Reward: ${advert.title}`,
+    balanceAfter: newBalance
+  });
+
+  user.notifications = user.notifications || [];
+  user.notifications.unshift({
+    id: `notif-${Date.now()}`,
+    title: 'Advert Reward Earned! 🎁',
+    body: `You earned ₦${reward.toLocaleString()} for viewing ${advert.title}. Funds have been credited to your Nevo wallet!`,
+    date: now,
+    unread: true,
+    type: 'advert_reward'
+  });
+
+  advert.impressions = Number(advert.impressions || 0) + 1;
+  await writeDb(db);
+
+  res.json({
+    success: true,
+    rewardAmount: reward,
+    newBalance
+  });
+});
+
+// 9. Direct browser redirect link: GET /ad-redirect/:id
+app.get('/ad-redirect/:id', async (req, res) => {
+  const { id } = req.params;
+  const db = readDb();
+  db.nevo_adverts = db.nevo_adverts || [];
+  const advert = db.nevo_adverts.find((a: any) => a.id === id);
+
+  if (!advert) {
+    return res.redirect('/');
+  }
+
+  advert.clicks = Number(advert.clicks || 0) + 1;
+  await writeDb(db);
+
+  const dest = sanitizeDestinationUrl(advert.destinationUrl);
+  res.redirect(dest);
 });
 
 // Get diagnostic logs

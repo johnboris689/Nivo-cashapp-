@@ -381,8 +381,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
 
                   <button
                     type="submit"
-                    disabled={!isVerified || !accountName || !nameConfirmed}
-                    disabled={!isVerified || resolving}
+                    disabled={!isVerified || !accountName || !nameConfirmed || resolving}
                     className="w-full bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-lg shadow-[#7A1831]/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40"
                   >
                     <span>Continue to Amount</span>

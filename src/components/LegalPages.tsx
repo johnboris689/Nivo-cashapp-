@@ -8,39 +8,79 @@ interface LegalPageProps {
 }
 
 export function TermsOfService({ onBack }: LegalPageProps) {
+  const settings = getCachedSettings();
+  const brandName = settings.websiteName || 'Nevo';
+  const supportPhone = settings.supportPhone || '+2349162845073';
+
   return (
-    <div className="flex-1 flex flex-col bg-slate-950 text-white overflow-y-auto no-scrollbar p-5 sm:p-6 space-y-5">
+    <div className="flex-1 flex flex-col bg-slate-950 text-white overflow-y-auto no-scrollbar p-6 space-y-6">
       <div className="flex items-center gap-3">
-        <button onClick={onBack} className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white"><ArrowLeft className="h-4 w-4" /></button>
-        <div>
-          <h4 className="text-base font-bold font-display flex items-center gap-2"><Scale className="h-4 w-4 text-teal-400" />Terms of Service</h4>
-          <p className="text-[10px] text-slate-500 mt-0.5">Nevo • Last updated September 2026</p>
-        </div>
+        <button
+          onClick={onBack}
+          className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <h4 className="text-base font-bold font-display flex items-center gap-2">
+          <Scale className="h-4 w-4 text-teal-400" />
+          Terms of Service
+        </h4>
       </div>
 
-      <GlassCard className="p-5 space-y-5 text-[11px] text-slate-300 leading-relaxed border-white/5 bg-slate-900/40">
-        <p>These Terms explain the rules for using Nevo, earning rewards, funding your wallet, and requesting withdrawals. By using Nevo, you agree to use the service honestly and in accordance with these terms.</p>
-        {[
-          ['1. Eligibility & Account', 'Nevo is intended for adults who are legally able to use the service. Keep your registration information accurate and protect your password, verification codes, PINs, and other account credentials. Your account is personal to you.'],
-          ['2. Tasks, Rewards & Referrals', 'Available tasks and their rewards are shown in Nevo. A task may require a timed visit, a username or handle, or other completion evidence. Rewards are credited only after the required verification succeeds. Referral rewards are subject to the referral rules displayed by Nevo.'],
-          ['3. Wallet Balance', 'Your wallet displays your recorded Nigerian Naira balance. Verified deposits and eligible rewards can increase the balance. A transaction is considered completed only when Nevo records it as successful.'],
-          ['4. Deposits & KoraPay', 'Deposits are completed through the KoraPay payment flow provided by Nevo. Nevo credits your wallet only after the payment is confirmed. A verified deposit of at least ₦520 is required for withdrawal eligibility. The ₦520 is wallet funding, not an activation fee.'],
-          ['5. Withdrawals', 'Withdrawal access requires at least 5 successful referrals and a verified KoraPay wallet deposit of at least ₦520. Once eligible, the normal minimum withdrawal is ₦5,000 and the limits shown in Nevo apply. Bank details may be verified before a withdrawal is submitted.'],
-          ['6. Verification & Honest Use', 'Nevo may verify deposits, withdrawals, referrals, task submissions, and other activity. Do not submit fake payment evidence, false task proof, duplicate claims, fraudulent referrals, or information belonging to another person.'],
-          ['7. Security & Prohibited Conduct', 'Do not attempt to bypass security, manipulate balances or rewards, interfere with payment verification, impersonate another person, create fraudulent accounts, or use Nevo for unlawful activity.'],
-          ['8. Account Restrictions', 'Nevo may restrict or suspend an account when there is a security, fraud, abuse, or compliance concern. Contact official support if you need help with a restriction or disputed transaction.'],
-          ['9. Service Availability', 'Some features depend on payment, banking, advertising, network, or other external services and may be delayed or temporarily unavailable. Provider confirmation is required before a payment is treated as successful.'],
-          ['10. Changes to These Terms', 'Nevo may update these terms when the service or its requirements change. The latest version will be made available through Nevo.'],
-          ['11. Contact Nevo', 'For account, payment, withdrawal, or terms questions, use the official support channels provided in the Nevo app or website.'],
-        ].map(([title, body]) => (
-          <div key={title} className="space-y-1.5">
-            <h5 className="font-bold text-white text-xs">{title}</h5>
-            <p>{body}</p>
-          </div>
-        ))}
+      <p className="text-[11px] text-slate-400">
+        Last updated: July 2026. Please read these terms carefully before utilizing {brandName} services.
+      </p>
+
+      <GlassCard className="p-4 space-y-4 text-[11px] text-slate-300 leading-relaxed font-sans max-h-[600px] overflow-y-auto border-white/5 bg-slate-900/40">
+        <div>
+          <h5 className="font-bold text-white uppercase text-xs mb-1">1. Acceptance of Terms</h5>
+          <p>
+            By accessing or using the {brandName} mobile application ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, you must immediately terminate use of the app.
+          </p>
+        </div>
+
+        <div>
+          <h5 className="font-bold text-white uppercase text-xs mb-1">2. Wallet Balances and Account Funding</h5>
+          <p>
+            {brandName} operates digital wallet balances for Nigeria (Naira). Balances can be used for virtual payments. All direct wallet balances are stored in persistent state. Account funding must be conducted via authorized channels, including manual peer-to-peer transfers or confirmed Withdrawal Voucher (deposit) vouchers.
+          </p>
+        </div>
+
+        <div>
+          <h5 className="font-bold text-white uppercase text-xs mb-1">3. Wallet Deposits</h5>
+          <p>
+            Wallet Deposits are unique cryptographic voucher tokens purchased by users. A deposit voucher is strictly non-refundable and has a fixed face value of ₦6,500. Verification of the deposit code is performed server-side. Users are solely responsible for keeping their active voucher codes secure. Sharing voucher codes is strictly at your own risk.
+          </p>
+        </div>
+
+        <div>
+          <h5 className="font-bold text-white uppercase text-xs mb-1">4. Forbidden Actions & Limits</h5>
+          <p>
+            You agree not to bypass, hack, or simulate voucher codes or verification routines. {brandName} reserves the right to freeze, deduct, or lock user accounts suspected of fraudulent voucher manipulation or fake transfer submissions.
+          </p>
+        </div>
+
+        <div>
+          <h5 className="font-bold text-white uppercase text-xs mb-1">5. Limitation of Liability</h5>
+          <p>
+            {brandName} provides services "as is" and "as available" without any warranty of any kind, either express or implied. Under no circumstances shall {brandName} or its operators be liable for financial loss, direct or indirect, arising from internet disruptions, bank downtime, or user negligence.
+          </p>
+        </div>
+
+        <div>
+          <h5 className="font-bold text-white uppercase text-xs mb-1">6. Contact & Support</h5>
+          <p>
+            For any billing disputes or transfer queries, users must contact official {brandName} representatives through our support live chat or verified WhatsApp link at {supportPhone}.
+          </p>
+        </div>
       </GlassCard>
 
-      <button onClick={onBack} className="w-full py-3 rounded-xl bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer">Acknowledge & Close</button>
+      <button
+        onClick={onBack}
+        className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
+      >
+        Acknowledge & Close
+      </button>
     </div>
   );
 }

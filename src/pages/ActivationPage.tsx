@@ -3,7 +3,7 @@ import { ShieldCheck, Lock, Users, ArrowRight, CheckCircle2, Wallet, PlusCircle,
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
 import { Link, useNavigate } from 'react-router-dom';
-import { DepositModal } from '../components/DepositModal';
+import WalletDepositModal from '../components/WalletDepositModal';
 
 export const ActivationPage: React.FC = () => {
   const { user, refreshUser } = useAuth();
@@ -192,10 +192,12 @@ export const ActivationPage: React.FC = () => {
         </div>
       )}
 
-      {/* Deposit Modal Modal */}
+      {/* Deposit Modal */}
       {showDepositModal && (
-        <DepositModal
+        <WalletDepositModal
+          isOpen={showDepositModal}
           onClose={() => setShowDepositModal(false)}
+          token={localStorage.getItem('nevo_auth_token') || localStorage.getItem('token') || ''}
           onSuccess={() => {
             setShowDepositModal(false);
             refreshUser();

@@ -72,13 +72,31 @@ export const RegisterPage: React.FC = () => {
               <Zap className="w-6 h-6 text-white fill-white" />
             </div>
             <span className="font-black text-2xl tracking-tight text-white">
-              NIVO <span className="text-[#C13A5A]">CASH</span>
+              NEVO <span className="text-[#C13A5A]">REWARDS</span>
             </span>
           </Link>
           <h1 className="text-xl font-black text-white mt-1">Create Your Account</h1>
           <p className="text-xs text-slate-400 mt-1">
             Join thousands of users earning daily on Nevo
           </p>
+        </div>
+
+        {/* Instant ₦750 Registration Bonus Highlight Banner */}
+        <div className="mb-6 bg-gradient-to-r from-emerald-950/40 via-teal-950/30 to-emerald-900/30 border border-emerald-500/30 p-3.5 rounded-2xl flex items-center gap-3 text-emerald-300 text-xs">
+          <div className="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 font-black">
+            ₦
+          </div>
+          <div>
+            <p className="text-white font-black text-xs flex items-center gap-1.5">
+              <span>Instant ₦750 Registration Bonus</span>
+              <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[9px] font-mono px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                Automatic
+              </span>
+            </p>
+            <p className="text-[11px] text-emerald-200/80 font-normal mt-0.5">
+              Get ₦750 credited directly to your Nevo wallet balance the moment your account is created.
+            </p>
+          </div>
         </div>
 
         {referralCode && (

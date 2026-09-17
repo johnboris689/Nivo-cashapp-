@@ -12,6 +12,7 @@ import {
   TrendingUp,
   AlertCircle,
   Settings,
+  Megaphone,
 } from 'lucide-react';
 import { AdminStats } from '../../types';
 import { api } from '../../lib/api';
@@ -121,6 +122,17 @@ export const AdminDashboardPage: React.FC = () => {
 
       {/* Admin Modules Quick Grid */}
       <div className="grid md:grid-cols-3 gap-6">
+        <Link
+          to="/admin/adverts"
+          className="bg-[#16090D] hover:nivo-glass-surface p-6 rounded-3xl border border-zinc-800 hover:border-[#8F1D3A]/40 transition-all space-y-3 group"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-[#8F1D3A]/10 text-[#C13A5A] flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
+            <Megaphone className="w-6 h-6" />
+          </div>
+          <h3 className="text-lg font-black text-white">Advert Management</h3>
+          <p className="text-xs text-zinc-400">Launch campaigns, edit destination URLs, track clicks and views, and configure cash rewards.</p>
+        </Link>
+
         <Link
           to="/admin/users"
           className="bg-[#16090D] hover:nivo-glass-surface p-6 rounded-3xl border border-zinc-800 hover:border-[#8F1D3A]/40 transition-all space-y-3 group"

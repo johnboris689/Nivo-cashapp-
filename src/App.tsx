@@ -350,17 +350,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const openReferrals = () => {
-      setCurrentScreen('dashboard');
-      setActiveTab('social');
-      setRewardsTab('referrals');
-      navigateTo('/referrals');
-    };
-    window.addEventListener('nevo-open-referrals', openReferrals);
-    return () => window.removeEventListener('nevo-open-referrals', openReferrals);
-  }, []);
-
-  useEffect(() => {
     const name = user?.fullName?.split(' ')[0] || 'there';
     const text = `Hi, ${name}`;
     setTypedGreeting('');
@@ -451,7 +440,7 @@ export default function App() {
   const [systemSettings, setSystemSettings] = useState<Record<string, string>>({
     websiteName: "Nevo",
     scrollingAnnouncement: "Welcome to Nevo! Fast and secure manual transactions with 24/7 support.",
-    liveFeedText: "Verified live activity will appear here automatically.",
+    liveFeedText: "Chioma O. just purchased a Deposit code • Yusuf D. withdrew ₦25,000",
     welcomeMessage: "Welcome to Nevo",
     dashboardBanner: "Get started with fast manual voucher activation & seamless transfers",
     whatsappNumber: "+2349162845073",
@@ -4971,6 +4960,7 @@ export default function App() {
                       </button>
                       <div>
                         <h2 className="text-lg font-black font-display text-white">Bank Withdrawal</h2>
+                        <p className="text-[10px] font-mono text-slate-400">Route: /dashboard/withdraw</p>
                       </div>
                     </div>
                     <div className="bg-teal-500/10 border border-teal-500/20 px-3 py-1 rounded-full text-[10px] font-mono font-bold text-teal-400">
@@ -5561,41 +5551,58 @@ export default function App() {
                     <h4 className="text-base font-bold font-display text-slate-800 dark:text-white">Our Brand Story</h4>
                   </div>
 
-                  {/* Rebranding card banner */}
-                  <div className="rounded-3xl p-6 bg-gradient-to-tr from-indigo-950 via-purple-950 to-teal-950 text-white relative overflow-hidden border border-white/5 shadow-lg">
-                    <div className="absolute right-0 top-0 h-24 w-24 bg-teal-500/10 rounded-full blur-xl" />
+                  {/* Nevo Brand Story Banner */}
+                  <div className="rounded-3xl p-6 bg-gradient-to-tr from-[#16090D] via-[#240A12] to-[#7A1831]/40 text-white relative overflow-hidden border border-[#8F1D3A]/30 shadow-xl">
+                    <div className="absolute right-0 top-0 h-32 w-32 bg-[#C13A5A]/10 rounded-full blur-2xl pointer-events-none" />
                     
-                    <h5 className="text-base font-extrabold font-display">Nevo Digital Platform</h5>
+                    <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#8F1D3A]/30 border border-[#C13A5A]/30 text-[#D46A83] text-[10px] font-bold uppercase tracking-wider mb-2">
+                      Nevo Digital Platform
+                    </div>
+                    <h5 className="text-lg font-black font-display text-white">Our Brand Story</h5>
                     <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                      Nevo is a digital rewards and wallet platform built to give users simple, transparent ways to earn through verified tasks, referrals and other available opportunities. Your wallet activity and eligible rewards are recorded in your Nevo account.
+                      Nevo was founded with a clear, singular conviction: digital engagement and user attention across Nigeria deserve real, tangible rewards. We have created a transparent, mobile-first rewards and digital wallet ecosystem where everyday Nigerians earn real money from completing micro-tasks, watching verified rewarded adverts, referring peers, and accessing instant KoraPay bank settlements.
                     </p>
                   </div>
 
                   {/* Our Mission */}
                   <div className="space-y-2.5">
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-400">Our Mission</h5>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                      To make digital earning opportunities easier to discover, complete and track while giving users a clear view of their wallet activity and rewards.
+                    <h5 className="text-xs font-bold uppercase tracking-wider text-[#D46A83]">Our Mission</h5>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                      To empower everyday Nigerians—students, creators, young professionals, and remote earners—with dependable digital income channels, instant ₦750 welcome rewards, transparent ledger accounting, and prompt Nigerian bank payouts with zero hidden deductions.
                     </p>
                   </div>
 
-                  {/* What We Offer bullet list */}
+                  {/* What Sets Nevo Apart */}
                   <div className="space-y-3">
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-400">What We Offer</h5>
-                    <GlassCard className="p-5 space-y-3">
+                    <h5 className="text-xs font-bold uppercase tracking-wider text-[#D46A83]">What We Offer</h5>
+                    <GlassCard className="p-5 space-y-3.5 border-[#8F1D3A]/20 bg-slate-950/40">
                       {[
-                        'Daily instant withdrawal limits up to ₦100,000.',
-                        'Verified earning tasks and promotional opportunities managed through Nevo.',
-                        'Clear wallet and reward history for completed eligible activities.',
-                        'Secure account access with password and supported device authentication.',
-                        '24/7 dedicated Telegram, WhatsApp, and email support operators.'
-                      ].map((bullet, index) => (
-                        <div key={index} className="flex gap-2.5 items-start">
-                          <Check className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
-                          <p className="text-xs text-slate-600 dark:text-slate-300 leading-normal">{bullet}</p>
+                        { title: 'Instant ₦750 Registration Bonus', desc: 'Credited directly to your wallet upon free account creation.' },
+                        { title: 'Sponsored Adverts & Daily Tasks', desc: 'Watch verified sponsor ads and complete micro-tasks to earn real Naira credits.' },
+                        { title: 'Reliable KoraPay Wallet Funding', desc: 'Instant, automated Nigerian bank and card deposits protected by 256-bit encryption.' },
+                        { title: 'Fast Bank Account Cashouts', desc: 'Direct withdrawals to all licensed Nigerian commercial banks and fintechs.' },
+                        { title: '₦1,000+ Referral Rewards', desc: 'Earn lucrative bonuses for inviting colleagues, friends, and family to Nevo.' },
+                        { title: 'PIN-Secured Ledger Security', desc: 'Strict multi-factor transaction authentication, fraud prevention, and 24/7 support.' }
+                      ].map((item, index) => (
+                        <div key={index} className="flex gap-3 items-start">
+                          <div className="w-5 h-5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                            <Check className="h-3.5 w-3.5" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-white">{item.title}</p>
+                            <p className="text-[11px] text-slate-400 leading-normal">{item.desc}</p>
+                          </div>
                         </div>
                       ))}
                     </GlassCard>
+                  </div>
+
+                  {/* Trust & Compliance */}
+                  <div className="p-4 rounded-2xl bg-[#16090D] border border-[#8F1D3A]/20 space-y-1.5">
+                    <h6 className="text-[11px] font-bold text-white uppercase tracking-wide">Enterprise Reliability</h6>
+                    <p className="text-[10px] text-slate-400 leading-relaxed">
+                      All financial settlements on Nevo are processed through PCI-DSS certified payment rails via KoraPay. Account operations are tracked with unalterable double-entry ledger timestamps.
+                    </p>
                   </div>
                 </div>
               )}

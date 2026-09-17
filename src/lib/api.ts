@@ -1,4 +1,4 @@
-import { User, Transaction, DepositRequest, WithdrawalRequest, ActivationRequest, Task, NotificationItem, BankDetails, SiteSettings, AdminStats, ReferralRecord, TaskSubmission, TaskSubmissionStatus, PaymentOverviewResponse } from '../types';
+import { User, Transaction, DepositRequest, WithdrawalRequest, ActivationRequest, Task, NotificationItem, BankDetails, SiteSettings, AdminStats, ReferralRecord, TaskSubmission, TaskSubmissionStatus, PaymentOverviewResponse, Advert } from '../types';
 
 const TOKEN_KEY = 'nevo_auth_token';
 const ADMIN_TOKEN_KEY = 'nevo_admin_token';
@@ -205,39 +205,21 @@ export const api = {
     }>('/api/referrals/stats'),
 
   // --- Tasks ---
-  getTasks: async () => {
-    const res = await request<{ tasks: any[] }>('/api/nivo/tasks');
-    return (res.tasks || []).map((t: any) => {
-      const status = (t.status || 'not_started') as TaskSubmissionStatus;
-      return {
-        ...t,
-        rewardAmount: Number(t.rewardamount ?? t.rewardAmount ?? 0),
-        timerSeconds: Number(t.timerseconds ?? t.timerSeconds ?? 0),
-        completionCount: Number(t.completioncount ?? t.completionCount ?? 0),
-        enabled: Boolean(Number(t.enabled ?? 1)),
-        verificationType: t.verificationtype ?? t.verificationType ?? 'timer',
-        proofInstructions: t.proofinstructions ?? t.proofInstructions ?? '',
-        actionUrl: t.actionurl ?? t.actionUrl ?? '/',
-        userStatus: status,
-        submission: t.submission || null,
-        completed: status === 'claimed' || status === 'approved',
-      };
-    });
-  },
+  getTasks: () => request<(Task & { userStatus: TaskSubmissionStatus; submission: TaskSubmission | null; completed: boolean })[]>('/api/tasks'),
 
   startTask: (taskId: string) =>
-    request<{ message: string; submission: TaskSubmission }>(`/api/nivo/tasks/${taskId}/start`, {
+    request<{ message: string; submission: TaskSubmission }>(`/api/tasks/${taskId}/start`, {
       method: 'POST',
     }),
 
   submitTaskProof: (taskId: string, proofText?: string, proofUrl?: string) =>
-    request<{ message: string; submission: TaskSubmission; credited?: boolean }>(`/api/nivo/tasks/${taskId}/submit`, {
+    request<{ message: string; submission: TaskSubmission; credited?: boolean }>(`/api/tasks/${taskId}/submit`, {
       method: 'POST',
       body: JSON.stringify({ proofText, proofUrl }),
     }),
 
   completeTask: (taskId: string, proofText?: string, proofUrl?: string) =>
-    request<{ message: string; submission: TaskSubmission; credited?: boolean }>(`/api/nivo/tasks/${taskId}/submit`, {
+    request<{ message: string; submission: TaskSubmission; credited?: boolean }>('/api/tasks/complete', {
       method: 'POST',
       body: JSON.stringify({ taskId, proofText, proofUrl }),
     }),
@@ -262,7 +244,16 @@ export const api = {
 
   getAdminPaymentOverview: () => request<PaymentOverviewResponse>('/api/admin/payment-overview', {}, true),
 
-  getAdminUsers: () => request<User[]>('/api/admin/users', {}, true),
+  getAdminUsers: async () => {
+    const res = await request<any>('/api/admin/users', {}, true);
+    return Array.isArray(res) ? res : (res?.users || []);
+  },
+
+  updateUserInfo: (userId: string, updatedData: Partial<User>) =>
+    request<User>(`/api/admin/users/${userId}/edit`, {
+      method: 'POST',
+      body: JSON.stringify(updatedData),
+    }, true),
 
   updateUserStatus: (userId: string, status: 'active' | 'suspended') =>
     request<User>(`/api/admin/users/${userId}/status`, {
@@ -315,64 +306,36 @@ export const api = {
       body: JSON.stringify({ adminNote }),
     }, true),
 
-  getAdminTasks: async () => {
-    const res = await request<{ success: boolean; tasks: any[] }>('/api/admin/nivo/tasks', {}, true);
-    return (res.tasks || []).map((t: any) => ({
-      ...t,
-      rewardAmount: Number(t.rewardamount ?? t.rewardAmount ?? 0),
-      timerSeconds: Number(t.timerseconds ?? t.timerSeconds ?? 0),
-      completionCount: Number(t.completioncount ?? t.completionCount ?? 0),
-      enabled: Boolean(Number(t.enabled ?? 0)),
-      verificationType: t.verificationtype ?? t.verificationType ?? 'timer',
-      proofInstructions: t.proofinstructions ?? t.proofInstructions ?? '',
-      actionUrl: t.actionurl ?? t.actionUrl ?? '/',
-    }));
-  },
+  getAdminTasks: () => request<Task[]>('/api/admin/tasks', {}, true),
 
-  getAdminTaskSubmissions: async () => {
-    const res = await request<{ success: boolean; submissions: any[] }>('/api/admin/nivo/tasks', {}, true);
-    return (res.submissions || []).map((s: any) => ({
-      ...s,
-      userId: s.userid ?? s.userId,
-      taskId: s.taskid ?? s.taskId,
-      taskTitle: s.tasktitle ?? s.taskTitle,
-      rewardAmount: Number(s.rewardamount ?? s.rewardAmount ?? 0),
-      userEmail: s.useremail ?? s.userEmail,
-      userName: s.username ?? s.userName ?? s.useremail ?? s.userEmail ?? 'User',
-      status: s.status,
-      completedAt: s.completedat ?? s.completedAt,
-      createdAt: s.createdat ?? s.createdAt,
-      proofText: s.prooftext ?? s.proofText ?? '',
-      adminNote: s.adminnote ?? s.adminNote ?? '',
-    }));
-  },
+  getAdminTaskSubmissions: () => request<TaskSubmission[]>('/api/admin/tasks/submissions', {}, true),
 
   approveTaskSubmission: (submissionId: string, adminNote?: string) =>
-    request<{ success: boolean; message?: string; submission?: TaskSubmission }>(`/api/admin/nivo/submissions/${submissionId}/approve`, {
+    request<{ message: string; submission: TaskSubmission }>(`/api/admin/tasks/submissions/${submissionId}/approve`, {
       method: 'POST',
       body: JSON.stringify({ adminNote }),
     }, true),
 
   rejectTaskSubmission: (submissionId: string, adminNote?: string) =>
-    request<{ success: boolean; message?: string; submission?: TaskSubmission }>(`/api/admin/nivo/submissions/${submissionId}/reject`, {
+    request<{ message: string; submission: TaskSubmission }>(`/api/admin/tasks/submissions/${submissionId}/reject`, {
       method: 'POST',
-      body: JSON.stringify({ reason: adminNote }),
+      body: JSON.stringify({ adminNote }),
     }, true),
 
   createTask: (task: Omit<Task, 'id' | 'createdAt' | 'completionCount'>) =>
-    request<Task>('/api/admin/nivo/tasks', {
+    request<Task>('/api/admin/tasks', {
       method: 'POST',
       body: JSON.stringify(task),
     }, true),
 
   updateTask: (taskId: string, task: Partial<Task>) =>
-    request<Task>(`/api/admin/nivo/tasks/${taskId}`, {
-      method: 'PATCH',
+    request<Task>(`/api/admin/tasks/${taskId}`, {
+      method: 'PUT',
       body: JSON.stringify(task),
     }, true),
 
   deleteTask: (taskId: string) =>
-    request<{ success: boolean }>(`/api/admin/nivo/tasks/${taskId}`, {
+    request<{ success: boolean }>(`/api/admin/tasks/${taskId}`, {
       method: 'DELETE',
     }, true),
 
@@ -391,6 +354,39 @@ export const api = {
     }, true),
 
   getAdminReferrals: () => request<ReferralRecord[]>('/api/admin/referrals', {}, true),
+
+  // --- Admin Advert Management ---
+  getAdminAdverts: () => request<Advert[]>('/api/admin/adverts', {}, true),
+  createAdminAdvert: (payload: Partial<Advert>) =>
+    request<Advert>('/api/admin/adverts', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }, true),
+  updateAdminAdvert: (id: string, payload: Partial<Advert>) =>
+    request<Advert>(`/api/admin/adverts/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    }, true),
+  toggleAdvertStatus: (id: string, isActive: boolean) =>
+    request<{ success: boolean; advert: Advert }>(`/api/admin/adverts/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ isActive })
+    }, true),
+  deleteAdminAdvert: (id: string) =>
+    request<{ success: boolean }>(`/api/admin/adverts/${id}`, {
+      method: 'DELETE'
+    }, true),
+
+  // --- Public / User Adverts ---
+  getActiveAdverts: () => request<Advert[]>('/api/adverts'),
+  clickAdvert: (id: string) =>
+    request<{ success: boolean; destinationUrl: string }>(`/api/adverts/${id}/click`, {
+      method: 'POST'
+    }),
+  completeAdvert: (id: string) =>
+    request<{ success: boolean; rewardAmount: number; newBalance: number }>(`/api/adverts/${id}/complete`, {
+      method: 'POST'
+    }),
 
   // Activation & Manual Overrides
   getActivationStatus: () =>
