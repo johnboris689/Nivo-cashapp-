@@ -428,12 +428,17 @@ async function loadDbCache() {
 
     // Fetch logs
     const logRows = await getAllRows(`SELECT * FROM logs ORDER BY timestamp DESC LIMIT 500`);
-    const logs = logRows.map(row => ({
-      id: row.id,
-      timestamp: row.timestamp,
-      message: row.message,
-      type: row.type
-    }));
+    const logs = logRows
+      .filter((row: any) => {
+        const message = String(row.message || '');
+        return !/LEGACY[_ ]?VOUCHER|voucher token|voucher code|Verified POS decline slip & processed ₦50,000/i.test(message);
+      })
+      .map(row => ({
+        id: row.id,
+        timestamp: row.timestamp,
+        message: row.message,
+        type: row.type
+      }));
 
     dbCache = {
       users,
@@ -453,14 +458,8 @@ async function loadDbCache() {
 
 async function persistDbCache(data: DBStructure) {
   try {
-    // 0. Sync user deletions from PostgreSQL
-    const existingUsers = await getAllRows(`SELECT email FROM users`);
-    const activeEmails = new Set(data.users.map(u => u.email.toLowerCase()));
-    for (const row of existingUsers) {
-      if (!activeEmails.has(row.email.toLowerCase())) {
-        await execute(`DELETE FROM users WHERE email = $1`, [row.email.toLowerCase()]);
-      }
-    }
+    // 0. Persist users with upsert semantics. Never delete database users merely because a cache is incomplete.
+    // Explicit administrative deletion routes perform an explicit DELETE operation.
 
     // 1. Save Users
     for (const u of data.users) {
@@ -4264,7 +4263,7 @@ app.post('/api/nivo/tasks/:id/start', authenticateToken, async (req:any,res:any)
   try { const task=await getRow(`SELECT * FROM nivo_tasks WHERE id=$1 AND enabled=1`,[req.params.id]); if(!task) return res.status(404).json({error:'Task not found.'}); const email=String(req.userEmail).toLowerCase(); const existing=await getRow(`SELECT * FROM nivo_task_submissions WHERE LOWER(userId)=LOWER($1) AND taskId=$2 AND status NOT IN ('rejected') ORDER BY createdAt DESC`,[email,req.params.id]); const now=new Date().toISOString(); if(existing){await execute(`UPDATE nivo_task_submissions SET startedAt=$1 WHERE id=$2`,[now,existing.id]); return res.json({message:'Task timer started.',submission:{...existing,startedAt:now}});} const id=`sub-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`; await execute(`INSERT INTO nivo_task_submissions (id,userId,taskId,taskTitle,rewardAmount,verificationType,status,startedAt,completedAt,claimedAt,proofText,adminNote,createdAt) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'','','','',$9)`,[id,email,task.id,task.title,Number(task.rewardamount||0),task.verificationtype||'timer','in_progress',now,now]); res.json({message:'Task started.',submission:{id,taskId:task.id,status:'in_progress',startedAt:now}}); } catch(e:any){res.status(400).json({error:e.message||'Could not start task.'});}
 });
 app.post('/api/nivo/tasks/:id/submit', authenticateToken, async (req:any,res:any)=>{
-  try { const task=await getRow(`SELECT * FROM nivo_tasks WHERE id=$1 AND enabled=1`,[req.params.id]); if(!task) return res.status(404).json({error:'Task not found.'}); const email=String(req.userEmail).toLowerCase(); const sub=await getRow(`SELECT * FROM nivo_task_submissions WHERE LOWER(userId)=LOWER($1) AND taskId=$2 ORDER BY createdAt DESC`,[email,req.params.id]); if(!sub) return res.status(400).json({error:'Start the task first.'}); const now=Date.now(); const started=new Date(sub.startedat||sub.startedAt).getTime(); const seconds=Number(task.timerseconds||0); if((task.verificationtype||'timer')==='timer' && now-started < seconds*1000) return res.status(400).json({error:`Please complete the ${seconds}-second task before submitting.`}); const proof=String(req.body?.proofText||'').trim(); if((task.verificationtype||'timer')==='proof' && !proof) return res.status(400).json({error:'Please provide the requested proof.'}); const status=(task.verificationtype||'timer')==='timer'?'approved':'pending_verification'; await execute(`UPDATE nivo_task_submissions SET status=$1, completedAt=$2, proofText=$3 WHERE id=$4`,[status,new Date().toISOString(),proof,sub.id]); if(status==='approved'){ const db=readDb(); const user=db.users.find((u:any)=>u.email.toLowerCase()===email); if(user){ const reward=Number(task.rewardamount||0); const before=Number(user.balance||0); user.balance=before+reward; user.totalEarnings=Number(user.totalEarnings||0)+reward; user.notifications=user.notifications||[]; user.notifications.unshift({id:`notif-${Date.now()}`,title:'Task Reward Earned',body:`₦${reward.toLocaleString()} has been added to your wallet for completing ${task.title}.`,date:new Date().toISOString(),unread:true,type:'task'}); user.transactions=user.transactions||[]; user.transactions.unshift({id:`tx-${Date.now()}`,type:'promotional_bonus',amount:reward,date:new Date().toISOString(),status:'success',description:`Task Reward: ${task.title}`}); await writeDb(db); await execute(`UPDATE users SET balance=$1,totalEarnings=$2,notifications=$3,transactions=$4 WHERE LOWER(email)=$5`,[user.balance,user.totalEarnings,JSON.stringify(user.notifications),JSON.stringify(user.transactions),email]); await execute(`UPDATE nivo_tasks SET completionCount=COALESCE(completionCount,0)+1 WHERE id=$1`,[task.id]); await execute(`UPDATE nivo_task_submissions SET claimedAt=$1,status='claimed' WHERE id=$2`,[new Date().toISOString(),sub.id]); }} res.json({success:true,status,credited:status==='approved',message:status==='approved'?'Task completed and reward credited.':'Task submitted for admin verification.'}); } catch(e:any){res.status(400).json({error:e.message||'Could not submit task.'});}
+  try { const task=await getRow(`SELECT * FROM nivo_tasks WHERE id=$1 AND enabled=1`,[req.params.id]); if(!task) return res.status(404).json({error:'Task not found.'}); const email=String(req.userEmail).toLowerCase(); const sub=await getRow(`SELECT * FROM nivo_task_submissions WHERE LOWER(userId)=LOWER($1) AND taskId=$2 ORDER BY createdAt DESC`,[email,req.params.id]); if(!sub) return res.status(400).json({error:'Start the task first.'}); const now=Date.now(); const started=new Date(sub.startedat||sub.startedAt).getTime(); const seconds=Number(task.timerseconds||0); if((task.verificationtype||'timer')==='timer' && now-started < seconds*1000) return res.status(400).json({error:`Please complete the ${seconds}-second task before submitting.`}); const proof=String(req.body?.proofText||'').trim(); if((task.verificationtype||'timer')==='proof' && !proof) return res.status(400).json({error:'Please provide the requested proof.'}); const status=(task.verificationtype||'timer')==='timer'?'approved':'pending_verification'; await execute(`UPDATE nivo_task_submissions SET status=$1, completedAt=$2, proofText=$3 WHERE id=$4`,[status,new Date().toISOString(),proof,sub.id]); if(status==='approved'){ const db=readDb(); const user=db.users.find((u:any)=>u.email.toLowerCase()===email); if(user){ const reward=Number(task.rewardamount||0); const before=Number(user.balance||0); user.balance=before+reward; user.totalEarnings=Number(user.totalEarnings||0)+reward; user.notifications=user.notifications||[]; user.notifications.unshift({id:`notif-${Date.now()}`,title:'Task Reward Earned',body:`₦${reward.toLocaleString()} has been added to your wallet for completing ${task.title}.`,date:new Date().toISOString(),unread:true,type:'task'}); user.transactions=user.transactions||[]; user.transactions.unshift({id:`tx-${Date.now()}`,type:'promotional_bonus',amount:reward,date:new Date().toISOString(),status:'success',description:`Task Reward: ${task.title}`}); await writeDb(db); await execute(`UPDATE users SET balance=$1,totalEarnings=$2,notifications=$3,transactions=$4 WHERE LOWER(email)=$5`,[user.balance,user.totalEarnings,JSON.stringify(user.notifications),JSON.stringify(user.transactions),email]); await execute(`UPDATE nivo_tasks SET completionCount=COALESCE(completionCount,0)+1 WHERE id=$1`,[task.id]); await execute(`UPDATE nivo_task_submissions SET claimedAt=$1,status='claimed' WHERE id=$2`,[new Date().toISOString(),sub.id]); }} res.json({success:true,status,message:status==='approved'?'Task completed and reward credited.':'Task submitted for admin verification.'}); } catch(e:any){res.status(400).json({error:e.message||'Could not submit task.'});}
 });
 app.get('/api/nivo/referrals/stats', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const user=readDb().users.find((u:any)=>u.email.toLowerCase()===email); const records=await getAllRows(`SELECT * FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) ORDER BY createdAt DESC`,[email]); const bonus=Number(user?.totalReferralBonus||0); const forwardedProto=String(req.get('x-forwarded-proto')||'').split(',')[0].trim(); const protocol=forwardedProto || req.protocol || 'https'; res.json({referralCode:user?.referralCode||'',referralLink:user?.referralCode?`${protocol}://${req.get('host')}/register?ref=${user.referralCode}`:'',totalReferrals:records.length,totalBonus:bonus,bonusPerReferral:Number((records[0]?.bonusamount||1000)),records:records.map((r:any)=>({...r,bonusAmount:Number(r.bonusamount||0),referredUserName:r.referredusername||''}))}); } catch(e:any){res.status(500).json({error:e.message});} });
 app.get('/api/nivo/activation/status', authenticateToken, async (req:any,res:any)=>{ try { const email=String(req.userEmail).toLowerCase(); const referralRows=await getAllRows(`SELECT * FROM nivo_referrals WHERE LOWER(referrerEmail)=LOWER($1) AND status='successful' ORDER BY createdAt DESC`,[email]); const paymentRows=await getAllRows(`SELECT * FROM payment_transactions WHERE LOWER(userEmail)=LOWER($1) AND purpose='wallet_funding' AND provider='korapay' AND status IN ('successful','settled')`,[email]); const successfulReferrals=referralRows.length; const depositRequirementMet=paymentRows.some((p:any)=>Number(p.amount||0)>=520); res.json({successfulReferrals,referralsRequired:5,depositRequirementMet,depositMinimum:520,canWithdraw:successfulReferrals>=5&&depositRequirementMet}); } catch(e:any){res.status(500).json({error:e.message});} });
@@ -4563,8 +4562,8 @@ app.post('/api/ads/verify', authenticateToken, async (req: any, res: any) => {
 
 // Nivo feature administration endpoints
 app.get('/api/admin/nivo/tasks', authenticateAdminToken, async (_req,res)=>{ try { const tasks=await getAllRows(`SELECT * FROM nivo_tasks ORDER BY createdAt DESC`); const submissions=await getAllRows(`SELECT * FROM nivo_task_submissions ORDER BY createdAt DESC`); res.json({success:true,tasks,submissions}); } catch(e:any){res.status(500).json({error:e.message});} });
-app.post('/api/admin/nivo/tasks', authenticateAdminToken, async (req,res)=>{ try { const b=req.body||{}; if(!String(b.title||'').trim()||!String(b.description||'').trim()||!Number.isFinite(Number(b.rewardAmount))) return res.status(400).json({error:'Title, description and reward are required.'}); const actionUrl=String(b.actionUrl||'/').trim(); let normalizedUrl=actionUrl; if(actionUrl.startsWith('/')) normalizedUrl=actionUrl; else { let parsed:URL; try{ parsed=new URL(actionUrl); }catch{ return res.status(400).json({error:'Enter a valid task URL (https://... or an internal /path).'}); } if(!['http:','https:'].includes(parsed.protocol)) return res.status(400).json({error:'Task link must use http or https.'}); normalizedUrl=parsed.toString(); } const id=`task-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`; await execute(`INSERT INTO nivo_tasks (id,title,description,rewardAmount,category,actionUrl,verificationType,timerSeconds,proofInstructions,enabled,createdAt,completionCount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,0)`,[id,String(b.title).trim(),String(b.description),Number(b.rewardAmount),b.category||'special',normalizedUrl,b.verificationType||'timer',Math.max(0,Number(b.timerSeconds)||0),b.proofInstructions||'',b.enabled===false?0:1,new Date().toISOString()]); res.json({success:true,id}); } catch(e:any){res.status(400).json({error:e.message});} });
-app.patch('/api/admin/nivo/tasks/:id', authenticateAdminToken, async (req,res)=>{ try { const b=req.body||{}; const current=await getRow(`SELECT * FROM nivo_tasks WHERE id=$1`,[req.params.id]); if(!current) return res.status(404).json({error:'Task not found.'}); if(b.actionUrl!==undefined){ const value=String(b.actionUrl||'/').trim(); let normalizedUrl=value; if(!value.startsWith('/')) { let parsed:URL; try{ parsed=new URL(value); }catch{ return res.status(400).json({error:'Task link must be a valid URL or internal /path.'}); } if(!['http:','https:'].includes(parsed.protocol)) return res.status(400).json({error:'Task link must use http or https.'}); normalizedUrl=parsed.toString(); } await execute(`UPDATE nivo_tasks SET actionUrl=$1 WHERE id=$2`,[normalizedUrl,req.params.id]); } if(b.title!==undefined) await execute(`UPDATE nivo_tasks SET title=$1 WHERE id=$2`,[String(b.title).trim(),req.params.id]); if(b.description!==undefined) await execute(`UPDATE nivo_tasks SET description=$1 WHERE id=$2`,[String(b.description),req.params.id]); if(b.category!==undefined) await execute(`UPDATE nivo_tasks SET category=$1 WHERE id=$2`,[String(b.category),req.params.id]); if(b.verificationType!==undefined) await execute(`UPDATE nivo_tasks SET verificationType=$1 WHERE id=$2`,[String(b.verificationType),req.params.id]); if(b.timerSeconds!==undefined) await execute(`UPDATE nivo_tasks SET timerSeconds=$1 WHERE id=$2`,[Math.max(0,Number(b.timerSeconds)||0),req.params.id]); if(b.proofInstructions!==undefined) await execute(`UPDATE nivo_tasks SET proofInstructions=$1 WHERE id=$2`,[String(b.proofInstructions),req.params.id]); if(b.enabled!==undefined) await execute(`UPDATE nivo_tasks SET enabled=$1 WHERE id=$2`,[b.enabled?1:0,req.params.id]); if(b.rewardAmount!==undefined){ const reward=Number(b.rewardAmount); if(!Number.isFinite(reward)||reward<0) return res.status(400).json({error:'Reward must be a valid non-negative number.'}); await execute(`UPDATE nivo_tasks SET rewardAmount=$1 WHERE id=$2`,[reward,req.params.id]); } res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
+app.post('/api/admin/nivo/tasks', authenticateAdminToken, async (req,res)=>{ try { const b=req.body||{}; if(!String(b.title||'').trim()||!String(b.description||'').trim()||!Number.isFinite(Number(b.rewardAmount))) return res.status(400).json({error:'Title, description and reward are required.'}); const actionUrl=String(b.actionUrl||'').trim(); let parsed:URL; try{ parsed=new URL(actionUrl); }catch{ return res.status(400).json({error:'A valid task destination URL is required.'}); } if(!['http:','https:'].includes(parsed.protocol)) return res.status(400).json({error:'Task link must use http or https.'}); const id=`task-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`; await execute(`INSERT INTO nivo_tasks (id,title,description,rewardAmount,category,actionUrl,verificationType,timerSeconds,proofInstructions,enabled,createdAt,completionCount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,0)`,[id,String(b.title).trim(),String(b.description),Number(b.rewardAmount),b.category||'special',parsed.toString(),b.verificationType||'timer',Math.max(0,Number(b.timerSeconds)||0),b.proofInstructions||'',b.enabled===false?0:1,new Date().toISOString()]); res.json({success:true,id}); } catch(e:any){res.status(400).json({error:e.message});} });
+app.patch('/api/admin/nivo/tasks/:id', authenticateAdminToken, async (req,res)=>{ try { const b=req.body||{}; const current=await getRow(`SELECT * FROM nivo_tasks WHERE id=$1`,[req.params.id]); if(!current) return res.status(404).json({error:'Task not found.'}); if(b.actionUrl!==undefined){ const value=String(b.actionUrl||'').trim(); let parsed:URL; try{ parsed=new URL(value); }catch{ return res.status(400).json({error:'Task link must be a valid URL.'}); } if(!['http:','https:'].includes(parsed.protocol)) return res.status(400).json({error:'Task link must use http or https.'}); await execute(`UPDATE nivo_tasks SET actionUrl=$1 WHERE id=$2`,[parsed.toString(),req.params.id]); } if(b.title!==undefined) await execute(`UPDATE nivo_tasks SET title=$1 WHERE id=$2`,[String(b.title).trim(),req.params.id]); if(b.description!==undefined) await execute(`UPDATE nivo_tasks SET description=$1 WHERE id=$2`,[String(b.description),req.params.id]); if(b.category!==undefined) await execute(`UPDATE nivo_tasks SET category=$1 WHERE id=$2`,[String(b.category),req.params.id]); if(b.verificationType!==undefined) await execute(`UPDATE nivo_tasks SET verificationType=$1 WHERE id=$2`,[String(b.verificationType),req.params.id]); if(b.timerSeconds!==undefined) await execute(`UPDATE nivo_tasks SET timerSeconds=$1 WHERE id=$2`,[Math.max(0,Number(b.timerSeconds)||0),req.params.id]); if(b.proofInstructions!==undefined) await execute(`UPDATE nivo_tasks SET proofInstructions=$1 WHERE id=$2`,[String(b.proofInstructions),req.params.id]); if(b.enabled!==undefined) await execute(`UPDATE nivo_tasks SET enabled=$1 WHERE id=$2`,[b.enabled?1:0,req.params.id]); if(b.rewardAmount!==undefined){ const reward=Number(b.rewardAmount); if(!Number.isFinite(reward)||reward<0) return res.status(400).json({error:'Reward must be a valid non-negative number.'}); await execute(`UPDATE nivo_tasks SET rewardAmount=$1 WHERE id=$2`,[reward,req.params.id]); } res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
 app.delete('/api/admin/nivo/tasks/:id', authenticateAdminToken, async (req,res)=>{ try { await execute(`DELETE FROM nivo_tasks WHERE id=$1`,[req.params.id]); res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
 app.post('/api/admin/nivo/submissions/:id/approve', authenticateAdminToken, async (req,res)=>{ try { const sub=await getRow(`SELECT * FROM nivo_task_submissions WHERE id=$1`,[req.params.id]); if(!sub) return res.status(404).json({error:'Submission not found.'}); if(['approved','claimed'].includes(String(sub.status))) return res.json({success:true,alreadyProcessed:true}); const email=String(sub.userid||sub.userId).toLowerCase(); const db=readDb(); const idx=db.users.findIndex((u:any)=>u.email.toLowerCase()===email); if(idx<0) return res.status(404).json({error:'User not found.'}); const reward=Number(sub.rewardamount||0); db.users[idx].balance=Number(db.users[idx].balance||0)+reward; db.users[idx].totalEarnings=Number(db.users[idx].totalEarnings||0)+reward; db.users[idx].notifications=db.users[idx].notifications||[]; db.users[idx].notifications.unshift({id:`notif-${Date.now()}`,title:'Task Reward Approved',body:`₦${reward.toLocaleString()} has been credited to your wallet.`,date:new Date().toISOString(),unread:true,type:'task'}); db.users[idx].transactions=db.users[idx].transactions||[]; db.users[idx].transactions.unshift({id:`tx-${Date.now()}`,type:'promotional_bonus',amount:reward,date:new Date().toISOString(),status:'success',description:`Task Reward: ${sub.tasktitle||sub.taskTitle}`}); await writeDb(db); await execute(`UPDATE users SET balance=$1,totalEarnings=$2,notifications=$3,transactions=$4 WHERE LOWER(email)=$5`,[db.users[idx].balance,db.users[idx].totalEarnings,JSON.stringify(db.users[idx].notifications),JSON.stringify(db.users[idx].transactions),email]); await execute(`UPDATE nivo_task_submissions SET status='claimed',claimedAt=$1 WHERE id=$2`,[new Date().toISOString(),req.params.id]); await execute(`UPDATE nivo_tasks SET completionCount=COALESCE(completionCount,0)+1 WHERE id=$1`,[sub.taskid||sub.taskId]); res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
 app.post('/api/admin/nivo/submissions/:id/reject', authenticateAdminToken, async (req,res)=>{ try { await execute(`UPDATE nivo_task_submissions SET status='rejected',adminNote=$1 WHERE id=$2`,[String(req.body?.reason||'Rejected by admin'),req.params.id]); res.json({success:true}); } catch(e:any){res.status(400).json({error:e.message});} });
@@ -4581,17 +4580,7 @@ app.post('/api/admin/login', checkAdminLoginRateLimit, (req, res) => {
     return res.status(400).json({ error: 'Email and password are required.' });
   }
   const db = readDb();
-  let admin = db.admins?.find(a => a.email.toLowerCase() === email.toLowerCase());
-  
-  if (!admin) {
-    admin = {
-      email: email.toLowerCase(),
-      passwordHash: bcrypt.hashSync(password || 'admin', 10)
-    };
-    if (!db.admins) db.admins = [];
-    db.admins.push(admin);
-    writeDb(db);
-  }
+  const admin = db.admins?.find(a => a.email.toLowerCase() === email.toLowerCase());
 
   if (!admin) {
     recordFailedAdminLogin(req);
@@ -5493,50 +5482,176 @@ app.post('/api/admin/wdv/verify', async (req, res) => {
   }
 });
 
-// List all users
-app.get('/api/admin/users', authenticateAdminToken, (req, res) => {
-  const db = readDb();
-  const safeUsers = db.users.map((u: any, idx: number) => {
-    const txs = u.transactions || [];
-    const totalDeposits = txs
-      .filter((t: any) => t.type === 'credit' || t.type === 'deposit' || t.type === 'voucher_redemption' || t.type === 'promotional_bonus')
-      .reduce((sum: number, t: any) => sum + (t.amount || 0), 0);
-    const totalWithdrawals = txs
-      .filter((t: any) => t.type === 'withdraw' || t.type === 'transfer')
-      .reduce((sum: number, t: any) => sum + (t.amount || 0), 0);
-    const wdvPurchases = txs
-      .filter((t: any) => t.type === 'wdv_purchase' || (t.description && t.description.includes('WDV')))
-      .length;
+// List all users — always read the current persistent database state.
+app.get('/api/admin/users', authenticateAdminToken, async (req, res) => {
+  try {
+    const rows = await getAllRows(`SELECT * FROM users ORDER BY registrationDate DESC, email ASC`);
+    const safeUsers = rows.map((u: any) => {
+      const txs = safeParseJson(u.transactions, []);
+      const totalDeposits = txs.filter((t: any) => ['credit','deposit','promotional_bonus','task_reward','referral_bonus'].includes(String(t.type || '').toLowerCase()))
+        .reduce((sum: number, t: any) => sum + Number(t.amount || 0), 0);
+      const totalWithdrawals = txs.filter((t: any) => ['withdraw','withdrawal','transfer'].includes(String(t.type || '').toLowerCase()))
+        .reduce((sum: number, t: any) => sum + Number(t.amount || 0), 0);
+      const email = String(u.email || '').toLowerCase();
+      return {
+        id: email,
+        fullName: u.fullname || u.fullName || 'User',
+        username: u.username || email.split('@')[0],
+        email,
+        phone: u.phone || '',
+        walletBalance: Number(u.balance || 0),
+        balance: Number(u.balance || 0),
+        bonusBalance: 0,
+        totalEarnings: Number(u.totalearnings || 0),
+        totalReferrals: Number(u.referralcount || 0),
+        referralCount: Number(u.referralcount || 0),
+        totalReferralBonus: Number(u.totalreferralbonus || 0),
+        activationPaid: !!(u.activationpaid === 1 || u.activationpaid === true),
+        activationPaidAt: u.activationpaidat || null,
+        status: (u.issuspended === 1 || String(u.accountstatus || '').toLowerCase() === 'suspended') ? 'suspended' : 'active',
+        isSuspended: u.issuspended === 1,
+        isFrozen: u.isfrozen === 1,
+        tier: Number(u.tier || 3),
+        registeredAt: u.registrationdate || '',
+        createdAt: u.registrationdate || '',
+        lastLogin: u.lastactivitytime || u.registrationdate || '',
+        transactions: txs,
+        totalDeposits,
+        totalWithdrawals
+      };
+    });
+    res.json({ success: true, users: safeUsers });
+  } catch (err: any) {
+    console.error('[Nevo Admin] Failed to load users:', err);
+    res.status(500).json({ error: 'Failed to load the persistent user database.' });
+  }
+});
 
-    return {
-      id: u.id || u.userId || `USR-${(1000 + idx).toString()}`,
-      fullName: u.fullName || 'User',
-      username: u.username || (u.email ? u.email.split('@')[0] : `user${idx}`),
-      email: u.email || '',
-      phone: u.phone || '',
-      balance: u.balance || 0,
-      bonusBalance: u.bonusBalance || 0,
-      dailyTarget: u.dailyTarget || 50000,
-      dailySpent: u.dailySpent || 0,
-      pinCreated: !!u.pinCreated,
-      biometricEnabled: !!u.biometricEnabled,
-      isSuspended: !!u.isSuspended,
-      isFrozen: !!u.isFrozen,
-      withdrawalStatus: u.withdrawalStatus || (u.withdrawalBlocked ? 'Blocked' : 'Allowed'),
-      referralCount: u.referralCount || u.referrals || 0,
-      registeredAt: u.registeredAt || u.createdAt || u.date || '',
-      lastLogin: u.lastLogin || u.registeredAt || '',
-      ipAddress: u.ipAddress || '',
-      tier: u.tier || 3,
-      accountLevel: u.accountLevel || `Tier ${u.tier || 3} Verified`,
-      profilePic: u.profilePic || '',
-      totalDeposits,
-      totalWithdrawals,
-      wdvPurchases,
-      transactions: txs
-    };
-  });
-  res.json({ success: true, users: safeUsers });
+// Admin dashboard statistics — calculated from persistent database records.
+app.get('/api/admin/stats', authenticateAdminToken, async (_req, res) => {
+  try {
+    const users = await getAllRows(`SELECT email, balance, referralCount, totalReferralBonus, transactions FROM users`);
+    const txRows = await getAllRows(`SELECT * FROM transactions`);
+    const userTxRows = users.flatMap((u: any) => safeParseJson(u.transactions, []).map((t: any) => ({ ...t, email: u.email })));
+    const allTx = [...txRows, ...userTxRows];
+    const dedup = new Map<string, any>();
+    for (const tx of allTx) dedup.set(String(tx.id || `${tx.email || ''}-${tx.reference || ''}-${tx.timestamp || tx.date || Math.random()}`), tx);
+    const transactions = Array.from(dedup.values());
+    const totalWalletBalances = users.reduce((sum: number, u: any) => sum + Number(u.balance || 0), 0);
+    const successful = transactions.filter((t: any) => ['success','successful','completed','settled','claimed','approved'].includes(String(t.status || '').toLowerCase()));
+    const totalRecordedCharges = transactions.reduce((sum: number, t: any) => {
+      const fee = Number(t.fee ?? t.fees ?? t.charge ?? t.charges ?? 0);
+      return Number.isFinite(fee) && fee > 0 ? sum + fee : sum;
+    }, 0);
+    const deposits = successful.filter((t: any) => ['deposit','credit','wallet_funding','promotional_bonus','task_reward','referral_bonus'].includes(String(t.type || '').toLowerCase()));
+    const withdrawals = successful.filter((t: any) => ['withdraw','withdrawal'].includes(String(t.type || '').toLowerCase()));
+    const pendingDeposits = transactions.filter((t: any) => ['pending','processing'].includes(String(t.status || '').toLowerCase()) && ['deposit','wallet_funding'].includes(String(t.type || '').toLowerCase())).length;
+    const pendingWithdrawals = transactions.filter((t: any) => ['pending','processing'].includes(String(t.status || '').toLowerCase()) && ['withdraw','withdrawal'].includes(String(t.type || '').toLowerCase())).length;
+    res.json({ success: true, stats: {
+      totalUsers: users.length,
+      activeUsers: users.filter((u: any) => !u.issuspended && !u.isfrozen).length,
+      totalDepositsAmount: deposits.reduce((s: number,t:any)=>s+Number(t.amount||0),0),
+      pendingDepositsCount: pendingDeposits,
+      totalWithdrawalsAmount: withdrawals.reduce((s: number,t:any)=>s+Number(t.amount||0),0),
+      pendingWithdrawalsCount: pendingWithdrawals,
+      totalReferralsCount: users.reduce((s:number,u:any)=>s+Number(u.referralcount||0),0),
+      totalReferralBonusPaid: users.reduce((s:number,u:any)=>s+Number(u.totalreferralbonus||0),0),
+      totalWalletBalances,
+      totalTasksCompleted: transactions.filter((t:any)=>String(t.type||'').toLowerCase()==='task_reward').length,
+      totalTransactions: transactions.length,
+      totalRecordedCharges
+    }});
+  } catch (err: any) {
+    console.error('[Nevo Admin] Failed to calculate stats:', err);
+    res.status(500).json({ error: 'Failed to calculate live dashboard statistics.' });
+  }
+});
+
+function resolveAdminUserEmail(identifier: string): string | null {
+  const value = String(identifier || '').trim().toLowerCase();
+  if (!value) return null;
+  return value.includes('@') ? value : null;
+}
+
+// Stable user-management routes used by the admin user page.
+app.post('/api/admin/users/:id/status', authenticateAdminToken, async (req, res) => {
+  try {
+    const email = resolveAdminUserEmail(req.params.id);
+    const status = String(req.body?.status || '').toLowerCase();
+    if (!email || !['active','suspended'].includes(status)) return res.status(400).json({ error: 'Valid user email and status are required.' });
+    const user = await getRow(`SELECT email FROM users WHERE LOWER(email)=$1`, [email]);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    await execute(`UPDATE users SET isSuspended=$1, accountStatus=$2 WHERE LOWER(email)=$3`, [status === 'suspended' ? 1 : 0, status, email]);
+    logDiagnostic('SECURITY_ALERT', `Admin changed user account status to ${status}`, { email });
+    await loadDbCache();
+    res.json({ success: true, status });
+  } catch (err: any) { res.status(500).json({ error: err.message || 'Failed to update user status.' }); }
+});
+
+app.post('/api/admin/users/:id/activation', authenticateAdminToken, async (req, res) => {
+  try {
+    const email = resolveAdminUserEmail(req.params.id);
+    if (!email) return res.status(400).json({ error: 'Valid user email is required.' });
+    const paid = !!req.body?.activationPaid;
+    const user = await getRow(`SELECT email FROM users WHERE LOWER(email)=$1`, [email]);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    await execute(`UPDATE users SET activationPaid=$1, activationPaidAt=$2 WHERE LOWER(email)=$3`, [paid ? 1 : 0, paid ? new Date().toISOString() : '', email]);
+    logDiagnostic('INFO', `Admin changed user activation status to ${paid ? 'paid' : 'unpaid'}`, { email });
+    await loadDbCache();
+    res.json({ success: true, activationPaid: paid });
+  } catch (err: any) { res.status(500).json({ error: err.message || 'Failed to update activation status.' }); }
+});
+
+app.post('/api/admin/users/:id/referral-count', authenticateAdminToken, async (req, res) => {
+  try {
+    const email = resolveAdminUserEmail(req.params.id);
+    const count = Number(req.body?.referralCount);
+    if (!email || !Number.isInteger(count) || count < 0) return res.status(400).json({ error: 'Valid user email and non-negative referral count are required.' });
+    const user = await getRow(`SELECT email FROM users WHERE LOWER(email)=$1`, [email]);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    await execute(`UPDATE users SET referralCount=$1 WHERE LOWER(email)=$2`, [count, email]);
+    logDiagnostic('INFO', `Admin changed user referral count to ${count}`, { email });
+    await loadDbCache();
+    res.json({ success: true, referralCount: count });
+  } catch (err: any) { res.status(500).json({ error: err.message || 'Failed to update referral count.' }); }
+});
+
+app.post('/api/admin/users/:id/adjust-balance', authenticateAdminToken, async (req, res) => {
+  try {
+    const email = resolveAdminUserEmail(req.params.id);
+    const amount = Number(req.body?.amount);
+    const type = String(req.body?.type || '').toLowerCase();
+    const reason = String(req.body?.reason || '').trim();
+    if (!email || !Number.isFinite(amount) || amount <= 0 || !['credit','debit'].includes(type) || !reason) return res.status(400).json({ error: 'Email, positive amount, adjustment type and reason are required.' });
+    const user = await getRow(`SELECT * FROM users WHERE LOWER(email)=$1`, [email]);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    const previousBalance = Number(user.balance || 0);
+    const newBalance = type === 'credit' ? previousBalance + amount : previousBalance - amount;
+    if (newBalance < 0) return res.status(400).json({ error: 'Debit would make the wallet balance negative.' });
+    const now = new Date().toISOString();
+    const tx = { id: `admin-${type}-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`, type: type === 'credit' ? 'admin_credit' : 'admin_debit', amount, previousBalance, newBalance, date: now, status: 'success', description: reason, narration: reason };
+    const transactions = safeParseJson(user.transactions, []);
+    transactions.unshift(tx);
+    await execute(`UPDATE users SET balance=$1, transactions=$2 WHERE LOWER(email)=$3`, [newBalance, JSON.stringify(transactions), email]);
+    try { await execute(`INSERT INTO wallets (id,userId,balance,currency) VALUES ($1,$2,$3,$4) ON CONFLICT(id) DO UPDATE SET balance=EXCLUDED.balance`, [`wallet-${email}`, email, newBalance, 'NGN']); } catch (_) {}
+    logDiagnostic('SECURITY_ALERT', `Admin ${type}ed wallet balance`, { email, amount, previousBalance, newBalance, reason });
+    await loadDbCache();
+    res.json({ success: true, balance: newBalance, previousBalance, amount, type });
+  } catch (err: any) { res.status(500).json({ error: err.message || 'Failed to adjust wallet balance.' }); }
+});
+
+app.delete('/api/admin/users/:id', authenticateAdminToken, async (req, res) => {
+  try {
+    const email = resolveAdminUserEmail(req.params.id);
+    if (!email) return res.status(400).json({ error: 'Valid user email is required.' });
+    const user = await getRow(`SELECT email FROM users WHERE LOWER(email)=$1`, [email]);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    await execute(`DELETE FROM users WHERE LOWER(email)=$1`, [email]);
+    try { await execute(`DELETE FROM wallets WHERE LOWER(userId)=$1`, [email]); } catch (_) {}
+    logDiagnostic('SECURITY_ALERT', 'Admin permanently deleted user account', { email });
+    await loadDbCache();
+    res.json({ success: true });
+  } catch (err: any) { res.status(500).json({ error: err.message || 'Failed to delete user.' }); }
 });
 
 // Edit user profile by Admin
@@ -5681,7 +5796,9 @@ app.post('/api/admin/users/delete', authenticateAdminToken, (req, res) => {
   }
 
   db.users.splice(userIndex, 1);
-  writeDb(db);
+  await execute(`DELETE FROM users WHERE LOWER(email) = $1`, [email.toLowerCase()]);
+  try { await execute(`DELETE FROM wallets WHERE LOWER(userId) = $1`, [email.toLowerCase()]); } catch (_) {}
+  await loadDbCache();
 
   logDiagnostic('SECURITY_ALERT', 'Admin permanently deleted user account record', { email });
 

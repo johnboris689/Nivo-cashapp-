@@ -205,39 +205,21 @@ export const api = {
     }>('/api/referrals/stats'),
 
   // --- Tasks ---
-  getTasks: async () => {
-    const res = await request<{ tasks: any[] }>('/api/nivo/tasks');
-    return (res.tasks || []).map((t: any) => {
-      const status = (t.status || 'not_started') as TaskSubmissionStatus;
-      return {
-        ...t,
-        rewardAmount: Number(t.rewardamount ?? t.rewardAmount ?? 0),
-        timerSeconds: Number(t.timerseconds ?? t.timerSeconds ?? 0),
-        completionCount: Number(t.completioncount ?? t.completionCount ?? 0),
-        enabled: Boolean(Number(t.enabled ?? 1)),
-        verificationType: t.verificationtype ?? t.verificationType ?? 'timer',
-        proofInstructions: t.proofinstructions ?? t.proofInstructions ?? '',
-        actionUrl: t.actionurl ?? t.actionUrl ?? '/',
-        userStatus: status,
-        submission: t.submission || null,
-        completed: status === 'claimed' || status === 'approved',
-      };
-    });
-  },
+  getTasks: () => request<(Task & { userStatus: TaskSubmissionStatus; submission: TaskSubmission | null; completed: boolean })[]>('/api/tasks'),
 
   startTask: (taskId: string) =>
-    request<{ message: string; submission: TaskSubmission }>(`/api/nivo/tasks/${taskId}/start`, {
+    request<{ message: string; submission: TaskSubmission }>(`/api/tasks/${taskId}/start`, {
       method: 'POST',
     }),
 
   submitTaskProof: (taskId: string, proofText?: string, proofUrl?: string) =>
-    request<{ message: string; submission: TaskSubmission; credited?: boolean }>(`/api/nivo/tasks/${taskId}/submit`, {
+    request<{ message: string; submission: TaskSubmission; credited?: boolean }>(`/api/tasks/${taskId}/submit`, {
       method: 'POST',
       body: JSON.stringify({ proofText, proofUrl }),
     }),
 
   completeTask: (taskId: string, proofText?: string, proofUrl?: string) =>
-    request<{ message: string; submission: TaskSubmission; credited?: boolean }>(`/api/nivo/tasks/${taskId}/submit`, {
+    request<{ message: string; submission: TaskSubmission; credited?: boolean }>('/api/tasks/complete', {
       method: 'POST',
       body: JSON.stringify({ taskId, proofText, proofUrl }),
     }),
@@ -258,11 +240,11 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
-  getAdminStats: () => request<AdminStats>('/api/admin/stats', {}, true),
+  getAdminStats: async () => { const data = await request<{ success?: boolean; stats?: AdminStats }>('/api/admin/stats', {}, true); return data.stats || ({ totalUsers: 0, activeUsers: 0, totalDepositsAmount: 0, pendingDepositsCount: 0, totalWithdrawalsAmount: 0, pendingWithdrawalsCount: 0, totalReferralsCount: 0, totalReferralBonusPaid: 0, totalWalletBalances: 0, totalTasksCompleted: 0 } as AdminStats); },
 
   getAdminPaymentOverview: () => request<PaymentOverviewResponse>('/api/admin/payment-overview', {}, true),
 
-  getAdminUsers: () => request<User[]>('/api/admin/users', {}, true),
+  getAdminUsers: async () => { const data = await request<{ success?: boolean; users?: User[] }>('/api/admin/users', {}, true); return Array.isArray(data.users) ? data.users : []; },
 
   updateUserStatus: (userId: string, status: 'active' | 'suspended') =>
     request<User>(`/api/admin/users/${userId}/status`, {
@@ -316,60 +298,59 @@ export const api = {
     }, true),
 
   getAdminTasks: async () => {
-    const res = await request<{ success: boolean; tasks: any[] }>('/api/admin/nivo/tasks', {}, true);
-    return (res.tasks || []).map((t: any) => ({
+    const data = await request<{ success?: boolean; tasks?: any[] }>('/api/admin/nivo/tasks', {}, true);
+    return (Array.isArray(data.tasks) ? data.tasks : []).map((t: any) => ({
       ...t,
-      rewardAmount: Number(t.rewardamount ?? t.rewardAmount ?? 0),
-      timerSeconds: Number(t.timerseconds ?? t.timerSeconds ?? 0),
-      completionCount: Number(t.completioncount ?? t.completionCount ?? 0),
-      enabled: Boolean(Number(t.enabled ?? 0)),
-      verificationType: t.verificationtype ?? t.verificationType ?? 'timer',
-      proofInstructions: t.proofinstructions ?? t.proofInstructions ?? '',
-      actionUrl: t.actionurl ?? t.actionUrl ?? '/',
-    }));
+      rewardAmount: Number(t.rewardAmount ?? t.rewardamount ?? 0),
+      timerSeconds: Number(t.timerSeconds ?? t.timerseconds ?? 0),
+      completionCount: Number(t.completionCount ?? t.completioncount ?? 0),
+      enabled: !!(t.enabled === true || t.enabled === 1),
+      createdAt: t.createdAt || t.createdat || ''
+    })) as Task[];
   },
 
   getAdminTaskSubmissions: async () => {
-    const res = await request<{ success: boolean; submissions: any[] }>('/api/admin/nivo/tasks', {}, true);
-    return (res.submissions || []).map((s: any) => ({
+    const data = await request<{ success?: boolean; submissions?: any[] }>('/api/admin/nivo/tasks', {}, true);
+    return (Array.isArray(data.submissions) ? data.submissions : []).map((s: any) => ({
       ...s,
-      userId: s.userid ?? s.userId,
-      taskId: s.taskid ?? s.taskId,
-      taskTitle: s.tasktitle ?? s.taskTitle,
-      rewardAmount: Number(s.rewardamount ?? s.rewardAmount ?? 0),
-      userEmail: s.useremail ?? s.userEmail,
-      userName: s.username ?? s.userName ?? s.useremail ?? s.userEmail ?? 'User',
-      status: s.status,
-      completedAt: s.completedat ?? s.completedAt,
-      createdAt: s.createdat ?? s.createdAt,
-      proofText: s.prooftext ?? s.proofText ?? '',
-      adminNote: s.adminnote ?? s.adminNote ?? '',
-    }));
+      userId: s.userId || s.userid || '',
+      userEmail: s.userEmail || s.useremail || '',
+      userName: s.userName || s.username || s.useremail || '',
+      taskId: s.taskId || s.taskid || '',
+      taskTitle: s.taskTitle || s.tasktitle || '',
+      rewardAmount: Number(s.rewardAmount ?? s.rewardamount ?? 0),
+      verificationType: s.verificationType || s.verificationtype || 'timer',
+      createdAt: s.createdAt || s.createdat || ''
+    })) as TaskSubmission[];
   },
 
   approveTaskSubmission: (submissionId: string, adminNote?: string) =>
-    request<{ success: boolean; message?: string; submission?: TaskSubmission }>(`/api/admin/nivo/submissions/${submissionId}/approve`, {
+    request<{ message?: string; success?: boolean; submission?: TaskSubmission }>(`/api/admin/nivo/submissions/${submissionId}/approve`, {
       method: 'POST',
       body: JSON.stringify({ adminNote }),
-    }, true),
+    }, true).then((r) => ({ message: r.message || 'Task submission approved.', submission: r.submission as TaskSubmission })),
 
   rejectTaskSubmission: (submissionId: string, adminNote?: string) =>
-    request<{ success: boolean; message?: string; submission?: TaskSubmission }>(`/api/admin/nivo/submissions/${submissionId}/reject`, {
+    request<{ message?: string; success?: boolean; submission?: TaskSubmission }>(`/api/admin/nivo/submissions/${submissionId}/reject`, {
       method: 'POST',
       body: JSON.stringify({ reason: adminNote }),
-    }, true),
+    }, true).then((r) => ({ message: r.message || 'Task submission rejected.', submission: r.submission as TaskSubmission })),
 
-  createTask: (task: Omit<Task, 'id' | 'createdAt' | 'completionCount'>) =>
-    request<Task>('/api/admin/nivo/tasks', {
+  createTask: async (task: Omit<Task, 'id' | 'createdAt' | 'completionCount'>) => {
+    const data = await request<{ success?: boolean; id?: string }>('/api/admin/nivo/tasks', {
       method: 'POST',
       body: JSON.stringify(task),
-    }, true),
+    }, true);
+    return { ...task, id: data.id || `task-${Date.now()}`, createdAt: new Date().toISOString(), completionCount: 0 } as Task;
+  },
 
-  updateTask: (taskId: string, task: Partial<Task>) =>
-    request<Task>(`/api/admin/nivo/tasks/${taskId}`, {
+  updateTask: async (taskId: string, task: Partial<Task>) => {
+    await request<{ success?: boolean }>(`/api/admin/nivo/tasks/${taskId}`, {
       method: 'PATCH',
       body: JSON.stringify(task),
-    }, true),
+    }, true);
+    return { ...(task as any), id: taskId } as Task;
+  },
 
   deleteTask: (taskId: string) =>
     request<{ success: boolean }>(`/api/admin/nivo/tasks/${taskId}`, {

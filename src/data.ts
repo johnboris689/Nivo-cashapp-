@@ -130,20 +130,17 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [];
 export const INITIAL_NOTIFICATIONS: NotificationItem[] = [];
 
 export const FAQS = [
-  {
-    question: 'How do I fund my Nevo wallet?',
-    answer: 'Tap Deposit, choose an amount of at least ₦520, and continue to the fresh KoraPay hosted checkout. Nevo credits your wallet only after KoraPay confirms the payment server-side.'
-  },
-  {
-    question: 'When can I withdraw or spend my wallet balance?',
-    answer: 'Complete at least 5 successful referrals and make a verified KoraPay wallet deposit of at least ₦520. Both requirements are required before wallet-spending and cash-out services are unlocked.'
-  },
-  {
-    question: 'How do I earn on Nevo?',
-    answer: 'Complete available tasks, watch eligible rewarded adverts, and refer friends. Rewards are recorded in your Nevo account history.'
-  },
-  {
-    question: 'What is the minimum withdrawal?',
-    answer: 'The minimum withdrawal amount is ₦5,000 once your transaction eligibility requirements have been completed.'
-  }
+  { question: 'What is Nevo?', answer: 'Nevo is a digital wallet and rewards platform where registered users can manage their wallet, complete available tasks, participate in eligible rewarded activities, and use referrals and other features provided in the app.' },
+  { question: 'How do I create a Nevo account?', answer: 'Tap Sign Up and enter your name, email and password. Use information that belongs to you and keep your login details private.' },
+  { question: 'How do I fund my Nevo wallet?', answer: 'Tap Deposit, choose an amount of at least ₦520, and continue to the KoraPay checkout. Your wallet is credited only after the payment is successfully confirmed.' },
+  { question: 'What happens after a KoraPay payment?', answer: 'KoraPay confirms the payment and Nevo verifies that confirmation before crediting your wallet. If a successful payment is still pending, allow the verification process to finish and contact official support if the balance does not update.' },
+  { question: 'How do I withdraw?', answer: 'Open Withdraw, select your bank, enter your account number, and allow Nevo to verify the account holder name. Confirm the verified details before continuing to the withdrawal amount.' },
+  { question: 'What is the minimum withdrawal amount?', answer: 'The normal minimum withdrawal amount is ₦5,000 once the withdrawal eligibility requirements shown in your account have been completed.' },
+  { question: 'How do referrals work?', answer: 'Share your personal referral link or code with genuine new users. Referral rewards are subject to the requirements displayed by Nevo. Duplicate, false or abusive referrals do not qualify.' },
+  { question: 'How do Nevo tasks work?', answer: 'Open Tasks, choose an available task, read its instructions, start it, complete the required action, and submit when the task asks for proof or completion. The task reward is credited only after successful verification.' },
+  { question: 'How do rewarded adverts work?', answer: 'Open an eligible advert and follow the instructions shown. A reward is recorded only when the required advert activity is completed and accepted.' },
+  { question: 'Why is my deposit or withdrawal pending?', answer: 'A transaction may remain pending while payment or account details are being verified. Do not submit duplicate payments or withdrawal requests. Check your history and contact official Nevo support if the status does not update.' },
+  { question: 'What if my balance looks incorrect?', answer: 'Check your transaction history first. If the balance still appears incorrect, contact Nevo through an official support channel and provide the relevant transaction reference. Never send your password, OTP or PIN.' },
+  { question: 'How does Nevo protect my privacy?', answer: 'Nevo uses account information for legitimate account, service, transaction, security and support purposes. We do not sell personal information to advertisers. See the Privacy Policy for more information.' },
+  { question: 'How can I contact Nevo support?', answer: 'Use the official support contact shown on the Nevo website, including the support email or official Telegram channel. Nevo support will never ask you to disclose your password, OTP or PIN.' }
 ];

@@ -105,7 +105,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   scrollingAnnouncement: "Welcome! Fast and secure manual transactions with 24/7 support.",
   liveFeedText: "Verified live activity will appear here automatically.",
   welcomeMessage: "Welcome",
-  dashboardBanner: "Get started with fast manual voucher activation & seamless transfers",
+  dashboardBanner: "Manage your Nevo wallet, tasks, referrals and secure transactions",
   noticeBarText: "",
   bankName: "PalmPay",
   accountName: "pwamunadi ishaku",

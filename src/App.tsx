@@ -4971,7 +4971,7 @@ export default function App() {
                       </button>
                       <div>
                         <h2 className="text-lg font-black font-display text-white">Bank Withdrawal</h2>
-                      </div>
+                                              </div>
                     </div>
                     <div className="bg-teal-500/10 border border-teal-500/20 px-3 py-1 rounded-full text-[10px] font-mono font-bold text-teal-400">
                       Step {withdrawStep} of 2
@@ -5241,8 +5241,7 @@ export default function App() {
                       </button>
                       <div>
                         <h2 className="text-lg font-black font-display text-white">Bank Cashout Transfer</h2>
-                        <p className="text-[10px] font-mono text-slate-400">Route: /dashboard/transfer</p>
-                      </div>
+                                              </div>
                     </div>
                     <div className="bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full text-[10px] font-mono font-bold text-indigo-400">
                       Step {transferStep} of 2
@@ -5525,7 +5524,7 @@ export default function App() {
                   </div>
 
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Learn how our customized Deposit system operates and how you save on bank transaction bills.
+                    Find clear answers about Nevo accounts, wallets, KoraPay deposits, withdrawals, referrals, tasks, rewards, and account security.
                   </p>
 
                   <div className="space-y-3">

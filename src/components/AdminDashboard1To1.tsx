@@ -187,11 +187,6 @@ export default function AdminDashboard1To1({
     return () => clearInterval(timer);
   }, []);
 
-  // Sparkline mock data matching design curves
-  const sparkUsers = [15, 22, 18, 30, 25, 38, 32, 45, 40, 52, 48, 60];
-  const sparkLedger = [10, 25, 20, 35, 28, 42, 35, 50, 42, 58, 52, 65];
-  const sparkRev = [10, 10, 10, 12, 12, 11, 12, 12, 12, 12, 12, 12];
-  const sparkTxs = [12, 20, 18, 32, 26, 40, 34, 48, 42, 55, 50, 62];
 
   // Filter transactions based on date range selection
   const filteredTransactions = transactions.filter(t => {
@@ -220,9 +215,32 @@ export default function AdminDashboard1To1({
   const displayRevenue = totalRevenue;
   const displayTxsCount = totalTxsCount;
 
+  const makeTrend = (values: number[]) => {
+    const clean = values.filter(v => Number.isFinite(v));
+    if (!clean.length) return [0, 0, 0, 0];
+    const buckets = 12;
+    return Array.from({ length: buckets }, (_, i) => clean[Math.floor((i / buckets) * clean.length)] ?? clean[clean.length - 1]);
+  };
+  const realTransactionAmounts = filteredTransactions.map(t => Number(t.amount || 0));
+  const realLedgerTrend = makeTrend(users.map(u => Number(u.balance || 0)));
+  const realUserTrend = makeTrend(users.map((_, i) => i + 1));
+  const realRevenueTrend = makeTrend(filteredTransactions.map(t => Number(t.fee ?? t.fees ?? t.charge ?? t.charges ?? 0)));
+  const realTxTrend = makeTrend(realTransactionAmounts);
+  const relativeTime = (value: any) => {
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return 'Unknown time';
+    const seconds = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000));
+    if (seconds < 60) return `${seconds}s ago`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    return `${Math.floor(hours / 24)}d ago`;
+  };
+
   const recentTransactionsList = filteredTransactions.slice(0, 5).map((t, idx) => ({
     id: t.id ? (String(t.id).startsWith('#') ? t.id : `#TXN-${String(t.id).slice(0, 8)}`) : `#TXN-${String(idx + 1).padStart(4, '0')}`,
-    type: t.type === 'redeem_airtime' ? 'Airtime' : t.type === 'buy_legacyVoucher' ? 'Voucher' : t.type === 'withdraw' ? 'Withdrawal' : (t.type || 'Transaction'),
+    type: t.type === 'redeem_airtime' ? 'Airtime' : t.type === 'withdraw' ? 'Withdrawal' : (t.type || 'Transaction'),
     user: t.user || t.email || 'System User',
     amount: `₦${Number(t.amount || 0).toLocaleString()}`,
     status: ['success','successful','completed','settled','claimed'].includes(String(t.status || '').toLowerCase()) ? 'Success' : String(t.status || 'Pending')
@@ -241,14 +259,11 @@ export default function AdminDashboard1To1({
         </div>
         <div className="flex-1 overflow-hidden whitespace-nowrap">
           <div className="inline-block animate-[marquee_30s_linear_infinite] text-[11px] font-mono text-slate-300 font-medium tracking-wide">
-            <span className="text-emerald-400 font-bold">● LIVE SYSTEM ONLINE</span> &nbsp;•&nbsp;
-            <span className="text-teal-300">SECURITY CHECK COMPLETE</span> &nbsp;•&nbsp;
-            <span className="text-indigo-400">DATABASE ENCRYPTED (AES-256)</span> &nbsp;•&nbsp;
-            <span className="text-cyan-400">API CONNECTED</span> &nbsp;•&nbsp;
-            <span className="text-purple-400">BACKUP SYNCHRONIZED</span> &nbsp;•&nbsp;
-            <span className="text-emerald-400">USER LOGINS VERIFIED</span> &nbsp;•&nbsp;
-            <span className="text-teal-400">FRAUD DETECTION ENGINE ACTIVE</span> &nbsp;•&nbsp;
-            <span className="text-amber-400">SYSTEM HEALTH 100%</span>
+            <span className="text-emerald-400 font-bold">● LIVE DATABASE DATA</span> &nbsp;•&nbsp;
+            <span className="text-teal-300">{displayUsersCount} REGISTERED USERS</span> &nbsp;•&nbsp;
+            <span className="text-cyan-400">{displayTxsCount} RECORDED TRANSACTIONS</span> &nbsp;•&nbsp;
+            <span className="text-purple-400">₦{Number(totalSystemBalance || 0).toLocaleString()} TOTAL WALLET BALANCE</span> &nbsp;•&nbsp;
+            <span className="text-emerald-400">₦{Number(displayRevenue || 0).toLocaleString()} RECORDED CHARGES</span>
           </div>
         </div>
       </div>
@@ -280,7 +295,7 @@ export default function AdminDashboard1To1({
                 </h1>
               </div>
               <p className="text-[10px] text-slate-400 font-mono tracking-wider uppercase">
-                Real-Time Fintech Security Operations Center
+                Nevo Administration & Operations
               </p>
             </div>
           </div>
@@ -291,15 +306,15 @@ export default function AdminDashboard1To1({
           <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/10 font-mono text-[10px]">
             <span className="flex items-center gap-1 text-emerald-400 font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              DB: ONLINE
+              DB: LIVE DATA
             </span>
             <span className="text-slate-600">|</span>
             <span className="flex items-center gap-1 text-cyan-400 font-bold">
-              <Wifi className="h-3 w-3" /> API: CONNECTED
+              <Wifi className="h-3 w-3" /> API: LIVE
             </span>
             <span className="text-slate-600">|</span>
             <span className="flex items-center gap-1 text-teal-400 font-bold">
-              <Lock className="h-3 w-3" /> SEC: LEVEL 1
+              <Lock className="h-3 w-3" /> SECURITY: ACTIVE
             </span>
           </div>
 
@@ -415,7 +430,7 @@ export default function AdminDashboard1To1({
                   <span className="text-slate-400 text-[10px] ml-1 font-normal">live count</span>
                 </div>
                 <div className="hidden sm:block shrink-0">
-                  <Sparkline color="#2dd4bf" points={sparkUsers} />
+                  <Sparkline color="#2dd4bf" points={realUserTrend} />
                 </div>
               </div>
             </div>
@@ -444,7 +459,7 @@ export default function AdminDashboard1To1({
                   <span className="text-slate-400 text-[10px] ml-1 font-normal">wallet ledger</span>
                 </div>
                 <div className="hidden sm:block shrink-0">
-                  <Sparkline color="#a855f7" points={sparkLedger} />
+                  <Sparkline color="#a855f7" points={realLedgerTrend} />
                 </div>
               </div>
             </div>
@@ -471,7 +486,7 @@ export default function AdminDashboard1To1({
                   <span className="text-slate-400 text-[10px] ml-1 font-normal">actual charges</span>
                 </div>
                 <div className="hidden sm:block shrink-0">
-                  <Sparkline color="#10b981" points={sparkRev} />
+                  <Sparkline color="#10b981" points={realRevenueTrend} />
                 </div>
               </div>
             </div>
@@ -498,7 +513,7 @@ export default function AdminDashboard1To1({
                   <span className="text-slate-400 text-[10px] ml-1 font-normal">recorded transactions</span>
                 </div>
                 <div className="hidden sm:block shrink-0">
-                  <Sparkline color="#06b6d4" points={sparkTxs} />
+                  <Sparkline color="#06b6d4" points={realTxTrend} />
                 </div>
               </div>
             </div>
@@ -666,35 +681,21 @@ export default function AdminDashboard1To1({
               </div>
 
               <div className="space-y-3">
-                <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 flex items-start gap-3">
-                  <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 shrink-0">
-                    <AlertTriangle className="h-4 w-4" />
+                {logs.length === 0 ? (
+                  <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10 text-center text-slate-500 font-mono text-xs">
+                    No security or admin events recorded yet.
                   </div>
-                  <div className="space-y-0.5">
-                    <div className="text-xs font-bold text-white">Pending Withdrawal Approvals in Queue</div>
-                    <div className="text-[10px] text-slate-400 font-mono">12m ago • Awaiting operator sign-off</div>
+                ) : logs.slice(0, 3).map((log: any) => (
+                  <div key={String(log.id || log.timestamp)} className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-400 shrink-0">
+                      <Activity className="h-4 w-4" />
+                    </div>
+                    <div className="space-y-0.5 min-w-0">
+                      <div className="text-xs font-bold text-white break-words">{String(log.message || 'Administrative activity')}</div>
+                      <div className="text-[10px] text-slate-400 font-mono">{String(log.type || 'INFO').replace(/_/g, ' ')} • {relativeTime(log.timestamp)}</div>
+                    </div>
                   </div>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 flex items-start gap-3">
-                  <div className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 shrink-0">
-                    <ShieldAlert className="h-4 w-4" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <div className="text-xs font-bold text-white">Fraud Prevention Filter Scanning Active</div>
-                    <div className="text-[10px] text-slate-400 font-mono">28m ago • Zero anomalies triggered</div>
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 flex items-start gap-3">
-                  <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shrink-0">
-                    <CheckCircle className="h-4 w-4" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <div className="text-xs font-bold text-white">Automated Database Encrypted Snapshot</div>
-                    <div className="text-[10px] text-slate-400 font-mono">1h ago • AES-256 backup successful</div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -709,7 +710,7 @@ export default function AdminDashboard1To1({
                 <div>
                   <span className="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase block">PENDING WITHDRAWALS</span>
                   <div className="text-xl font-black text-white font-mono">{stats.pendingCount}</div>
-                  <div className="text-[10px] text-amber-400 font-mono font-bold mt-0.5">Requires Operator Verification</div>
+                  <div className="text-[10px] text-amber-400 font-mono font-bold mt-0.5">Current pending requests</div>
                 </div>
               </div>
               {renderCardMenu('pending_withdrawals', 'Pending Withdrawals', 'withdrawals')}
@@ -723,7 +724,7 @@ export default function AdminDashboard1To1({
                 <div>
                   <span className="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase block">NEW USERS TODAY</span>
                   <div className="text-xl font-black text-white font-mono">{stats.newUsersToday}</div>
-                  <div className="text-[10px] text-emerald-400 font-mono font-bold mt-0.5">+18.6% Growth Rate</div>
+                  <div className="text-[10px] text-emerald-400 font-mono font-bold mt-0.5">Actual registrations today</div>
                 </div>
               </div>
               {renderCardMenu('new_users', 'New Users Today', 'users')}
@@ -737,7 +738,7 @@ export default function AdminDashboard1To1({
                 <div>
                   <span className="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase block">FAILED TRANSACTIONS</span>
                   <div className="text-xl font-black text-white font-mono">{stats.failedTransactions}</div>
-                  <div className="text-[10px] text-emerald-400 font-mono font-bold mt-0.5">{stats.systemHealth}% System Reliability</div>
+                  <div className="text-[10px] text-slate-400 font-mono font-bold mt-0.5">{stats.systemHealth == null ? 'No transaction outcome data' : `${stats.systemHealth}% recorded success rate`}</div>
                 </div>
               </div>
               {renderCardMenu('failed_txs', 'Failed Transactions', 'security')}
@@ -750,8 +751,8 @@ export default function AdminDashboard1To1({
                 </div>
                 <div>
                   <span className="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase block">SYSTEM HEALTH</span>
-                  <div className="text-xl font-black text-emerald-400 font-mono">{stats.systemHealth}% {stats.systemHealth >= 99 ? 'OPERATIONAL' : 'DEGRADED'}</div>
-                  <div className="text-[10px] text-slate-400 font-mono mt-0.5">Based on recorded transaction outcomes</div>
+                  <div className="text-xl font-black text-emerald-400 font-mono">{stats.systemHealth == null ? 'NO DATA' : `${stats.systemHealth}%`}</div>
+                  <div className="text-[10px] text-slate-400 font-mono mt-0.5">{stats.systemHealth == null ? 'No transaction outcomes recorded' : 'Calculated from recorded transaction outcomes'}</div>
                 </div>
               </div>
               {renderCardMenu('system_health', 'System Health', 'reports')}
@@ -784,59 +785,16 @@ export default function AdminDashboard1To1({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5 font-sans">
-                  <tr className="hover:bg-white/[0.03] transition-colors">
-                    <td className="py-3 pr-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-teal-500/20 border border-teal-500/40 p-0.5 shrink-0">
-                          <img
-                            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-                            alt="Admin User"
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        </div>
-                        <span className="font-bold text-white">SOC Admin</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-2 text-teal-300 font-mono font-bold">Logged In</td>
-                    <td className="py-3 px-2 text-slate-300">Authenticated via Secure Terminal MFA</td>
-                    <td className="py-3 pl-2 text-right text-slate-400 font-mono text-[11px]">2m ago</td>
-                  </tr>
-
-                  <tr className="hover:bg-white/[0.03] transition-colors">
-                    <td className="py-3 pr-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-teal-500/20 border border-teal-500/40 p-0.5 shrink-0">
-                          <img
-                            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-                            alt="Admin User"
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        </div>
-                        <span className="font-bold text-white">SOC Admin</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-2 text-emerald-300 font-mono font-bold">Approved Withdrawal</td>
-                    <td className="py-3 px-2 text-slate-300">Verified POS decline slip &amp; processed ₦50,000</td>
-                    <td className="py-3 pl-2 text-right text-slate-400 font-mono text-[11px]">15m ago</td>
-                  </tr>
-
-                  <tr className="hover:bg-white/[0.03] transition-colors">
-                    <td className="py-3 pr-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-teal-500/20 border border-teal-500/40 p-0.5 shrink-0">
-                          <img
-                            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-                            alt="Admin User"
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        </div>
-                        <span className="font-bold text-white">SOC Admin</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-2 text-cyan-300 font-mono font-bold">Generated LEGACY_VOUCHER Code</td>
-                    <td className="py-3 px-2 text-slate-300">Issued single-use LEGACY_VOUCHER voucher token (₦10,000)</td>
-                    <td className="py-3 pl-2 text-right text-slate-400 font-mono text-[11px]">32m ago</td>
-                  </tr>
+                  {logs.length === 0 ? (
+                    <tr><td colSpan={4} className="py-10 text-center text-slate-500 font-mono text-xs">No recent admin activity recorded.</td></tr>
+                  ) : logs.slice(0, 5).map((log: any) => (
+                    <tr key={String(log.id || log.timestamp || Math.random())} className="hover:bg-white/[0.03] transition-colors">
+                      <td className="py-3 pr-2"><span className="font-bold text-white">Admin</span></td>
+                      <td className="py-3 px-2 text-teal-300 font-mono font-bold">{String(log.type || 'INFO').replace(/_/g, ' ')}</td>
+                      <td className="py-3 px-2 text-slate-300 break-words">{String(log.message || 'Administrative activity')}</td>
+                      <td className="py-3 pl-2 text-right text-slate-400 font-mono text-[11px]">{relativeTime(log.timestamp)}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

@@ -242,7 +242,7 @@ export default function AdminPanel({
   const [airtimeEnabled, setAirtimeEnabled] = useState(true);
   const [dataEnabled, setDataEnabled] = useState(true);
   const [billsEnabled, setBillsEnabled] = useState(true);
-  const [legacyVoucherEnabled, setLegacyVoucherEnabled] = useState(true);
+  const [legacyVoucherEnabled, setLegacyVoucherEnabled] = useState(false);
   const [referralEnabled, setReferralEnabled] = useState(true);
   const [referralBonus, setReferralBonus] = useState('5000');
   const [registrationBonus, setRegistrationBonus] = useState('750');
@@ -256,7 +256,7 @@ export default function AdminPanel({
   const [scrollingAnnouncement, setScrollingAnnouncement] = useState('Welcome to Nevo! Fast and secure manual transactions with 24/7 support.');
   const [liveFeedText, setLiveFeedText] = useState('Verified live activity will appear here automatically.');
   const [welcomeMessage, setWelcomeMessage] = useState('Welcome to Nevo');
-  const [dashboardBanner, setDashboardBanner] = useState('Get started with fast manual voucher activation & seamless transfers');
+  const [dashboardBanner, setDashboardBanner] = useState('Manage your Nevo wallet, tasks, referrals and secure transactions');
   const [noticeBarText, setNoticeBarText] = useState('');
   const [paymentCountdown, setPaymentCountdown] = useState('900');
   const [paymentsEnabled, setPaymentsEnabled] = useState(true);
@@ -514,7 +514,7 @@ export default function AdminPanel({
           if (s.airtimeEnabled) setAirtimeEnabled(s.airtimeEnabled === 'true');
           if (s.dataEnabled) setDataEnabled(s.dataEnabled === 'true');
           if (s.billsEnabled) setBillsEnabled(s.billsEnabled === 'true');
-          if (s.legacyVoucherEnabled) setLegacyVoucherEnabled(s.legacyVoucherEnabled === 'true');
+          setLegacyVoucherEnabled(false);
           if (s.referralEnabled) setReferralEnabled(s.referralEnabled === 'true');
           if (s.referralBonus) setReferralBonus(s.referralBonus);
           if (s.registrationBonus) setRegistrationBonus(s.registrationBonus);
@@ -599,7 +599,7 @@ export default function AdminPanel({
         airtimeEnabled: String(airtimeEnabled),
         dataEnabled: String(dataEnabled),
         billsEnabled: String(billsEnabled),
-        legacyVoucherEnabled: String(legacyVoucherEnabled),
+        legacyVoucherEnabled: 'false',
         referralEnabled: String(referralEnabled),
         referralBonus,
         registrationBonus,
@@ -1635,7 +1635,7 @@ export default function AdminPanel({
 
     const failedTransactions = transactionRows.filter((t: any) => ['failed','failure','rejected','cancelled'].includes(toSafeLower(t?.status))).length;
     const successfulOrCompletedTransactions = transactionRows.filter((t: any) => ['success','successful','completed','settled','claimed'].includes(toSafeLower(t?.status))).length;
-    const systemHealth = transactionRows.length === 0 ? 100 : Math.max(0, Math.min(100, Math.round(((transactionRows.length - failedTransactions) / transactionRows.length) * 100)));
+    const systemHealth = transactionRows.length === 0 ? null : Math.max(0, Math.min(100, Math.round(((transactionRows.length - failedTransactions) / transactionRows.length) * 100)));
 
     // Only count an actual recorded fee/charge. Never invent a fee from the transaction type.
     const totalRecordedCharges = transactionRows.reduce((sum: number, t: any) => {
