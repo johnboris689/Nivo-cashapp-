@@ -39,7 +39,7 @@ export const TasksPage: React.FC = () => {
       particleCount: 100,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#5A1024', '#7A1831', '#A52A4A', '#C13A5A', '#ffffff'],
+      colors: ['#071114', '#008F7A', '#00BFA6', '#C13A5A', '#ffffff'],
     });
 
     setMsg({ type: 'success', text: message });
@@ -66,7 +66,7 @@ export const TasksPage: React.FC = () => {
             Verified Task & Reward Hub
           </h1>
           <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#A52A4A]" />
+            <ShieldCheck className="w-3.5 h-3.5 text-[#00BFA6]" />
             Backend-verified completion engine prevents double claiming & exploits
           </p>
         </div>
@@ -84,8 +84,8 @@ export const TasksPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
-              : 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#C13A5A]'
+              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
+              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -101,9 +101,9 @@ export const TasksPage: React.FC = () => {
             {completedCount} of {tasks.length} Verified & Claimed
           </span>
         </div>
-        <div className="w-full bg-[#240A12] h-3 rounded-full overflow-hidden border border-white/10">
+        <div className="w-full bg-[#071114] h-3 rounded-full overflow-hidden border border-white/10">
           <div
-            className="bg-gradient-to-r from-[#7A1831] to-[#C13A5A] h-full transition-all duration-500"
+            className="bg-gradient-to-r from-[#008F7A] to-[#C13A5A] h-full transition-all duration-500"
             style={{ width: `${tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0}%` }}
           ></div>
         </div>

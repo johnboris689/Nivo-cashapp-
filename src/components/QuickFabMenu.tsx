@@ -16,7 +16,7 @@ export default function QuickFabMenu({ isOpen, onClose, onSelectAction }: QuickF
       title: 'Deposit Funds',
       desc: 'Add money to your wallet through KoraPay',
       icon: Wallet,
-      color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
+      color: 'bg-teal-500/10 text-teal-400 border-teal-500/20',
       textColor: 'text-white'
     },
     {

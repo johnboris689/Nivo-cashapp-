@@ -1,0 +1,23 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="nevoA" x1="20" y1="103" x2="108" y2="25" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#20F2D0"/>
+      <stop offset="0.48" stop-color="#2AC7E8"/>
+      <stop offset="1" stop-color="#7C6CFF"/>
+    </linearGradient>
+    <linearGradient id="nevoB" x1="30" y1="100" x2="94" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00D6B4"/>
+      <stop offset="1" stop-color="#8D7CFF"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="34" fill="#071114" stroke="#1EE4C5" stroke-opacity=".35" stroke-width="2"/>
+  <rect x="13" y="13" width="102" height="102" rx="28" fill="url(#nevoA)" opacity=".08"/>
+  <g filter="url(#glow)">
+    <path d="M29 88V40C29 35.6 34.1 33.4 37.2 36.5L90 89.5C93.2 92.7 98.5 90.4 98.5 85.9V40" stroke="url(#nevoA)" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M29 88L55 62" stroke="url(#nevoB)" stroke-width="15" stroke-linecap="round"/>
+  </g>
+</svg>

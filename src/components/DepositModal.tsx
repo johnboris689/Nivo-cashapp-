@@ -27,7 +27,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({ onClose }) => {
       <div className="flex justify-between items-center"><h3 className="text-white font-black">Deposit via KoraPay</h3><button onClick={onClose} className="text-slate-400">✕</button></div>
       {error && <div className="text-xs text-rose-300 bg-rose-500/10 p-3 rounded-xl">{error}</div>}
       <input inputMode="numeric" value={amount} onChange={e => setAmount(e.target.value.replace(/\D/g,''))} className="w-full rounded-xl bg-white/5 border border-white/10 p-3 text-white" placeholder="Amount" />
-      <button disabled={loading} onClick={submit} className="w-full rounded-xl bg-gradient-to-r from-teal-400 to-indigo-500 py-3 font-black text-slate-950 disabled:opacity-50">{loading ? 'Creating checkout…' : 'Continue to KoraPay'}</button>
+      <button disabled={loading} onClick={submit} className="w-full rounded-xl bg-gradient-to-r from-teal-400 to-teal-500 py-3 font-black text-slate-950 disabled:opacity-50">{loading ? 'Creating checkout…' : 'Continue to KoraPay'}</button>
     </div>
   </div>;
 };

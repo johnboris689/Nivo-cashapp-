@@ -61,3 +61,83 @@ html, body, #root {
   100% { transform: translateY(0); opacity: 1; }
 }
 .animate-ticker { animation: nevoTickerIn 420ms ease-out both; }
+
+/* --------------------------------------------------------------------------
+   NEVO SMOKY-EMERALD GLASS SYSTEM
+   Visual language based on the current Nevo reference: near-black smoked
+   glass, subtle teal borders, emerald actions, restrained purple only in the
+   brand mark, and soft depth rather than bright neon panels.
+   -------------------------------------------------------------------------- */
+:root {
+  --nevo-bg: #070A0D;
+  --nevo-surface: rgba(18, 25, 27, 0.72);
+  --nevo-surface-strong: rgba(12, 19, 21, 0.9);
+  --nevo-border: rgba(0, 210, 170, 0.22);
+  --nevo-border-soft: rgba(255, 255, 255, 0.075);
+  --nevo-accent: #00C9A7;
+  --nevo-accent-soft: #7EE8D3;
+  --nevo-text: #F2F5F4;
+  --nevo-muted: #8E9A9A;
+}
+
+html, body, #root {
+  background:
+    radial-gradient(circle at 15% 0%, rgba(0, 201, 167, 0.055), transparent 30%),
+    radial-gradient(circle at 90% 20%, rgba(0, 201, 167, 0.035), transparent 28%),
+    var(--nevo-bg) !important;
+  color: var(--nevo-text);
+}
+
+body {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Shared glass surface used throughout the existing application. */
+.nivo-glass-surface,
+.glass-panel-dark {
+  background: var(--nevo-surface) !important;
+  border-color: var(--nevo-border-soft) !important;
+  backdrop-filter: blur(22px) saturate(125%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(125%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 18px 45px rgba(0,0,0,.22) !important;
+}
+
+/* Existing GlassCard gets the same treatment without changing its API. */
+[class*="rounded-2xl"][class*="backdrop-blur-xl"],
+[class*="rounded-3xl"][class*="backdrop-blur-xl"] {
+  border-color: rgba(0, 201, 167, 0.16) !important;
+}
+
+/* Convert common cool-blue utility accents to Nevo emerald glass. */
+[class*="bg-indigo-"], [class*="bg-purple-"], [class*="bg-cyan-"] {
+  background-color: color-mix(in srgb, var(--nevo-accent) 9%, transparent) !important;
+}
+[class*="text-indigo-"], [class*="text-purple-"], [class*="text-cyan-"] {
+  color: var(--nevo-accent-soft) !important;
+}
+[class*="border-indigo-"], [class*="border-purple-"], [class*="border-cyan-"] {
+  border-color: rgba(0, 201, 167, 0.22) !important;
+}
+
+/* Keep danger/status colors meaningful rather than recoloring them. */
+[class*="bg-rose-"], [class*="bg-red-"], [class*="text-rose-"], [class*="text-red-"] {
+  /* intentionally untouched by the theme */
+}
+
+/* Emerald primary actions. */
+button[class*="from-teal-"],
+a[class*="from-teal-"] {
+  box-shadow: 0 10px 28px rgba(0, 201, 167, .12) !important;
+}
+
+/* Subtle glass inputs. */
+input, textarea, select {
+  color-scheme: dark;
+}
+
+/* Mobile-first width: cards should breathe without returning to blue/indigo. */
+@media (max-width: 640px) {
+  .nivo-glass-surface {
+    border-radius: 20px !important;
+  }
+}

@@ -50,7 +50,7 @@ export function DeviceManagement({
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-xl bg-white/5 text-slate-400">
                 {device.os.toLowerCase().includes('windows') || device.os.toLowerCase().includes('mac') ? (
-                  <Monitor className="h-4.5 w-4.5 text-indigo-400" />
+                  <Monitor className="h-4.5 w-4.5 text-teal-400" />
                 ) : (
                   <Smartphone className="h-4.5 w-4.5 text-teal-400" />
                 )}

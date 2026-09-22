@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getCachedSettings } from '../services/settingsService';
+import NevoLogo from './NevoLogo';
 import AdminSidebar, { AdminTab } from './AdminSidebar';
 import {
   Users,
@@ -164,7 +165,7 @@ export default function AdminDashboard1To1({
             onClick={() => handleCardAction('refresh', targetTab, title)}
             className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-200 hover:bg-white/10 transition-colors cursor-pointer text-left"
           >
-            <RefreshCw className="h-3.5 w-3.5 text-cyan-400" />
+            <RefreshCw className="h-3.5 w-3.5 text-teal-400" />
             <span>Refresh</span>
           </button>
           <button
@@ -261,8 +262,8 @@ export default function AdminDashboard1To1({
           <div className="inline-block animate-[marquee_30s_linear_infinite] text-[11px] font-mono text-slate-300 font-medium tracking-wide">
             <span className="text-emerald-400 font-bold">● LIVE DATABASE DATA</span> &nbsp;•&nbsp;
             <span className="text-teal-300">{displayUsersCount} REGISTERED USERS</span> &nbsp;•&nbsp;
-            <span className="text-cyan-400">{displayTxsCount} RECORDED TRANSACTIONS</span> &nbsp;•&nbsp;
-            <span className="text-purple-400">₦{Number(totalSystemBalance || 0).toLocaleString()} TOTAL WALLET BALANCE</span> &nbsp;•&nbsp;
+            <span className="text-teal-400">{displayTxsCount} RECORDED TRANSACTIONS</span> &nbsp;•&nbsp;
+            <span className="text-emerald-400">₦{Number(totalSystemBalance || 0).toLocaleString()} TOTAL WALLET BALANCE</span> &nbsp;•&nbsp;
             <span className="text-emerald-400">₦{Number(displayRevenue || 0).toLocaleString()} RECORDED CHARGES</span>
           </div>
         </div>
@@ -280,11 +281,7 @@ export default function AdminDashboard1To1({
 
           {/* Nevo Brand & SOC Title */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveSidebar('overview')}>
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-teal-500 via-indigo-600 to-purple-600 p-0.5 shadow-lg shadow-teal-500/20 flex items-center justify-center">
-              <div className="w-full h-full bg-[#080c16] rounded-[14px] flex items-center justify-center font-black text-transparent bg-clip-text bg-gradient-to-tr from-teal-400 to-cyan-200 text-lg">
-                S
-              </div>
-            </div>
+            <NevoLogo size={42} showName={false} />
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base md:text-lg font-black tracking-tight text-white flex items-center gap-1.5">
@@ -309,7 +306,7 @@ export default function AdminDashboard1To1({
               DB: LIVE DATA
             </span>
             <span className="text-slate-600">|</span>
-            <span className="flex items-center gap-1 text-cyan-400 font-bold">
+            <span className="flex items-center gap-1 text-teal-400 font-bold">
               <Wifi className="h-3 w-3" /> API: LIVE
             </span>
             <span className="text-slate-600">|</span>
@@ -436,14 +433,14 @@ export default function AdminDashboard1To1({
             </div>
 
             {/* Card 2: TOTAL LEDGER BALANCE */}
-            <div className="p-4 md:p-5 rounded-2xl bg-[#080d1a]/90 border border-purple-500/30 backdrop-blur-xl shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:border-purple-400/60 transition-all group">
+            <div className="p-4 md:p-5 rounded-2xl bg-[#080d1a]/90 border border-emerald-500/30 backdrop-blur-xl shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:border-emerald-400/60 transition-all group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 group-hover:scale-105 transition-transform">
+                  <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 group-hover:scale-105 transition-transform">
                     <Wallet className="h-6 w-6" />
                   </div>
                   <div>
-                    <span className="text-[9px] font-mono font-bold tracking-widest text-purple-400 uppercase block">TOTAL SYSTEM LEDGER</span>
+                    <span className="text-[9px] font-mono font-bold tracking-widest text-emerald-400 uppercase block">TOTAL SYSTEM LEDGER</span>
                     <div className="text-2xl font-black text-white font-mono">
                       ₦{totalSystemBalance.toLocaleString()}
                     </div>
@@ -492,14 +489,14 @@ export default function AdminDashboard1To1({
             </div>
 
             {/* Card 4: TRANSACTIONS COUNT */}
-            <div className="p-4 md:p-5 rounded-2xl bg-[#080d1a]/90 border border-cyan-500/30 backdrop-blur-xl shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:border-cyan-400/60 transition-all group">
+            <div className="p-4 md:p-5 rounded-2xl bg-[#080d1a]/90 border border-teal-500/30 backdrop-blur-xl shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:border-teal-400/60 transition-all group">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 group-hover:scale-105 transition-transform">
+                  <div className="p-3 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-400 group-hover:scale-105 transition-transform">
                     <Database className="h-6 w-6" />
                   </div>
                   <div>
-                    <span className="text-[9px] font-mono font-bold tracking-widest text-cyan-400 uppercase block">EXECUTED TRANSACTIONS</span>
+                    <span className="text-[9px] font-mono font-bold tracking-widest text-teal-400 uppercase block">EXECUTED TRANSACTIONS</span>
                     <div className="text-2xl font-black text-white font-mono">{displayTxsCount}</div>
                   </div>
                 </div>
@@ -564,8 +561,8 @@ export default function AdminDashboard1To1({
                 <div className="bg-[#03050a] rounded-xl border border-white/10 p-3 mt-3 font-mono text-[11px] space-y-2 h-48 overflow-y-auto">
                   <div className="text-emerald-400 flex items-start gap-1.5"><span className="text-slate-600">[{currentTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})}]</span><span>✓ Admin dashboard connected to live application data</span></div>
                   <div className="text-teal-300 flex items-start gap-1.5"><span className="text-slate-600">LIVE</span><span>✓ Registered users: {totalUsersCount}</span></div>
-                  <div className="text-cyan-400 flex items-start gap-1.5"><span className="text-slate-600">LIVE</span><span>✓ Recorded transactions: {totalTxsCount}</span></div>
-                  <div className="text-purple-400 flex items-start gap-1.5"><span className="text-slate-600">LIVE</span><span>✓ Pending withdrawals: {stats.pendingCount}</span></div>
+                  <div className="text-teal-400 flex items-start gap-1.5"><span className="text-slate-600">LIVE</span><span>✓ Recorded transactions: {totalTxsCount}</span></div>
+                  <div className="text-emerald-400 flex items-start gap-1.5"><span className="text-slate-600">LIVE</span><span>✓ Pending withdrawals: {stats.pendingCount}</span></div>
                   <div className="text-amber-400 flex items-start gap-1.5"><span className="text-slate-600">LIVE</span><span>! Failed transactions: {stats.failedTransactions}</span></div>
                   <div className="text-emerald-400 flex items-start gap-1.5"><span className="text-slate-600">LIVE</span><span>✓ System health: {stats.systemHealth}%</span></div>
                 </div>
@@ -590,21 +587,21 @@ export default function AdminDashboard1To1({
 
                   <div className="space-y-1">
                     <div className="flex justify-between text-[10px] font-mono text-slate-300">
-                      <span className="flex items-center gap-1"><Server className="h-3 w-3 text-indigo-400" /> Memory (RAM)</span>
-                      <span className="text-indigo-400 font-bold">41%</span>
+                      <span className="flex items-center gap-1"><Server className="h-3 w-3 text-teal-400" /> Memory (RAM)</span>
+                      <span className="text-teal-400 font-bold">41%</span>
                     </div>
                     <div className="w-full h-1.5 rounded-full bg-white/5 overflow-hidden">
-                      <div className="h-full bg-indigo-500 rounded-full w-[41%]" />
+                      <div className="h-full bg-teal-500 rounded-full w-[41%]" />
                     </div>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex justify-between text-[10px] font-mono text-slate-300">
-                      <span className="flex items-center gap-1"><Zap className="h-3 w-3 text-cyan-400" /> API Latency</span>
-                      <span className="text-cyan-400 font-bold">19ms</span>
+                      <span className="flex items-center gap-1"><Zap className="h-3 w-3 text-teal-400" /> API Latency</span>
+                      <span className="text-teal-400 font-bold">19ms</span>
                     </div>
                     <div className="w-full h-1.5 rounded-full bg-white/5 overflow-hidden">
-                      <div className="h-full bg-cyan-400 rounded-full w-[12%]" />
+                      <div className="h-full bg-teal-400 rounded-full w-[12%]" />
                     </div>
                   </div>
                 </div>
@@ -618,7 +615,7 @@ export default function AdminDashboard1To1({
             <div className="lg:col-span-7 p-5 rounded-2xl bg-[#080d1a]/90 border border-white/10 backdrop-blur-xl space-y-4 shadow-xl">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <h3 className="text-xs font-black tracking-wider text-white uppercase flex items-center gap-2 font-mono">
-                  <Activity className="h-4 w-4 text-cyan-400" />
+                  <Activity className="h-4 w-4 text-teal-400" />
                   Recent Transaction Ledger
                 </h3>
                 <button
@@ -763,7 +760,7 @@ export default function AdminDashboard1To1({
           <div className="p-5 rounded-2xl bg-[#080d1a]/90 border border-white/10 backdrop-blur-xl space-y-4 shadow-xl">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="text-xs font-black tracking-wider text-white uppercase flex items-center gap-2 font-mono">
-                <Terminal className="h-4 w-4 text-purple-400" />
+                <Terminal className="h-4 w-4 text-emerald-400" />
                 Recent Security &amp; Admin Audit Log
               </h3>
               <button

@@ -377,9 +377,9 @@ export const AdsPage: React.FC<AdsPageProps> = ({ onBack }) => {
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         {/* Hero Banner Card */}
-        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-950/70 via-slate-900 to-slate-900 border border-indigo-500/20 p-6 shadow-xl">
+        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-950/70 via-slate-900 to-slate-900 border border-teal-500/20 p-6 shadow-xl">
           <div className="relative z-10 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-semibold">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 text-xs font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
               <span>OFFICIAL REWARDED ADVERTISING</span>
             </div>
@@ -408,7 +408,7 @@ export const AdsPage: React.FC<AdsPageProps> = ({ onBack }) => {
             </div>
           </div>
 
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-teal-600/10 rounded-full blur-3xl pointer-events-none" />
         </section>
 
         {/* Ad Action Center Card */}
@@ -416,7 +416,7 @@ export const AdsPage: React.FC<AdsPageProps> = ({ onBack }) => {
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
             <div>
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <PlayCircle className="w-5 h-5 text-indigo-400" />
+                <PlayCircle className="w-5 h-5 text-teal-400" />
                 <span>Rewarded Advertisement Unit</span>
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
@@ -445,7 +445,7 @@ export const AdsPage: React.FC<AdsPageProps> = ({ onBack }) => {
               <div className={`p-3 rounded-lg text-xs font-medium max-w-md mx-auto ${
                 adState === 'granted' 
                   ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300' 
-                  : 'bg-indigo-500/10 border border-indigo-500/30 text-indigo-300'
+                  : 'bg-teal-500/10 border border-teal-500/30 text-teal-300'
               }`}>
                 <div className="flex items-center justify-center gap-2">
                   {isWatchingOrBusy && <RefreshCw className="w-4 h-4 animate-spin" />}
@@ -471,7 +471,7 @@ export const AdsPage: React.FC<AdsPageProps> = ({ onBack }) => {
                 className={`w-full sm:w-auto min-w-[240px] px-8 py-3.5 rounded-xl font-bold text-base transition-all duration-200 flex items-center justify-center gap-3 mx-auto shadow-lg cursor-pointer ${
                   isWatchingOrBusy
                     ? 'bg-slate-800 text-slate-400 cursor-not-allowed border border-slate-700'
-                    : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white shadow-emerald-900/30 hover:shadow-emerald-900/50 hover:scale-[1.02] active:scale-[0.98]'
+                    : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-900/30 hover:shadow-emerald-900/50 hover:scale-[1.02] active:scale-[0.98]'
                 }`}
               >
                 {isWatchingOrBusy ? (
@@ -497,7 +497,7 @@ export const AdsPage: React.FC<AdsPageProps> = ({ onBack }) => {
           {/* Important Rules Checklist */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs text-slate-300">
             <div className="p-3 rounded-lg bg-slate-950/40 border border-slate-800/80 flex items-start gap-2.5">
-              <Clock className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+              <Clock className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
               <div>
                 <strong className="text-white block">Full Duration</strong>
                 <span>Watch the full video without closing early to qualify.</span>
@@ -538,7 +538,7 @@ export const AdsPage: React.FC<AdsPageProps> = ({ onBack }) => {
 
           <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800">
             <span className="text-xs text-slate-400 uppercase font-semibold block">Reward / Ad</span>
-            <span className="text-xl font-bold text-indigo-400 mt-1 block">₦{rewardAmount}</span>
+            <span className="text-xl font-bold text-teal-400 mt-1 block">₦{rewardAmount}</span>
             <span className="text-[11px] text-slate-500">Per verified completion</span>
           </div>
 

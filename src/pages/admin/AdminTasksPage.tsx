@@ -178,7 +178,7 @@ export const AdminTasksPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-white flex items-center gap-2">
-            <CheckSquare className="w-6 h-6 text-[#8F1D3A]" />
+            <CheckSquare className="w-6 h-6 text-[#00C9A7]" />
             Task Verification & Management Center
           </h1>
           <p className="text-xs text-zinc-400 mt-1">Manage active tasks and review user proof submissions</p>
@@ -187,7 +187,7 @@ export const AdminTasksPage: React.FC = () => {
         {activeTab === 'tasks' && (
           <button
             onClick={openCreateModal}
-            className="flex items-center gap-1.5 bg-[#8F1D3A] hover:bg-[#7A1831] text-black font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all cursor-pointer shadow-md shadow-[#8F1D3A]/20"
+            className="flex items-center gap-1.5 bg-[#00C9A7] hover:bg-[#008F7A] text-black font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all cursor-pointer shadow-md shadow-[#00C9A7]/20"
           >
             <Plus className="w-4 h-4" />
             <span>Create New Task</span>
@@ -201,7 +201,7 @@ export const AdminTasksPage: React.FC = () => {
           onClick={() => setActiveTab('tasks')}
           className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'tasks'
-              ? 'bg-[#8F1D3A] text-black shadow-md'
+              ? 'bg-[#00C9A7] text-black shadow-md'
               : 'text-zinc-400 hover:text-white'
           }`}
         >
@@ -211,13 +211,13 @@ export const AdminTasksPage: React.FC = () => {
           onClick={() => setActiveTab('submissions')}
           className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
             activeTab === 'submissions'
-              ? 'bg-[#8F1D3A] text-black shadow-md'
+              ? 'bg-[#00C9A7] text-black shadow-md'
               : 'text-zinc-400 hover:text-white'
           }`}
         >
           <span>Review Submissions</span>
           {pendingCount > 0 && (
-            <span className="bg-[#8F1D3A] text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+            <span className="bg-[#00C9A7] text-white text-[10px] font-black px-2 py-0.5 rounded-full">
               {pendingCount}
             </span>
           )}
@@ -228,8 +228,8 @@ export const AdminTasksPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
-              : 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#C13A5A]'
+              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
+              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -253,10 +253,10 @@ export const AdminTasksPage: React.FC = () => {
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold uppercase text-[#8F1D3A] bg-[#8F1D3A]/10 px-2.5 py-0.5 rounded-full border border-[#8F1D3A]/20">
+                      <span className="text-[10px] font-bold uppercase text-[#00C9A7] bg-[#00C9A7]/10 px-2.5 py-0.5 rounded-full border border-[#00C9A7]/20">
                         {task.category} • {task.verificationType || 'timer'}
                       </span>
-                      <span className="text-sm font-black text-[#8F1D3A]">+₦{task.rewardAmount}</span>
+                      <span className="text-sm font-black text-[#00C9A7]">+₦{task.rewardAmount}</span>
                     </div>
 
                     <h3 className="font-extrabold text-white text-sm">{task.title}</h3>
@@ -273,7 +273,7 @@ export const AdminTasksPage: React.FC = () => {
                       className="flex items-center gap-1 text-xs font-bold transition-colors cursor-pointer"
                     >
                       {task.enabled ? (
-                        <span className="text-[#A52A4A] flex items-center gap-1">
+                        <span className="text-[#00BFA6] flex items-center gap-1">
                           <ToggleRight className="w-5 h-5" /> Enabled
                         </span>
                       ) : (
@@ -292,7 +292,7 @@ export const AdminTasksPage: React.FC = () => {
                       </button>
                       <button
                         onClick={() => handleDelete(task.id, task.title)}
-                        className="p-1.5 bg-[#8F1D3A]/10 hover:bg-[#8F1D3A]/20 text-[#C13A5A] border border-[#8F1D3A]/30 rounded-lg transition-all cursor-pointer"
+                        className="p-1.5 bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 text-[#C13A5A] border border-[#00C9A7]/30 rounded-lg transition-all cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -312,7 +312,7 @@ export const AdminTasksPage: React.FC = () => {
             <button
               onClick={() => setSubmissionFilter('pending')}
               className={`px-3 py-1.5 rounded-xl cursor-pointer ${
-                submissionFilter === 'pending' ? 'bg-[#8F1D3A] text-black' : 'text-zinc-400 hover:text-white'
+                submissionFilter === 'pending' ? 'bg-[#00C9A7] text-black' : 'text-zinc-400 hover:text-white'
               }`}
             >
               Pending Verification ({pendingCount})
@@ -320,7 +320,7 @@ export const AdminTasksPage: React.FC = () => {
             <button
               onClick={() => setSubmissionFilter('claimed')}
               className={`px-3 py-1.5 rounded-xl cursor-pointer ${
-                submissionFilter === 'claimed' ? 'bg-[#8F1D3A] text-black' : 'text-zinc-400 hover:text-white'
+                submissionFilter === 'claimed' ? 'bg-[#00C9A7] text-black' : 'text-zinc-400 hover:text-white'
               }`}
             >
               Approved ({submissions.filter((s) => s.status === 'claimed').length})
@@ -328,7 +328,7 @@ export const AdminTasksPage: React.FC = () => {
             <button
               onClick={() => setSubmissionFilter('rejected')}
               className={`px-3 py-1.5 rounded-xl cursor-pointer ${
-                submissionFilter === 'rejected' ? 'bg-[#8F1D3A] text-white' : 'text-zinc-400 hover:text-white'
+                submissionFilter === 'rejected' ? 'bg-[#00C9A7] text-white' : 'text-zinc-400 hover:text-white'
               }`}
             >
               Rejected ({submissions.filter((s) => s.status === 'rejected').length})
@@ -364,10 +364,10 @@ export const AdminTasksPage: React.FC = () => {
                         <span
                           className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
                             sub.status === 'pending_verification'
-                              ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#C13A5A]'
+                              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
                               : sub.status === 'claimed'
-                              ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
-                              : 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#C13A5A]'
+                              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
+                              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
                           }`}
                         >
                           {sub.status === 'pending_verification' ? 'Pending Review' : sub.status}
@@ -376,7 +376,7 @@ export const AdminTasksPage: React.FC = () => {
 
                       <div className="text-xs font-extrabold text-white flex items-center gap-2">
                         <span>Task: {sub.taskTitle}</span>
-                        <span className="text-[#8F1D3A]">+₦{sub.rewardAmount.toLocaleString()}</span>
+                        <span className="text-[#00C9A7]">+₦{sub.rewardAmount.toLocaleString()}</span>
                       </div>
 
                       {sub.proofText && (
@@ -401,7 +401,7 @@ export const AdminTasksPage: React.FC = () => {
                         <button
                           onClick={() => handleApproveSubmission(sub)}
                           disabled={processingSubmissionId === sub.id}
-                          className="flex items-center gap-1.5 bg-[#8F1D3A] hover:bg-[#7A1831] disabled:opacity-50 text-black font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer"
+                          className="flex items-center gap-1.5 bg-[#00C9A7] hover:bg-[#008F7A] disabled:opacity-50 text-black font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer"
                         >
                           <CheckCircle className="w-4 h-4" />
                           <span>Approve & Pay</span>
@@ -409,7 +409,7 @@ export const AdminTasksPage: React.FC = () => {
                         <button
                           onClick={() => handleRejectSubmission(sub)}
                           disabled={processingSubmissionId === sub.id}
-                          className="flex items-center gap-1.5 bg-[#8F1D3A]/10 hover:bg-[#8F1D3A]/20 disabled:opacity-50 text-[#C13A5A] border border-[#8F1D3A]/30 font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer"
+                          className="flex items-center gap-1.5 bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 disabled:opacity-50 text-[#C13A5A] border border-[#00C9A7]/30 font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer"
                         >
                           <XCircle className="w-4 h-4" />
                           <span>Reject</span>
@@ -427,7 +427,7 @@ export const AdminTasksPage: React.FC = () => {
       {/* Task Creation / Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="nivo-glass-surface border border-[#8F1D3A]/30 rounded-3xl w-full max-w-lg p-6 space-y-4">
+          <div className="nivo-glass-surface border border-[#00C9A7]/30 rounded-3xl w-full max-w-lg p-6 space-y-4">
             <h3 className="font-extrabold text-white text-base">
               {editingTask ? 'Edit Task Settings' : 'Create New Task'}
             </h3>
@@ -441,7 +441,7 @@ export const AdminTasksPage: React.FC = () => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Task title"
-                  className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#8F1D3A]"
+                  className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#00C9A7]"
                 />
               </div>
 
@@ -453,7 +453,7 @@ export const AdminTasksPage: React.FC = () => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Explain requirements to complete this task"
-                  className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#8F1D3A]"
+                  className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#00C9A7]"
                 />
               </div>
 
@@ -466,7 +466,7 @@ export const AdminTasksPage: React.FC = () => {
                     value={rewardAmount}
                     onChange={(e) => setRewardAmount(e.target.value)}
                     placeholder="500"
-                    className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-[#8F1D3A] font-bold text-xs focus:outline-none focus:border-[#8F1D3A]"
+                    className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-[#00C9A7] font-bold text-xs focus:outline-none focus:border-[#00C9A7]"
                   />
                 </div>
 
@@ -475,7 +475,7 @@ export const AdminTasksPage: React.FC = () => {
                   <select
                     value={verificationType}
                     onChange={(e: any) => setVerificationType(e.target.value)}
-                    className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#8F1D3A]"
+                    className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#00C9A7]"
                   >
                     <option value="timer">Timer Countdown (External Visit)</option>
                     <option value="proof">Proof Submission (Username/Handle)</option>
@@ -491,7 +491,7 @@ export const AdminTasksPage: React.FC = () => {
                     value={timerSeconds}
                     onChange={(e) => setTimerSeconds(e.target.value)}
                     placeholder="30"
-                    className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#8F1D3A]"
+                    className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#00C9A7]"
                   />
                 </div>
               ) : (
@@ -502,7 +502,7 @@ export const AdminTasksPage: React.FC = () => {
                     value={proofInstructions}
                     onChange={(e) => setProofInstructions(e.target.value)}
                     placeholder="e.g. Enter your Telegram @username or review handle"
-                    className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#8F1D3A]"
+                    className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#00C9A7]"
                   />
                 </div>
               )}
@@ -514,7 +514,7 @@ export const AdminTasksPage: React.FC = () => {
                   value={actionUrl}
                   onChange={(e) => setActionUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#8F1D3A]"
+                  className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#00C9A7]"
                 />
               </div>
 
@@ -529,7 +529,7 @@ export const AdminTasksPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="w-2/3 bg-[#8F1D3A] hover:bg-[#7A1831] disabled:opacity-50 text-black font-extrabold text-xs py-3 rounded-xl cursor-pointer"
+                  className="w-2/3 bg-[#00C9A7] hover:bg-[#008F7A] disabled:opacity-50 text-black font-extrabold text-xs py-3 rounded-xl cursor-pointer"
                 >
                   {saving ? 'Saving...' : 'Save Task'}
                 </button>

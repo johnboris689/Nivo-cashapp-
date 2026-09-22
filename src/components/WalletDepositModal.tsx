@@ -91,7 +91,7 @@ export default function WalletDepositModal({ isOpen, onClose, onToast }: WalletD
             <p className="text-xs text-slate-400 leading-relaxed">A new secure KoraPay checkout session is created for every deposit. This is a real wallet deposit, not an activation fee. Your wallet is credited only after server-side payment verification, and the deposited amount remains your money.</p>
           </div>
 
-          <button onClick={startKoraPay} disabled={loading} className="w-full py-4 rounded-xl bg-gradient-to-r from-teal-400 via-indigo-500 to-teal-400 text-slate-950 font-black text-sm uppercase flex items-center justify-center gap-2 disabled:opacity-50">
+          <button onClick={startKoraPay} disabled={loading} className="w-full py-4 rounded-xl bg-gradient-to-r from-teal-400 via-teal-500 to-teal-400 text-slate-950 font-black text-sm uppercase flex items-center justify-center gap-2 disabled:opacity-50">
             {loading ? 'Creating Secure Checkout…' : <>Continue to KoraPay <ExternalLink className="w-4 h-4" /></>}
           </button>
           <div className="text-[10px] text-slate-500 flex items-center justify-center gap-1"><ArrowRight className="w-3 h-3" /> You will be redirected to KoraPay's hosted payment page.</div>

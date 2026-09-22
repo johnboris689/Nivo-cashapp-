@@ -23,9 +23,9 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 bg-[#16090D] border-r border-[#8F1D3A]/20 min-h-[calc(100vh-4rem)] p-4 space-y-6 shrink-0 shadow-xl">
+    <aside className="hidden lg:flex flex-col w-64 bg-[#16090D] border-r border-[#00C9A7]/20 min-h-[calc(100vh-4rem)] p-4 space-y-6 shrink-0 shadow-xl">
       {/* Quick Referral Promotion Banner */}
-      <div className="bg-gradient-to-br from-[#350D18]/40 via-[#350D18]/20 to-[#350D18]/20 border border-[#8F1D3A]/30 rounded-2xl p-4 relative overflow-hidden backdrop-blur-md">
+      <div className="bg-gradient-to-br from-[#0D1B1C]/40 via-[#0D1B1C]/20 to-[#0D1B1C]/20 border border-[#00C9A7]/30 rounded-2xl p-4 relative overflow-hidden backdrop-blur-md">
         <div className="flex items-center gap-2 text-[#C13A5A] font-extrabold text-xs uppercase tracking-wider mb-1">
           <Gift className="w-4 h-4 text-[#C13A5A]" />
           Referral Bonus
@@ -34,7 +34,7 @@ export const Sidebar: React.FC = () => {
         <p className="text-[11px] text-slate-400 mt-1">Instant wallet credit on every successful sign-up.</p>
         <NavLink
           to="/referrals"
-          className="inline-block mt-3 bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-extrabold text-[11px] px-3.5 py-1.5 rounded-xl shadow-md shadow-[#7A1831]/30 transition-all hover:scale-105"
+          className="inline-block mt-3 bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-extrabold text-[11px] px-3.5 py-1.5 rounded-xl shadow-md shadow-[#008F7A]/30 transition-all hover:scale-105"
         >
           Get My Link
         </NavLink>
@@ -54,7 +54,7 @@ export const Sidebar: React.FC = () => {
               className={({ isActive }) =>
                 `flex items-center justify-between px-4 py-3 rounded-xl text-xs font-semibold transition-all ${
                   isActive
-                    ? 'bg-gradient-to-r from-[#7A1831] to-[#A52A4A] text-white shadow-lg shadow-[#7A1831]/25'
+                    ? 'bg-gradient-to-r from-[#008F7A] to-[#00BFA6] text-white shadow-lg shadow-[#008F7A]/25'
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
                 }`
               }
@@ -69,7 +69,7 @@ export const Sidebar: React.FC = () => {
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                       isActive 
                         ? 'bg-white/20 text-white border-white/30' 
-                        : 'bg-[#A52A4A]/10 text-[#C13A5A] border-[#A52A4A]/30'
+                        : 'bg-[#00BFA6]/10 text-[#C13A5A] border-[#00BFA6]/30'
                     }`}>
                       {item.badge}
                     </span>

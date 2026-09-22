@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShieldCheck, Lock, Zap } from 'lucide-react';
+import NevoLogo from './NevoLogo';
 
 interface SplashScreenProps {
   message?: string;
@@ -8,8 +9,8 @@ interface SplashScreenProps {
 }
 
 const statusMessages = [
-  'Connecting securely to Nivo Servers...',
-  'Encrypting 256-bit session data...',
+  'Connecting securely to Nevo...',
+  'Securing your Nevo session...',
   'Preparing your secure wallet...',
   'Loading your live dashboard...',
 ];
@@ -47,7 +48,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="w-96 h-96 bg-[#8F1D3A] rounded-full blur-[110px]"
+          className="w-96 h-96 bg-[#00C9A7] rounded-full blur-[110px]"
         />
 
         {/* Ambient Secondary Ring */}
@@ -61,7 +62,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="w-72 h-72 bg-[#7A1831] rounded-full blur-[80px]"
+          className="w-72 h-72 bg-[#008F7A] rounded-full blur-[80px]"
         />
 
         {/* Subtle Geometric Overlay */}
@@ -70,7 +71,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
 
       {/* Top Header Security Tag */}
       <div className="relative z-10 pt-4 flex items-center gap-1.5 text-gray-500 text-[10px] font-extrabold uppercase tracking-widest bg-white/[0.03] border border-white/5 px-3 py-1.5 rounded-full backdrop-blur-md">
-        <ShieldCheck className="w-3.5 h-3.5 text-[#A52A4A]" />
+        <ShieldCheck className="w-3.5 h-3.5 text-[#00BFA6]" />
         <span>Bank-Grade Encryption</span>
       </div>
 
@@ -99,20 +100,18 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
               repeat: Infinity,
               ease: 'easeInOut',
             }}
-            className="absolute -inset-2 bg-gradient-to-r from-[#8F1D3A] to-[#7A1831] rounded-3xl blur-lg"
+            className="absolute -inset-2 bg-gradient-to-r from-[#00C9A7] to-[#008F7A] rounded-3xl blur-lg"
           />
 
-          {/* Logo Icon Box */}
-          <div className="relative w-20 h-20 bg-gradient-to-br from-[#8F1D3A] via-[#8F1D3A] to-[#5A1024] rounded-2xl flex items-center justify-center shadow-2xl shadow-[#240A12]/50 border border-white/20">
-            <span className="text-white font-black text-4xl tracking-tighter drop-shadow-md">N</span>
-            <div className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-white/90 animate-pulse" />
+          {/* Nevo glass logo */}
+          <div className="relative w-20 h-20 rounded-[22px] flex items-center justify-center shadow-2xl border border-white/10 bg-white/[0.035] backdrop-blur-xl">
+            <NevoLogo size={64} showName={false} />
           </div>
         </motion.div>
 
         {/* Brand Name */}
         <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-1.5">
-          <span>NIVO</span>
-          <span className="text-[#8F1D3A]">CASH</span>
+          <span>Nevo</span>
         </h1>
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.25em] mt-1 mb-8">
           Mobile Financial Platform
@@ -129,7 +128,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
               repeat: Infinity,
               ease: 'easeInOut',
             }}
-            className="w-1/2 h-full bg-gradient-to-r from-transparent via-[#8F1D3A] to-transparent rounded-full shadow-sm shadow-[#8F1D3A]"
+            className="w-1/2 h-full bg-gradient-to-r from-transparent via-[#00C9A7] to-transparent rounded-full shadow-sm shadow-[#00C9A7]"
           />
         </div>
 
@@ -158,7 +157,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
       <div className="relative z-10 pb-4 flex flex-col items-center gap-1 text-[10px] text-gray-500 font-medium">
         <div className="flex items-center gap-1.5">
           <Lock className="w-3 h-3 text-gray-400" />
-          <span>Secured by Nivo Engine</span>
+          <span>Secured by Nevo</span>
         </div>
         <p className="text-[9px] text-gray-600">Centralized Instant Settlements</p>
       </div>

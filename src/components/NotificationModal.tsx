@@ -34,11 +34,11 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-[#1A080E] border border-[#8F1D3A]/30 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
+      <div className="bg-[#1A080E] border border-[#00C9A7]/30 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#1A080E]">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-[#8F1D3A]/10 text-[#C13A5A] border border-[#8F1D3A]/20">
+            <div className="p-2 rounded-xl bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20">
               <Bell className="w-5 h-5" />
             </div>
             <div>
@@ -49,7 +49,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleMarkAllRead}
-              className="text-xs font-semibold text-[#C13A5A] hover:text-[#D46A83] transition-colors flex items-center gap-1 bg-[#A52A4A]/10 px-3 py-1.5 rounded-xl border border-[#A52A4A]/20 cursor-pointer"
+              className="text-xs font-semibold text-[#C13A5A] hover:text-[#D46A83] transition-colors flex items-center gap-1 bg-[#00BFA6]/10 px-3 py-1.5 rounded-xl border border-[#00BFA6]/20 cursor-pointer"
             >
               <Check className="w-3.5 h-3.5" />
               Mark all read
@@ -79,13 +79,13 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                 className={`pt-3 first:pt-0 p-3 rounded-2xl transition-all cursor-pointer ${
                   n.read
                     ? 'bg-transparent opacity-75'
-                    : 'nivo-glass-surface border border-[#8F1D3A]/20 shadow-md'
+                    : 'nivo-glass-surface border border-[#00C9A7]/20 shadow-md'
                 }`}
               >
                 <div className="flex gap-3">
                   <div className="mt-0.5 shrink-0">
                     {n.type === 'success' ? (
-                      <CheckCircle2 className="w-5 h-5 text-[#A52A4A]" />
+                      <CheckCircle2 className="w-5 h-5 text-[#00BFA6]" />
                     ) : n.type === 'alert' || n.type === 'warning' ? (
                       <AlertCircle className="w-5 h-5 text-[#C13A5A]" />
                     ) : (

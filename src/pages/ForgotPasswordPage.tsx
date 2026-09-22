@@ -97,13 +97,13 @@ export const ForgotPasswordPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#100709] flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute -top-24 -left-24 w-80 h-80 bg-[#8F1D3A]/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[#5A1024]/25 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -top-24 -left-24 w-80 h-80 bg-[#00C9A7]/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[#071114]/25 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="w-full max-w-md nivo-glass-strong rounded-[28px] p-7 sm:p-8 relative z-10">
         <div className="text-center mb-7">
           <Link to="/" className="inline-flex items-center gap-2.5 mb-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#5A1024] via-[#7A1831] to-[#C13A5A] flex items-center justify-center shadow-lg shadow-[#8F1D3A]/25">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#071114] via-[#008F7A] to-[#C13A5A] flex items-center justify-center shadow-lg shadow-[#00C9A7]/25">
               <Zap className="w-6 h-6 text-white fill-white" />
             </div>
             <span className="font-black text-2xl tracking-tight text-white">NIVO <span className="text-[#C13A5A]">CASH</span></span>
@@ -114,12 +114,12 @@ export const ForgotPasswordPage: React.FC = () => {
 
         <div className="flex gap-1.5 mb-6">
           {['email', 'otp', 'password'].map((s, i) => (
-            <div key={s} className={`h-1.5 flex-1 rounded-full ${step === 'success' || i < ['email','otp','password'].indexOf(step) + (step !== 'email' ? 1 : 0) ? 'bg-gradient-to-r from-[#7A1831] to-[#C13A5A]' : 'bg-[#240A12]'}`} />
+            <div key={s} className={`h-1.5 flex-1 rounded-full ${step === 'success' || i < ['email','otp','password'].indexOf(step) + (step !== 'email' ? 1 : 0) ? 'bg-gradient-to-r from-[#008F7A] to-[#C13A5A]' : 'bg-[#071114]'}`} />
           ))}
         </div>
 
         {error && (
-          <div className="mb-5 p-3.5 bg-[#5A1024]/25 border border-[#A52A4A]/30 rounded-2xl text-[#E6B8C3] text-xs flex items-center gap-2 font-semibold">
+          <div className="mb-5 p-3.5 bg-[#071114]/25 border border-[#00BFA6]/30 rounded-2xl text-[#E6B8C3] text-xs flex items-center gap-2 font-semibold">
             <AlertCircle className="w-4 h-4 shrink-0 text-[#C13A5A]" />
             <span>{error}</span>
           </div>
@@ -186,7 +186,7 @@ export const ForgotPasswordPage: React.FC = () => {
 
         {step === 'success' && (
           <div className="nivo-glass-surface rounded-2xl p-6 text-center space-y-3">
-            <div className="w-14 h-14 rounded-full bg-[#8F1D3A]/20 border border-[#C13A5A]/30 flex items-center justify-center mx-auto shadow-lg">
+            <div className="w-14 h-14 rounded-full bg-[#00C9A7]/20 border border-[#C13A5A]/30 flex items-center justify-center mx-auto shadow-lg">
               <CheckCircle2 className="w-8 h-8 text-[#C13A5A]" />
             </div>
             <h2 className="text-base font-black text-white">Password Changed Successfully</h2>

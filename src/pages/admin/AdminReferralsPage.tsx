@@ -48,7 +48,7 @@ export const AdminReferralsPage: React.FC = () => {
     <div className="space-y-6 animate-fade-in pb-12">
       <div>
         <h1 className="text-2xl font-black text-white flex items-center gap-2">
-          <Sparkles className="w-6 h-6 text-[#A52A4A]" />
+          <Sparkles className="w-6 h-6 text-[#00BFA6]" />
           Referral System Controls & Logs
         </h1>
         <p className="text-xs text-zinc-400 mt-1">Set registration referral payouts and audit system referral bonus credits</p>
@@ -58,8 +58,8 @@ export const AdminReferralsPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
-              : 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#C13A5A]'
+              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
+              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -68,7 +68,7 @@ export const AdminReferralsPage: React.FC = () => {
       )}
 
       {/* Bonus Amount Configuration Form */}
-      <div className="nivo-glass-surface border border-[#8F1D3A]/30 rounded-3xl p-6">
+      <div className="nivo-glass-surface border border-[#00C9A7]/30 rounded-3xl p-6">
         <h2 className="text-base font-extrabold text-white mb-2">Global Referral Bonus Configuration</h2>
         <p className="text-xs text-zinc-400 mb-4">
           This amount is automatically credited to referrers when a new user registers using their code or link.
@@ -83,14 +83,14 @@ export const AdminReferralsPage: React.FC = () => {
               min={100}
               value={referralBonusAmount}
               onChange={(e) => setReferralBonusAmount(e.target.value)}
-              className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-[#C13A5A] font-mono font-black text-base focus:outline-none focus:border-[#8F1D3A]"
+              className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-[#C13A5A] font-mono font-black text-base focus:outline-none focus:border-[#00C9A7]"
             />
           </div>
 
           <button
             type="submit"
             disabled={saving}
-            className="bg-[#8F1D3A] hover:bg-[#A52A4A] disabled:opacity-50 text-black font-extrabold text-xs px-6 py-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+            className="bg-[#00C9A7] hover:bg-[#00BFA6] disabled:opacity-50 text-black font-extrabold text-xs px-6 py-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
           >
             <Save className="w-4 h-4" />
             <span>{saving ? 'Updating...' : 'Save New Reward Amount'}</span>
@@ -120,7 +120,7 @@ export const AdminReferralsPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-zinc-800/60 font-medium text-zinc-300">
                 {referrals.map((r) => (
-                  <tr key={r.id} className="hover:bg-[#240A12] transition-colors">
+                  <tr key={r.id} className="hover:bg-[#071114] transition-colors">
                     <td className="py-3 px-3 font-bold text-white">
                       ID: {r.referrerId.slice(0, 8)}...
                     </td>
@@ -133,7 +133,7 @@ export const AdminReferralsPage: React.FC = () => {
                     <td className="py-3 px-3 font-black text-[#C13A5A]">₦{r.bonusAmount.toLocaleString()}</td>
 
                     <td className="py-3 px-3">
-                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20">
+                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#00C9A7]/10 text-[#00BFA6] border border-[#00C9A7]/20">
                         {r.status}
                       </span>
                     </td>

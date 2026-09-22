@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ShieldCheck, Scale, Mail, Home, AlertTriangle, LockKeyhole } from 'lucide-react';
 import GlassCard from './GlassCard';
+import NevoLogo from './NevoLogo';
 import { getCachedSettings, fetchMasterSettings } from '../services/settingsService';
 
 interface StandalonePageProps {
@@ -23,13 +24,11 @@ function LegalHeader({ navigateTo, label, icon }: { navigateTo: (path: string) =
   return (
     <header className="sticky top-0 z-50 w-full bg-[#050507]/90 backdrop-blur-md border-b border-white/5 px-4 sm:px-6 py-4">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="h-9 w-9 bg-indigo-950/80 border border-indigo-500/40 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            {icon}
-          </div>
-          <div>
-            <span className="font-extrabold text-base tracking-tight font-display bg-gradient-to-r from-indigo-300 to-teal-300 bg-clip-text text-transparent">{NEVO_NAME}</span>
-            <span className="text-[9px] font-mono block text-slate-400 leading-none">{label}</span>
+        <div className="flex items-center gap-3">
+          <NevoLogo size={38} compact />
+          <div className="hidden sm:block h-7 w-px bg-white/10" />
+          <div className="hidden sm:block">
+            <span className="text-[9px] font-mono block text-slate-400 leading-none tracking-[0.16em]">{label}</span>
           </div>
         </div>
         <button
@@ -176,15 +175,15 @@ export function Custom404Page({ navigateTo }: StandalonePageProps) {
   return (
     <div className="min-h-screen bg-[#050507] text-slate-100 flex flex-col items-center justify-center p-4 font-sans text-center">
       <div className="max-w-md w-full space-y-6">
-        <div className="mx-auto h-20 w-20 bg-indigo-950/80 border border-indigo-500/40 rounded-3xl flex items-center justify-center shadow-2xl shadow-indigo-500/20 animate-pulse">
+        <div className="mx-auto h-20 w-20 bg-teal-950/80 border border-teal-500/40 rounded-3xl flex items-center justify-center shadow-2xl shadow-teal-500/20 animate-pulse">
           <AlertTriangle className="h-10 w-10 text-rose-400" />
         </div>
         <div className="space-y-2">
-          <h1 className="text-6xl sm:text-7xl font-black font-display tracking-widest bg-gradient-to-r from-rose-400 to-indigo-400 bg-clip-text text-transparent">404</h1>
+          <h1 className="text-6xl sm:text-7xl font-black font-display tracking-widest bg-gradient-to-r from-rose-400 to-teal-400 bg-clip-text text-transparent">404</h1>
           <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">Page Not Found</h2>
           <p className="text-xs sm:text-sm text-slate-400 leading-relaxed px-4">The page you are trying to open does not exist on Nevo.</p>
         </div>
-        <button onClick={() => navigateTo('/')} className="flex mx-auto items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-teal-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg active:scale-95 transition-all cursor-pointer">
+        <button onClick={() => navigateTo('/')} className="flex mx-auto items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-teal-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg active:scale-95 transition-all cursor-pointer">
           <Home className="h-4 w-4" /><span>Return Home</span>
         </button>
         <p className="text-[10px] text-slate-500 font-mono pt-6">© 2026 Nevo</p>

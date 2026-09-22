@@ -1876,7 +1876,7 @@ export default function AdminPanel({
         </GlassCard>
 
         <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400">
+          <div className="p-2.5 rounded-xl bg-teal-500/10 text-teal-400">
             <Coins className="h-4 w-4" />
           </div>
           <div>
@@ -1896,7 +1896,7 @@ export default function AdminPanel({
         </GlassCard>
 
         <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400">
+          <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400">
             <Database className="h-4 w-4" />
           </div>
           <div>
@@ -1930,7 +1930,7 @@ export default function AdminPanel({
               <span className="text-[8px] font-mono text-slate-300 font-bold opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 px-1 py-0.5 rounded -mt-6 absolute">{transferTxs.length} txs</span>
               <div
                 style={{ height: `${Math.max(15, Math.min(80, (transferTxs.length / (totalTxsCount || 1)) * 100))}%` }}
-                className="w-10 bg-gradient-to-t from-indigo-600 to-indigo-400 rounded-t-md hover:from-indigo-500 hover:to-indigo-300 transition-all duration-300"
+                className="w-10 bg-gradient-to-t from-teal-600 to-teal-400 rounded-t-md hover:from-teal-500 hover:to-teal-300 transition-all duration-300"
               />
               <span className="text-[8px] text-slate-400 font-mono">Transfers</span>
             </div>
@@ -1950,7 +1950,7 @@ export default function AdminPanel({
               <span className="text-[8px] font-mono text-slate-300 font-bold opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 px-1 py-0.5 rounded -mt-6 absolute">{airtimeTxs.length} txs</span>
               <div
                 style={{ height: `${Math.max(15, Math.min(80, (airtimeTxs.length / (totalTxsCount || 1)) * 100))}%` }}
-                className="w-10 bg-gradient-to-t from-purple-500 to-purple-300 rounded-t-md hover:from-purple-400 hover:to-purple-200 transition-all duration-300"
+                className="w-10 bg-gradient-to-t from-emerald-500 to-emerald-300 rounded-t-md hover:from-emerald-400 hover:to-emerald-200 transition-all duration-300"
               />
               <span className="text-[8px] text-slate-400 font-mono">Airtime/Data</span>
             </div>
@@ -1974,9 +1974,9 @@ export default function AdminPanel({
           </button>
           <button
             onClick={handleExportTransactionsCSV}
-            className="p-3 bg-white/5 border border-white/5 hover:border-indigo-500/20 hover:bg-indigo-500/10 text-indigo-400 text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer flex flex-col items-center gap-1 text-center"
+            className="p-3 bg-white/5 border border-white/5 hover:border-teal-500/20 hover:bg-teal-500/10 text-teal-400 text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer flex flex-col items-center gap-1 text-center"
           >
-            <FileSpreadsheet className="h-4 w-4 mb-1 text-indigo-400" />
+            <FileSpreadsheet className="h-4 w-4 mb-1 text-teal-400" />
             Export Ledger CSV
           </button>
         </div>
@@ -2029,7 +2029,7 @@ export default function AdminPanel({
                       </span>
                     )}
                     {u.isFrozen && (
-                      <span className="text-[7px] font-black uppercase bg-indigo-500 text-white px-1 py-0.5 rounded">
+                      <span className="text-[7px] font-black uppercase bg-teal-500 text-white px-1 py-0.5 rounded">
                         Frozen
                       </span>
                     )}
@@ -2101,7 +2101,7 @@ export default function AdminPanel({
                   onClick={() => handleUpdateUserStatus(selectedUser.email, 'isFrozen', !selectedUser.isFrozen)}
                   className={`py-2 px-3 border rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                     selectedUser.isFrozen
-                      ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/20'
+                      ? 'bg-teal-500/10 border-teal-500/20 text-teal-400 hover:bg-teal-500/20'
                       : 'bg-white/5 border-white/5 text-slate-300 hover:bg-white/10'
                   }`}
                 >
@@ -2181,7 +2181,7 @@ export default function AdminPanel({
 
             <button
               type="submit"
-              className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-teal-500 hover:from-indigo-700 hover:to-teal-600 text-white text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center gap-1"
+              className="px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center gap-1"
             >
               <Send className="h-3 w-3" /> Broadcast
             </button>
@@ -2284,7 +2284,7 @@ export default function AdminPanel({
             <button
               type="submit"
               disabled={savingLegacyVoucherConfig}
-              className="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-600 hover:to-indigo-700 disabled:opacity-50 text-slate-950 font-bold text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
+              className="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 disabled:opacity-50 text-slate-950 font-bold text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
             >
               {savingLegacyVoucherConfig ? 'Saving Settings...' : 'Save Configuration'}
             </button>
@@ -2418,7 +2418,7 @@ export default function AdminPanel({
                                 {u.profilePic ? (
                                   <img src={u.profilePic} alt={u.fullName} className="h-8 w-8 rounded-full object-cover border border-teal-500/30 shrink-0" />
                                 ) : (
-                                  <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-teal-500/20 to-indigo-500/20 text-teal-400 font-bold flex items-center justify-center text-xs border border-white/10 shrink-0">
+                                  <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-teal-500/20 to-teal-500/20 text-teal-400 font-bold flex items-center justify-center text-xs border border-white/10 shrink-0">
                                     {(u.fullName || 'U').charAt(0).toUpperCase()}
                                   </div>
                                 )}
@@ -2460,7 +2460,7 @@ export default function AdminPanel({
                                 <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${
                                   u.withdrawalStatus === 'Blocked'
                                     ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                                    : 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30'
+                                    : 'bg-teal-500/20 text-teal-400 border border-teal-500/30'
                                 }`}>
                                   WD: {u.withdrawalStatus || 'Allowed'}
                                 </span>
@@ -2502,7 +2502,7 @@ export default function AdminPanel({
                                     });
                                   }}
                                   title="Edit User Profile"
-                                  className="p-1.5 rounded-lg bg-white/5 hover:bg-indigo-500/20 hover:text-indigo-400 text-slate-300 transition-all cursor-pointer"
+                                  className="p-1.5 rounded-lg bg-white/5 hover:bg-teal-500/20 hover:text-teal-400 text-slate-300 transition-all cursor-pointer"
                                 >
                                   <Edit2 className="h-3.5 w-3.5" />
                                 </button>
@@ -2568,7 +2568,7 @@ export default function AdminPanel({
           {activeTab === 'voucher_generator' && (
             <div className="space-y-6 animate-[fadeIn_0.2s_ease-out]">
               {/* Introduction Header card */}
-              <GlassCard className="p-5 border-white/5 bg-gradient-to-br from-indigo-950/10 via-slate-900/10 to-teal-950/5">
+              <GlassCard className="p-5 border-white/5 bg-gradient-to-br from-teal-950/10 via-slate-900/10 to-teal-950/5">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <h4 className="text-sm font-black uppercase tracking-wider text-teal-400 flex items-center gap-2">
@@ -2607,7 +2607,7 @@ export default function AdminPanel({
                     type="button"
                     onClick={(e) => handleGenerateVoucher(e)}
                     disabled={generatingVoucher}
-                    className="w-full py-4 px-6 bg-gradient-to-r from-teal-500 via-emerald-500 to-indigo-600 hover:from-teal-600 hover:to-indigo-700 disabled:opacity-50 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl shadow-xl hover:shadow-teal-500/10 transition-all cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-4 px-6 bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 disabled:opacity-50 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl shadow-xl hover:shadow-teal-500/10 transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     {generatingVoucher ? (
                       <>
@@ -2950,7 +2950,7 @@ export default function AdminPanel({
           {activeTab === 'withdrawals' && (
             <div className="space-y-6 animate-[fadeIn_0.2s_ease-out]">
               {/* Introduction Header card */}
-              <GlassCard className="p-5 border-white/5 bg-gradient-to-br from-indigo-950/10 via-slate-900/10 to-teal-950/5">
+              <GlassCard className="p-5 border-white/5 bg-gradient-to-br from-teal-950/10 via-slate-900/10 to-teal-950/5">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <h4 className="text-sm font-black uppercase tracking-wider text-teal-400 flex items-center gap-2">
@@ -3036,7 +3036,7 @@ export default function AdminPanel({
                 </GlassCard>
 
                 <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400">
+                  <div className="p-2.5 rounded-xl bg-teal-500/10 text-teal-400">
                     <ArrowUpRight className="h-4 w-4" />
                   </div>
                   <div>
@@ -3169,7 +3169,7 @@ export default function AdminPanel({
                               onClick={() => {
                                 navigateTo && navigateTo(`/Boris/withdrawals/${w.id}`);
                               }}
-                              className="px-3 py-1.5 bg-gradient-to-r from-teal-500/10 to-indigo-500/10 hover:from-teal-500 hover:to-indigo-500 text-teal-400 hover:text-slate-950 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-teal-500/20 hover:border-transparent transition-all cursor-pointer"
+                              className="px-3 py-1.5 bg-gradient-to-r from-teal-500/10 to-teal-500/10 hover:from-teal-500 hover:to-teal-500 text-teal-400 hover:text-slate-950 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-teal-500/20 hover:border-transparent transition-all cursor-pointer"
                             >
                               View Details
                             </button>
@@ -3266,7 +3266,7 @@ export default function AdminPanel({
                                   onClick={() => {
                                     navigateTo && navigateTo(`/Boris/withdrawals/${w.id}`);
                                   }}
-                                  className="px-3 py-1.5 bg-gradient-to-r from-teal-500/10 to-indigo-500/10 hover:from-teal-500 hover:to-indigo-500 text-teal-400 hover:text-slate-950 rounded-lg text-[9px] font-bold uppercase tracking-wider border border-teal-500/20 hover:border-transparent transition-all cursor-pointer"
+                                  className="px-3 py-1.5 bg-gradient-to-r from-teal-500/10 to-teal-500/10 hover:from-teal-500 hover:to-teal-500 text-teal-400 hover:text-slate-950 rounded-lg text-[9px] font-bold uppercase tracking-wider border border-teal-500/20 hover:border-transparent transition-all cursor-pointer"
                                 >
                                   View Details
                                 </button>
@@ -3343,7 +3343,7 @@ export default function AdminPanel({
               ) : (
                 <>
                   {/* Header Info Card */}
-                  <GlassCard className="p-5 border-white/5 bg-gradient-to-br from-indigo-950/20 via-slate-900/30 to-teal-950/15">
+                  <GlassCard className="p-5 border-white/5 bg-gradient-to-br from-teal-950/20 via-slate-900/30 to-teal-950/15">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
@@ -3533,7 +3533,7 @@ export default function AdminPanel({
                       <button
                         type="submit"
                         disabled={savingLegacyVoucherConfig}
-                        className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-600 hover:to-indigo-700 disabled:opacity-50 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-teal-500/10"
+                        className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 disabled:opacity-50 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-teal-500/10"
                       >
                         <Save className="h-4 w-4" />
                         {savingLegacyVoucherConfig ? 'Saving Settings to Database...' : 'Save Changes'}
@@ -4138,7 +4138,7 @@ export default function AdminPanel({
             <button
               type="submit"
               disabled={savingSettings}
-              className="px-6 py-3 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-600 hover:to-indigo-700 disabled:opacity-50 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-lg shadow-teal-500/10"
+              className="px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 disabled:opacity-50 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-lg shadow-teal-500/10"
             >
               <Save className="h-4 w-4" />
               {savingSettings ? 'Saving All Settings...' : 'Save Master Settings Permanently'}
@@ -4208,7 +4208,7 @@ export default function AdminPanel({
               <GlassCard className="p-5 border-white/10 space-y-2">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-teal-500 p-0.5 shadow-lg shadow-teal-500/20 flex items-center justify-center shrink-0">
+                    <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-teal-600 to-teal-500 p-0.5 shadow-lg shadow-teal-500/20 flex items-center justify-center shrink-0">
                       <Bot className="h-6 w-6 text-teal-300" />
                     </div>
                     <div>
@@ -4362,7 +4362,7 @@ export default function AdminPanel({
                       <button
                         type="submit"
                         disabled={savingAiSettings}
-                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-lg active:scale-95 cursor-pointer disabled:opacity-50"
+                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-400 hover:to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-lg active:scale-95 cursor-pointer disabled:opacity-50"
                       >
                         <Save className="h-4 w-4" />
                         <span>{savingAiSettings ? 'Saving Settings...' : 'Save AI Settings Permanently'}</span>
@@ -4571,7 +4571,7 @@ export default function AdminPanel({
                   </div>
                   <div className="p-3 bg-slate-950/60 rounded-xl border border-white/5 flex items-center justify-between">
                     <div>
-                      <span className="text-indigo-400 font-bold">[SYSTEM_AUDIT]</span> Diagnostic integrity check completed cleanly
+                      <span className="text-teal-400 font-bold">[SYSTEM_AUDIT]</span> Diagnostic integrity check completed cleanly
                     </div>
                     <span className="text-slate-500">Yesterday, 11:40 PM</span>
                   </div>
@@ -4643,7 +4643,7 @@ export default function AdminPanel({
                 </button>
                 <button
                   onClick={() => onToast('Financial Ledger CSV exported successfully!', 'success')}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] uppercase rounded-xl transition-all cursor-pointer flex items-center gap-2"
+                  className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-bold text-[10px] uppercase rounded-xl transition-all cursor-pointer flex items-center gap-2"
                 >
                   <FileSpreadsheet className="h-4 w-4" />
                   Export Ledger CSV
@@ -4767,7 +4767,7 @@ export default function AdminPanel({
                   </div>
                   <div className="flex justify-between py-1 border-b border-white/5">
                     <span className="text-slate-400">LEGACY_VOUCHER Purchases Count:</span>
-                    <span className="text-indigo-400 font-bold">{selectedUserForView.legacyVoucherPurchases || 0} Transactions</span>
+                    <span className="text-teal-400 font-bold">{selectedUserForView.legacyVoucherPurchases || 0} Transactions</span>
                   </div>
                   <div className="flex justify-between py-1">
                     <span className="text-slate-400">Withdrawal Status:</span>
@@ -4797,7 +4797,7 @@ export default function AdminPanel({
                       });
                       setSelectedUserForView(null);
                     }}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold uppercase transition-all"
+                    className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-bold uppercase transition-all"
                   >
                     Edit Profile
                   </button>
@@ -4960,7 +4960,7 @@ export default function AdminPanel({
                     </button>
                     <button
                       type="submit"
-                      className="px-5 py-2 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-600 hover:to-indigo-700 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl transition-all"
+                      className="px-5 py-2 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl transition-all"
                     >
                       Save Changes Permanently
                     </button>

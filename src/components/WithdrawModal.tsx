@@ -213,7 +213,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-[#1A080E] border border-[#8F1D3A]/20 rounded-3xl w-full max-w-sm sm:max-w-md overflow-hidden shadow-2xl relative">
+      <div className="bg-[#1A080E] border border-[#00C9A7]/20 rounded-3xl w-full max-w-sm sm:max-w-md overflow-hidden shadow-2xl relative">
         {/* Header */}
         <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between bg-[#1A080E]">
           <div className="flex items-center gap-2">
@@ -243,7 +243,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
 
         <div className="p-4 sm:p-5 max-h-[80vh] overflow-y-auto space-y-4">
           {/* Balance info banner */}
-          <div className="nivo-glass-surface border border-[#8F1D3A]/20 p-3.5 rounded-2xl flex justify-between items-center">
+          <div className="nivo-glass-surface border border-[#00C9A7]/20 p-3.5 rounded-2xl flex justify-between items-center">
             <div>
               <p className="text-[11px] text-slate-400 font-medium">Available Balance</p>
               <p className="text-base sm:text-lg font-black text-[#C13A5A]">
@@ -257,7 +257,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
 
           {/* WITHDRAWAL LOCKED WARNING BOX */}
           {isWithdrawalLocked ? (
-            <div className="bg-[#8F1D3A]/10 border border-[#8F1D3A]/30 rounded-2xl p-4 space-y-3">
+            <div className="bg-[#00C9A7]/10 border border-[#00C9A7]/30 rounded-2xl p-4 space-y-3">
               <div className="flex items-start gap-2.5">
                 <ShieldAlert className="w-5 h-5 text-[#C13A5A] shrink-0 mt-0.5" />
                 <div>
@@ -274,7 +274,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                 <div className="space-y-2">
                   <div className="nivo-glass-surface p-3 rounded-xl border border-white/10 text-xs flex items-center justify-between">
                     <span className="text-slate-300 font-medium">Referral Goal</span>
-                    <span className="font-bold px-2 py-0.5 rounded bg-[#8F1D3A]/20 text-[#C13A5A]">
+                    <span className="font-bold px-2 py-0.5 rounded bg-[#00C9A7]/20 text-[#C13A5A]">
                       {currentRefs} / 5 Done
                     </span>
                   </div>
@@ -283,7 +283,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                       onClose();
                       navigate('/referrals');
                     }}
-                    className="w-full bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-extrabold text-xs py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-extrabold text-xs py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Users className="w-4 h-4" />
                     <span>Invite Friends ({currentRefs}/5)</span>
@@ -297,7 +297,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                       onClose();
                       window.dispatchEvent(new CustomEvent('nevo-open-deposit'));
                     }}
-                    className="w-full bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-black text-xs py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-black text-xs py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <CreditCard className="w-4 h-4" />
                     <span>Deposit ₦520+ via KoraPay</span>
@@ -309,7 +309,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
           ) : (
             <>
               {error && (
-                <div className="p-3 bg-[#8F1D3A]/10 border border-[#8F1D3A]/20 rounded-xl text-[#C13A5A] text-xs flex items-center gap-2 font-semibold">
+                <div className="p-3 bg-[#00C9A7]/10 border border-[#00C9A7]/20 rounded-xl text-[#C13A5A] text-xs flex items-center gap-2 font-semibold">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </div>
@@ -327,7 +327,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                         required
                         value={bankName}
                         onChange={handleBankSelect}
-                        className="w-full nivo-glass-surface border border-[#8F1D3A]/20 rounded-xl px-3.5 py-3 text-white text-xs font-medium focus:outline-none focus:border-[#C13A5A] transition-colors"
+                        className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl px-3.5 py-3 text-white text-xs font-medium focus:outline-none focus:border-[#C13A5A] transition-colors"
                       >
                         <option value="" className="bg-[#1A080E] text-white">Select your bank</option>
                         {bankOptions.map((b) => (
@@ -349,7 +349,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                         value={accountNumber}
                         onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
                         placeholder="Enter 10-digit account number"
-                        className="w-full nivo-glass-surface border border-[#8F1D3A]/20 rounded-xl px-3.5 py-3 text-white text-sm font-mono tracking-widest focus:outline-none focus:border-[#C13A5A] transition-colors"
+                        className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl px-3.5 py-3 text-white text-sm font-mono tracking-widest focus:outline-none focus:border-[#C13A5A] transition-colors"
                       />
                     </div>
 
@@ -362,8 +362,8 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                     )}
 
                     {isVerified && accountName && (
-                      <div className="p-3 bg-[#8F1D3A]/10 border border-[#8F1D3A]/30 rounded-xl text-xs space-y-0.5 animate-fade-in">
-                        <div className="flex items-center gap-1.5 font-bold text-[#A52A4A]">
+                      <div className="p-3 bg-[#00C9A7]/10 border border-[#00C9A7]/30 rounded-xl text-xs space-y-0.5 animate-fade-in">
+                        <div className="flex items-center gap-1.5 font-bold text-[#00BFA6]">
                           <CheckCircle2 className="w-4 h-4" />
                           <span>Account Verified</span>
                         </div>
@@ -383,7 +383,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                     type="submit"
                     disabled={!isVerified || !accountName || !nameConfirmed}
                     disabled={!isVerified || resolving}
-                    className="w-full bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-lg shadow-[#7A1831]/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40"
+                    className="w-full bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-lg shadow-[#008F7A]/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40"
                   >
                     <span>Continue to Amount</span>
                     <ArrowRight className="w-4 h-4" />
@@ -407,7 +407,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder={`Min ₦${minWithdrawal.toLocaleString()}`}
-                        className="w-full nivo-glass-surface border border-[#8F1D3A]/20 rounded-xl px-3.5 py-3 text-white text-base font-bold focus:outline-none focus:border-[#C13A5A] transition-colors"
+                        className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl px-3.5 py-3 text-white text-base font-bold focus:outline-none focus:border-[#C13A5A] transition-colors"
                       />
                     </div>
 
@@ -420,7 +420,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
 
                       <div className="flex justify-between items-center text-slate-400">
                         <span>Withdrawal Fee</span>
-                        <span className="font-bold text-[#A52A4A]">₦0.00</span>
+                        <span className="font-bold text-[#00BFA6]">₦0.00</span>
                       </div>
 
                       <div className="flex justify-between items-center text-slate-400 border-t border-white/10 pt-2">
@@ -445,7 +445,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({ onClose, onSuccess
                   <button
                     type="submit"
                     disabled={loading || numAmount < minWithdrawal || (user?.walletBalance || 0) < numAmount}
-                    className="w-full bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-lg shadow-[#7A1831]/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40"
+                    className="w-full bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-black text-xs sm:text-sm py-3.5 rounded-xl shadow-lg shadow-[#008F7A]/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40"
                   >
                     {loading ? (
                       <>

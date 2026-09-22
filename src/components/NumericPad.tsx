@@ -34,7 +34,7 @@ export default function NumericPad({
         <button
           type="button"
           onClick={onBiometricClick}
-          className="h-16 w-16 mx-auto rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 active:scale-95 flex items-center justify-center transition-all duration-150 border border-indigo-500/20 shadow-sm"
+          className="h-16 w-16 mx-auto rounded-full bg-teal-500/10 hover:bg-teal-500/20 text-teal-600 dark:text-teal-400 active:scale-95 flex items-center justify-center transition-all duration-150 border border-teal-500/20 shadow-sm"
           title="Fingerprint scanner"
         >
           <Fingerprint className="h-8 w-8" />

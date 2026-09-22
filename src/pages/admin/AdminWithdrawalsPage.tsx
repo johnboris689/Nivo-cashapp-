@@ -59,8 +59,8 @@ export const AdminWithdrawalsPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
-              : 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#C13A5A]'
+              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
+              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -89,7 +89,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-zinc-800/60 font-medium text-zinc-300">
                 {withdrawals.map((w) => (
-                  <tr key={w.id} className="hover:bg-[#240A12] transition-colors">
+                  <tr key={w.id} className="hover:bg-[#071114] transition-colors">
                     <td className="py-3 px-3">
                       <p className="font-bold text-white">{w.userName}</p>
                       <p className="text-[10px] text-zinc-500">{w.userEmail}</p>
@@ -99,7 +99,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
 
                     <td className="py-3 px-3">
                       <p className="font-bold text-white">{w.bankName}</p>
-                      <p className="text-[#A52A4A] font-mono font-bold">{w.accountNumber}</p>
+                      <p className="text-[#00BFA6] font-mono font-bold">{w.accountNumber}</p>
                       <p className="text-[10px] text-zinc-400">{w.accountName}</p>
                     </td>
 
@@ -107,10 +107,10 @@ export const AdminWithdrawalsPage: React.FC = () => {
                       <span
                         className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                           w.status === 'approved'
-                            ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20'
+                            ? 'bg-[#00C9A7]/10 text-[#00BFA6] border border-[#00C9A7]/20'
                             : w.status === 'pending'
-                            ? 'bg-[#8F1D3A]/10 text-[#C13A5A] border border-[#8F1D3A]/20'
-                            : 'bg-[#8F1D3A]/10 text-[#C13A5A] border border-[#8F1D3A]/20'
+                            ? 'bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20'
+                            : 'bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20'
                         }`}
                       >
                         {w.status}
@@ -126,13 +126,13 @@ export const AdminWithdrawalsPage: React.FC = () => {
                         <>
                           <button
                             onClick={() => handleApprove(w.id)}
-                            className="bg-[#8F1D3A] hover:bg-[#7A1831] text-black font-extrabold text-[10px] px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+                            className="bg-[#00C9A7] hover:bg-[#008F7A] text-black font-extrabold text-[10px] px-3 py-1.5 rounded-lg transition-all cursor-pointer"
                           >
                             Approve & Pay
                           </button>
                           <button
                             onClick={() => handleReject(w.id)}
-                            className="bg-[#8F1D3A]/10 hover:bg-[#8F1D3A]/20 text-[#C13A5A] border border-[#8F1D3A]/30 font-bold text-[10px] px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+                            className="bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 text-[#C13A5A] border border-[#00C9A7]/30 font-bold text-[10px] px-3 py-1.5 rounded-lg transition-all cursor-pointer"
                           >
                             Decline & Refund
                           </button>

@@ -101,7 +101,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
 
   const featureCards = [
     { icon: CheckCircle2, title: "Complete Tasks", desc: "Complete tasks and earn rewards", color: "text-teal-400 bg-teal-500/10 border-teal-500/20" },
-    { icon: Sparkles, title: "Watch Adverts", desc: "Watch rewarded adverts and earn", color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
+    { icon: Sparkles, title: "Watch Adverts", desc: "Watch rewarded adverts and earn", color: "text-teal-400 bg-teal-500/10 border-teal-500/20" },
     { icon: ArrowUpRight, title: "Refer Friends", desc: "Invite friends and earn rewards", color: "text-sky-400 bg-sky-500/10 border-sky-500/20" },
     { icon: ArrowUpRight, title: "Withdraw Funds", desc: "Cash out after eligibility", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
   ];
@@ -111,7 +111,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
       
       {/* Background glowing blurred orbs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-indigo-500/10 rounded-full blur-[140px] animate-pulse" />
+        <div className="absolute top-1/4 left-1/4 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-teal-500/10 rounded-full blur-[140px] animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-teal-500/10 rounded-full blur-[140px] animate-pulse" style={{ animationDuration: '7s' }} />
       </div>
 
@@ -202,10 +202,10 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
           className="w-full max-w-xl mx-auto flex items-center justify-between pt-2 relative z-10 shrink-0"
         >
           <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-indigo-500 to-teal-400 flex items-center justify-center shadow-md">
+            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-teal-500 to-teal-400 flex items-center justify-center shadow-md">
               <span className="text-white font-black text-xs tracking-tighter">NV</span>
             </div>
-            <span className="text-sm font-black tracking-tight bg-gradient-to-r from-teal-400 to-indigo-300 bg-clip-text text-transparent">
+            <span className="text-sm font-black tracking-tight bg-gradient-to-r from-teal-400 to-teal-300 bg-clip-text text-transparent">
               Nevo
             </span>
           </div>
@@ -228,13 +228,13 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
           <div className="relative mb-1">
             {/* Glowing Aura */}
             <div className="absolute inset-0 bg-teal-400/20 rounded-full blur-2xl scale-150 animate-pulse" />
-            <div className="absolute -inset-3 bg-gradient-to-tr from-indigo-500/30 to-teal-400/30 rounded-full blur-md animate-spin" style={{ animationDuration: '12s' }} />
+            <div className="absolute -inset-3 bg-gradient-to-tr from-teal-500/30 to-teal-400/30 rounded-full blur-md animate-spin" style={{ animationDuration: '12s' }} />
             
             <motion.div
               initial={{ scale: 0, rotate: -45 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 220, damping: 16, delay: 0.2 }}
-              className="w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-gradient-to-tr from-teal-500 via-indigo-600 to-teal-400 flex items-center justify-center border-2 border-teal-300/40 shadow-[0_0_40px_rgba(45,212,191,0.4)] relative z-10"
+              className="w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-gradient-to-tr from-teal-500 via-teal-600 to-teal-400 flex items-center justify-center border-2 border-teal-300/40 shadow-[0_0_40px_rgba(45,212,191,0.4)] relative z-10"
             >
               <Check className="w-10 h-10 sm:w-11 sm:h-11 text-teal-100 stroke-[3.5]" />
             </motion.div>
@@ -251,7 +251,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
           </div>
 
           <div className="w-full bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-5 text-center shadow-2xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 via-indigo-500/5 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 via-teal-500/5 to-transparent pointer-events-none" />
             <div className="relative flex items-center justify-center gap-2 text-teal-300 font-black text-xs uppercase tracking-wider">
               <Gift className="w-4 h-4" />
               Welcome to Nevo
@@ -283,7 +283,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
               type="button"
               onClick={handleRegisterBiometric}
               disabled={isBioLoading}
-              className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-teal-500 via-indigo-600 to-teal-500 hover:from-teal-400 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-teal-500 via-teal-600 to-teal-500 hover:from-teal-400 hover:to-teal-500 text-white text-xs font-bold transition-all shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               <Fingerprint className="w-4 h-4" />
               {isBioLoading ? 'Opening Device Biometric Prompt...' : 'Register Fingerprint'}
@@ -329,7 +329,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
             disabled={isSubmitting}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-teal-400 via-indigo-500 to-teal-400 hover:from-teal-300 hover:to-teal-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(45,212,191,0.3)] hover:shadow-[0_0_40px_rgba(45,212,191,0.5)] transition-all cursor-pointer disabled:opacity-50"
+            className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-teal-400 via-teal-500 to-teal-400 hover:from-teal-300 hover:to-teal-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(45,212,191,0.3)] hover:shadow-[0_0_40px_rgba(45,212,191,0.5)] transition-all cursor-pointer disabled:opacity-50"
           >
             {isSubmitting ? (
               <span className="flex items-center gap-2">

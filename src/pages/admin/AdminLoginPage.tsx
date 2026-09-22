@@ -34,11 +34,11 @@ export const AdminLoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#090506] flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] bg-[#8F1D3A]/10 rounded-full blur-[140px] pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] bg-[#00C9A7]/10 rounded-full blur-[140px] pointer-events-none"></div>
 
-      <div className="w-full max-w-md nivo-glass-surface border border-[#8F1D3A]/30 rounded-3xl p-8 shadow-2xl relative z-10">
+      <div className="w-full max-w-md nivo-glass-surface border border-[#00C9A7]/30 rounded-3xl p-8 shadow-2xl relative z-10">
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#8F1D3A] to-[#8F1D3A] text-black flex items-center justify-center mx-auto mb-3 shadow-lg shadow-[#8F1D3A]/20">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#00C9A7] to-[#00C9A7] text-black flex items-center justify-center mx-auto mb-3 shadow-lg shadow-[#00C9A7]/20">
             <ShieldCheck className="w-7 h-7" />
           </div>
           <h1 className="text-2xl font-black text-white">Administrator Access</h1>
@@ -46,7 +46,7 @@ export const AdminLoginPage: React.FC = () => {
         </div>
 
         {error && (
-          <div className="mb-6 p-3.5 bg-[#8F1D3A]/10 border border-[#8F1D3A]/30 rounded-xl text-[#C13A5A] text-xs flex items-center gap-2">
+          <div className="mb-6 p-3.5 bg-[#00C9A7]/10 border border-[#00C9A7]/30 rounded-xl text-[#C13A5A] text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -65,7 +65,7 @@ export const AdminLoginPage: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter administrator email"
-                className="w-full nivo-glass-surface border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#8F1D3A] transition-colors"
+                className="w-full nivo-glass-surface border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#00C9A7] transition-colors"
               />
             </div>
           </div>
@@ -82,7 +82,7 @@ export const AdminLoginPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full nivo-glass-surface border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#8F1D3A] transition-colors"
+                className="w-full nivo-glass-surface border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#00C9A7] transition-colors"
               />
             </div>
           </div>
@@ -90,7 +90,7 @@ export const AdminLoginPage: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-[#8F1D3A] to-[#8F1D3A] hover:from-[#A52A4A] hover:to-[#7A1831] text-black font-extrabold text-sm py-3.5 rounded-xl shadow-lg shadow-[#8F1D3A]/20 flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
+            className="w-full bg-gradient-to-r from-[#00C9A7] to-[#00C9A7] hover:from-[#00BFA6] hover:to-[#008F7A] text-black font-extrabold text-sm py-3.5 rounded-xl shadow-lg shadow-[#00C9A7]/20 flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
           >
             {loading ? 'Authenticating...' : 'Sign In to Admin Portal'}
             {!loading && <ArrowRight className="w-4 h-4" />}

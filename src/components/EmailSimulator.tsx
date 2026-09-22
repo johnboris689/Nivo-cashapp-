@@ -29,7 +29,7 @@ export default function EmailSimulator({
       return <Shield className="h-4 w-4 text-teal-400" />;
     }
     if (sub.includes('login') || sub.includes('device') || sub.includes('failed')) {
-      return <Lock className="h-4 w-4 text-indigo-400" />;
+      return <Lock className="h-4 w-4 text-teal-400" />;
     }
     if (sub.includes('success') || sub.includes('transfer') || sub.includes('withdrawal')) {
       return <Check className="h-4 w-4 text-emerald-400" />;
@@ -123,7 +123,7 @@ export default function EmailSimulator({
                   className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer relative group ${
                     email.read
                       ? 'bg-white/[0.02] border-white/5 hover:border-white/10'
-                      : 'bg-indigo-500/5 border-indigo-500/20 hover:border-indigo-500/30 ring-1 ring-indigo-500/10'
+                      : 'bg-teal-500/5 border-teal-500/20 hover:border-teal-500/30 ring-1 ring-teal-500/10'
                   }`}
                 >
                   {!email.read && (

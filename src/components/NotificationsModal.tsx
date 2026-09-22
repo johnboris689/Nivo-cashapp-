@@ -160,9 +160,9 @@ export default function NotificationsModal({
       case 'daily refreshed balance':
       case 'wallet':
         return {
-          icon: <RefreshCw className="h-6 w-6 text-indigo-400" />,
-          badgeBg: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30',
-          glow: 'bg-indigo-500/10 border-indigo-500/20'
+          icon: <RefreshCw className="h-6 w-6 text-teal-400" />,
+          badgeBg: 'bg-teal-500/15 text-teal-400 border-teal-500/30',
+          glow: 'bg-teal-500/10 border-teal-500/20'
         };
       case 'bank transfer':
         return {
@@ -172,15 +172,15 @@ export default function NotificationsModal({
         };
       case 'airtime topup':
         return {
-          icon: <Smartphone className="h-6 w-6 text-purple-400" />,
-          badgeBg: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
-          glow: 'bg-purple-500/10 border-purple-500/20'
+          icon: <Smartphone className="h-6 w-6 text-emerald-400" />,
+          badgeBg: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+          glow: 'bg-emerald-500/10 border-emerald-500/20'
         };
       case 'data bundle':
         return {
-          icon: <Wifi className="h-6 w-6 text-cyan-400" />,
-          badgeBg: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
-          glow: 'bg-cyan-500/10 border-cyan-500/20'
+          icon: <Wifi className="h-6 w-6 text-teal-400" />,
+          badgeBg: 'bg-teal-500/15 text-teal-400 border-teal-500/30',
+          glow: 'bg-teal-500/10 border-teal-500/20'
         };
       case 'account security':
         return {
@@ -190,9 +190,9 @@ export default function NotificationsModal({
         };
       default:
         return {
-          icon: <Bell className="h-6 w-6 text-indigo-400" />,
-          badgeBg: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30',
-          glow: 'bg-indigo-500/10 border-indigo-500/20'
+          icon: <Bell className="h-6 w-6 text-teal-400" />,
+          badgeBg: 'bg-teal-500/15 text-teal-400 border-teal-500/30',
+          glow: 'bg-teal-500/10 border-teal-500/20'
         };
     }
   };
@@ -252,7 +252,7 @@ export default function NotificationsModal({
               <div className="overflow-y-auto no-scrollbar flex-1 space-y-4 pr-1">
                 {/* Hero Header */}
                 <div className="flex flex-col items-center text-center p-5 rounded-2xl bg-slate-950/60 border border-slate-800/80 relative overflow-hidden">
-                  <div className={`p-3.5 rounded-2xl border ${style.glow} mb-3 shadow-lg shadow-indigo-950/50`}>
+                  <div className={`p-3.5 rounded-2xl border ${style.glow} mb-3 shadow-lg shadow-teal-950/50`}>
                     {style.icon}
                   </div>
 
@@ -419,7 +419,7 @@ export default function NotificationsModal({
                   <button
                     type="button"
                     onClick={() => handleCopy(details.voucherCode!, 'voucher_btn')}
-                    className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-teal-950/40 transition-all active:scale-95"
+                    className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-400 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-teal-950/40 transition-all active:scale-95"
                   >
                     {copiedField === 'voucher_btn' ? (
                       <>
@@ -450,7 +450,7 @@ export default function NotificationsModal({
           <div className="flex flex-col h-full overflow-hidden">
             <div className="flex items-center justify-between mb-4 shrink-0 pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                <div className="p-2 rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20">
                   <Bell className="h-5 w-5" />
                 </div>
                 <div>
@@ -466,7 +466,7 @@ export default function NotificationsModal({
                     id="btn-mark-all-read"
                     type="button"
                     onClick={onMarkAllRead}
-                    className="p-2 rounded-xl hover:bg-slate-800 text-indigo-400 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-indigo-500/20 bg-indigo-500/5"
+                    className="p-2 rounded-xl hover:bg-slate-800 text-teal-400 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-teal-500/20 bg-teal-500/5"
                     title="Mark all as read"
                   >
                     <CheckCheck className="h-4 w-4" />
@@ -504,7 +504,7 @@ export default function NotificationsModal({
                       onClick={() => handleSelectNotif(notif)}
                       className={`p-3.5 rounded-2xl border text-left transition-all duration-200 cursor-pointer relative group flex items-start gap-3.5 ${
                         notif.unread
-                          ? 'bg-gradient-to-r from-slate-800/80 via-slate-800/40 to-slate-900 border-indigo-500/30 hover:border-indigo-400 shadow-lg shadow-indigo-950/20'
+                          ? 'bg-gradient-to-r from-slate-800/80 via-slate-800/40 to-slate-900 border-teal-500/30 hover:border-teal-400 shadow-lg shadow-teal-950/20'
                           : 'bg-slate-950/40 border-slate-800/60 hover:bg-slate-800/30 hover:border-slate-700 opacity-80'
                       }`}
                     >
@@ -536,7 +536,7 @@ export default function NotificationsModal({
                       {/* Unread indicator / Chevron */}
                       <div className="flex items-center gap-1 shrink-0 self-center">
                         {notif.unread && (
-                          <span className="h-2.5 w-2.5 rounded-full bg-indigo-500 animate-pulse" />
+                          <span className="h-2.5 w-2.5 rounded-full bg-teal-500 animate-pulse" />
                         )}
                         <ChevronRight className="h-4 w-4 text-slate-600 group-hover:text-slate-300 transition-colors" />
                       </div>

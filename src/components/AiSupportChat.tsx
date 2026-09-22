@@ -199,7 +199,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
           )}
 
           <div className="relative">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-teal-500 p-0.5 shadow-lg shadow-teal-500/20">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-teal-600 to-teal-500 p-0.5 shadow-lg shadow-teal-500/20">
               <div className="h-full w-full bg-[#0c0c14] rounded-[10px] flex items-center justify-center">
                 <Bot className="h-5 w-5 text-teal-400 animate-pulse" />
               </div>
@@ -263,7 +263,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
       </div>
 
       {/* Safety Banner */}
-      <div className="bg-indigo-950/40 border-b border-indigo-500/20 px-3 py-1.5 flex items-center justify-between text-[10px] text-indigo-200 font-sans">
+      <div className="bg-teal-950/40 border-b border-teal-500/20 px-3 py-1.5 flex items-center justify-between text-[10px] text-teal-200 font-sans">
         <div className="flex items-center gap-1.5 truncate">
           <ShieldCheck className="h-3.5 w-3.5 text-teal-400 shrink-0" />
           <span className="truncate">Automated guidance only. For payment disputes or PIN resets, escalate to WhatsApp.</span>
@@ -292,7 +292,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
                 <div
                   className={`p-3.5 rounded-2xl text-xs sm:text-[13px] leading-relaxed shadow-sm transition-all ${
                     isUser
-                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-tr-none font-medium'
+                      ? 'bg-gradient-to-r from-teal-600 to-violet-600 text-white rounded-tr-none font-medium'
                       : 'bg-slate-900/90 border border-white/10 text-slate-200 rounded-tl-none font-sans'
                   }`}
                 >
@@ -331,7 +331,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
 
                   {/* User Timestamp */}
                   {isUser && (
-                    <div className="mt-1 text-[9px] text-indigo-200 font-mono text-right">
+                    <div className="mt-1 text-[9px] text-teal-200 font-mono text-right">
                       {msg.time}
                     </div>
                   )}
@@ -391,8 +391,8 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
 
               {/* Avatar for User */}
               {isUser && (
-                <div className="h-7 w-7 rounded-lg bg-indigo-950 border border-indigo-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <User className="h-4 w-4 text-indigo-400" />
+                <div className="h-7 w-7 rounded-lg bg-teal-950 border border-teal-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <User className="h-4 w-4 text-teal-400" />
                 </div>
               )}
             </div>
@@ -455,7 +455,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
             id="btn-send-ai-support-message"
             type="submit"
             disabled={!inputMessage.trim() || isLoading}
-            className="h-10 w-10 rounded-xl bg-gradient-to-r from-indigo-600 to-teal-500 hover:from-indigo-500 hover:to-teal-400 text-white flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 shadow-md shrink-0 cursor-pointer"
+            className="h-10 w-10 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 shadow-md shrink-0 cursor-pointer"
             title="Send Message"
           >
             <Send className="h-4 w-4" />

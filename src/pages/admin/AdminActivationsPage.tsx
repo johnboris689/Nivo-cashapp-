@@ -74,14 +74,14 @@ export const AdminActivationsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-white flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-[#8F1D3A]" />
+            <ShieldCheck className="w-6 h-6 text-[#00C9A7]" />
             Withdrawal Access Verification
           </h1>
           <p className="text-xs text-zinc-400 mt-1">Review withdrawal-access eligibility and verified KoraPay wallet deposits</p>
         </div>
 
         {pendingCount > 0 && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#8F1D3A]/20 border border-[#8F1D3A]/30 text-[#C13A5A] font-extrabold text-xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#00C9A7]/20 border border-[#00C9A7]/30 text-[#C13A5A] font-extrabold text-xs">
             <Clock className="w-3.5 h-3.5 animate-spin" />
             {pendingCount} Pending Approvals
           </span>
@@ -92,8 +92,8 @@ export const AdminActivationsPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#A52A4A]'
-              : 'bg-[#8F1D3A]/10 border-[#8F1D3A]/30 text-[#C13A5A]'
+              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
+              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -110,7 +110,7 @@ export const AdminActivationsPage: React.FC = () => {
               onClick={() => setFilter(tab)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all cursor-pointer ${
                 filter === tab
-                  ? 'bg-[#8F1D3A] text-black shadow-md'
+                  ? 'bg-[#00C9A7] text-black shadow-md'
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
@@ -126,7 +126,7 @@ export const AdminActivationsPage: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search user, ref or sender..."
-            className="w-full nivo-glass-surface border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-white text-xs focus:outline-none focus:border-[#8F1D3A]"
+            className="w-full nivo-glass-surface border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-white text-xs focus:outline-none focus:border-[#00C9A7]"
           />
         </div>
       </div>
@@ -155,7 +155,7 @@ export const AdminActivationsPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-zinc-800/60 font-medium text-zinc-300">
                 {filtered.map((a) => (
-                  <tr key={a.id} className="hover:bg-[#240A12] transition-colors">
+                  <tr key={a.id} className="hover:bg-[#071114] transition-colors">
                     <td className="py-3 px-3">
                       <p className="font-bold text-white">{a.userName}</p>
                       <p className="text-[11px] text-zinc-400">{a.userEmail}</p>
@@ -177,10 +177,10 @@ export const AdminActivationsPage: React.FC = () => {
                       <span
                         className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                           a.status === 'approved'
-                            ? 'bg-[#8F1D3A]/20 text-[#A52A4A] border border-[#8F1D3A]/30'
+                            ? 'bg-[#00C9A7]/20 text-[#00BFA6] border border-[#00C9A7]/30'
                             : a.status === 'pending'
-                            ? 'bg-[#8F1D3A]/20 text-[#C13A5A] border border-[#8F1D3A]/30'
-                            : 'bg-[#8F1D3A]/20 text-[#C13A5A] border border-[#8F1D3A]/30'
+                            ? 'bg-[#00C9A7]/20 text-[#C13A5A] border border-[#00C9A7]/30'
+                            : 'bg-[#00C9A7]/20 text-[#C13A5A] border border-[#00C9A7]/30'
                         }`}
                       >
                         {a.status.toUpperCase()}
@@ -193,7 +193,7 @@ export const AdminActivationsPage: React.FC = () => {
                           <button
                             disabled={actionLoading === a.id}
                             onClick={() => handleApprove(a.id)}
-                            className="bg-[#8F1D3A] hover:bg-[#7A1831] disabled:opacity-50 text-black text-[11px] font-black px-3 py-1.5 rounded-xl shadow transition-all cursor-pointer inline-flex items-center gap-1"
+                            className="bg-[#00C9A7] hover:bg-[#008F7A] disabled:opacity-50 text-black text-[11px] font-black px-3 py-1.5 rounded-xl shadow transition-all cursor-pointer inline-flex items-center gap-1"
                           >
                             <Check className="w-3.5 h-3.5" />
                             <span>Approve</span>
@@ -202,7 +202,7 @@ export const AdminActivationsPage: React.FC = () => {
                           <button
                             disabled={actionLoading === a.id}
                             onClick={() => handleReject(a.id)}
-                            className="bg-[#8F1D3A]/20 hover:bg-[#8F1D3A]/30 text-[#C13A5A] border border-[#8F1D3A]/30 text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer inline-flex items-center gap-1"
+                            className="bg-[#00C9A7]/20 hover:bg-[#00C9A7]/30 text-[#C13A5A] border border-[#00C9A7]/30 text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer inline-flex items-center gap-1"
                           >
                             <X className="w-3.5 h-3.5" />
                             <span>Reject</span>

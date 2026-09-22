@@ -35,7 +35,7 @@ export default function TransactionList({
       case 'buy_legacyVoucher':
         return {
           icon: Ticket,
-          bg: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20'
+          bg: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20'
         };
       case 'redeem_airtime':
         return {
@@ -94,7 +94,7 @@ export default function TransactionList({
               placeholder="Search history (e.g. OPay, MTN)..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full text-xs pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-950/30 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-slate-800 dark:text-white"
+              className="w-full text-xs pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-950/30 focus:outline-none focus:ring-2 focus:ring-teal-500/20 text-slate-800 dark:text-white"
             />
           </div>
 
@@ -114,7 +114,7 @@ export default function TransactionList({
                 onClick={() => setFilter(btn.id)}
                 className={`text-[10px] font-semibold font-mono py-1.5 px-3 rounded-full border transition-all ${
                   filter === btn.id
-                    ? 'bg-indigo-600 text-white border-indigo-600 dark:bg-teal-500 dark:text-slate-950 dark:border-teal-500'
+                    ? 'bg-teal-600 text-white border-teal-600 dark:bg-teal-500 dark:text-slate-950 dark:border-teal-500'
                     : 'bg-white/40 border-slate-200/50 dark:bg-slate-900/40 dark:border-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
                 }`}
               >
@@ -148,7 +148,7 @@ export default function TransactionList({
                     <IconComponent className="h-3.5 w-3.5" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h5 className="text-[11px] sm:text-xs font-bold text-slate-200 group-hover:text-indigo-400 dark:group-hover:text-teal-400 transition-colors truncate leading-tight">
+                    <h5 className="text-[11px] sm:text-xs font-bold text-slate-200 group-hover:text-teal-400 dark:group-hover:text-teal-400 transition-colors truncate leading-tight">
                       {tx.description}
                     </h5>
                     <span className="text-[9px] text-slate-400 font-mono mt-0.5 block">

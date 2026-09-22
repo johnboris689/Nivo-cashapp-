@@ -204,8 +204,8 @@ export function CyberWithdrawalTerminal({
       );
     }
     return (
-      <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-cyan-950/80 border border-cyan-500/50 text-cyan-400 font-mono text-xs font-bold shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-        <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+      <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-cyan-950/80 border border-teal-500/50 text-teal-400 font-mono text-xs font-bold shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+        <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
         ● PENDING REVIEW - AWAITING ACTION
       </div>
     );
@@ -214,12 +214,12 @@ export function CyberWithdrawalTerminal({
   return (
     <div className="w-full min-h-screen bg-[#060810] text-slate-200 p-3 sm:p-6 space-y-6 font-mono text-xs select-none">
       {/* Navigation Header */}
-      <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-cyan-500/20 pb-4">
+      <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-teal-500/20 pb-4">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-950/50 border border-cyan-500/30 hover:border-cyan-400/60 hover:bg-cyan-900/40 transition-all text-cyan-300 font-bold cursor-pointer w-fit shadow-[0_0_10px_rgba(6,182,212,0.15)]"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-950/50 border border-teal-500/30 hover:border-teal-400/60 hover:bg-teal-900/40 transition-all text-teal-300 font-bold cursor-pointer w-fit shadow-[0_0_10px_rgba(6,182,212,0.15)]"
         >
-          <ArrowLeft className="h-4 w-4 text-cyan-400" />
+          <ArrowLeft className="h-4 w-4 text-teal-400" />
           [ BACK TO WITHDRAWAL QUEUE ]
         </button>
         <div className="flex items-center gap-3">
@@ -258,16 +258,16 @@ export function CyberWithdrawalTerminal({
         {/* 3-CARD BALANCE BREAKDOWN GRID (Requested / Already Approved / Remaining) */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {/* Requested Amount */}
-          <div className="p-3.5 rounded-lg bg-[#050811] border border-cyan-500/30 flex flex-col justify-between">
+          <div className="p-3.5 rounded-lg bg-[#050811] border border-teal-500/30 flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">REQUESTED AMOUNT</span>
-              <Coins className="h-4 w-4 text-cyan-400" />
+              <Coins className="h-4 w-4 text-teal-400" />
             </div>
             <div className="mt-2">
               <span className="text-xl sm:text-2xl font-black text-white font-mono block">
                 {formatNaira(requestedAmount)}
               </span>
-              <span className="text-[10px] text-cyan-400 font-mono">Original user withdrawal sum</span>
+              <span className="text-[10px] text-teal-400 font-mono">Original user withdrawal sum</span>
             </div>
           </div>
 
@@ -471,7 +471,7 @@ export function CyberWithdrawalTerminal({
                     onChange={(e) => setPartialNoteInput(e.target.value)}
                     placeholder="e.g. Approved first tranche, NIBSS batch #1..."
                     disabled={approvingPartial}
-                    className="w-full px-3 py-2 bg-[#03050a] border border-white/15 rounded-lg text-slate-200 text-xs placeholder:text-slate-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 disabled:opacity-50 font-sans"
+                    className="w-full px-3 py-2 bg-[#03050a] border border-white/15 rounded-lg text-slate-200 text-xs placeholder:text-slate-600 focus:outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400/50 disabled:opacity-50 font-sans"
                   />
                 </div>
 
@@ -535,16 +535,16 @@ export function CyberWithdrawalTerminal({
 
         {/* Right Column: Approval Audit Trail (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="p-5 rounded-xl bg-[#090d18] border border-cyan-500/30 space-y-3 h-full flex flex-col justify-between">
+          <div className="p-5 rounded-xl bg-[#090d18] border border-teal-500/30 space-y-3 h-full flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between border-b border-cyan-500/20 pb-3">
+              <div className="flex items-center justify-between border-b border-teal-500/20 pb-3">
                 <div className="flex items-center gap-2">
-                  <History className="h-5 w-5 text-cyan-400" />
+                  <History className="h-5 w-5 text-teal-400" />
                   <h3 className="text-xs font-bold text-white uppercase tracking-wider">
                     APPROVAL AUDIT TRAIL ({approvalHistory.length})
                   </h3>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-300">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-500/10 border border-teal-500/30 text-teal-300">
                   IMMUTABLE
                 </span>
               </div>
@@ -602,13 +602,13 @@ export function CyberWithdrawalTerminal({
       {/* THREE MAIN TERMINAL MODULES (ACCOUNT, BANKING, LEGACY_VOUCHER) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Module 1: Client Profile Terminal */}
-        <div className="p-4 rounded-xl bg-[#090d18] border border-indigo-500/30 space-y-3 shadow-lg">
-          <div className="flex items-center justify-between border-b border-indigo-500/20 pb-2">
-            <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-2">
-              <User className="h-4 w-4 text-indigo-400" />
+        <div className="p-4 rounded-xl bg-[#090d18] border border-teal-500/30 space-y-3 shadow-lg">
+          <div className="flex items-center justify-between border-b border-teal-500/20 pb-2">
+            <h3 className="text-xs font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2">
+              <User className="h-4 w-4 text-teal-400" />
               CLIENT PROFILE TERMINAL
             </h3>
-            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">USER DB</span>
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300">USER DB</span>
           </div>
           <div className="space-y-2 text-[11px]">
             <div className="flex justify-between border-b border-white/5 pb-1">
@@ -635,13 +635,13 @@ export function CyberWithdrawalTerminal({
         </div>
 
         {/* Module 2: Bank Terminal */}
-        <div className="p-4 rounded-xl bg-[#090d18] border border-cyan-500/30 space-y-3 shadow-lg">
-          <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2">
-            <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
-              <Building className="h-4 w-4 text-cyan-400" />
+        <div className="p-4 rounded-xl bg-[#090d18] border border-teal-500/30 space-y-3 shadow-lg">
+          <div className="flex items-center justify-between border-b border-teal-500/20 pb-2">
+            <h3 className="text-xs font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2">
+              <Building className="h-4 w-4 text-teal-400" />
               BANK TERMINAL
             </h3>
-            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">NIBSS INTEGRATED</span>
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300">NIBSS INTEGRATED</span>
           </div>
           <div className="space-y-2 text-[11px]">
             <div className="flex justify-between border-b border-white/5 pb-1">
@@ -650,7 +650,7 @@ export function CyberWithdrawalTerminal({
             </div>
             <div className="flex justify-between border-b border-white/5 pb-1">
               <span className="text-slate-500">ACCOUNT:</span>
-              <span className="text-cyan-300 font-bold">{maskAccountNumber(selectedWithdrawal.accountNumber || selectedWithdrawal.accountnumber)}</span>
+              <span className="text-teal-300 font-bold">{maskAccountNumber(selectedWithdrawal.accountNumber || selectedWithdrawal.accountnumber)}</span>
             </div>
             <div className="flex justify-between border-b border-white/5 pb-1">
               <span className="text-slate-500">ACCOUNT NAME:</span>
@@ -825,15 +825,15 @@ export function CyberWithdrawalTerminal({
 
         {/* Right Column: Live System Monitor (5 cols) */}
         <div className="lg:col-span-5 space-y-5">
-          <div className="p-5 rounded-xl bg-[#090d18] border border-cyan-500/30 space-y-4">
-            <div className="flex items-center justify-between border-b border-cyan-500/20 pb-3">
+          <div className="p-5 rounded-xl bg-[#090d18] border border-teal-500/30 space-y-4">
+            <div className="flex items-center justify-between border-b border-teal-500/20 pb-3">
               <div className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-cyan-400" />
+                <Activity className="h-5 w-5 text-teal-400" />
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider">
                   LIVE TELEMETRY &amp; FRAUD ENGINE
                 </h3>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-500/10 border border-teal-500/30 text-teal-400">
                 MONITOR ONLINE
               </span>
             </div>
@@ -842,22 +842,22 @@ export function CyberWithdrawalTerminal({
               {/* CPU Load */}
               <div>
                 <div className="flex justify-between text-[11px] text-slate-400 mb-1">
-                  <span className="flex items-center gap-1.5"><Cpu className="h-3.5 w-3.5 text-cyan-400" /> NIBSS AUDIT THREADS</span>
+                  <span className="flex items-center gap-1.5"><Cpu className="h-3.5 w-3.5 text-teal-400" /> NIBSS AUDIT THREADS</span>
                   <span className="font-bold text-white">{cpuUsage}%</span>
                 </div>
                 <div className="w-full h-2 bg-[#03050a] rounded-full overflow-hidden border border-white/5">
-                  <div className="h-full bg-cyan-400 transition-all duration-300" style={{ width: `${cpuUsage}%` }}></div>
+                  <div className="h-full bg-teal-400 transition-all duration-300" style={{ width: `${cpuUsage}%` }}></div>
                 </div>
               </div>
 
               {/* Memory Allocation */}
               <div>
                 <div className="flex justify-between text-[11px] text-slate-400 mb-1">
-                  <span className="flex items-center gap-1.5"><Database className="h-3.5 w-3.5 text-indigo-400" /> ENCRYPTED MEMORY BUFFER</span>
+                  <span className="flex items-center gap-1.5"><Database className="h-3.5 w-3.5 text-teal-400" /> ENCRYPTED MEMORY BUFFER</span>
                   <span className="font-bold text-white">{ramUsage}%</span>
                 </div>
                 <div className="w-full h-2 bg-[#03050a] rounded-full overflow-hidden border border-white/5">
-                  <div className="h-full bg-indigo-500 transition-all duration-300" style={{ width: `${ramUsage}%` }}></div>
+                  <div className="h-full bg-teal-500 transition-all duration-300" style={{ width: `${ramUsage}%` }}></div>
                 </div>
               </div>
 
@@ -885,7 +885,7 @@ export function CyberWithdrawalTerminal({
               </div>
               <div className="flex items-center justify-between text-slate-400">
                 <span>IP / DEVICE FINGERPRINT:</span>
-                <span className="text-cyan-400 font-bold">VERIFIED TRUSTED</span>
+                <span className="text-teal-400 font-bold">VERIFIED TRUSTED</span>
               </div>
             </div>
           </div>

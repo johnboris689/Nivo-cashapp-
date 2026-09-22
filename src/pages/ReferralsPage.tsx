@@ -83,7 +83,7 @@ export const ReferralsPage: React.FC = () => {
 
         <button
           onClick={() => setShowShareModal(true)}
-          className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-extrabold text-xs px-5 py-3 rounded-2xl shadow-lg shadow-[#7A1831]/25 cursor-pointer transition-all hover:scale-105 shrink-0"
+          className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-extrabold text-xs px-5 py-3 rounded-2xl shadow-lg shadow-[#008F7A]/25 cursor-pointer transition-all hover:scale-105 shrink-0"
         >
           <Share2 className="w-4 h-4" />
           <span>Share Link Now</span>
@@ -93,14 +93,14 @@ export const ReferralsPage: React.FC = () => {
       {/* Referral Link & Code Cards Grid */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* Referral Code Box */}
-        <div className="nivo-glass-surface border border-[#8F1D3A]/30 rounded-3xl p-5 sm:p-6 relative overflow-hidden flex flex-col justify-between shadow-xl">
+        <div className="nivo-glass-surface border border-[#00C9A7]/30 rounded-3xl p-5 sm:p-6 relative overflow-hidden flex flex-col justify-between shadow-xl">
           <div>
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-extrabold text-[#C13A5A] uppercase tracking-wider flex items-center gap-1.5">
                 <Gift className="w-4 h-4 text-[#C13A5A]" />
                 Your Referral Code
               </span>
-              <span className="bg-[#A52A4A]/10 text-[#C13A5A] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#A52A4A]/20">
+              <span className="bg-[#00BFA6]/10 text-[#C13A5A] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#00BFA6]/20">
                 Active
               </span>
             </div>
@@ -111,9 +111,9 @@ export const ReferralsPage: React.FC = () => {
               </span>
               <button
                 onClick={copyCode}
-                className="flex items-center gap-1.5 bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-black text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer shadow-md shadow-[#7A1831]/20"
+                className="flex items-center gap-1.5 bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-black text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer shadow-md shadow-[#008F7A]/20"
               >
-                {copiedCode ? <Check className="w-4 h-4 text-[#A52A4A]" /> : <Copy className="w-4 h-4" />}
+                {copiedCode ? <Check className="w-4 h-4 text-[#00BFA6]" /> : <Copy className="w-4 h-4" />}
                 <span>{copiedCode ? 'Copied' : 'Copy Code'}</span>
               </button>
             </div>
@@ -125,14 +125,14 @@ export const ReferralsPage: React.FC = () => {
         </div>
 
         {/* Referral Link Box */}
-        <div className="nivo-glass-surface border border-[#8F1D3A]/30 rounded-3xl p-5 sm:p-6 relative overflow-hidden flex flex-col justify-between shadow-xl">
+        <div className="nivo-glass-surface border border-[#00C9A7]/30 rounded-3xl p-5 sm:p-6 relative overflow-hidden flex flex-col justify-between shadow-xl">
           <div>
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-extrabold text-[#C13A5A] uppercase tracking-wider flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-[#C13A5A]" />
                 Unique Referral Link
               </span>
-              <span className="bg-[#8F1D3A]/10 text-[#A52A4A] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#8F1D3A]/20">
+              <span className="bg-[#00C9A7]/10 text-[#00BFA6] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#00C9A7]/20">
                 Auto-fills Code
               </span>
             </div>
@@ -144,14 +144,14 @@ export const ReferralsPage: React.FC = () => {
               <div className="flex gap-2">
                 <button
                   onClick={copyLink}
-                  className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-black text-xs py-2.5 rounded-xl transition-all cursor-pointer"
+                  className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-black text-xs py-2.5 rounded-xl transition-all cursor-pointer"
                 >
-                  {copiedLink ? <Check className="w-4 h-4 text-[#A52A4A]" /> : <Copy className="w-4 h-4" />}
+                  {copiedLink ? <Check className="w-4 h-4 text-[#00BFA6]" /> : <Copy className="w-4 h-4" />}
                   <span>{copiedLink ? 'Copied!' : 'Copy Link'}</span>
                 </button>
                 <button
                   onClick={() => setShowShareModal(true)}
-                  className="flex items-center justify-center gap-1.5 bg-[#240A12] hover:bg-[#350D18] text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-white/10 transition-all cursor-pointer"
+                  className="flex items-center justify-center gap-1.5 bg-[#071114] hover:bg-[#0D1B1C] text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-white/10 transition-all cursor-pointer"
                 >
                   <Share2 className="w-4 h-4 text-[#C13A5A]" />
                   <span>Share</span>
@@ -186,7 +186,7 @@ export const ReferralsPage: React.FC = () => {
 
         <div className="nivo-glass-surface p-4 sm:p-5 rounded-2xl border border-white/10 shadow-lg">
           <p className="text-xs font-bold text-slate-400 uppercase">Successful</p>
-          <p className="text-2xl font-black text-[#A52A4A] mt-1">
+          <p className="text-2xl font-black text-[#00BFA6] mt-1">
             {stats?.successfulReferrals || stats?.totalReferrals || user?.totalReferrals || 0}
           </p>
           <p className="text-[10px] text-slate-500 mt-1">Credited & active</p>
@@ -219,7 +219,7 @@ export const ReferralsPage: React.FC = () => {
             </p>
             <button
               onClick={() => setShowShareModal(true)}
-              className="mt-3 inline-block bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-extrabold text-xs px-5 py-2.5 rounded-xl cursor-pointer"
+              className="mt-3 inline-block bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-extrabold text-xs px-5 py-2.5 rounded-xl cursor-pointer"
             >
               Share Link Now
             </button>
@@ -239,8 +239,8 @@ export const ReferralsPage: React.FC = () => {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-black text-[#A52A4A]">+₦{ref.bonusAmount.toLocaleString()}</p>
-                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#8F1D3A]/10 text-[#A52A4A] border border-[#8F1D3A]/20 inline-block mt-0.5">
+                  <p className="text-xs font-black text-[#00BFA6]">+₦{ref.bonusAmount.toLocaleString()}</p>
+                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#00C9A7]/10 text-[#00BFA6] border border-[#00C9A7]/20 inline-block mt-0.5">
                     {ref.status}
                   </span>
                 </div>

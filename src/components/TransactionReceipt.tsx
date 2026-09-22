@@ -245,7 +245,7 @@ export default function TransactionReceipt({
       <div className="w-full max-w-sm bg-[#0c0c14] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl relative animate-[scaleUp_0.25s_ease-out] font-sans">
         
         {/* Receipt Header Banner */}
-        <div className="bg-gradient-to-r from-indigo-600 to-teal-500 p-6 text-center text-white relative">
+        <div className="bg-gradient-to-r from-teal-600 to-teal-500 p-6 text-center text-white relative">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-1.5 rounded-full bg-black/20 hover:bg-black/40 text-white/80 hover:text-white transition-colors cursor-pointer"
@@ -296,7 +296,7 @@ export default function TransactionReceipt({
             <button
               id="btn-download-pdf-receipt"
               onClick={handleDownload}
-              className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-teal-500 hover:from-indigo-700 hover:to-teal-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+              className="flex-1 py-3 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
             >
               <Download className="h-3.5 w-3.5" /> Download PDF
             </button>

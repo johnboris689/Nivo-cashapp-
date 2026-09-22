@@ -35,7 +35,7 @@ function LegalLayout({onBack,title,icon,sections}:{onBack:()=>void;title:string;
     <GlassCard className="p-4 space-y-5 text-[11px] text-slate-300 leading-relaxed font-sans max-h-[680px] overflow-y-auto border-white/5 bg-slate-900/40">
       {sections.map(([heading,text])=><section key={heading}><h5 className="font-bold text-white uppercase text-xs mb-1">{heading}</h5><p>{text}</p></section>)}
     </GlassCard>
-    <button onClick={onBack} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-teal-500 text-white font-bold text-xs uppercase tracking-wider">Acknowledge & Close</button>
+    <button onClick={onBack} className="w-full py-3 rounded-xl bg-gradient-to-r from-teal-500 to-teal-500 text-white font-bold text-xs uppercase tracking-wider">Acknowledge & Close</button>
   </div>;
 }
 

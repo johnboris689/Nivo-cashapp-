@@ -50,7 +50,7 @@ export const ProfilePage: React.FC = () => {
         particleCount: 80,
         spread: 60,
         origin: { y: 0.6 },
-        colors: ['#5A1024', '#7A1831', '#A52A4A', '#C13A5A', '#ffffff'],
+        colors: ['#071114', '#008F7A', '#00BFA6', '#C13A5A', '#ffffff'],
       });
 
       setMsg({ type: 'success', text: `Avatar updated to "${avatar.name}"!` });
@@ -78,8 +78,8 @@ export const ProfilePage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl flex items-center gap-3 text-xs font-bold border transition-all ${
             msg.type === 'success'
-              ? 'bg-[#8F1D3A]/10 text-[#A52A4A] border-[#8F1D3A]/20'
-              : 'bg-[#8F1D3A]/10 text-[#C13A5A] border-[#8F1D3A]/20'
+              ? 'bg-[#00C9A7]/10 text-[#00BFA6] border-[#00C9A7]/20'
+              : 'bg-[#00C9A7]/10 text-[#C13A5A] border-[#00C9A7]/20'
           }`}
         >
           <Sparkles className="w-4 h-4 shrink-0" />
@@ -89,15 +89,15 @@ export const ProfilePage: React.FC = () => {
 
       {/* Main Account Card */}
       <div className="nivo-glass-surface border border-white/10 rounded-3xl p-5 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
-        <div className="absolute -right-16 -top-16 w-64 h-64 bg-[#A52A4A]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-16 -top-16 w-64 h-64 bg-[#00BFA6]/5 rounded-full blur-3xl pointer-events-none" />
 
         {/* User Card Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 border-b border-white/10">
           <div className="flex items-center gap-4">
             {/* Avatar display */}
             <div className="relative group">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-[#7A1831] to-[#C13A5A] p-0.5 shadow-xl shadow-[#8F1D3A]/20">
-                <div className="w-full h-full rounded-[14px] bg-[#240A12] overflow-hidden flex items-center justify-center text-white font-black text-3xl">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-[#008F7A] to-[#C13A5A] p-0.5 shadow-xl shadow-[#00C9A7]/20">
+                <div className="w-full h-full rounded-[14px] bg-[#071114] overflow-hidden flex items-center justify-center text-white font-black text-3xl">
                   {user?.avatarUrl ? (
                     <img
                       src={user.avatarUrl}
@@ -119,13 +119,13 @@ export const ProfilePage: React.FC = () => {
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-xl font-black text-white">{user?.fullName}</h2>
-                <span className="bg-[#8F1D3A]/10 text-[#A52A4A] text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border border-[#8F1D3A]/20 flex items-center gap-1">
+                <span className="bg-[#00C9A7]/10 text-[#00BFA6] text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border border-[#00C9A7]/20 flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3" /> Verified Account
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5 font-mono">@{user?.username}</p>
               <div className="mt-2 flex items-center gap-3">
-                <span className="text-xs bg-[#A52A4A]/10 text-[#C13A5A] border border-[#A52A4A]/20 font-bold px-3 py-1 rounded-xl">
+                <span className="text-xs bg-[#00BFA6]/10 text-[#C13A5A] border border-[#00BFA6]/20 font-bold px-3 py-1 rounded-xl">
                   Wallet: ₦{user?.walletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -145,7 +145,7 @@ export const ProfilePage: React.FC = () => {
                 Choose a default avatar or upload your own profile picture. Your selected image is stored with your Nevo account.
               </p>
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#C13A5A] bg-[#A52A4A]/10 px-3 py-1 rounded-full border border-[#A52A4A]/20 self-start sm:self-auto">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#C13A5A] bg-[#00BFA6]/10 px-3 py-1 rounded-full border border-[#00BFA6]/20 self-start sm:self-auto">
               3D AI Rendered
             </span>
           </div>
@@ -159,8 +159,8 @@ export const ProfilePage: React.FC = () => {
                   onClick={() => handleSelectAvatar(av)}
                   className={`group relative nivo-glass-surface rounded-2xl border p-3 flex flex-col items-center text-center transition-all cursor-pointer hover:scale-[1.02] ${
                     isSelected
-                      ? 'border-[#C13A5A] bg-[#A52A4A]/10 shadow-lg shadow-[#C13A5A]/20'
-                      : 'border-white/10 hover:border-[#8F1D3A]/30'
+                      ? 'border-[#C13A5A] bg-[#00BFA6]/10 shadow-lg shadow-[#C13A5A]/20'
+                      : 'border-white/10 hover:border-[#00C9A7]/30'
                   }`}
                 >
                   {/* Avatar image frame */}
@@ -189,7 +189,7 @@ export const ProfilePage: React.FC = () => {
                     className={`mt-2.5 w-full text-[11px] font-black py-1.5 px-2 rounded-xl transition-all ${
                       isSelected
                         ? 'bg-[#C13A5A] text-slate-950 shadow-md'
-                        : 'bg-white/5 text-slate-300 group-hover:bg-gradient-to-r group-hover:from-[#7A1831] group-hover:to-[#A52A4A] group-hover:text-white'
+                        : 'bg-white/5 text-slate-300 group-hover:bg-gradient-to-r group-hover:from-[#008F7A] group-hover:to-[#00BFA6] group-hover:text-white'
                     }`}
                   >
                     {isSelected ? 'Current Avatar' : 'Set Avatar'}
@@ -229,7 +229,7 @@ export const ProfilePage: React.FC = () => {
                 onClick={copyCode}
                 className="text-xs font-bold text-[#C13A5A] hover:underline flex items-center gap-1 cursor-pointer"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-[#A52A4A]" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? <Check className="w-3.5 h-3.5 text-[#00BFA6]" /> : <Copy className="w-3.5 h-3.5" />}
                 {copied ? 'Copied' : 'Copy'}
               </button>
             </div>
@@ -249,7 +249,7 @@ export const ProfilePage: React.FC = () => {
         {/* Security / Sign out */}
         <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row gap-3 justify-between items-center">
           <div className="flex items-center gap-2 text-xs text-slate-400">
-            <ShieldCheck className="w-4 h-4 text-[#A52A4A]" />
+            <ShieldCheck className="w-4 h-4 text-[#00BFA6]" />
             <span>Encrypted Session Active</span>
           </div>
 
@@ -258,7 +258,7 @@ export const ProfilePage: React.FC = () => {
               logout();
               navigate('/login');
             }}
-            className="w-full sm:w-auto bg-[#8F1D3A]/10 hover:bg-[#8F1D3A]/20 text-[#C13A5A] border border-[#8F1D3A]/30 font-extrabold text-xs px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-full sm:w-auto bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 text-[#C13A5A] border border-[#00C9A7]/30 font-extrabold text-xs px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             Sign Out of Account

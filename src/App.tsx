@@ -2529,7 +2529,7 @@ export default function App() {
         )}
         <div className="w-full max-w-md bg-[#0c0c14]/90 border border-white/10 rounded-3xl p-8 backdrop-blur-xl shadow-2xl relative font-sans">
           <div className="flex flex-col items-center mb-8 text-center">
-            <div className="h-14 w-14 bg-[#312e81]/60 border border-[#818cf8]/40 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/10">
+            <div className="h-14 w-14 bg-[#312e81]/60 border border-[#818cf8]/40 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-teal-500/10">
               <Shield className="h-7 w-7 text-[#2dd4bf]" />
             </div>
             <h1 className="text-2xl font-black font-display bg-gradient-to-r from-[#818cf8] to-[#2dd4bf] bg-clip-text text-transparent">
@@ -2570,7 +2570,7 @@ export default function App() {
             <button
               type="submit"
               disabled={isAdminSubmitting}
-              className={`w-full py-3.5 bg-gradient-to-r from-[#6366f1] to-[#0d9488] hover:from-[#4f46e5] hover:to-[#0f766e] text-white font-bold rounded-xl text-sm uppercase tracking-wider transition-all duration-200 active:scale-[0.98] cursor-pointer shadow-lg shadow-indigo-500/10 ${
+              className={`w-full py-3.5 bg-gradient-to-r from-[#6366f1] to-[#0d9488] hover:from-[#4f46e5] hover:to-[#0f766e] text-white font-bold rounded-xl text-sm uppercase tracking-wider transition-all duration-200 active:scale-[0.98] cursor-pointer shadow-lg shadow-teal-500/10 ${
                 isAdminSubmitting ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
@@ -2599,7 +2599,7 @@ export default function App() {
         {toastMessage && (
           <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 animate-[slideDown_0.2s_ease-out]">
             <div className={`p-3.5 rounded-xl text-xs font-semibold shadow-xl border backdrop-blur-md flex items-center gap-2.5 ${
-              toastType === 'success' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+              toastType === 'success' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-teal-500/10 text-teal-400 border-teal-500/20'
             }`}>
               <CheckCircle2 className="h-4.5 w-4.5 shrink-0" />
               <span>{toastMessage}</span>
@@ -2715,7 +2715,7 @@ export default function App() {
                   ? 'bg-emerald-500/10 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                   : toastType === 'error'
                   ? 'bg-red-500/10 dark:bg-red-950/80 text-red-600 dark:text-red-400 border-red-500/20'
-                  : 'bg-indigo-500/10 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border-indigo-500/20'
+                  : 'bg-teal-500/10 dark:bg-teal-950/80 text-teal-600 dark:text-teal-400 border-teal-500/20'
               }`}
             >
               {toastType === 'success' && <CheckCircle2 className="h-4.5 w-4.5 shrink-0" />}
@@ -2728,16 +2728,16 @@ export default function App() {
 
         {/* -------------------- VIEW 1 & 2: AUTH / ONBOARDING SCREEN -------------------- */}
         {!isAuthenticated && (
-          <div className="flex-1 flex flex-col justify-between p-6 bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 overflow-y-auto no-scrollbar">
+          <div className="flex-1 flex flex-col justify-between p-6 bg-gradient-to-b from-teal-950 via-purple-950 to-slate-950 overflow-y-auto no-scrollbar">
             
             {/* Upper Splash Logo & Slogan */}
             <div className="text-center pt-8">
               {systemSettings.websiteLogo ? (
-                <div className="mx-auto h-16 w-16 rounded-2xl overflow-hidden flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/20">
+                <div className="mx-auto h-16 w-16 rounded-2xl overflow-hidden flex items-center justify-center mb-4 shadow-lg shadow-teal-500/20">
                   <img src={systemSettings.websiteLogo} alt={systemSettings.websiteName || 'Logo'} className="h-full w-full object-contain" />
                 </div>
               ) : (
-                <div className="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-tr from-indigo-500 via-violet-500 to-teal-400 flex items-center justify-center shadow-lg shadow-indigo-500/20 mb-4 animate-bounce">
+                <div className="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-tr from-teal-500 via-violet-500 to-teal-400 flex items-center justify-center shadow-lg shadow-teal-500/20 mb-4 animate-bounce">
                   <Sparkles className="h-8 w-8 text-white stroke-[2.5]" />
                 </div>
               )}
@@ -2785,7 +2785,7 @@ export default function App() {
                           onClick={() => setSignInMethod('password')}
                           className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition-all ${
                             signInMethod === 'password'
-                              ? 'bg-gradient-to-r from-indigo-500 to-teal-500 text-white font-bold shadow'
+                              ? 'bg-gradient-to-r from-teal-500 to-teal-500 text-white font-bold shadow'
                               : 'text-slate-400 hover:text-white'
                           }`}
                         >
@@ -2796,7 +2796,7 @@ export default function App() {
                           onClick={() => setSignInMethod('biometric')}
                           className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition-all ${
                             signInMethod === 'biometric'
-                              ? 'bg-gradient-to-r from-indigo-500 to-teal-500 text-white font-bold shadow'
+                              ? 'bg-gradient-to-r from-teal-500 to-teal-500 text-white font-bold shadow'
                               : 'text-slate-400 hover:text-white'
                           }`}
                         >
@@ -2807,7 +2807,7 @@ export default function App() {
                           onClick={() => setSignInMethod('pin')}
                           className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition-all ${
                             signInMethod === 'pin'
-                              ? 'bg-gradient-to-r from-indigo-500 to-teal-500 text-white font-bold shadow'
+                              ? 'bg-gradient-to-r from-teal-500 to-teal-500 text-white font-bold shadow'
                               : 'text-slate-400 hover:text-white'
                           }`}
                         >
@@ -2928,7 +2928,7 @@ export default function App() {
                           id="btn-auth-submit"
                           type="submit"
                           disabled={isAuthSubmitting}
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-indigo-500 via-violet-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-indigo-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-violet-500 to-teal-500 hover:from-teal-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                           {isAuthSubmitting ? (
                             <>
@@ -2963,7 +2963,7 @@ export default function App() {
                             type="button"
                             onClick={handleBiometricSignIn}
                             disabled={isAuthSubmitting}
-                            className="relative group h-20 w-20 rounded-full bg-gradient-to-tr from-teal-500/20 via-indigo-500/20 to-purple-500/20 border-2 border-teal-400/40 flex items-center justify-center shadow-lg hover:border-teal-400 active:scale-95 transition-all cursor-pointer"
+                            className="relative group h-20 w-20 rounded-full bg-gradient-to-tr from-teal-500/20 via-teal-500/20 to-emerald-500/20 border-2 border-teal-400/40 flex items-center justify-center shadow-lg hover:border-teal-400 active:scale-95 transition-all cursor-pointer"
                           >
                             <div className="absolute inset-0 rounded-full bg-teal-400/10 animate-ping opacity-75" />
                             <Fingerprint className="h-10 w-10 text-teal-400 stroke-[1.75] group-hover:scale-110 transition-transform" />
@@ -3009,7 +3009,7 @@ export default function App() {
                         <button
                           type="submit"
                           disabled={isAuthSubmitting}
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-indigo-500 via-violet-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-indigo-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-violet-500 to-teal-500 hover:from-teal-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                           {isAuthSubmitting ? 'Verifying PIN...' : 'Sign In With Security PIN'}
                         </button>
@@ -3049,7 +3049,7 @@ export default function App() {
                         <button
                           id="btn-send-otp"
                           type="submit"
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-indigo-500 via-violet-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-violet-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
                         >
                           Send Verification Code
                         </button>
@@ -3111,7 +3111,7 @@ export default function App() {
                         <button
                           id="btn-verify-otp"
                           type="submit"
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-indigo-500 via-violet-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-violet-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
                         >
                           Verify Code
                         </button>
@@ -3162,7 +3162,7 @@ export default function App() {
                         <button
                           id="btn-submit-reset-password"
                           type="submit"
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-indigo-500 via-violet-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-violet-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
                         >
                           Complete Password Reset
                         </button>
@@ -3211,7 +3211,7 @@ export default function App() {
                 <div className="space-y-6">
                   <div className="flex items-center justify-between border-b border-white/5 pb-4">
                     <div>
-                      <span className="text-xl font-black font-display bg-gradient-to-r from-indigo-400 to-teal-300 bg-clip-text text-transparent">
+                      <span className="text-xl font-black font-display bg-gradient-to-r from-teal-400 to-teal-300 bg-clip-text text-transparent">
                         Nevo
                       </span>
                       <span className="text-[8px] font-mono text-slate-400 block uppercase tracking-widest mt-0.5">Version 4.1.0</span>
@@ -3245,7 +3245,7 @@ export default function App() {
                           }}
                           className={`w-full p-3 rounded-xl flex items-center gap-3.5 text-left text-xs font-semibold transition-all cursor-pointer ${
                             isCurrent
-                              ? 'bg-gradient-to-r from-teal-500/10 to-indigo-500/10 border border-teal-500/25 text-teal-400 shadow-[0_4px_25px_rgba(20,184,166,0.06)]'
+                              ? 'bg-gradient-to-r from-teal-500/10 to-teal-500/10 border border-teal-500/25 text-teal-400 shadow-[0_4px_25px_rgba(20,184,166,0.06)]'
                               : 'text-slate-400 hover:text-white hover:bg-white/5'
                           }`}
                         >
@@ -3333,7 +3333,7 @@ export default function App() {
                           <p className="text-[11px] text-slate-400 mt-0.5">Welcome back to Nevo — complete tasks, watch adverts and earn money.</p>
                         </div>
                         {/* User Avatar */}
-                        <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-gradient-to-tr from-indigo-500 to-teal-400 p-0.5 shadow-md">
+                        <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-gradient-to-tr from-teal-500 to-teal-400 p-0.5 shadow-md">
                           <div className="h-full w-full rounded-full bg-slate-900 flex items-center justify-center text-[11px] font-extrabold text-white">
                             {user?.fullName.split(' ').map(n => n[0]).join('') || 'AS'}
                           </div>
@@ -3341,13 +3341,13 @@ export default function App() {
                       </div>
 
                       {/* COMPACT FINTECH BALANCE CARD */}
-                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#4c1d95] p-5 sm:p-6 text-white border border-indigo-500/20 shadow-xl shadow-indigo-950/50">
+                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#4c1d95] p-5 sm:p-6 text-white border border-teal-500/20 shadow-xl shadow-teal-950/50">
                         {/* Subtle background glow elements */}
                         <div className="absolute -right-12 -top-12 w-36 h-36 rounded-full bg-teal-400/10 blur-2xl pointer-events-none" />
-                        <div className="absolute -left-12 -bottom-12 w-32 h-32 rounded-full bg-indigo-400/15 blur-2xl pointer-events-none" />
+                        <div className="absolute -left-12 -bottom-12 w-32 h-32 rounded-full bg-teal-400/15 blur-2xl pointer-events-none" />
 
                         <div className="relative z-10 flex items-center justify-between">
-                          <span className="text-[10px] sm:text-xs font-mono font-bold tracking-widest uppercase text-indigo-200/90">Available Balance</span>
+                          <span className="text-[10px] sm:text-xs font-mono font-bold tracking-widest uppercase text-teal-200/90">Available Balance</span>
                           <span className="text-[10px] font-mono px-2.5 py-0.5 bg-teal-500/15 border border-teal-500/30 rounded-full text-teal-300 font-extrabold tracking-wide">Tier 3 Verified</span>
                         </div>
 
@@ -3367,7 +3367,7 @@ export default function App() {
                               setCurrentScreen('withdraw');
                               navigateTo('/dashboard/withdraw');
                             }}
-                            className="w-full py-2.5 px-2.5 rounded-xl bg-gradient-to-r from-teal-400 to-cyan-400 hover:from-teal-300 hover:to-cyan-300 text-slate-950 text-xs font-black shadow-md shadow-teal-500/20 active:scale-95 hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer"
+                            className="w-full py-2.5 px-2.5 rounded-xl bg-gradient-to-r from-teal-400 to-teal-400 hover:from-teal-300 hover:to-teal-300 text-slate-950 text-xs font-black shadow-md shadow-teal-500/20 active:scale-95 hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer"
                           >
                             <ArrowRight className="h-4 w-4 stroke-[2.5]" />
                             <span>Withdraw</span>
@@ -3377,7 +3377,7 @@ export default function App() {
                             id="btn-deposit-trigger"
                             type="button"
                             onClick={() => setPaymentModalOpen(true)}
-                            className="w-full py-2.5 px-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 text-white text-xs font-black shadow-md shadow-indigo-500/25 active:scale-95 hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer border border-indigo-400/30"
+                            className="w-full py-2.5 px-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-violet-600 hover:from-teal-400 hover:to-violet-500 text-white text-xs font-black shadow-md shadow-teal-500/25 active:scale-95 hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer border border-teal-400/30"
                           >
                             <Send className="h-4 w-4 stroke-[2.5]" />
                             <span>Deposit</span>
@@ -3390,7 +3390,7 @@ export default function App() {
                         <h5 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-2">Quick Actions</h5>
                         <div className="grid grid-cols-4 gap-1.5 sm:gap-3 w-full max-w-full min-w-0">
                           {[
-                            { id: 'support', label: 'Support', icon: MessageSquare, bg: 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20' },
+                            { id: 'support', label: 'Support', icon: MessageSquare, bg: 'bg-teal-500/15 text-teal-400 border border-teal-500/20' },
                             { id: 'deposit', label: 'Deposit', icon: Wallet, bg: 'bg-teal-500/15 text-teal-400 border border-teal-500/20' },
                             { id: 'guide', label: 'Watch Guide', icon: Clock, bg: 'bg-violet-500/15 text-violet-400 border border-violet-500/20' },
                             { id: 'airtime', label: 'Airtime', icon: Smartphone, bg: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' }
@@ -3427,7 +3427,7 @@ export default function App() {
                         <h5 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-2">Earn & Rewards</h5>
                         <div className="grid grid-cols-4 gap-1.5 sm:gap-2.5 w-full max-w-full min-w-0">
                           {[
-                            { id: 'tasks' as const, label: 'Tasks', icon: CheckCircle2, bg: 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20' },
+                            { id: 'tasks' as const, label: 'Tasks', icon: CheckCircle2, bg: 'bg-teal-500/15 text-teal-400 border border-teal-500/20' },
                             { id: 'referrals' as const, label: 'Referrals', icon: Share2, bg: 'bg-teal-500/15 text-teal-400 border border-teal-500/20' },
                             { id: 'ads' as const, label: 'Ads', icon: PlayCircle, bg: 'bg-amber-500/15 text-amber-400 border border-amber-500/20' },
                             { id: 'history' as const, label: 'Rewards', icon: Clock, bg: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' }
@@ -3533,7 +3533,7 @@ export default function App() {
                   
                   {/* Hero card details */}
                   <div className="text-center bg-white/40 dark:bg-slate-900/30 rounded-3xl p-5 border border-slate-150 dark:border-slate-800/60">
-                    <div className="h-16 w-16 rounded-full bg-gradient-to-tr from-indigo-500 to-teal-400 p-0.5 mx-auto mb-3">
+                    <div className="h-16 w-16 rounded-full bg-gradient-to-tr from-teal-500 to-teal-400 p-0.5 mx-auto mb-3">
                       <div className="h-full w-full rounded-full bg-slate-950 flex items-center justify-center text-lg font-bold text-white">
                         {user?.fullName.split(' ').map(n => n[0]).join('') || 'AS'}
                       </div>
@@ -3542,7 +3542,7 @@ export default function App() {
                     <span className="text-xs text-slate-400 block mt-0.5 font-mono">{user?.email || 'user@example.com'}</span>
                     
                     <div className="mt-4 flex items-center justify-center gap-2">
-                      <span className="text-[10px] font-semibold bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 px-3 py-1 rounded-full border border-indigo-500/10">
+                      <span className="text-[10px] font-semibold bg-teal-500/10 text-teal-500 dark:text-teal-400 px-3 py-1 rounded-full border border-teal-500/10">
                         Level 2 Verified
                       </span>
                       <span className="text-[10px] font-semibold bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/10">
@@ -3582,7 +3582,7 @@ export default function App() {
                               onClick={() => setTheme(pref)}
                               className={`py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer ${
                                 theme === pref
-                                  ? 'bg-gradient-to-r from-indigo-600 to-teal-500 text-white shadow-md'
+                                  ? 'bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-md'
                                   : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                               }`}
                             >
@@ -3672,7 +3672,7 @@ export default function App() {
                                     showToast(result.message || 'Biometric activation failed', 'error');
                                   }
                                 }}
-                                className="px-3 py-1.5 bg-gradient-to-r from-teal-500 to-indigo-600 text-white rounded-xl text-[10px] font-bold shadow-md hover:brightness-110 transition-all cursor-pointer flex items-center gap-1"
+                                className="px-3 py-1.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-xl text-[10px] font-bold shadow-md hover:brightness-110 transition-all cursor-pointer flex items-center gap-1"
                               >
                                 {isActivatingBiometric ? 'Activating...' : 'Register Fingerprint'}
                               </button>
@@ -3690,7 +3690,7 @@ export default function App() {
                           className="w-full py-2.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-900 border border-slate-150 dark:border-slate-800/80 text-xs font-bold rounded-xl flex items-center justify-between px-3 text-slate-700 dark:text-slate-300 transition-colors"
                         >
                           <div className="flex items-center gap-2">
-                            <ShieldCheck className="h-4 w-4 text-indigo-400" />
+                            <ShieldCheck className="h-4 w-4 text-teal-400" />
                             <span>{user?.pinCreated ? 'Update Security PIN' : 'Setup Security PIN'}</span>
                           </div>
                           <ChevronRight className={`h-4 w-4 transition-transform ${isChangingPinOpen ? 'rotate-90' : ''}`} />
@@ -3749,7 +3749,7 @@ export default function App() {
                             <button
                               id="btn-submit-change-pin"
                               type="submit"
-                              className="w-full py-2 bg-gradient-to-r from-indigo-600 to-teal-500 hover:from-indigo-700 hover:to-teal-600 text-white rounded-lg text-xs font-bold cursor-pointer"
+                              className="w-full py-2 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-lg text-xs font-bold cursor-pointer"
                             >
                               Save Security PIN
                             </button>
@@ -3850,7 +3850,7 @@ export default function App() {
                             <button
                               id="btn-submit-change-pw"
                               type="submit"
-                              className="w-full py-2 bg-gradient-to-r from-indigo-600 to-teal-500 hover:from-indigo-700 hover:to-teal-600 text-white rounded-lg text-xs font-bold cursor-pointer"
+                              className="w-full py-2 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-lg text-xs font-bold cursor-pointer"
                             >
                               Update Password
                             </button>
@@ -3869,7 +3869,7 @@ export default function App() {
                       className="w-full p-4 rounded-2xl bg-white/40 dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800/60 flex items-center justify-between hover:bg-white/60 dark:hover:bg-slate-900/60 transition-all text-left cursor-pointer"
                     >
                       <div className="flex items-center gap-3">
-                        <ShieldCheck className="h-5 w-5 text-indigo-500" />
+                        <ShieldCheck className="h-5 w-5 text-teal-500" />
                         <div>
                           <h6 className="text-xs font-bold text-slate-800 dark:text-white">Terms of Service</h6>
                           <p className="text-[10px] text-slate-400 mt-0.5">Read our terms and conditions</p>
@@ -3962,7 +3962,7 @@ export default function App() {
                   </p>
 
                   {/* Secure KoraPay Checkout */}
-                  <div className="p-4 rounded-2xl bg-gradient-to-r from-teal-500/15 via-emerald-500/10 to-indigo-500/15 border border-teal-500/30 space-y-3 shadow-lg shadow-teal-500/5">
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-teal-500/15 via-emerald-500/10 to-teal-500/15 border border-teal-500/30 space-y-3 shadow-lg shadow-teal-500/5">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <div className="p-2 rounded-xl bg-teal-500/20 text-teal-400 border border-teal-500/30">
@@ -4018,7 +4018,7 @@ export default function App() {
                   )}
 
                   {/* ACCOUNT DETAILS CARD */}
-                  <GlassCard className="p-5 space-y-3.5 bg-gradient-to-tr from-slate-900/80 to-indigo-950/40 border-teal-500/20">
+                  <GlassCard className="p-5 space-y-3.5 bg-gradient-to-tr from-slate-900/80 to-teal-950/40 border-teal-500/20">
                     {/* Fixed Voucher Price */}
                     <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
                       <span className="text-xs text-slate-400">Fixed Voucher Price:</span>
@@ -4131,7 +4131,7 @@ export default function App() {
                         window.open(finalUrl, '_blank');
                         showToast('Opening WhatsApp support to verify transfer...', 'info');
                       }}
-                      className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-slate-950 font-black text-xs uppercase tracking-widest shadow-xl shadow-teal-500/25 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs uppercase tracking-widest shadow-xl shadow-teal-500/25 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Send className="h-4 w-4" />
                       <span>I HAVE MADE THIS TRANSFER</span>
@@ -4191,7 +4191,7 @@ export default function App() {
                     <button
                       id="btn-download-legacyVoucher-pdf"
                       onClick={handleDownloadLegacyVoucherPdfReceipt}
-                      className="w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-white text-xs font-extrabold uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2"
+                      className="w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-400 hover:to-teal-500 text-white text-xs font-extrabold uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2"
                     >
                       <Download className="h-4 w-4" />
                       <span>Download PDF Receipt</span>
@@ -4232,7 +4232,7 @@ export default function App() {
                         {nairaFormat(user?.balance || 0)}
                       </span>
                     </div>
-                    <span className="text-[9px] font-bold text-indigo-600 dark:text-teal-400 bg-indigo-500/10 dark:bg-teal-500/10 px-2.5 py-1 rounded-full border border-indigo-500/10">
+                    <span className="text-[9px] font-bold text-teal-600 dark:text-teal-400 bg-teal-500/10 dark:bg-teal-500/10 px-2.5 py-1 rounded-full border border-teal-500/10">
                       Standard pricing
                     </span>
                   </div>
@@ -4278,7 +4278,7 @@ export default function App() {
                               onClick={() => setAirtimeNetwork(net.id)}
                               className={`py-3 rounded-xl text-center text-xs font-bold border transition-all ${
                                 airtimeNetwork === net.id
-                                  ? `${net.color} border-transparent ring-2 ring-indigo-500/30 scale-102`
+                                  ? `${net.color} border-transparent ring-2 ring-teal-500/30 scale-102`
                                   : 'bg-white/40 border-slate-200 text-slate-500 dark:bg-slate-950/40 dark:border-slate-800 hover:text-slate-800 dark:hover:text-white'
                               }`}
                             >
@@ -4317,7 +4317,7 @@ export default function App() {
                                 showToast('Added to favourites!', 'success');
                               }
                             }}
-                            className="px-3 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-400 rounded-xl text-xs font-bold flex items-center justify-center border border-indigo-500/20 active:scale-95 transition-all"
+                            className="px-3 bg-teal-500/15 hover:bg-teal-500/25 text-teal-400 rounded-xl text-xs font-bold flex items-center justify-center border border-teal-500/20 active:scale-95 transition-all"
                             title="Save as Favourite"
                           >
                             ⭐ Save
@@ -4370,7 +4370,7 @@ export default function App() {
                               id="btn-goto-buy-legacyVoucher-airtime"
                               type="button"
                               onClick={() => setPaymentModalOpen(true)}
-                              className="text-[9px] font-bold text-indigo-600 dark:text-teal-400 hover:underline"
+                              className="text-[9px] font-bold text-teal-600 dark:text-teal-400 hover:underline"
                             >
                               Deposit Funds
                             </button>
@@ -4389,7 +4389,7 @@ export default function App() {
                               <button
                                 type="button"
                                 onClick={() => setPaymentModalOpen(true)}
-                                className="font-extrabold underline text-indigo-600 dark:text-teal-400"
+                                className="font-extrabold underline text-teal-600 dark:text-teal-400"
                               >
                                 'Deposit Funds'
                               </button>.
@@ -4417,7 +4417,7 @@ export default function App() {
                           (!true && !isVoucherValid(airtimeLegacyVoucherCode)) ||
                           isSubmitting
                         }
-                        className={`w-full text-xs font-bold uppercase tracking-widest py-3.5 bg-gradient-to-r from-indigo-600 to-teal-500 hover:from-indigo-700 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-indigo-500/20 active:scale-95 transition-all mt-2 flex items-center justify-center gap-2 ${
+                        className={`w-full text-xs font-bold uppercase tracking-widest py-3.5 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 flex items-center justify-center gap-2 ${
                           (!airtimePhone || airtimePhone.length < 10 || !airtimeAmount || parseInt(airtimeAmount) < 100 || (!true && !isVoucherValid(airtimeLegacyVoucherCode)) || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                       >
@@ -4456,7 +4456,7 @@ export default function App() {
                         {nairaFormat(user?.balance || 0)}
                       </span>
                     </div>
-                    <span className="text-[9px] font-bold text-indigo-600 dark:text-teal-400 bg-indigo-500/10 dark:bg-teal-500/10 px-2.5 py-1 rounded-full border border-indigo-500/10 animate-pulse">
+                    <span className="text-[9px] font-bold text-teal-600 dark:text-teal-400 bg-teal-500/10 dark:bg-teal-500/10 px-2.5 py-1 rounded-full border border-teal-500/10 animate-pulse">
                       Wallet balance active
                     </span>
                   </div>
@@ -4506,7 +4506,7 @@ export default function App() {
                               }}
                               className={`py-3 rounded-xl text-center text-xs font-black border transition-all ${
                                 dataNetwork === net.id
-                                  ? `${net.color} border-transparent ring-2 ring-indigo-500/30 scale-102 shadow-md`
+                                  ? `${net.color} border-transparent ring-2 ring-teal-500/30 scale-102 shadow-md`
                                   : 'bg-white/40 border-slate-250 text-slate-500 dark:bg-slate-950/40 dark:border-slate-800 hover:text-slate-800 dark:hover:text-white hover:border-slate-300'
                               }`}
                             >
@@ -4545,7 +4545,7 @@ export default function App() {
                                 showToast('Added to favourites!', 'success');
                               }
                             }}
-                            className="px-3 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-400 rounded-xl text-xs font-bold flex items-center justify-center border border-indigo-500/20 active:scale-95 transition-all"
+                            className="px-3 bg-teal-500/15 hover:bg-teal-500/25 text-teal-400 rounded-xl text-xs font-bold flex items-center justify-center border border-teal-500/20 active:scale-95 transition-all"
                             title="Save as Favourite"
                           >
                             ⭐ Save
@@ -4569,7 +4569,7 @@ export default function App() {
                               }}
                               className={`flex-1 text-center py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${
                                 activeDataTab === tab
-                                  ? 'bg-gradient-to-r from-indigo-600 to-teal-500 text-white shadow-sm font-extrabold'
+                                  ? 'bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-sm font-extrabold'
                                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
                               }`}
                             >
@@ -4602,20 +4602,20 @@ export default function App() {
                               onClick={() => setSelectedDataPlan(plan)}
                               className={`p-3 rounded-xl border transition-all cursor-pointer text-left relative overflow-hidden ${
                                 selectedDataPlan?.id === plan.id
-                                  ? 'bg-gradient-to-tr from-indigo-500/15 to-teal-500/15 border-indigo-500 text-slate-900 dark:text-white ring-1 ring-indigo-500/30'
+                                  ? 'bg-gradient-to-tr from-teal-500/15 to-teal-500/15 border-teal-500 text-slate-900 dark:text-white ring-1 ring-teal-500/30'
                                   : 'bg-white/40 border-slate-150 text-slate-500 dark:bg-slate-900/40 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700'
                               }`}
                             >
                               <div className="flex justify-between items-start">
                                 <span className="text-xs font-black text-slate-800 dark:text-slate-100 block">{plan.size}</span>
                                 {selectedDataPlan?.id === plan.id && (
-                                  <span className="h-3.5 w-3.5 bg-indigo-600 rounded-full flex items-center justify-center text-white scale-90">
+                                  <span className="h-3.5 w-3.5 bg-teal-600 rounded-full flex items-center justify-center text-white scale-90">
                                     <Check className="h-2 w-2 stroke-[3]" />
                                   </span>
                                 )}
                               </div>
                               <span className="text-[9px] text-slate-400 block font-mono mt-0.5">{plan.validity}</span>
-                              <span className="text-xs font-mono font-bold text-indigo-600 dark:text-teal-400 block mt-2">{nairaFormat(plan.price)}</span>
+                              <span className="text-xs font-mono font-bold text-teal-600 dark:text-teal-400 block mt-2">{nairaFormat(plan.price)}</span>
                             </div>
                           ))}
                         </div>
@@ -4638,7 +4638,7 @@ export default function App() {
                               id="btn-goto-buy-legacyVoucher-data"
                               type="button"
                               onClick={() => setPaymentModalOpen(true)}
-                              className="text-[9px] font-bold text-indigo-600 dark:text-teal-400 hover:underline"
+                              className="text-[9px] font-bold text-teal-600 dark:text-teal-400 hover:underline"
                             >
                               Deposit Funds
                             </button>
@@ -4657,7 +4657,7 @@ export default function App() {
                               <button
                                 type="button"
                                 onClick={() => setPaymentModalOpen(true)}
-                                className="font-extrabold underline text-indigo-600 dark:text-teal-400"
+                                className="font-extrabold underline text-teal-600 dark:text-teal-400"
                               >
                                 'Deposit Funds'
                               </button>.
@@ -4684,7 +4684,7 @@ export default function App() {
                           (!true && !isVoucherValid(dataLegacyVoucherCode)) ||
                           isSubmitting
                         }
-                        className={`w-full text-xs font-extrabold uppercase tracking-widest py-3.5 bg-gradient-to-r from-indigo-600 to-teal-500 hover:from-indigo-700 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-indigo-500/20 active:scale-95 transition-all mt-2 flex items-center justify-center gap-2 ${
+                        className={`w-full text-xs font-extrabold uppercase tracking-widest py-3.5 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 flex items-center justify-center gap-2 ${
                           (!dataPhone || dataPhone.length < 10 || !selectedDataPlan || (!true && !isVoucherValid(dataLegacyVoucherCode)) || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                       >
@@ -4731,7 +4731,7 @@ export default function App() {
                         {nairaFormat(user?.balance || 0)}
                       </span>
                     </div>
-                    <span className="text-[9px] font-bold text-indigo-600 dark:text-teal-400 bg-indigo-500/10 dark:bg-teal-500/10 px-2.5 py-1 rounded-full border border-indigo-500/10">
+                    <span className="text-[9px] font-bold text-teal-600 dark:text-teal-400 bg-teal-500/10 dark:bg-teal-500/10 px-2.5 py-1 rounded-full border border-teal-500/10">
                       Standard Billing
                     </span>
                   </div>
@@ -4743,7 +4743,7 @@ export default function App() {
                       onClick={() => { setBillsType('cable'); }}
                       className={`py-2 text-[10px] font-bold uppercase rounded-lg transition-all flex flex-col items-center gap-1 ${
                         billsType === 'cable'
-                          ? 'bg-white dark:bg-slate-850 text-indigo-600 dark:text-teal-400 shadow-sm'
+                          ? 'bg-white dark:bg-slate-850 text-teal-600 dark:text-teal-400 shadow-sm'
                           : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
                       }`}
                     >
@@ -4755,7 +4755,7 @@ export default function App() {
                       onClick={() => { setBillsType('electricity'); }}
                       className={`py-2 text-[10px] font-bold uppercase rounded-lg transition-all flex flex-col items-center gap-1 ${
                         billsType === 'electricity'
-                          ? 'bg-white dark:bg-slate-850 text-indigo-600 dark:text-teal-400 shadow-sm'
+                          ? 'bg-white dark:bg-slate-850 text-teal-600 dark:text-teal-400 shadow-sm'
                           : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
                       }`}
                     >
@@ -4767,7 +4767,7 @@ export default function App() {
                       onClick={() => { setBillsType('betting'); }}
                       className={`py-2 text-[10px] font-bold uppercase rounded-lg transition-all flex flex-col items-center gap-1 ${
                         billsType === 'betting'
-                          ? 'bg-white dark:bg-slate-850 text-indigo-600 dark:text-teal-400 shadow-sm'
+                          ? 'bg-white dark:bg-slate-850 text-teal-600 dark:text-teal-400 shadow-sm'
                           : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
                       }`}
                     >
@@ -4784,7 +4784,7 @@ export default function App() {
                         <select
                           value={billsProvider}
                           onChange={(e) => handleProviderChange(e.target.value)}
-                          className="w-full h-11 px-3 bg-white/50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500 dark:focus:border-teal-500"
+                          className="w-full h-11 px-3 bg-white/50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-teal-500 dark:focus:border-teal-500"
                         >
                           {billsType === 'cable' && CABLE_PROVIDERS.map(p => (
                             <option key={p.id} value={p.id}>{p.name}</option>
@@ -4805,7 +4805,7 @@ export default function App() {
                           <select
                             value={billsCablePackage}
                             onChange={(e) => setBillsCablePackage(e.target.value)}
-                            className="w-full h-11 px-3 bg-white/50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500 dark:focus:border-teal-500"
+                            className="w-full h-11 px-3 bg-white/50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-teal-500 dark:focus:border-teal-500"
                           >
                             {CABLE_PROVIDERS.find(p => p.id === billsProvider)?.packages.map(pkg => (
                               <option key={pkg.id} value={pkg.id}>
@@ -4826,7 +4826,7 @@ export default function App() {
                               onClick={() => handleMeterTypeChange('prepaid')}
                               className={`py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all ${
                                 billsMeterType === 'prepaid'
-                                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-teal-400 shadow-sm border border-slate-200/40 dark:border-slate-700/40'
+                                  ? 'bg-white dark:bg-slate-800 text-teal-600 dark:text-teal-400 shadow-sm border border-slate-200/40 dark:border-slate-700/40'
                                   : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
                               }`}
                             >
@@ -4837,7 +4837,7 @@ export default function App() {
                               onClick={() => handleMeterTypeChange('postpaid')}
                               className={`py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all ${
                                 billsMeterType === 'postpaid'
-                                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-teal-400 shadow-sm border border-slate-200/40 dark:border-slate-700/40'
+                                  ? 'bg-white dark:bg-slate-800 text-teal-600 dark:text-teal-400 shadow-sm border border-slate-200/40 dark:border-slate-700/40'
                                   : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
                               }`}
                             >
@@ -4865,7 +4865,7 @@ export default function App() {
                             placeholder={
                               billsType === 'cable' ? 'e.g. 1023485764' : billsType === 'electricity' ? 'e.g. 45091827364' : 'e.g. SB-10928374'
                             }
-                            className="flex-1 h-11 px-3 bg-white/50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500 dark:focus:border-teal-500 font-mono"
+                            className="flex-1 h-11 px-3 bg-white/50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 font-mono"
                           />
                           {billsType === 'electricity' && (
                             <button
@@ -4905,12 +4905,12 @@ export default function App() {
                           value={billsAmount}
                           onChange={(e) => setBillsAmount(e.target.value.replace(/[^0-9]/g, ''))}
                           placeholder={billsType === 'cable' ? 'Auto-filled per bouquet selection' : 'e.g. 5000'}
-                          className={`w-full h-11 px-3 bg-white/50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500 dark:focus:border-teal-500 font-mono ${
+                          className={`w-full h-11 px-3 bg-white/50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800/80 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 font-mono ${
                             billsType === 'cable' ? 'opacity-80 bg-slate-100 dark:bg-slate-900/60 cursor-not-allowed select-none' : ''
                           }`}
                         />
                         {billsType === 'cable' && (
-                          <span className="text-[9px] text-indigo-500 dark:text-teal-400 mt-1 block">
+                          <span className="text-[9px] text-teal-500 dark:text-teal-400 mt-1 block">
                             Pricing is automated per package selection. No manual entry required.
                           </span>
                         )}
@@ -4932,10 +4932,10 @@ export default function App() {
                           isSubmitting || 
                           (billsType === 'electricity' && !isMeterValidated)
                         }
-                        className={`w-full h-12 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 dark:from-teal-600 dark:to-teal-700 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
+                        className={`w-full h-12 rounded-xl bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-900 dark:from-teal-600 dark:to-teal-700 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
                           (!billsAccountNumber || !billsAmount || isSubmitting || (billsType === 'electricity' && !isMeterValidated)) 
                             ? 'opacity-50 cursor-not-allowed' 
-                            : 'shadow-lg hover:shadow-indigo-500/10'
+                            : 'shadow-lg hover:shadow-teal-500/10'
                         }`}
                       >
                         {isSubmitting ? (
@@ -4979,7 +4979,7 @@ export default function App() {
                   </div>
 
                   {/* Wallet Balance Summary Card */}
-                  <div className="p-5 bg-gradient-to-r from-slate-900/90 to-indigo-950/80 border border-white/10 rounded-2xl flex items-center justify-between shadow-xl">
+                  <div className="p-5 bg-gradient-to-r from-slate-900/90 to-teal-950/80 border border-white/10 rounded-2xl flex items-center justify-between shadow-xl">
                     <div>
                       <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Available Balance</span>
                       <span className="text-xl font-black text-teal-400 font-mono mt-0.5 block">
@@ -5089,7 +5089,7 @@ export default function App() {
                         type="button"
                         disabled={!withdrawBank || withdrawAccount.length !== 10 || !withdrawVerified || !withdrawAccName || !withdrawNameConfirmed}
                         onClick={() => setWithdrawStep(2)}
-                        className={`w-full py-4 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
+                        className={`w-full py-4 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-400 hover:to-teal-500 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
                           (!withdrawBank || withdrawAccount.length !== 10 || !withdrawVerified || !withdrawAccName || !withdrawNameConfirmed) ? 'opacity-40 cursor-not-allowed' : ''
                         }`}
                       >
@@ -5161,14 +5161,14 @@ export default function App() {
                             <div className="font-bold">Withdrawal access is currently locked.</div>
                             <div>Complete 5 successful referrals first.</div>
                             <div className="font-mono text-[11px]">Referral progress: {withdrawSuccessfulReferrals}/5</div>
-                            <button type="button" onClick={() => { setCurrentScreen('dashboard'); setActiveTab('social'); setRewardsTab('referrals'); navigateTo('/referrals'); }} className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-indigo-600 text-white font-black text-[10px] uppercase tracking-wider">Invite Friends</button>
+                            <button type="button" onClick={() => { setCurrentScreen('dashboard'); setActiveTab('social'); setRewardsTab('referrals'); navigateTo('/referrals'); }} className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-teal-600 text-white font-black text-[10px] uppercase tracking-wider">Invite Friends</button>
                           </div>
                         ) : !withdrawDepositVerified ? (
                           <div className="p-4 rounded-xl bg-teal-500/10 border border-teal-500/20 text-xs text-teal-100 leading-relaxed space-y-3">
                             <div className="font-bold">Referral requirement complete (5/5).</div>
                             <div>Make a verified KoraPay wallet deposit of at least <strong>₦520</strong> before you can withdraw.</div>
                             <div className="text-[10px] text-teal-100/80">This is not an activation fee. The deposit is credited to your wallet and remains your money. Once the normal withdrawal requirements are met, it can be withdrawn with your available balance.</div>
-                            <button type="button" onClick={() => window.dispatchEvent(new CustomEvent('nevo-open-deposit'))} className="w-full py-2.5 rounded-xl bg-gradient-to-r from-teal-400 to-indigo-500 text-slate-950 font-black text-[10px] uppercase tracking-wider">Deposit ₦520+ via KoraPay</button>
+                            <button type="button" onClick={() => window.dispatchEvent(new CustomEvent('nevo-open-deposit'))} className="w-full py-2.5 rounded-xl bg-gradient-to-r from-teal-400 to-teal-500 text-slate-950 font-black text-[10px] uppercase tracking-wider">Deposit ₦520+ via KoraPay</button>
                           </div>
                         ) : (
                           <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-200 leading-relaxed">
@@ -5191,7 +5191,7 @@ export default function App() {
                             parseInt(withdrawAmount) > 200000 ||
                             isSubmitting
                           }
-                          className={`w-full py-4 bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
+                          className={`w-full py-4 bg-gradient-to-r from-rose-600 to-teal-600 hover:from-rose-500 hover:to-teal-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
                             (!withdrawAccount || withdrawAccount.length !== 10 || !withdrawAccName || withdrawSuccessfulReferrals < 5 || !withdrawDepositVerified || !withdrawAmount || parseInt(withdrawAmount) < 5000 || parseInt(withdrawAmount) > 200000 || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
                         >
@@ -5243,13 +5243,13 @@ export default function App() {
                         <h2 className="text-lg font-black font-display text-white">Bank Cashout Transfer</h2>
                                               </div>
                     </div>
-                    <div className="bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full text-[10px] font-mono font-bold text-indigo-400">
+                    <div className="bg-teal-500/10 border border-teal-500/20 px-3 py-1 rounded-full text-[10px] font-mono font-bold text-teal-400">
                       Step {transferStep} of 2
                     </div>
                   </div>
 
                   {/* Wallet Balance Summary Card */}
-                  <div className="p-5 bg-gradient-to-r from-slate-900/90 to-indigo-950/80 border border-white/10 rounded-2xl flex items-center justify-between shadow-xl">
+                  <div className="p-5 bg-gradient-to-r from-slate-900/90 to-teal-950/80 border border-white/10 rounded-2xl flex items-center justify-between shadow-xl">
                     <div>
                       <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Available Balance</span>
                       <span className="text-xl font-black text-teal-400 font-mono mt-0.5 block">
@@ -5267,7 +5267,7 @@ export default function App() {
                     <GlassCard className="p-6 space-y-5 border-white/10">
                       <div className="border-b border-white/5 pb-3">
                         <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                          <span className="h-6 w-6 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-mono font-bold">1</span>
+                          <span className="h-6 w-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs font-mono font-bold">1</span>
                           Step 1: Account Information
                         </h3>
                         <p className="text-[11px] text-slate-400 mt-1">Select recipient bank and enter account details manually.</p>
@@ -5306,7 +5306,7 @@ export default function App() {
                                 setTransferAccNum(val);
                               }
                             }}
-                            className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono tracking-widest focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                            className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono tracking-widest focus:outline-none focus:ring-1 focus:ring-teal-400"
                           />
                         </div>
 
@@ -5315,13 +5315,13 @@ export default function App() {
                           <label className="text-[11px] font-mono text-slate-300 block mb-1.5 font-bold flex items-center justify-between">
                             <span>3. Account Holder Name</span>
                             {isVerifyingAccount && (
-                              <span className="text-[10px] text-indigo-400 font-mono flex items-center gap-1">
+                              <span className="text-[10px] text-teal-400 font-mono flex items-center gap-1">
                                 <RefreshCw className="h-3 w-3 animate-spin" /> Resolving...
                               </span>
                             )}
                           </label>
                           {isVerifyingAccount ? (
-                            <div className="w-full text-xs bg-slate-950 border border-indigo-500/30 rounded-xl px-4 py-3 text-indigo-400 font-mono flex items-center gap-2 animate-pulse">
+                            <div className="w-full text-xs bg-slate-950 border border-teal-500/30 rounded-xl px-4 py-3 text-teal-400 font-mono flex items-center gap-2 animate-pulse">
                               <RefreshCw className="h-4 w-4 animate-spin shrink-0" />
                               <span>Resolving account holder's name...</span>
                             </div>
@@ -5351,7 +5351,7 @@ export default function App() {
                         type="button"
                         disabled={!transferBank || transferAccNum.length !== 10 || !transferVerified || !transferAccName}
                         onClick={() => setTransferStep(2)}
-                        className={`w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
+                        className={`w-full py-4 bg-gradient-to-r from-teal-600 to-violet-600 hover:from-teal-500 hover:to-violet-500 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
                           (!transferBank || transferAccNum.length !== 10 || !transferVerified || !transferAccName) ? 'opacity-40 cursor-not-allowed' : ''
                         }`}
                       >
@@ -5367,7 +5367,7 @@ export default function App() {
                       <div className="border-b border-white/5 pb-3 flex items-center justify-between">
                         <div>
                           <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                            <span className="h-6 w-6 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-mono font-bold">2</span>
+                            <span className="h-6 w-6 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-xs font-mono font-bold">2</span>
                             Step 2: Amount & Authorization
                           </h3>
                           <p className="text-[11px] text-slate-400 mt-1">Specify transfer amount and enter deposit code.</p>
@@ -5375,7 +5375,7 @@ export default function App() {
                         <button
                           type="button"
                           onClick={() => setTransferStep(1)}
-                          className="text-[10px] font-mono text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
+                          className="text-[10px] font-mono text-teal-400 hover:underline flex items-center gap-1 cursor-pointer"
                         >
                           <Edit3 className="h-3 w-3" /> Edit Details
                         </button>
@@ -5387,7 +5387,7 @@ export default function App() {
                           <span>BANK: <strong className="text-white">{transferBank}</strong></span>
                           <span>ACCOUNT: <strong className="text-white">{transferAccNum}</strong></span>
                         </div>
-                        <div className="text-indigo-400 font-extrabold uppercase text-sm border-t border-white/5 pt-2">
+                        <div className="text-teal-400 font-extrabold uppercase text-sm border-t border-white/5 pt-2">
                           {transferAccName}
                         </div>
                       </div>
@@ -5408,7 +5408,7 @@ export default function App() {
                             required
                             value={transferAmount}
                             onChange={(e) => setTransferAmount(e.target.value)}
-                            className="w-full text-sm bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono font-bold focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                            className="w-full text-sm bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono font-bold focus:outline-none focus:ring-1 focus:ring-teal-400"
                           />
                           {transferAmount && (parseInt(transferAmount) < 50 || parseInt(transferAmount) > 200000) && (
                             <p className="text-[10px] text-rose-400 font-mono mt-1">Amount must be between ₦5,000 and ₦200,000.</p>
@@ -5433,7 +5433,7 @@ export default function App() {
                                   id="btn-goto-buy-legacyVoucher-transfer"
                                   type="button"
                                   onClick={() => setPaymentModalOpen(true)}
-                                  className="text-[10px] font-bold text-indigo-400 hover:underline cursor-pointer flex items-center gap-1"
+                                  className="text-[10px] font-bold text-teal-400 hover:underline cursor-pointer flex items-center gap-1"
                                 >
                                   Deposit Funds <ExternalLink className="h-3 w-3" />
                                 </button>
@@ -5444,7 +5444,7 @@ export default function App() {
                                 placeholder="No voucher required"
                                 value={transferLegacyVoucherCode}
                                 onChange={(e) => setTransferLegacyVoucherCode(e.target.value)}
-                                className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono tracking-widest uppercase focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                                className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono tracking-widest uppercase focus:outline-none focus:ring-1 focus:ring-teal-400"
                               />
                             </div>
                           )}
@@ -5462,7 +5462,7 @@ export default function App() {
                             parseInt(transferAmount) > 200000 ||
                             isSubmitting
                           }
-                          className={`w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
+                          className={`w-full py-4 bg-gradient-to-r from-teal-600 to-violet-600 hover:from-teal-500 hover:to-violet-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
                             (!transferAccNum || transferAccNum.length !== 10 || !transferAccName || !transferAmount || parseInt(transferAmount) < 50 || parseInt(transferAmount) > 200000 || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
                         >
@@ -5530,11 +5530,11 @@ export default function App() {
                   <div className="space-y-3">
                     {FAQS.map((item, idx) => (
                       <GlassCard id={`faq-item-${idx}`} key={idx} className="p-4 space-y-2">
-                        <h6 className="text-xs font-bold text-indigo-600 dark:text-teal-400 flex items-start gap-1.5 leading-snug">
+                        <h6 className="text-xs font-bold text-teal-600 dark:text-teal-400 flex items-start gap-1.5 leading-snug">
                           <span className="font-mono text-[10px]">Q:</span>
                           {item.question}
                         </h6>
-                        <p className="text-xs text-slate-500 dark:text-slate-300 pl-4 border-l border-indigo-500/10 leading-relaxed">
+                        <p className="text-xs text-slate-500 dark:text-slate-300 pl-4 border-l border-teal-500/10 leading-relaxed">
                           {item.answer}
                         </p>
                       </GlassCard>
@@ -5561,7 +5561,7 @@ export default function App() {
                   </div>
 
                   {/* Rebranding card banner */}
-                  <div className="rounded-3xl p-6 bg-gradient-to-tr from-indigo-950 via-purple-950 to-teal-950 text-white relative overflow-hidden border border-white/5 shadow-lg">
+                  <div className="rounded-3xl p-6 bg-gradient-to-tr from-teal-950 via-purple-950 to-teal-950 text-white relative overflow-hidden border border-white/5 shadow-lg">
                     <div className="absolute right-0 top-0 h-24 w-24 bg-teal-500/10 rounded-full blur-xl" />
                     
                     <h5 className="text-base font-extrabold font-display">Nevo Digital Platform</h5>
@@ -5726,11 +5726,11 @@ export default function App() {
                   id="btn-floating-ai-support"
                   type="button"
                   onClick={() => setIsFloatingAiChatOpen(true)}
-                  className="group relative flex items-center gap-2 pl-3.5 pr-4 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-500 hover:from-indigo-500 hover:to-teal-400 text-white font-bold text-xs shadow-xl shadow-indigo-500/25 border border-white/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                  className="group relative flex items-center gap-2 pl-3.5 pr-4 py-2.5 rounded-full bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white font-bold text-xs shadow-xl shadow-teal-500/25 border border-white/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   <div className="relative flex items-center justify-center">
                     <Bot className="h-4 w-4 text-white animate-pulse" />
-                    <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-400 border border-indigo-900 animate-ping" />
+                    <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-400 border border-teal-900 animate-ping" />
                   </div>
                   <span className="font-display tracking-tight">AI Support</span>
                   <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400" />
@@ -5756,7 +5756,7 @@ export default function App() {
                   <div className="space-y-6">
                     <div className="flex items-center justify-between border-b border-slate-150 dark:border-slate-900 pb-4">
                       <div>
-                        <span className="text-base font-black font-display bg-gradient-to-r from-indigo-600 to-teal-500 dark:from-indigo-400 dark:to-teal-300 bg-clip-text text-transparent">
+                        <span className="text-base font-black font-display bg-gradient-to-r from-teal-600 to-teal-500 dark:from-teal-400 dark:to-teal-300 bg-clip-text text-transparent">
                           Nevo
                         </span>
                         <span className="text-[8px] font-mono text-slate-400 block uppercase tracking-widest mt-0.5">Version 4.1.0</span>
@@ -5793,7 +5793,7 @@ export default function App() {
                             }}
                             className="w-full p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/60 flex items-center gap-3.5 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
                           >
-                            <Icon className="h-4.5 w-4.5 text-indigo-500" />
+                            <Icon className="h-4.5 w-4.5 text-teal-500" />
                             {item.label}
                           </button>
                         );
@@ -5845,7 +5845,7 @@ export default function App() {
                     <X className="h-4 w-4" />
                   </button>
 
-                  <div className="h-12 w-12 rounded-full bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto">
+                  <div className="h-12 w-12 rounded-full bg-teal-500/10 text-teal-400 flex items-center justify-center mx-auto">
                     <Clock className="h-6 w-6" />
                   </div>
 
@@ -5916,7 +5916,7 @@ export default function App() {
                       setInactivityCountdown(null);
                       showToast('Session extended successfully!', 'success');
                     }}
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-teal-500 text-white text-xs font-bold uppercase tracking-wider active:scale-95 transition-all"
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 text-white text-xs font-bold uppercase tracking-wider active:scale-95 transition-all"
                   >
                     Extend Session
                   </button>
@@ -5970,7 +5970,7 @@ export default function App() {
                           showToast('Incorrect authorization code. Check the simulated inbox.', 'error');
                         }
                       }}
-                      className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-teal-500 hover:from-indigo-700 hover:to-teal-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
+                      className="flex-1 py-3 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
                     >
                       Authorize
                     </button>

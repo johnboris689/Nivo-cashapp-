@@ -169,7 +169,7 @@ export const PaymentAdminTab: React.FC<PaymentAdminTabProps> = ({
   return (
     <div className="space-y-6 animate-[fadeIn_0.2s_ease-out]">
       {/* Header Banner */}
-      <GlassCard className="p-5 border-white/5 bg-gradient-to-br from-indigo-950/20 via-slate-900/40 to-teal-950/20">
+      <GlassCard className="p-5 border-white/5 bg-gradient-to-br from-teal-950/20 via-slate-900/40 to-teal-950/20">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-teal-500/10 text-teal-400 border border-teal-500/20">
@@ -377,7 +377,7 @@ export const PaymentAdminTab: React.FC<PaymentAdminTabProps> = ({
                       <td className="py-3 px-3 font-bold text-teal-400">
                         ₦{Number(tx.amount || 0).toLocaleString()}
                       </td>
-                      <td className="py-3 px-3 uppercase text-indigo-300 font-bold">
+                      <td className="py-3 px-3 uppercase text-teal-300 font-bold">
                         {tx.provider || 'korapay'}
                       </td>
                       <td className="py-3 px-3 text-slate-400">

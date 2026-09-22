@@ -26,7 +26,7 @@ export default function BottomNav({ activeTab, currentScreen, onTabChange, onFab
           type="button"
           onClick={onFabClick}
           aria-label="Open Quick Actions Menu"
-          className="h-12 w-12 rounded-full bg-gradient-to-tr from-indigo-600 to-teal-500 hover:from-indigo-500 hover:to-teal-400 text-white shadow-xl shadow-teal-500/30 flex items-center justify-center transition-all duration-300 active:scale-95 border-2 border-[#0a0a12] cursor-pointer"
+          className="h-12 w-12 rounded-full bg-gradient-to-tr from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white shadow-xl shadow-teal-500/30 flex items-center justify-center transition-all duration-300 active:scale-95 border-2 border-[#0a0a12] cursor-pointer"
         >
           <Plus className="h-6 w-6 stroke-[2.5]" />
         </button>

@@ -20,16 +20,16 @@ export const LandingPage: React.FC = () => {
   const bonusAmount = settings?.referralBonusAmount || 1200;
 
   return (
-    <div className="min-h-screen bg-[#100709] text-white font-sans selection:bg-[#A52A4A] selection:text-slate-950">
+    <div className="min-h-screen bg-[#100709] text-white font-sans selection:bg-[#00BFA6] selection:text-slate-950">
       {/* Top Notice Banner */}
-      <div className="bg-gradient-to-r from-[#7A1831] via-[#A52A4A] to-[#7A1831] text-white py-2 px-4 text-center font-extrabold text-xs tracking-wide shadow-lg">
+      <div className="bg-gradient-to-r from-[#008F7A] via-[#00BFA6] to-[#008F7A] text-white py-2 px-4 text-center font-extrabold text-xs tracking-wide shadow-lg">
         🔥 Special Offer: Register now & earn ₦{bonusAmount.toLocaleString()} instantly per referral!
       </div>
 
       {/* Hero Section */}
       <section className="relative pt-16 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden">
         {/* Glow Effects */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#7A1831]/10 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#008F7A]/10 rounded-full blur-[150px] pointer-events-none" />
 
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 nivo-glass-surface border border-[#C13A5A]/30 px-4 py-1.5 rounded-full text-xs font-bold text-[#C13A5A] mb-8 shadow-lg shadow-[#C13A5A]/10">
@@ -38,7 +38,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] max-w-4xl mx-auto">
-            Earn, Manage & Withdraw Cash <span className="bg-gradient-to-r from-[#A52A4A] to-[#C13A5A] bg-clip-text text-transparent">Instantly</span>
+            Earn, Manage & Withdraw Cash <span className="bg-gradient-to-r from-[#00BFA6] to-[#C13A5A] bg-clip-text text-transparent">Instantly</span>
           </h1>
 
           <p className="mt-6 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
@@ -50,7 +50,7 @@ export const LandingPage: React.FC = () => {
             {user ? (
               <Link
                 to="/dashboard"
-                className="w-full sm:w-auto bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-black text-base px-8 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#7A1831]/25"
+                className="w-full sm:w-auto bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-black text-base px-8 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#008F7A]/25"
               >
                 <span>Go to My Dashboard</span>
                 <ArrowRight className="w-5 h-5" />
@@ -59,14 +59,14 @@ export const LandingPage: React.FC = () => {
               <>
                 <Link
                   to="/register"
-                  className="w-full sm:w-auto bg-gradient-to-r from-[#7A1831] to-[#A52A4A] hover:from-[#8F1D3A] hover:to-[#C13A5A] text-white font-black text-base px-8 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#7A1831]/25"
+                  className="w-full sm:w-auto bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-black text-base px-8 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#008F7A]/25"
                 >
                   <span>Get Started Now</span>
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
                   to="/login"
-                  className="w-full sm:w-auto bg-[#240A12] hover:bg-[#240A12] text-white font-black text-base px-8 py-4 rounded-2xl border border-white/10 transition-colors"
+                  className="w-full sm:w-auto bg-[#071114] hover:bg-[#071114] text-white font-black text-base px-8 py-4 rounded-2xl border border-white/10 transition-colors"
                 >
                   Sign In to Account
                 </Link>
@@ -89,7 +89,7 @@ export const LandingPage: React.FC = () => {
               <p className="text-xs text-slate-400 mt-1">Active Members</p>
             </div>
             <div className="nivo-glass-surface p-6 rounded-3xl border border-white/10 shadow-xl">
-              <p className="text-2xl font-black text-[#A52A4A] font-mono">Instant</p>
+              <p className="text-2xl font-black text-[#00BFA6] font-mono">Instant</p>
               <p className="text-xs text-slate-400 mt-1">Bank Payouts</p>
             </div>
           </div>
@@ -97,12 +97,12 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Referral System Feature Highlight */}
-      <section className="py-16 bg-[#090506] border-y border-[#8F1D3A]/20">
+      <section className="py-16 bg-[#090506] border-y border-[#00C9A7]/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-[#240A12]/90 border border-[#8F1D3A]/30 rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-2xl">
+          <div className="bg-[#071114]/90 border border-[#00C9A7]/30 rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-2xl">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
-                <div className="inline-flex items-center gap-2 bg-[#A52A4A]/10 text-[#C13A5A] border border-[#A52A4A]/20 px-3 py-1 rounded-full text-xs font-bold mb-4">
+                <div className="inline-flex items-center gap-2 bg-[#00BFA6]/10 text-[#C13A5A] border border-[#00BFA6]/20 px-3 py-1 rounded-full text-xs font-bold mb-4">
                   <Gift className="w-4 h-4" />
                   REAL REFERRAL SYSTEM
                 </div>
@@ -115,25 +115,25 @@ export const LandingPage: React.FC = () => {
 
                 <ul className="mt-6 space-y-2.5 text-xs font-semibold text-slate-200">
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#A52A4A] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[#00BFA6] shrink-0" />
                     Automatic wallet crediting upon new registration
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#A52A4A] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[#00BFA6] shrink-0" />
                     Unique referral code & link generated automatically
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#A52A4A] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[#00BFA6] shrink-0" />
                     1-Click Copy Code, Copy Link & Native Share buttons
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#A52A4A] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[#00BFA6] shrink-0" />
                     Zero limit on referral earnings — invite unlimited friends
                   </li>
                 </ul>
               </div>
 
-              <div className="nivo-glass-surface p-6 rounded-2xl border border-[#8F1D3A]/20 space-y-4">
+              <div className="nivo-glass-surface p-6 rounded-2xl border border-[#00C9A7]/20 space-y-4">
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <span className="text-xs text-slate-400 font-bold uppercase">Sample Referral Link</span>
                   <span className="text-xs text-[#C13A5A] font-bold">Live Backend</span>
@@ -141,12 +141,12 @@ export const LandingPage: React.FC = () => {
                 <div className="bg-[#090506] p-3 rounded-xl border border-white/10 font-mono text-xs text-[#C13A5A] break-all">
                   https://nivocash.app/register?ref=NIVO9821X
                 </div>
-                <div className="bg-[#A52A4A]/10 border border-[#A52A4A]/20 p-4 rounded-xl flex items-center justify-between">
+                <div className="bg-[#00BFA6]/10 border border-[#00BFA6]/20 p-4 rounded-xl flex items-center justify-between">
                   <div>
                     <p className="text-xs text-slate-400">Referral Bonus Per User</p>
                     <p className="text-xl font-black text-white font-mono">₦1,200.00</p>
                   </div>
-                  <span className="bg-gradient-to-r from-[#7A1831] to-[#A52A4A] text-white font-extrabold text-xs px-3 py-1.5 rounded-lg shadow-md">
+                  <span className="bg-gradient-to-r from-[#008F7A] to-[#00BFA6] text-white font-extrabold text-xs px-3 py-1.5 rounded-lg shadow-md">
                     Instant Credit
                   </span>
                 </div>
@@ -166,8 +166,8 @@ export const LandingPage: React.FC = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          <div className="nivo-glass-surface p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#8F1D3A]/40 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#8F1D3A]/10 text-[#C13A5A] flex items-center justify-center font-bold">
+          <div className="nivo-glass-surface p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#00C9A7]/40 transition-all">
+            <div className="w-12 h-12 rounded-xl bg-[#00C9A7]/10 text-[#C13A5A] flex items-center justify-center font-bold">
               <Wallet className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold text-white">Instant Wallet System</h3>
@@ -176,8 +176,8 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="nivo-glass-surface p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#8F1D3A]/40 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#A52A4A]/10 text-[#C13A5A] flex items-center justify-center font-bold">
+          <div className="nivo-glass-surface p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#00C9A7]/40 transition-all">
+            <div className="w-12 h-12 rounded-xl bg-[#00BFA6]/10 text-[#C13A5A] flex items-center justify-center font-bold">
               <TrendingUp className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold text-white">Daily Tasks & Rewards</h3>
@@ -186,8 +186,8 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="nivo-glass-surface p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#8F1D3A]/40 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#8F1D3A]/10 text-[#A52A4A] flex items-center justify-center font-bold">
+          <div className="nivo-glass-surface p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#00C9A7]/40 transition-all">
+            <div className="w-12 h-12 rounded-xl bg-[#00C9A7]/10 text-[#00BFA6] flex items-center justify-center font-bold">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold text-white">Bank Grade Security</h3>
@@ -202,7 +202,7 @@ export const LandingPage: React.FC = () => {
       <footer className="border-t border-white/10 bg-[#090506] py-10 px-4 text-center">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[#7A1831] to-[#C13A5A] flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[#008F7A] to-[#C13A5A] flex items-center justify-center">
               <Zap className="w-4 h-4 text-white fill-white" />
             </div>
             <span className="font-black text-sm text-white">NEVO</span>
