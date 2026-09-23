@@ -107,7 +107,7 @@ export default function CongratulationsScreen({ userEmail, onContinue }: Congrat
   ];
 
   return (
-    <div className="fixed inset-0 z-[100] w-full h-full bg-[#070712] [background:radial-gradient(ellipse_at_top,#1e1b4b_0%,#070712_60%),radial-gradient(ellipse_at_bottom,#0d9488_0%,#070712_60%)] text-white font-sans overflow-y-auto overscroll-y-contain no-scrollbar">
+    <div className="fixed inset-0 z-[100] w-full h-full bg-[#070A0D] [background:radial-gradient(ellipse_at_top,#062C2C_0%,#070A0D_60%),radial-gradient(ellipse_at_bottom,#0d9488_0%,#070A0D_60%)] text-white font-sans overflow-y-auto overscroll-y-contain no-scrollbar">
       
       {/* Background glowing blurred orbs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">

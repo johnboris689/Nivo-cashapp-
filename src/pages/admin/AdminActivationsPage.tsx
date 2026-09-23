@@ -81,7 +81,7 @@ export const AdminActivationsPage: React.FC = () => {
         </div>
 
         {pendingCount > 0 && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#00C9A7]/20 border border-[#00C9A7]/30 text-[#C13A5A] font-extrabold text-xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#00C9A7]/20 border border-[#00C9A7]/30 text-[#7EE8D3] font-extrabold text-xs">
             <Clock className="w-3.5 h-3.5 animate-spin" />
             {pendingCount} Pending Approvals
           </span>
@@ -92,8 +92,8 @@ export const AdminActivationsPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
-              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
+              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00C9A7]'
+              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#7EE8D3]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -162,12 +162,12 @@ export const AdminActivationsPage: React.FC = () => {
                     </td>
 
                     <td className="py-3 px-3">
-                      <span className="font-black text-[#C13A5A]">₦{a.amount.toLocaleString()}</span>
+                      <span className="font-black text-[#7EE8D3]">₦{a.amount.toLocaleString()}</span>
                     </td>
 
                     <td className="py-3 px-3 font-bold text-white">{a.senderName}</td>
 
-                    <td className="py-3 px-3 font-mono font-bold text-[#D46A83]">{a.paymentProofRef}</td>
+                    <td className="py-3 px-3 font-mono font-bold text-[#7EE8D3]">{a.paymentProofRef}</td>
 
                     <td className="py-3 px-3 text-zinc-400 text-[11px]">
                       {new Date(a.createdAt).toLocaleString()}
@@ -177,10 +177,10 @@ export const AdminActivationsPage: React.FC = () => {
                       <span
                         className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                           a.status === 'approved'
-                            ? 'bg-[#00C9A7]/20 text-[#00BFA6] border border-[#00C9A7]/30'
+                            ? 'bg-[#00C9A7]/20 text-[#00C9A7] border border-[#00C9A7]/30'
                             : a.status === 'pending'
-                            ? 'bg-[#00C9A7]/20 text-[#C13A5A] border border-[#00C9A7]/30'
-                            : 'bg-[#00C9A7]/20 text-[#C13A5A] border border-[#00C9A7]/30'
+                            ? 'bg-[#00C9A7]/20 text-[#7EE8D3] border border-[#00C9A7]/30'
+                            : 'bg-[#00C9A7]/20 text-[#7EE8D3] border border-[#00C9A7]/30'
                         }`}
                       >
                         {a.status.toUpperCase()}
@@ -202,7 +202,7 @@ export const AdminActivationsPage: React.FC = () => {
                           <button
                             disabled={actionLoading === a.id}
                             onClick={() => handleReject(a.id)}
-                            className="bg-[#00C9A7]/20 hover:bg-[#00C9A7]/30 text-[#C13A5A] border border-[#00C9A7]/30 text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer inline-flex items-center gap-1"
+                            className="bg-[#00C9A7]/20 hover:bg-[#00C9A7]/30 text-[#7EE8D3] border border-[#00C9A7]/30 text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer inline-flex items-center gap-1"
                           >
                             <X className="w-3.5 h-3.5" />
                             <span>Reject</span>

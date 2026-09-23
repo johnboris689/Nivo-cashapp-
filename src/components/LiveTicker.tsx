@@ -32,8 +32,8 @@ export default function LiveTicker() {
   const text = current?.message || 'VERIFIED LIVE ACTIVITY — Confirmed deposits and withdrawals appear here automatically.';
 
   return (
-    <div className="w-full bg-[#0a0a12] border-b border-white/[0.06] py-1 overflow-hidden flex items-center relative z-20 select-none shrink-0 font-sans">
-      <div className="bg-teal-500/10 text-teal-400 border-r border-white/5 px-2.5 py-0.5 flex items-center gap-1.5 shrink-0 z-30 text-[9px] font-bold font-mono tracking-wider uppercase bg-[#0c0c14] h-full">
+    <div className="w-full bg-[#070A0D] border-b border-white/[0.06] py-1 overflow-hidden flex items-center relative z-20 select-none shrink-0 font-sans">
+      <div className="bg-teal-500/10 text-teal-400 border-r border-white/5 px-2.5 py-0.5 flex items-center gap-1.5 shrink-0 z-30 text-[9px] font-bold font-mono tracking-wider uppercase bg-[#070A0D] h-full">
         <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" /><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-500" /></span>
         LIVE
       </div>

@@ -49,7 +49,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
     <div className="space-y-6 animate-fade-in pb-12">
       <div>
         <h1 className="text-2xl font-black text-white flex items-center gap-2">
-          <ArrowUpRight className="w-6 h-6 text-[#C13A5A]" />
+          <ArrowUpRight className="w-6 h-6 text-[#7EE8D3]" />
           Withdrawal Requests Management
         </h1>
         <p className="text-xs text-zinc-400 mt-1">Review bank payout requests, approve or decline with auto-refund</p>
@@ -59,8 +59,8 @@ export const AdminWithdrawalsPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
-              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
+              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00C9A7]'
+              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#7EE8D3]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -95,11 +95,11 @@ export const AdminWithdrawalsPage: React.FC = () => {
                       <p className="text-[10px] text-zinc-500">{w.userEmail}</p>
                     </td>
 
-                    <td className="py-3 px-3 font-black text-[#C13A5A]">₦{w.amount.toLocaleString()}</td>
+                    <td className="py-3 px-3 font-black text-[#7EE8D3]">₦{w.amount.toLocaleString()}</td>
 
                     <td className="py-3 px-3">
                       <p className="font-bold text-white">{w.bankName}</p>
-                      <p className="text-[#00BFA6] font-mono font-bold">{w.accountNumber}</p>
+                      <p className="text-[#00C9A7] font-mono font-bold">{w.accountNumber}</p>
                       <p className="text-[10px] text-zinc-400">{w.accountName}</p>
                     </td>
 
@@ -107,10 +107,10 @@ export const AdminWithdrawalsPage: React.FC = () => {
                       <span
                         className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                           w.status === 'approved'
-                            ? 'bg-[#00C9A7]/10 text-[#00BFA6] border border-[#00C9A7]/20'
+                            ? 'bg-[#00C9A7]/10 text-[#00C9A7] border border-[#00C9A7]/20'
                             : w.status === 'pending'
-                            ? 'bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20'
-                            : 'bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20'
+                            ? 'bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20'
+                            : 'bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20'
                         }`}
                       >
                         {w.status}
@@ -132,7 +132,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
                           </button>
                           <button
                             onClick={() => handleReject(w.id)}
-                            className="bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 text-[#C13A5A] border border-[#00C9A7]/30 font-bold text-[10px] px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+                            className="bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 text-[#7EE8D3] border border-[#00C9A7]/30 font-bold text-[10px] px-3 py-1.5 rounded-lg transition-all cursor-pointer"
                           >
                             Decline & Refund
                           </button>

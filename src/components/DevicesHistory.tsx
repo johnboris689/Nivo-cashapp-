@@ -43,7 +43,7 @@ export function DeviceManagement({
             key={device.id}
             className={`p-3.5 rounded-xl border flex items-center justify-between ${
               device.isCurrent
-                ? 'bg-[#1e1b4b]/20 border-teal-500/30'
+                ? 'bg-[#062C2C]/20 border-teal-500/30'
                 : 'bg-white/5 border-white/5'
             }`}
           >

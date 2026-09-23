@@ -33,7 +33,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4 }}
-      className="fixed inset-0 z-50 bg-[#090506] flex flex-col items-center justify-between p-6 overflow-hidden select-none"
+      className="fixed inset-0 z-50 bg-[#070A0D] flex flex-col items-center justify-between p-6 overflow-hidden select-none"
     >
       {/* Background Radial Glow & Ambient Particles */}
       <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
@@ -71,7 +71,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message, subMessage 
 
       {/* Top Header Security Tag */}
       <div className="relative z-10 pt-4 flex items-center gap-1.5 text-gray-500 text-[10px] font-extrabold uppercase tracking-widest bg-white/[0.03] border border-white/5 px-3 py-1.5 rounded-full backdrop-blur-md">
-        <ShieldCheck className="w-3.5 h-3.5 text-[#00BFA6]" />
+        <ShieldCheck className="w-3.5 h-3.5 text-[#00C9A7]" />
         <span>Bank-Grade Encryption</span>
       </div>
 

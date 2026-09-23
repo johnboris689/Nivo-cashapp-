@@ -53,7 +53,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-white flex items-center gap-2">
-            <Wallet className="w-6 h-6 text-[#00BFA6]" />
+            <Wallet className="w-6 h-6 text-[#00C9A7]" />
             Wallet & Bank Overview
           </h1>
           <p className="text-xs text-zinc-400 mt-1">Manage deposits, withdrawals, and bank details</p>
@@ -71,7 +71,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
             onClick={onOpenWithdraw}
             className="flex items-center gap-2 nivo-glass-surface hover:bg-[#071114] text-white border border-zinc-700 font-bold text-xs px-5 py-2.5 rounded-xl cursor-pointer transition-all"
           >
-            <ArrowUpRight className="w-4 h-4 text-[#00BFA6]" />
+            <ArrowUpRight className="w-4 h-4 text-[#00C9A7]" />
             Withdraw
           </button>
         </div>
@@ -85,21 +85,21 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
             <h2 className="text-4xl font-black text-white mt-2">
               ₦{user?.walletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
             </h2>
-            <p className="text-xs text-[#C13A5A] font-semibold mt-2">
+            <p className="text-xs text-[#7EE8D3] font-semibold mt-2">
               Lifetime Earnings: ₦{user?.totalEarnings.toLocaleString()}
             </p>
           </div>
 
           <div className="mt-6 pt-4 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-400">
-            <span>Account Status: <strong className="text-[#00BFA6]">Active & Verified</strong></span>
-            <span>Ref Code: <strong className="text-[#C13A5A] font-mono">{user?.referralCode}</strong></span>
+            <span>Account Status: <strong className="text-[#00C9A7]">Active & Verified</strong></span>
+            <span>Ref Code: <strong className="text-[#7EE8D3] font-mono">{user?.referralCode}</strong></span>
           </div>
         </div>
 
         {/* Automated KoraPay Deposit Card */}
         <div className="nivo-glass-surface border border-zinc-800 rounded-3xl p-6 space-y-3 flex flex-col justify-between">
           <div>
-            <span className="text-xs font-bold text-[#C13A5A] uppercase tracking-wider flex items-center gap-1.5">
+            <span className="text-xs font-bold text-[#7EE8D3] uppercase tracking-wider flex items-center gap-1.5">
               <Building2 className="w-4 h-4 text-[#00C9A7]" />
               KoraPay Checkout
             </span>
@@ -170,8 +170,8 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
                   <div
                     className={`p-2.5 rounded-xl ${
                       tx.type.includes('deposit') || tx.type.includes('credit') || tx.type.includes('reward') || tx.type.includes('bonus')
-                        ? 'bg-[#00C9A7]/10 text-[#00BFA6]'
-                        : 'bg-[#00C9A7]/10 text-[#C13A5A]'
+                        ? 'bg-[#00C9A7]/10 text-[#00C9A7]'
+                        : 'bg-[#00C9A7]/10 text-[#7EE8D3]'
                     }`}
                   >
                     {tx.type.includes('deposit') || tx.type.includes('credit') ? (
@@ -189,14 +189,14 @@ export const WalletPage: React.FC<WalletPageProps> = ({ onOpenDeposit, onOpenWit
                 </div>
 
                 <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center">
-                  <span className="text-sm font-black text-[#C13A5A]">₦{tx.amount.toLocaleString()}</span>
+                  <span className="text-sm font-black text-[#7EE8D3]">₦{tx.amount.toLocaleString()}</span>
                   <span
                     className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full mt-1 ${
                       tx.status === 'completed' || tx.status === 'approved'
-                        ? 'bg-[#00C9A7]/10 text-[#00BFA6] border border-[#00C9A7]/20'
+                        ? 'bg-[#00C9A7]/10 text-[#00C9A7] border border-[#00C9A7]/20'
                         : tx.status === 'pending'
-                        ? 'bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20'
-                        : 'bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20'
+                        ? 'bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20'
+                        : 'bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20'
                     }`}
                   >
                     {tx.status}

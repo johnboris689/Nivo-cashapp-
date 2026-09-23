@@ -1,65 +1,271 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
-@theme { --font-sans:"Inter",ui-sans-serif,system-ui,sans-serif; --font-display:"Space Grotesk",sans-serif; --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace; }
-:root { --nevo-bg:#070b0c; --nevo-bg-2:#0b1111; --nevo-panel:rgba(14,23,22,.72); --nevo-panel-strong:rgba(9,16,15,.94); --nevo-line:rgba(139,244,220,.13); --nevo-line-strong:rgba(71,224,191,.26); --nevo-green:#28d7b0; --nevo-green-soft:#8cebd8; --nevo-text:#f3f7f5; --nevo-muted:#899795; }
-*,::before,::after{box-sizing:border-box}
-html,body,#root{margin:0;padding:0;width:100%;min-height:100%;min-height:100dvh;overflow-x:hidden;background:var(--nevo-bg);color:var(--nevo-text);-webkit-tap-highlight-color:transparent}
-body{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:radial-gradient(circle at 15% -5%,rgba(43,215,176,.075),transparent 30%),radial-gradient(circle at 100% 20%,rgba(72,201,177,.045),transparent 28%),var(--nevo-bg)}
-button,a,input,textarea,select{font:inherit}
-button{cursor:pointer}
-input,textarea,select{color-scheme:dark}
-.pt-safe{padding-top:env(safe-area-inset-top,0px)} .pb-safe{padding-bottom:env(safe-area-inset-bottom,0px)}
-.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{scrollbar-width:none;-ms-overflow-style:none}
-
-/* Universal Nevo glass */
-.nivo-glass-surface,.glass-panel-dark,.nevo-auth-card,.nevo-admin-frame,.nevo-admin-login-card{background:var(--nevo-panel)!important;border:1px solid var(--nevo-line)!important;backdrop-filter:blur(24px) saturate(125%);-webkit-backdrop-filter:blur(24px) saturate(125%);box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 24px 70px rgba(0,0,0,.28)!important}
-.glass-panel-light{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(22px)}
-[class*="rounded-2xl"][class*="backdrop-blur-xl"],[class*="rounded-3xl"][class*="backdrop-blur-xl"]{border-color:var(--nevo-line)!important}
-
-/* Remove the old purple/blue/orange visual language without changing semantics. */
-[class*="bg-indigo-"],[class*="bg-purple-"],[class*="bg-cyan-"],[class*="bg-blue-"],[class*="bg-orange-"]{background-color:rgba(40,215,176,.065)!important}
-[class*="text-indigo-"],[class*="text-purple-"],[class*="text-cyan-"],[class*="text-blue-"]{color:var(--nevo-green-soft)!important}
-[class*="border-indigo-"],[class*="border-purple-"],[class*="border-cyan-"],[class*="border-blue-"]{border-color:var(--nevo-line-strong)!important}
-
-/* Auth */
-.nevo-auth-shell{background:radial-gradient(circle at 50% 0%,rgba(38,214,177,.10),transparent 35%),linear-gradient(180deg,#07100f 0%,#070b0c 52%,#050707 100%);}
-.nevo-auth-card{width:100%;max-width:520px;margin-inline:auto;border-radius:28px!important;background:rgba(12,20,19,.78)!important}
-.nevo-auth-shell input,.nevo-admin-login-card input{background:rgba(255,255,255,.035)!important;border-color:rgba(255,255,255,.09)!important;border-radius:14px!important;min-height:46px}
-.nevo-auth-shell input:focus,.nevo-admin-login-card input:focus{border-color:rgba(40,215,176,.55)!important;box-shadow:0 0 0 3px rgba(40,215,176,.08)!important}
-.nevo-auth-shell button[class*="bg-gradient"],.nevo-admin-login-card button[class*="bg-gradient"]{background:linear-gradient(100deg,#27d5ae,#5de0c4)!important;color:#04110e!important}
-
-/* Dashboard surfaces and balance */
-#nevo-mobile-container{background:transparent!important}
-.nevo-glass-surface{border-radius:24px!important}
-
-/* Deposit: true full-width mobile sheet */
-.nevo-deposit-overlay{align-items:stretch!important}
-.nevo-deposit-sheet{min-height:100dvh!important;max-height:100dvh;overflow:auto!important}
-@media(min-width:640px){.nevo-deposit-overlay{align-items:center!important}.nevo-deposit-sheet{min-height:0!important;max-height:calc(100dvh - 32px);border-radius:28px!important}}
-
-/* Admin */
-.nevo-admin-shell{min-height:100dvh;background:radial-gradient(circle at 0 0,rgba(38,214,177,.08),transparent 30%),radial-gradient(circle at 100% 100%,rgba(38,214,177,.035),transparent 35%),#070b0c;color:var(--nevo-text)}
-.nevo-admin-login-shell{min-height:100dvh;background:radial-gradient(circle at 50% 0,rgba(38,214,177,.10),transparent 35%),#070b0c;color:white;display:flex;align-items:center;justify-content:center;padding:16px}
-.nevo-admin-login-card{border-radius:30px!important;background:rgba(11,18,17,.86)!important}
-.nevo-admin-frame{background:rgba(10,16,15,.70)!important;border-radius:28px!important;border-color:var(--nevo-line)!important}
-
-/* Landing */
-.nevo-landing{background:radial-gradient(circle at 20% 0%,rgba(41,215,176,.11),transparent 32%),radial-gradient(circle at 85% 18%,rgba(32,160,139,.08),transparent 30%),linear-gradient(180deg,#060b0a,#07100e 48%,#050807)}
-.nevo-landing-orb{position:absolute;pointer-events:none;border-radius:999px;filter:blur(70px);opacity:.22}.nevo-landing-orb-a{width:280px;height:280px;left:-120px;top:180px;background:#20d3ad}.nevo-landing-orb-b{width:320px;height:320px;right:-150px;top:520px;background:#157f6e}
-.nevo-gradient-text{background:linear-gradient(110deg,#fff 0%,#9af0dc 48%,#37d6b4 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.nevo-primary-button{background:linear-gradient(110deg,#25d5ad,#67e2ca);color:#04100d;box-shadow:0 16px 40px rgba(37,213,173,.12);transition:transform .2s,filter .2s,box-shadow .2s}.nevo-primary-button:hover{filter:brightness(1.05);transform:translateY(-1px);box-shadow:0 20px 50px rgba(37,213,173,.18)}
-.nevo-secondary-button{border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);color:#e6efec;backdrop-filter:blur(18px)}
-.nevo-hero-card,.nevo-feature-card{background:rgba(10,18,17,.66);backdrop-filter:blur(24px);box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 30px 80px rgba(0,0,0,.24)}
-.nevo-feature-card{border:1px solid rgba(255,255,255,.07);transition:border-color .2s,transform .2s,background .2s}.nevo-feature-card:hover{border-color:rgba(76,224,193,.2);transform:translateY(-2px);background:rgba(13,24,22,.78)}
-
-/* Mobile edge-to-edge: preserve safe areas, remove artificial narrow shells */
-@media(max-width:639px){
-  .nevo-auth-shell{padding-left:0!important;padding-right:0!important}
-  .nevo-auth-card{border-left:0!important;border-right:0!important;border-radius:24px!important;max-width:none!important}
-  #nevo-mobile-container main,#nevo-mobile-container [role="main"]{max-width:none!important}
-  .nevo-admin-frame{border-radius:0!important;border-left:0!important;border-right:0!important}
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
-@keyframes nevoTickerIn{0%{transform:translateY(8px);opacity:0}100%{transform:translateY(0);opacity:1}}
-.animate-ticker{animation:nevoTickerIn 420ms ease-out both}
+*, ::before, ::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  overflow-x: hidden !important;
+  max-width: 100%;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  background-color: #070A0D;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Safe area padding utilities for mobile notches */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Custom glassmorphism helpers */
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.glass-panel-dark {
+  background: rgba(15, 12, 30, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Scrollbar styling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+@keyframes nevoTickerIn {
+  0% { transform: translateY(8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+.animate-ticker { animation: nevoTickerIn 420ms ease-out both; }
+
+/* --------------------------------------------------------------------------
+   NEVO SMOKY-EMERALD GLASS SYSTEM
+   Visual language based on the current Nevo reference: near-black smoked
+   glass, subtle teal borders, emerald actions, restrained purple only in the
+   brand mark, and soft depth rather than bright neon panels.
+   -------------------------------------------------------------------------- */
+:root {
+  --nevo-bg: #070A0D;
+  --nevo-surface: rgba(18, 25, 27, 0.72);
+  --nevo-surface-strong: rgba(12, 19, 21, 0.9);
+  --nevo-border: rgba(0, 210, 170, 0.22);
+  --nevo-border-soft: rgba(255, 255, 255, 0.075);
+  --nevo-accent: #00C9A7;
+  --nevo-accent-soft: #7EE8D3;
+  --nevo-text: #F2F5F4;
+  --nevo-muted: #8E9A9A;
+}
+
+html, body, #root {
+  background:
+    radial-gradient(circle at 15% 0%, rgba(0, 201, 167, 0.055), transparent 30%),
+    radial-gradient(circle at 90% 20%, rgba(0, 201, 167, 0.035), transparent 28%),
+    var(--nevo-bg) !important;
+  color: var(--nevo-text);
+}
+
+body {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Shared glass surface used throughout the existing application. */
+.nivo-glass-surface,
+.glass-panel-dark {
+  background: var(--nevo-surface) !important;
+  border-color: var(--nevo-border-soft) !important;
+  backdrop-filter: blur(22px) saturate(125%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(125%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 18px 45px rgba(0,0,0,.22) !important;
+}
+
+/* Existing GlassCard gets the same treatment without changing its API. */
+[class*="rounded-2xl"][class*="backdrop-blur-xl"],
+[class*="rounded-3xl"][class*="backdrop-blur-xl"] {
+  border-color: rgba(0, 201, 167, 0.16) !important;
+}
+
+/* Convert common cool-blue utility accents to Nevo emerald glass. */
+[class*="bg-indigo-"], [class*="bg-purple-"], [class*="bg-cyan-"] {
+  background-color: color-mix(in srgb, var(--nevo-accent) 9%, transparent) !important;
+}
+[class*="text-indigo-"], [class*="text-purple-"], [class*="text-cyan-"] {
+  color: var(--nevo-accent-soft) !important;
+}
+[class*="border-indigo-"], [class*="border-purple-"], [class*="border-cyan-"] {
+  border-color: rgba(0, 201, 167, 0.22) !important;
+}
+
+/* Keep danger/status colors meaningful rather than recoloring them. */
+[class*="bg-rose-"], [class*="bg-red-"], [class*="text-rose-"], [class*="text-red-"] {
+  /* intentionally untouched by the theme */
+}
+
+/* Emerald primary actions. */
+button[class*="from-teal-"],
+a[class*="from-teal-"] {
+  box-shadow: 0 10px 28px rgba(0, 201, 167, .12) !important;
+}
+
+/* Subtle glass inputs. */
+input, textarea, select {
+  color-scheme: dark;
+}
+
+/* Mobile-first width: cards should breathe without returning to blue/indigo. */
+@media (max-width: 640px) {
+  .nivo-glass-surface {
+    border-radius: 20px !important;
+  }
+}
+
+/* ========================================================================
+   NEVO REFERENCE LOCK — global visual rules
+   ======================================================================== */
+:root {
+  --nevo-bg: #070A0D;
+  --nevo-card: rgba(10, 18, 20, .72);
+  --nevo-card-strong: rgba(7, 17, 19, .92);
+  --nevo-border: rgba(0, 201, 167, .18);
+  --nevo-border-bright: rgba(0, 201, 167, .34);
+  --nevo-primary: #00C9A7;
+  --nevo-primary-soft: #7EE8D3;
+  --nevo-text: #F2F5F4;
+  --nevo-muted: #8E9A9A;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: #070A0D !important;
+  color: var(--nevo-text) !important;
+}
+button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+
+.nevo-auth-shell {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(0,201,167,.10), transparent 27%),
+    radial-gradient(circle at 90% 86%, rgba(126,232,211,.055), transparent 28%),
+    #070A0D;
+}
+.nevo-auth-card {
+  width: 100%;
+  max-width: 520px;
+  margin-inline: auto;
+  background: linear-gradient(145deg, rgba(16,29,31,.86), rgba(7,14,16,.82)) !important;
+  border: 1px solid rgba(0,201,167,.18) !important;
+  box-shadow: 0 28px 80px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.04) !important;
+  backdrop-filter: blur(24px) saturate(125%);
+  -webkit-backdrop-filter: blur(24px) saturate(125%);
+}
+.nevo-auth-card input,
+.nevo-auth-card textarea,
+.nevo-auth-card select {
+  background: rgba(5,11,13,.72) !important;
+  border-color: rgba(255,255,255,.075) !important;
+  border-radius: 14px !important;
+}
+.nevo-auth-card input:focus,
+.nevo-auth-card textarea:focus,
+.nevo-auth-card select:focus { border-color: rgba(0,201,167,.55) !important; box-shadow: 0 0 0 3px rgba(0,201,167,.08); }
+
+.nevo-primary-button {
+  background: linear-gradient(135deg, #008F7A 0%, #00C9A7 55%, #7EE8D3 100%);
+  color: #03110f;
+  box-shadow: 0 14px 34px rgba(0,201,167,.18), inset 0 1px 0 rgba(255,255,255,.25);
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+.nevo-primary-button:hover { transform: translateY(-1px); filter: saturate(1.06); box-shadow: 0 18px 40px rgba(0,201,167,.24), inset 0 1px 0 rgba(255,255,255,.28); }
+.nevo-secondary-button { background: rgba(9,18,20,.76); border: 1px solid rgba(255,255,255,.09); color: #E5EBEA; }
+.nevo-secondary-button:hover { border-color: rgba(0,201,167,.28); background: rgba(0,201,167,.05); }
+
+.nevo-landing {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(0,201,167,.07), transparent 25%),
+    radial-gradient(circle at 85% 42%, rgba(126,232,211,.045), transparent 27%),
+    #070A0D;
+}
+.nevo-orb { position:absolute; border-radius:9999px; pointer-events:none; filter:blur(80px); opacity:.28; }
+.nevo-orb-one { width:300px; height:300px; top:40px; right:20%; background:rgba(0,201,167,.14); }
+.nevo-orb-two { width:240px; height:240px; bottom:0; left:0; background:rgba(126,232,211,.08); }
+.nevo-phone-shell {
+  position:relative;
+  background:linear-gradient(145deg, rgba(0,201,167,.20), rgba(255,255,255,.04) 35%, rgba(0,201,167,.10));
+  border:1px solid rgba(0,201,167,.25);
+  box-shadow:0 35px 100px rgba(0,0,0,.46), 0 0 70px rgba(0,201,167,.08);
+}
+.nevo-phone-glow { position:absolute; inset:12% -8% -5%; border-radius:50%; background:rgba(0,201,167,.10); filter:blur(60px); pointer-events:none; }
+.nevo-feature-card, .nevo-step-card {
+  background:linear-gradient(145deg, rgba(13,24,26,.78), rgba(7,14,16,.74));
+  border:1px solid rgba(255,255,255,.065);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025), 0 18px 50px rgba(0,0,0,.16);
+}
+.nevo-feature-card:hover { border-color:rgba(0,201,167,.20); transform:translateY(-2px); transition:all .2s ease; }
+
+/* Reference-like glass surfaces across existing legacy components. */
+.nivo-glass-surface,
+.nivo-glass-strong,
+.glass-panel-dark {
+  background:linear-gradient(145deg, rgba(14,25,27,.78), rgba(7,15,17,.80)) !important;
+  border-color:rgba(0,201,167,.16) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035), 0 18px 50px rgba(0,0,0,.20) !important;
+}
+
+/* Edge-to-edge mobile behavior: remove artificial max-width shells while keeping safe areas. */
+@media (max-width: 767px) {
+  #nevo-mobile-container,
+  #nevo-mobile-container > * { max-width:100% !important; width:100% !important; }
+  #nevo-mobile-container .mx-auto { margin-left:0 !important; margin-right:0 !important; }
+  #nevo-mobile-container .max-w-md,
+  #nevo-mobile-container .max-w-lg,
+  #nevo-mobile-container .max-w-xl,
+  #nevo-mobile-container .max-w-2xl,
+  #nevo-mobile-container .max-w-3xl,
+  #nevo-mobile-container .max-w-4xl { max-width:none !important; }
+  .nevo-auth-card { border-radius:24px !important; }
+}
+
+/* Replace old indigo/purple treatment that survived component-level classes. */
+[class*="bg-indigo-"], [class*="bg-purple-"], [class*="bg-violet-"] { background-color:rgba(0,201,167,.07) !important; }
+[class*="text-indigo-"], [class*="text-purple-"], [class*="text-violet-"] { color:#7EE8D3 !important; }
+[class*="border-indigo-"], [class*="border-purple-"], [class*="border-violet-"] { border-color:rgba(0,201,167,.18) !important; }
+
+/* Never let normal UI accidentally inherit a legacy wine/maroon background. */
+[class*="bg-[#16090D]"], [class*="bg-[#1A080E]"], [class*="bg-[#100709]"], [class*="bg-[#090506]"] { background:#070A0D !important; }
+
+/* Inputs throughout the product use the same smoked-glass treatment. */
+input, textarea, select {
+  background-color:rgba(7,14,16,.76);
+  border-color:rgba(255,255,255,.075);
+}
+input:focus, textarea:focus, select:focus { outline:none; border-color:rgba(0,201,167,.48); }
+
+/* Bottom navigation belongs to the same glass system. */
+#nevo-mobile-container [class*="fixed bottom-0"] > div {
+  background:rgba(5,12,14,.90) !important;
+  border-top-color:rgba(0,201,167,.14) !important;
+  backdrop-filter:blur(24px) saturate(135%) !important;
+  -webkit-backdrop-filter:blur(24px) saturate(135%) !important;
+}

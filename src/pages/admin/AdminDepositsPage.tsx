@@ -74,7 +74,7 @@ export const AdminDepositsPage: React.FC = () => {
 
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-[#00C9A7]/10 text-[#00BFA6]">
+            <div className="p-2 rounded-xl bg-[#00C9A7]/10 text-[#00C9A7]">
               <Building2 className="w-6 h-6" />
             </div>
             <h1 className="text-2xl font-black text-white">Automated KoraPay Deposit Logs</h1>
@@ -86,7 +86,7 @@ export const AdminDepositsPage: React.FC = () => {
 
         <button
           onClick={fetchDeposits}
-          className="flex items-center gap-1.5 nivo-glass-surface hover:bg-[#071114] text-[#00BFA6] text-xs font-bold px-4 py-2.5 rounded-xl border border-[#00C9A7]/30 transition-all cursor-pointer shrink-0"
+          className="flex items-center gap-1.5 nivo-glass-surface hover:bg-[#071114] text-[#00C9A7] text-xs font-bold px-4 py-2.5 rounded-xl border border-[#00C9A7]/30 transition-all cursor-pointer shrink-0"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh Live Logs</span>
@@ -98,37 +98,37 @@ export const AdminDepositsPage: React.FC = () => {
         <div className="nivo-glass-surface p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
             <span className="text-xs font-bold uppercase tracking-wider">Total Deposit Volume</span>
-            <TrendingUp className="w-4 h-4 text-[#00BFA6]" />
+            <TrendingUp className="w-4 h-4 text-[#00C9A7]" />
           </div>
-          <p className="text-2xl font-black text-[#00BFA6]">₦{totalVolume.toLocaleString()}</p>
+          <p className="text-2xl font-black text-[#00C9A7]">₦{totalVolume.toLocaleString()}</p>
           <p className="text-[10px] text-zinc-500 font-bold">Auto-credited via KoraPay</p>
         </div>
 
         <div className="nivo-glass-surface p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
             <span className="text-xs font-bold uppercase tracking-wider">Successful Transactions</span>
-            <CheckCircle2 className="w-4 h-4 text-[#00BFA6]" />
+            <CheckCircle2 className="w-4 h-4 text-[#00C9A7]" />
           </div>
           <p className="text-2xl font-black text-white">{successfulCount}</p>
-          <p className="text-[10px] text-[#00BFA6] font-bold">100% Webhook Verified</p>
+          <p className="text-[10px] text-[#00C9A7] font-bold">100% Webhook Verified</p>
         </div>
 
         <div className="nivo-glass-surface p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
             <span className="text-xs font-bold uppercase tracking-wider">Pending One-Time Sessions</span>
-            <Clock className="w-4 h-4 text-[#C13A5A]" />
+            <Clock className="w-4 h-4 text-[#7EE8D3]" />
           </div>
-          <p className="text-2xl font-black text-[#C13A5A]">{pendingCount}</p>
+          <p className="text-2xl font-black text-[#7EE8D3]">{pendingCount}</p>
           <p className="text-[10px] text-zinc-500 font-bold">Awaiting User Transfer</p>
         </div>
 
         <div className="nivo-glass-surface p-5 rounded-2xl border border-zinc-800 space-y-2">
           <div className="flex items-center justify-between text-zinc-400">
             <span className="text-xs font-bold uppercase tracking-wider">KoraPay Engine</span>
-            <Zap className="w-4 h-4 text-[#00BFA6] fill-[#00BFA6]" />
+            <Zap className="w-4 h-4 text-[#00C9A7] fill-[#00C9A7]" />
           </div>
-          <p className="text-base font-black text-[#00BFA6] flex items-center gap-1.5 mt-1">
-            <ShieldCheck className="w-5 h-5 text-[#00BFA6]" />
+          <p className="text-base font-black text-[#00C9A7] flex items-center gap-1.5 mt-1">
+            <ShieldCheck className="w-5 h-5 text-[#00C9A7]" />
             <span>Automated Active</span>
           </p>
           <p className="text-[10px] text-zinc-500 font-bold">Zero Manual Approval Required</p>
@@ -190,7 +190,7 @@ export const AdminDepositsPage: React.FC = () => {
         {/* Deposits Table */}
         {loading ? (
           <div className="text-center py-12 text-zinc-500 text-xs flex items-center justify-center gap-2">
-            <RefreshCw className="w-4 h-4 animate-spin text-[#00BFA6]" />
+            <RefreshCw className="w-4 h-4 animate-spin text-[#00C9A7]" />
             <span>Loading KoraPay deposit logs...</span>
           </div>
         ) : filteredDeposits.length === 0 ? (
@@ -221,13 +221,13 @@ export const AdminDepositsPage: React.FC = () => {
                         <p className="text-[10px] text-zinc-500 font-mono">{d.userEmail}</p>
                       </td>
 
-                      <td className="py-3.5 px-3 font-black text-[#00BFA6] text-sm">
+                      <td className="py-3.5 px-3 font-black text-[#00C9A7] text-sm">
                         ₦{d.amount.toLocaleString()}
                       </td>
 
                       <td className="py-3.5 px-3">
                         <p className="font-bold text-zinc-200">{d.bankName || 'KoraPay Hosted Checkout'}</p>
-                        <p className="text-[10px] font-mono text-[#C13A5A]">
+                        <p className="text-[10px] font-mono text-[#7EE8D3]">
                           {d.accountNumber || 'Account Generated'}
                         </p>
                       </td>
@@ -238,12 +238,12 @@ export const AdminDepositsPage: React.FC = () => {
 
                       <td className="py-3.5 px-3">
                         {isApproved ? (
-                          <span className="inline-flex items-center gap-1 bg-[#00C9A7]/10 text-[#00BFA6] border border-[#00C9A7]/20 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold">
-                            <Sparkles className="w-3 h-3 text-[#00BFA6]" />
+                          <span className="inline-flex items-center gap-1 bg-[#00C9A7]/10 text-[#00C9A7] border border-[#00C9A7]/20 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold">
+                            <Sparkles className="w-3 h-3 text-[#00C9A7]" />
                             Verified & Credited
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold">
+                          <span className="inline-flex items-center gap-1 bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold">
                             <Clock className="w-3 h-3" />
                             Awaiting Webhook
                           </span>
@@ -254,8 +254,8 @@ export const AdminDepositsPage: React.FC = () => {
                         <span
                           className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
                             isApproved
-                              ? 'bg-[#00C9A7]/10 text-[#00BFA6] border-[#00C9A7]/20'
-                              : 'bg-[#00C9A7]/10 text-[#C13A5A] border-[#00C9A7]/20'
+                              ? 'bg-[#00C9A7]/10 text-[#00C9A7] border-[#00C9A7]/20'
+                              : 'bg-[#00C9A7]/10 text-[#7EE8D3] border-[#00C9A7]/20'
                           }`}
                         >
                           {isApproved ? 'SUCCESSFUL' : 'PENDING'}

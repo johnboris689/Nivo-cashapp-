@@ -33,7 +33,7 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#090506] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#070A0D] flex items-center justify-center p-4 relative overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] bg-[#00C9A7]/10 rounded-full blur-[140px] pointer-events-none"></div>
 
       <div className="w-full max-w-md nivo-glass-surface border border-[#00C9A7]/30 rounded-3xl p-8 shadow-2xl relative z-10">
@@ -42,11 +42,11 @@ export const AdminLoginPage: React.FC = () => {
             <ShieldCheck className="w-7 h-7" />
           </div>
           <h1 className="text-2xl font-black text-white">Administrator Access</h1>
-          <p className="text-xs text-[#C13A5A] font-semibold mt-1">Nevo Management Portal</p>
+          <p className="text-xs text-[#7EE8D3] font-semibold mt-1">Nevo Management Portal</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-3.5 bg-[#00C9A7]/10 border border-[#00C9A7]/30 rounded-xl text-[#C13A5A] text-xs flex items-center gap-2">
+          <div className="mb-6 p-3.5 bg-[#00C9A7]/10 border border-[#00C9A7]/30 rounded-xl text-[#7EE8D3] text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -90,7 +90,7 @@ export const AdminLoginPage: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-[#00C9A7] to-[#00C9A7] hover:from-[#00BFA6] hover:to-[#008F7A] text-black font-extrabold text-sm py-3.5 rounded-xl shadow-lg shadow-[#00C9A7]/20 flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
+            className="w-full bg-gradient-to-r from-[#00C9A7] to-[#00C9A7] hover:from-[#00C9A7] hover:to-[#008F7A] text-black font-extrabold text-sm py-3.5 rounded-xl shadow-lg shadow-[#00C9A7]/20 flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
           >
             {loading ? 'Authenticating...' : 'Sign In to Admin Portal'}
             {!loading && <ArrowRight className="w-4 h-4" />}

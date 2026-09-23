@@ -147,7 +147,7 @@ export const AdminUsersPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-white flex items-center gap-2">
-            <Users className="w-6 h-6 text-[#00BFA6]" />
+            <Users className="w-6 h-6 text-[#00C9A7]" />
             User Management & Wallets
           </h1>
           <p className="text-xs text-zinc-400 mt-1">View registered accounts, credit/debit balances, suspend or delete users</p>
@@ -158,8 +158,8 @@ export const AdminUsersPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
-              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
+              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00C9A7]'
+              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#7EE8D3]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -208,7 +208,7 @@ export const AdminUsersPage: React.FC = () => {
                       <p className="font-bold text-white flex items-center gap-1.5">
                         {u.fullName}
                         {u.isAdmin && (
-                          <span className="text-[9px] bg-[#00C9A7]/20 text-[#C13A5A] px-1.5 py-0.5 rounded border border-[#00C9A7]/30">
+                          <span className="text-[9px] bg-[#00C9A7]/20 text-[#7EE8D3] px-1.5 py-0.5 rounded border border-[#00C9A7]/30">
                             ADMIN
                           </span>
                         )}
@@ -222,13 +222,13 @@ export const AdminUsersPage: React.FC = () => {
                     </td>
 
                     <td className="py-3 px-3">
-                      <p className="font-black text-[#C13A5A]">₦{u.walletBalance.toLocaleString()}</p>
+                      <p className="font-black text-[#7EE8D3]">₦{u.walletBalance.toLocaleString()}</p>
                       <p className="text-[10px] text-zinc-500">Earnings: ₦{u.totalEarnings.toLocaleString()}</p>
                     </td>
 
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-2">
-                        <span className={`font-bold ${u.totalReferrals >= 5 ? 'text-[#00BFA6]' : 'text-[#C13A5A]'}`}>
+                        <span className={`font-bold ${u.totalReferrals >= 5 ? 'text-[#00C9A7]' : 'text-[#7EE8D3]'}`}>
                           {u.totalReferrals} / 5
                         </span>
                         <button
@@ -249,8 +249,8 @@ export const AdminUsersPage: React.FC = () => {
                         onClick={() => handleToggleActivation(u)}
                         className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border transition-all cursor-pointer ${
                           u.activationPaid
-                            ? 'bg-[#00C9A7]/20 text-[#00BFA6] border-[#00C9A7]/30 hover:bg-[#00C9A7]/30'
-                            : 'bg-[#00C9A7]/20 text-[#C13A5A] border-[#00C9A7]/30 hover:bg-[#00C9A7]/30'
+                            ? 'bg-[#00C9A7]/20 text-[#00C9A7] border-[#00C9A7]/30 hover:bg-[#00C9A7]/30'
+                            : 'bg-[#00C9A7]/20 text-[#7EE8D3] border-[#00C9A7]/30 hover:bg-[#00C9A7]/30'
                         }`}
                         title="Click to toggle activation status"
                       >
@@ -262,8 +262,8 @@ export const AdminUsersPage: React.FC = () => {
                       <span
                         className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                           u.status === 'active'
-                            ? 'bg-[#00C9A7]/10 text-[#00BFA6] border border-[#00C9A7]/20'
-                            : 'bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20'
+                            ? 'bg-[#00C9A7]/10 text-[#00C9A7] border border-[#00C9A7]/20'
+                            : 'bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20'
                         }`}
                       >
                         {u.status}
@@ -276,7 +276,7 @@ export const AdminUsersPage: React.FC = () => {
                           setSelectedUser(u);
                           setAdjustModalOpen(true);
                         }}
-                        className="bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 text-[#C13A5A] border border-[#00C9A7]/30 text-[10px] font-bold px-2 py-1 rounded-lg transition-all cursor-pointer"
+                        className="bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 text-[#7EE8D3] border border-[#00C9A7]/30 text-[10px] font-bold px-2 py-1 rounded-lg transition-all cursor-pointer"
                       >
                         Adjust Balance
                       </button>
@@ -285,8 +285,8 @@ export const AdminUsersPage: React.FC = () => {
                         onClick={() => handleToggleStatus(u)}
                         className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-all cursor-pointer ${
                           u.status === 'active'
-                            ? 'bg-[#00C9A7]/10 text-[#C13A5A] border-[#00C9A7]/30 hover:bg-[#00C9A7]/20'
-                            : 'bg-[#00C9A7]/10 text-[#00BFA6] border-[#00C9A7]/30 hover:bg-[#00C9A7]/20'
+                            ? 'bg-[#00C9A7]/10 text-[#7EE8D3] border-[#00C9A7]/30 hover:bg-[#00C9A7]/20'
+                            : 'bg-[#00C9A7]/10 text-[#00C9A7] border-[#00C9A7]/30 hover:bg-[#00C9A7]/20'
                         }`}
                       >
                         {u.status === 'active' ? 'Suspend' : 'Activate'}
@@ -295,7 +295,7 @@ export const AdminUsersPage: React.FC = () => {
                       {!u.isAdmin && (
                         <button
                           onClick={() => handleDeleteUser(u.id, u.username)}
-                          className="p-1 bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 text-[#C13A5A] border border-[#00C9A7]/30 rounded-lg transition-all cursor-pointer inline-block align-middle"
+                          className="p-1 bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 text-[#7EE8D3] border border-[#00C9A7]/30 rounded-lg transition-all cursor-pointer inline-block align-middle"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -329,7 +329,7 @@ export const AdminUsersPage: React.FC = () => {
             <form onSubmit={handleAdjustSubmit} className="space-y-4">
               <div className="nivo-glass-surface p-3 rounded-xl border border-zinc-800">
                 <p className="text-xs text-zinc-400">Current Wallet Balance</p>
-                <p className="text-lg font-black text-[#C13A5A]">₦{selectedUser.walletBalance.toLocaleString()}</p>
+                <p className="text-lg font-black text-[#7EE8D3]">₦{selectedUser.walletBalance.toLocaleString()}</p>
               </div>
 
               <div>
@@ -340,7 +340,7 @@ export const AdminUsersPage: React.FC = () => {
                     onClick={() => setAdjustType('credit')}
                     className={`py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
                       adjustType === 'credit'
-                        ? 'bg-[#00C9A7] text-black border-[#00BFA6]'
+                        ? 'bg-[#00C9A7] text-black border-[#00C9A7]'
                         : 'nivo-glass-surface text-zinc-400 border-zinc-800'
                     }`}
                   >
@@ -351,7 +351,7 @@ export const AdminUsersPage: React.FC = () => {
                     onClick={() => setAdjustType('debit')}
                     className={`py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
                       adjustType === 'debit'
-                        ? 'bg-[#00C9A7] text-white border-[#C13A5A]'
+                        ? 'bg-[#00C9A7] text-white border-[#7EE8D3]'
                         : 'nivo-glass-surface text-zinc-400 border-zinc-800'
                     }`}
                   >
@@ -388,7 +388,7 @@ export const AdminUsersPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={actionLoading}
-                className="w-full bg-[#00C9A7] hover:bg-[#00BFA6] disabled:opacity-50 text-black font-extrabold text-xs py-3.5 rounded-xl transition-all cursor-pointer"
+                className="w-full bg-[#00C9A7] hover:bg-[#00C9A7] disabled:opacity-50 text-black font-extrabold text-xs py-3.5 rounded-xl transition-all cursor-pointer"
               >
                 {actionLoading ? 'Processing...' : 'Apply Wallet Adjustment'}
               </button>
@@ -417,10 +417,10 @@ export const AdminUsersPage: React.FC = () => {
               <div className="nivo-glass-surface p-3.5 rounded-xl border border-zinc-800 flex justify-between items-center">
                 <div>
                   <p className="text-xs text-zinc-400">Current Referrals</p>
-                  <p className="text-base font-black text-[#C13A5A]">{selectedUser.totalReferrals || 0} / 5</p>
+                  <p className="text-base font-black text-[#7EE8D3]">{selectedUser.totalReferrals || 0} / 5</p>
                 </div>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                  (selectedUser.totalReferrals || 0) >= 5 ? 'bg-[#00C9A7]/20 text-[#00BFA6]' : 'bg-[#00C9A7]/20 text-[#C13A5A]'
+                  (selectedUser.totalReferrals || 0) >= 5 ? 'bg-[#00C9A7]/20 text-[#00C9A7]' : 'bg-[#00C9A7]/20 text-[#7EE8D3]'
                 }`}>
                   {(selectedUser.totalReferrals || 0) >= 5 ? 'Requirement Met ✅' : 'Below Threshold ❌'}
                 </span>
@@ -443,7 +443,7 @@ export const AdminUsersPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setNewRefCount('5')}
-                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-[#C13A5A] font-bold text-xs py-2 rounded-xl border border-zinc-700 cursor-pointer"
+                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-[#7EE8D3] font-bold text-xs py-2 rounded-xl border border-zinc-700 cursor-pointer"
                 >
                   Quick Set: 5 Referrals
                 </button>
@@ -452,7 +452,7 @@ export const AdminUsersPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={actionLoading}
-                className="w-full bg-[#00C9A7] hover:bg-[#00BFA6] disabled:opacity-50 text-black font-extrabold text-xs py-3.5 rounded-xl transition-all cursor-pointer"
+                className="w-full bg-[#00C9A7] hover:bg-[#00C9A7] disabled:opacity-50 text-black font-extrabold text-xs py-3.5 rounded-xl transition-all cursor-pointer"
               >
                 {actionLoading ? 'Saving...' : 'Update Referral Count'}
               </button>

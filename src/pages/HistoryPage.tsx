@@ -35,7 +35,7 @@ export const HistoryPage: React.FC = () => {
     <div className="space-y-5 animate-fade-in pb-20">
       <div>
         <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-          <History className="w-6 h-6 text-[#C13A5A]" />
+          <History className="w-6 h-6 text-[#7EE8D3]" />
           Full Transaction History
         </h1>
         <p className="text-xs text-slate-400 mt-1">
@@ -52,7 +52,7 @@ export const HistoryPage: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by reference or note..."
-            className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-2xl pl-10 pr-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#C13A5A] transition-colors"
+            className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-2xl pl-10 pr-4 py-2.5 text-white text-xs focus:outline-none focus:border-[#7EE8D3] transition-colors"
           />
         </div>
 
@@ -63,7 +63,7 @@ export const HistoryPage: React.FC = () => {
               onClick={() => setFilterType(type)}
               className={`px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer ${
                 filterType === type
-                  ? 'bg-gradient-to-r from-[#008F7A] to-[#00BFA6] text-white shadow-lg shadow-[#008F7A]/25'
+                  ? 'bg-gradient-to-r from-[#008F7A] to-[#00C9A7] text-white shadow-lg shadow-[#008F7A]/25'
                   : 'bg-[#071114] text-slate-400 hover:text-white border border-white/10'
               }`}
             >
@@ -100,8 +100,8 @@ export const HistoryPage: React.FC = () => {
                     <div
                       className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
                         isCredit
-                          ? 'bg-[#00C9A7]/10 text-[#00BFA6] border border-[#00C9A7]/20'
-                          : 'bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20'
+                          ? 'bg-[#00C9A7]/10 text-[#00C9A7] border border-[#00C9A7]/20'
+                          : 'bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20'
                       }`}
                     >
                       {isCredit ? (
@@ -112,7 +112,7 @@ export const HistoryPage: React.FC = () => {
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black uppercase text-[#C13A5A] bg-[#00BFA6]/10 border border-[#00BFA6]/20 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-black uppercase text-[#7EE8D3] bg-[#00C9A7]/10 border border-[#00C9A7]/20 px-2 py-0.5 rounded-full">
                           {tx.type.replace('_', ' ')}
                         </span>
                         <span className="font-mono text-[10px] text-slate-400 font-bold">{tx.reference}</span>
@@ -131,10 +131,10 @@ export const HistoryPage: React.FC = () => {
                     <span
                       className={`text-[9px] font-bold px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 mt-0.5 ${
                         tx.status === 'completed' || tx.status === 'approved'
-                          ? 'bg-[#00C9A7]/10 text-[#00BFA6] border border-[#00C9A7]/20'
+                          ? 'bg-[#00C9A7]/10 text-[#00C9A7] border border-[#00C9A7]/20'
                           : tx.status === 'pending'
-                          ? 'bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20'
-                          : 'bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20'
+                          ? 'bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20'
+                          : 'bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20'
                       }`}
                     >
                       {tx.status === 'completed' || tx.status === 'approved' ? (

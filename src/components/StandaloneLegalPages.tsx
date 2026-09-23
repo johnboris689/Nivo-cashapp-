@@ -22,7 +22,7 @@ function useNevoSettings() {
 
 function LegalHeader({ navigateTo, label, icon }: { navigateTo: (path: string) => void; label: string; icon: React.ReactNode }) {
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#050507]/90 backdrop-blur-md border-b border-white/5 px-4 sm:px-6 py-4">
+    <header className="sticky top-0 z-50 w-full bg-[#070A0D]/90 backdrop-blur-md border-b border-white/5 px-4 sm:px-6 py-4">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3">
           <NevoLogo size={38} compact />
@@ -64,7 +64,7 @@ export function StandaloneTermsPage({ navigateTo }: StandalonePageProps) {
   useEffect(() => { document.title = 'Terms of Service | Nevo'; }, []);
 
   return (
-    <div className="min-h-screen bg-[#050507] text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#070A0D] text-slate-100 flex flex-col font-sans">
       <LegalHeader navigateTo={navigateTo} label="TERMS OF SERVICE" icon={<Scale className="h-4.5 w-4.5 text-teal-400" />} />
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-8">
         <div>
@@ -98,7 +98,7 @@ export function StandaloneTermsPage({ navigateTo }: StandalonePageProps) {
           </section>
         </GlassCard>
       </main>
-      <footer className="w-full bg-[#050507]/90 border-t border-white/5 py-8 px-4 text-center mt-auto">
+      <footer className="w-full bg-[#070A0D]/90 border-t border-white/5 py-8 px-4 text-center mt-auto">
         <p className="text-xs text-slate-500 font-mono tracking-wider">© 2026 Nevo. All rights reserved.</p>
       </footer>
     </div>
@@ -124,7 +124,7 @@ export function StandalonePrivacyPage({ navigateTo }: StandalonePageProps) {
   useEffect(() => { document.title = 'Privacy Policy | Nevo'; }, []);
 
   return (
-    <div className="min-h-screen bg-[#050507] text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#070A0D] text-slate-100 flex flex-col font-sans">
       <LegalHeader navigateTo={navigateTo} label="PRIVACY POLICY" icon={<ShieldCheck className="h-4.5 w-4.5 text-teal-400" />} />
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-8">
         <div>
@@ -164,7 +164,7 @@ export function StandalonePrivacyPage({ navigateTo }: StandalonePageProps) {
           </section>
         </GlassCard>
       </main>
-      <footer className="w-full bg-[#050507]/90 border-t border-white/5 py-8 px-4 text-center mt-auto">
+      <footer className="w-full bg-[#070A0D]/90 border-t border-white/5 py-8 px-4 text-center mt-auto">
         <p className="text-xs text-slate-500 font-mono tracking-wider">© 2026 Nevo. All rights reserved.</p>
       </footer>
     </div>
@@ -173,7 +173,7 @@ export function StandalonePrivacyPage({ navigateTo }: StandalonePageProps) {
 
 export function Custom404Page({ navigateTo }: StandalonePageProps) {
   return (
-    <div className="min-h-screen bg-[#050507] text-slate-100 flex flex-col items-center justify-center p-4 font-sans text-center">
+    <div className="min-h-screen bg-[#070A0D] text-slate-100 flex flex-col items-center justify-center p-4 font-sans text-center">
       <div className="max-w-md w-full space-y-6">
         <div className="mx-auto h-20 w-20 bg-teal-950/80 border border-teal-500/40 rounded-3xl flex items-center justify-center shadow-2xl shadow-teal-500/20 animate-pulse">
           <AlertTriangle className="h-10 w-10 text-rose-400" />

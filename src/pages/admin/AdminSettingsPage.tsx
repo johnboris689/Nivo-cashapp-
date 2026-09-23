@@ -125,8 +125,8 @@ export const AdminSettingsPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
-              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
+              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00C9A7]'
+              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#7EE8D3]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -142,7 +142,7 @@ export const AdminSettingsPage: React.FC = () => {
           <div className="p-5 sm:p-6 nivo-glass-surface border border-[#00C9A7]/30 rounded-3xl space-y-5 shadow-2xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#00C9A7]/20 text-[#00BFA6] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-[#00C9A7]/20 text-[#00C9A7] flex items-center justify-center">
                   <CreditCard className="w-5 h-5" />
                 </div>
                 <div>
@@ -172,13 +172,13 @@ export const AdminSettingsPage: React.FC = () => {
               <select
                 value={paymentProvider}
                 onChange={(e) => setPaymentProvider(e.target.value as any)}
-                className="w-full bg-[#16090D] border border-zinc-700 rounded-xl px-4 py-3 text-white text-xs font-bold focus:outline-none focus:border-[#00C9A7] transition-colors cursor-pointer"
+                className="w-full bg-[#0B1517] border border-zinc-700 rounded-xl px-4 py-3 text-white text-xs font-bold focus:outline-none focus:border-[#00C9A7] transition-colors cursor-pointer"
               >
                   <option value="korapay">KoraPay Gateway</option>
               </select>
               <p className="text-[11px] text-zinc-400">
                 Current active provider resolved by backend:{' '}
-                <span className="font-bold text-[#C13A5A] uppercase">
+                <span className="font-bold text-[#7EE8D3] uppercase">
                   {paymentOverview?.activeProvider || 'None Configured'}
                 </span>
               </p>
@@ -193,18 +193,18 @@ export const AdminSettingsPage: React.FC = () => {
                     key={prov.id}
                     className={`p-4 rounded-2xl border transition-all ${
                       prov.isConfigured
-                        ? 'bg-[#16090D] border-[#00C9A7]/30'
-                        : 'bg-[#16090D] border-zinc-800'
+                        ? 'bg-[#0B1517] border-[#00C9A7]/30'
+                        : 'bg-[#0B1517] border-zinc-800'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-black text-sm text-white">{prov.name}</span>
                       {prov.isConfigured ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#00C9A7]/20 text-[#00BFA6] border border-[#00C9A7]/30 flex items-center gap-1">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#00C9A7]/20 text-[#00C9A7] border border-[#00C9A7]/30 flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" /> Ready
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#00C9A7]/15 text-[#C13A5A] border border-[#00C9A7]/30">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#00C9A7]/15 text-[#7EE8D3] border border-[#00C9A7]/30">
                           Missing Keys
                         </span>
                       )}
@@ -212,12 +212,12 @@ export const AdminSettingsPage: React.FC = () => {
 
                     <div className="mt-3 space-y-2 text-[11px]">
                       {prov.isConfigured ? (
-                        <p className="text-[#00BFA6]/90 font-medium">
+                        <p className="text-[#00C9A7]/90 font-medium">
                           ✓ Secret key configured in environment. Available for deposits.
                         </p>
                       ) : (
                         <div className="text-zinc-400 space-y-1">
-                          <p className="text-[#C13A5A]/90 font-semibold">Missing environment variables:</p>
+                          <p className="text-[#7EE8D3]/90 font-semibold">Missing environment variables:</p>
                           <ul className="list-disc list-inside text-[10px] font-mono text-zinc-300">
                             {prov.missingVariables.map((v) => (
                               <li key={v}>{v}</li>
@@ -239,7 +239,7 @@ export const AdminSettingsPage: React.FC = () => {
                             title="Copy Webhook URL"
                           >
                             {copiedUrl === prov.id ? (
-                              <Check className="w-3 h-3 text-[#00BFA6]" />
+                              <Check className="w-3 h-3 text-[#00C9A7]" />
                             ) : (
                               <Copy className="w-3 h-3" />
                             )}
@@ -294,7 +294,7 @@ export const AdminSettingsPage: React.FC = () => {
                 required
                 value={minDeposit}
                 onChange={(e) => setMinDeposit(e.target.value)}
-                className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-[#C13A5A] font-bold text-xs focus:outline-none focus:border-[#00C9A7]"
+                className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-[#7EE8D3] font-bold text-xs focus:outline-none focus:border-[#00C9A7]"
               />
             </div>
 
@@ -305,7 +305,7 @@ export const AdminSettingsPage: React.FC = () => {
                 required
                 value={minWithdrawal}
                 onChange={(e) => setMinWithdrawal(e.target.value)}
-                className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-[#C13A5A] font-bold text-xs focus:outline-none focus:border-[#00C9A7]"
+                className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-[#7EE8D3] font-bold text-xs focus:outline-none focus:border-[#00C9A7]"
               />
             </div>
 
@@ -316,7 +316,7 @@ export const AdminSettingsPage: React.FC = () => {
                 required
                 value={activationFeeAmount}
                 onChange={(e) => setActivationFeeAmount(e.target.value)}
-                className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-[#C13A5A] font-bold text-xs focus:outline-none focus:border-[#00C9A7]"
+                className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-[#7EE8D3] font-bold text-xs focus:outline-none focus:border-[#00C9A7]"
               />
             </div>
           </div>
@@ -335,7 +335,7 @@ export const AdminSettingsPage: React.FC = () => {
           <div className="p-4 nivo-glass-surface border border-zinc-800 rounded-2xl flex items-center justify-between">
             <div>
               <p className="text-xs font-bold text-white flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-[#C13A5A]" />
+                <ShieldAlert className="w-4 h-4 text-[#7EE8D3]" />
                 Maintenance Mode
               </p>
               <p className="text-[11px] text-zinc-400 mt-0.5">When active, non-admin users cannot access dashboard features.</p>
@@ -357,7 +357,7 @@ export const AdminSettingsPage: React.FC = () => {
           <button
             type="submit"
             disabled={saving}
-            className="w-full bg-[#00C9A7] hover:bg-[#00BFA6] disabled:opacity-50 text-black font-extrabold text-xs py-3.5 rounded-xl shadow-lg shadow-[#00C9A7]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+            className="w-full bg-[#00C9A7] hover:bg-[#00C9A7] disabled:opacity-50 text-black font-extrabold text-xs py-3.5 rounded-xl shadow-lg shadow-[#00C9A7]/20 transition-all cursor-pointer flex items-center justify-center gap-2"
           >
             <Save className="w-4 h-4" />
             <span>{saving ? 'Saving System Changes...' : 'Save Configuration Changes'}</span>

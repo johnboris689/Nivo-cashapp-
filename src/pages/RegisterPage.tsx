@@ -60,7 +60,7 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#100709] flex items-center justify-center p-4 relative overflow-hidden py-12">
+    <div className="min-h-screen bg-[#070A0D] flex items-center justify-center p-4 relative overflow-hidden py-12">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#008F7A]/10 rounded-full blur-[140px] pointer-events-none"></div>
 
@@ -68,11 +68,11 @@ export const RegisterPage: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-6">
           <Link to="/" className="inline-flex items-center gap-2.5 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#008F7A] to-[#C13A5A] flex items-center justify-center shadow-lg shadow-[#00C9A7]/20">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#008F7A] to-[#7EE8D3] flex items-center justify-center shadow-lg shadow-[#00C9A7]/20">
               <Zap className="w-6 h-6 text-white fill-white" />
             </div>
             <span className="font-black text-2xl tracking-tight text-white">
-              NIVO <span className="text-[#C13A5A]">CASH</span>
+              NIVO <span className="text-[#7EE8D3]">CASH</span>
             </span>
           </Link>
           <h1 className="text-xl font-black text-white mt-1">Create Your Account</h1>
@@ -82,8 +82,8 @@ export const RegisterPage: React.FC = () => {
         </div>
 
         {referralCode && (
-          <div className="mb-6 bg-gradient-to-r from-[#008F7A]/20 to-[#00BFA6]/20 border border-[#C13A5A]/30 p-3.5 rounded-2xl flex items-center gap-3 text-[#D46A83] text-xs font-bold">
-            <Gift className="w-5 h-5 shrink-0 text-[#C13A5A]" />
+          <div className="mb-6 bg-gradient-to-r from-[#008F7A]/20 to-[#00C9A7]/20 border border-[#7EE8D3]/30 p-3.5 rounded-2xl flex items-center gap-3 text-[#7EE8D3] text-xs font-bold">
+            <Gift className="w-5 h-5 shrink-0 text-[#7EE8D3]" />
             <div>
               <p className="text-white font-extrabold">Referred by Code: {referralCode}</p>
               <p className="text-[11px] text-slate-300 font-normal">
@@ -94,8 +94,8 @@ export const RegisterPage: React.FC = () => {
         )}
 
         {error && (
-          <div className="mb-6 p-3.5 bg-[#00C9A7]/10 border border-[#00C9A7]/30 rounded-xl text-[#C13A5A] text-xs flex items-center gap-2.5 font-semibold">
-            <AlertCircle className="w-4 h-4 shrink-0 text-[#C13A5A]" />
+          <div className="mb-6 p-3.5 bg-[#00C9A7]/10 border border-[#00C9A7]/30 rounded-xl text-[#7EE8D3] text-xs flex items-center gap-2.5 font-semibold">
+            <AlertCircle className="w-4 h-4 shrink-0 text-[#7EE8D3]" />
             <span>{error}</span>
           </div>
         )}
@@ -114,7 +114,7 @@ export const RegisterPage: React.FC = () => {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="John Doe"
-                  className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#C13A5A] transition-colors"
+                  className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#7EE8D3] transition-colors"
                 />
               </div>
             </div>
@@ -133,7 +133,7 @@ export const RegisterPage: React.FC = () => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="johndoe"
-                  className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-8 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#C13A5A] transition-colors"
+                  className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-8 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#7EE8D3] transition-colors"
                 />
               </div>
             </div>
@@ -152,7 +152,7 @@ export const RegisterPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="john@example.com"
-                  className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#C13A5A] transition-colors"
+                  className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#7EE8D3] transition-colors"
                 />
               </div>
             </div>
@@ -169,7 +169,7 @@ export const RegisterPage: React.FC = () => {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="08012345678"
-                  className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#C13A5A] transition-colors"
+                  className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#7EE8D3] transition-colors"
                 />
               </div>
             </div>
@@ -187,7 +187,7 @@ export const RegisterPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 6 characters"
-                className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-10 py-3 text-white text-sm focus:outline-none focus:border-[#C13A5A] transition-colors"
+                className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-10 py-3 text-white text-sm focus:outline-none focus:border-[#7EE8D3] transition-colors"
               />
               <button
                 type="button"
@@ -204,13 +204,13 @@ export const RegisterPage: React.FC = () => {
               Referral Code (Optional)
             </label>
             <div className="relative">
-              <Gift className="w-4 h-4 text-[#C13A5A] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Gift className="w-4 h-4 text-[#7EE8D3] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={referralCode}
                 onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
                 placeholder="e.g. NIVO8912"
-                className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-4 py-3 text-[#C13A5A] font-mono font-bold text-sm focus:outline-none focus:border-[#C13A5A] transition-colors uppercase"
+                className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-4 py-3 text-[#7EE8D3] font-mono font-bold text-sm focus:outline-none focus:border-[#7EE8D3] transition-colors uppercase"
               />
             </div>
           </div>
@@ -218,7 +218,7 @@ export const RegisterPage: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] disabled:opacity-50 text-white font-black text-sm py-3.5 rounded-xl shadow-lg shadow-[#008F7A]/25 flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
+            className="w-full bg-gradient-to-r from-[#008F7A] to-[#00C9A7] hover:from-[#00C9A7] hover:to-[#7EE8D3] disabled:opacity-50 text-white font-black text-sm py-3.5 rounded-xl shadow-lg shadow-[#008F7A]/25 flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
           >
             {loading ? 'Creating Your Account...' : 'Complete Free Registration'}
             {!loading && <ArrowRight className="w-4 h-4" />}
@@ -227,7 +227,7 @@ export const RegisterPage: React.FC = () => {
 
         <div className="mt-8 text-center text-xs text-slate-400 border-t border-white/10 pt-6">
           Already have an account?{' '}
-          <Link to="/login" className="font-black text-[#C13A5A] hover:underline">
+          <Link to="/login" className="font-black text-[#7EE8D3] hover:underline">
             Sign In Here
           </Link>
         </div>

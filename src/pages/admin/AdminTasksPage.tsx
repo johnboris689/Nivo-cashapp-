@@ -228,8 +228,8 @@ export const AdminTasksPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
-              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
+              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00C9A7]'
+              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#7EE8D3]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -273,7 +273,7 @@ export const AdminTasksPage: React.FC = () => {
                       className="flex items-center gap-1 text-xs font-bold transition-colors cursor-pointer"
                     >
                       {task.enabled ? (
-                        <span className="text-[#00BFA6] flex items-center gap-1">
+                        <span className="text-[#00C9A7] flex items-center gap-1">
                           <ToggleRight className="w-5 h-5" /> Enabled
                         </span>
                       ) : (
@@ -292,7 +292,7 @@ export const AdminTasksPage: React.FC = () => {
                       </button>
                       <button
                         onClick={() => handleDelete(task.id, task.title)}
-                        className="p-1.5 bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 text-[#C13A5A] border border-[#00C9A7]/30 rounded-lg transition-all cursor-pointer"
+                        className="p-1.5 bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 text-[#7EE8D3] border border-[#00C9A7]/30 rounded-lg transition-all cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -364,10 +364,10 @@ export const AdminTasksPage: React.FC = () => {
                         <span
                           className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
                             sub.status === 'pending_verification'
-                              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
+                              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#7EE8D3]'
                               : sub.status === 'claimed'
-                              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
-                              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
+                              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00C9A7]'
+                              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#7EE8D3]'
                           }`}
                         >
                           {sub.status === 'pending_verification' ? 'Pending Review' : sub.status}
@@ -409,7 +409,7 @@ export const AdminTasksPage: React.FC = () => {
                         <button
                           onClick={() => handleRejectSubmission(sub)}
                           disabled={processingSubmissionId === sub.id}
-                          className="flex items-center gap-1.5 bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 disabled:opacity-50 text-[#C13A5A] border border-[#00C9A7]/30 font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer"
+                          className="flex items-center gap-1.5 bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 disabled:opacity-50 text-[#7EE8D3] border border-[#00C9A7]/30 font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer"
                         >
                           <XCircle className="w-4 h-4" />
                           <span>Reject</span>

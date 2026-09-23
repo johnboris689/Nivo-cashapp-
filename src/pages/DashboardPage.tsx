@@ -75,7 +75,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
               particleCount: 120,
               spread: 80,
               origin: { y: 0.6 },
-              colors: ['#071114', '#008F7A', '#00BFA6', '#C13A5A'],
+              colors: ['#071114', '#008F7A', '#00C9A7', '#7EE8D3'],
             });
             await refreshUser();
             await fetchData();
@@ -135,7 +135,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
       {/* Greeting Banner */}
       <div className="flex items-center justify-between nivo-glass-surface px-4 py-3.5 rounded-2xl border border-white/10 shadow-lg">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#008F7A] to-[#C13A5A] text-white flex items-center justify-center font-black text-sm shadow-md shadow-[#00C9A7]/20 border border-[#C13A5A]/30">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#008F7A] to-[#7EE8D3] text-white flex items-center justify-center font-black text-sm shadow-md shadow-[#00C9A7]/20 border border-[#7EE8D3]/30">
             {user?.fullName?.charAt(0) || 'U'}
           </div>
           <div>
@@ -145,7 +145,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
             <p className="text-[11px] text-slate-400">Welcome to Nevo</p>
           </div>
         </div>
-        <span className="bg-[#00C9A7]/10 text-[#00BFA6] text-[10px] font-bold px-3 py-1 rounded-full border border-[#00C9A7]/20 flex items-center gap-1.5 shadow-sm">
+        <span className="bg-[#00C9A7]/10 text-[#00C9A7] text-[10px] font-bold px-3 py-1 rounded-full border border-[#00C9A7]/20 flex items-center gap-1.5 shadow-sm">
           <ShieldCheck className="w-3.5 h-3.5" />
           Verified
         </span>
@@ -156,17 +156,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
         <div
           className={`p-4 rounded-2xl border flex items-center justify-between text-xs font-bold animate-fade-in shadow-xl ${
             paymentNotice.type === 'success'
-              ? 'bg-[#00C9A7]/15 border-[#00C9A7]/30 text-[#C13A5A]'
+              ? 'bg-[#00C9A7]/15 border-[#00C9A7]/30 text-[#7EE8D3]'
               : paymentNotice.type === 'error'
-              ? 'bg-[#00C9A7]/15 border-[#00C9A7]/30 text-[#D46A83]'
-              : 'bg-[#00C9A7]/15 border-[#00C9A7]/30 text-[#D46A83]'
+              ? 'bg-[#00C9A7]/15 border-[#00C9A7]/30 text-[#7EE8D3]'
+              : 'bg-[#00C9A7]/15 border-[#00C9A7]/30 text-[#7EE8D3]'
           }`}
         >
           <div className="flex items-center gap-2.5">
             {paymentNotice.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-[#00BFA6] shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-[#00C9A7] shrink-0" />
             ) : (
-              <ShieldCheck className="w-4 h-4 text-[#C13A5A] shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-[#7EE8D3] shrink-0" />
             )}
             <span>{paymentNotice.message}</span>
           </div>
@@ -181,20 +181,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
       )}
 
       {/* Nivo Wallet Balance Card — compact glass fintech presentation */}
-      <div className="nivo-glass-strong w-full rounded-[24px] p-4 sm:p-5 text-white shadow-2xl relative overflow-hidden border border-[#C13A5A]/25">
+      <div className="nivo-glass-strong w-full rounded-[24px] p-4 sm:p-5 text-white shadow-2xl relative overflow-hidden border border-[#7EE8D3]/25">
         {/* Card Decorative Blurs & Accents */}
-        <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-[#C13A5A]/12 blur-3xl pointer-events-none" />
-        <div className="absolute top-0 right-1/4 w-36 h-36 rounded-full bg-[#00BFA6]/10 blur-2xl pointer-events-none" />
+        <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-[#7EE8D3]/12 blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-36 h-36 rounded-full bg-[#00C9A7]/10 blur-2xl pointer-events-none" />
 
         <div className="flex items-center justify-between relative z-10">
-          <span className="text-[11px] font-bold text-[#D46A83]/90 uppercase tracking-wider">
+          <span className="text-[11px] font-bold text-[#7EE8D3]/90 uppercase tracking-wider">
             Wallet Balance
           </span>
           <button
             onClick={() => setShowBalance(!showBalance)}
             className="flex items-center gap-1.5 bg-black/20 hover:bg-black/30 text-white text-[11px] font-bold px-3 py-1 rounded-full backdrop-blur-md transition-all cursor-pointer border border-white/10"
           >
-            {showBalance ? <EyeOff className="w-3.5 h-3.5 text-[#D46A83]" /> : <Eye className="w-3.5 h-3.5 text-[#D46A83]" />}
+            {showBalance ? <EyeOff className="w-3.5 h-3.5 text-[#7EE8D3]" /> : <Eye className="w-3.5 h-3.5 text-[#7EE8D3]" />}
             <span>{showBalance ? 'Hide' : 'Show'}</span>
           </button>
         </div>
@@ -206,7 +206,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
               : '••••••••'}
           </h2>
           <div className="text-right bg-black/20 px-3 py-1.5 rounded-xl border border-white/10 shrink-0">
-            <span className="text-[10px] font-bold text-[#D46A83] uppercase block">Total Earned</span>
+            <span className="text-[10px] font-bold text-[#7EE8D3] uppercase block">Total Earned</span>
             <span className="text-xs font-black text-white">
               ₦{user?.totalEarnings.toLocaleString() || '0.00'}
             </span>
@@ -226,7 +226,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
             onClick={onOpenWithdraw}
             className="flex-1 bg-black/30 hover:bg-black/40 border border-white/20 active:scale-95 text-white transition-all text-xs font-black h-10 rounded-xl flex items-center justify-center gap-2 backdrop-blur-md cursor-pointer"
           >
-            <ArrowUpRight className="w-4 h-4 text-[#D46A83]" />
+            <ArrowUpRight className="w-4 h-4 text-[#7EE8D3]" />
             <span>Withdraw</span>
           </button>
         </div>
@@ -247,7 +247,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
                   onClick={action.action}
                   className="flex flex-col items-center gap-2 group cursor-pointer"
                 >
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl nivo-glass-surface border border-[#00C9A7]/20 flex items-center justify-center text-[#C13A5A] group-hover:border-[#C13A5A]/50 group-hover:bg-[#008F7A]/20 group-hover:text-white group-active:scale-95 transition-all shadow-md">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl nivo-glass-surface border border-[#00C9A7]/20 flex items-center justify-center text-[#7EE8D3] group-hover:border-[#7EE8D3]/50 group-hover:bg-[#008F7A]/20 group-hover:text-white group-active:scale-95 transition-all shadow-md">
                     <Icon className="w-5 h-5" />
                   </div>
                   <span className="text-[10px] font-semibold text-slate-300 group-hover:text-white truncate max-w-full">
@@ -262,7 +262,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
                   to={action.path!}
                   className="flex flex-col items-center gap-2 group cursor-pointer"
                 >
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl nivo-glass-surface border border-[#00C9A7]/20 flex items-center justify-center text-[#C13A5A] group-hover:border-[#C13A5A]/50 group-hover:bg-[#008F7A]/20 group-hover:text-white group-active:scale-95 transition-all shadow-md">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl nivo-glass-surface border border-[#00C9A7]/20 flex items-center justify-center text-[#7EE8D3] group-hover:border-[#7EE8D3]/50 group-hover:bg-[#008F7A]/20 group-hover:text-white group-active:scale-95 transition-all shadow-md">
                     <Icon className="w-5 h-5" />
                   </div>
                   <span className="text-[10px] font-semibold text-slate-300 group-hover:text-white truncate max-w-full">
@@ -312,10 +312,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
           <div>
             <div className="flex justify-between items-center mb-3.5">
               <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
-                <Zap className="w-4 h-4 text-[#C13A5A]" />
+                <Zap className="w-4 h-4 text-[#7EE8D3]" />
                 <span>Referral Earnings</span>
               </h3>
-              <span className="text-[#C13A5A] text-[10px] font-black bg-[#00BFA6]/10 px-3 py-1 rounded-full border border-[#00BFA6]/30">
+              <span className="text-[#7EE8D3] text-[10px] font-black bg-[#00C9A7]/10 px-3 py-1 rounded-full border border-[#00C9A7]/30">
                 ₦{bonusAmount.toLocaleString()} / REGISTRATION
               </span>
             </div>
@@ -332,7 +332,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
                 </div>
                 <button
                   onClick={copyReferralLink}
-                  className="bg-[#00BFA6]/10 text-[#C13A5A] hover:bg-[#C13A5A] hover:text-slate-950 text-[10px] font-black px-3 py-1.5 rounded-xl shrink-0 transition-all cursor-pointer border border-[#00BFA6]/20"
+                  className="bg-[#00C9A7]/10 text-[#7EE8D3] hover:bg-[#7EE8D3] hover:text-slate-950 text-[10px] font-black px-3 py-1.5 rounded-xl shrink-0 transition-all cursor-pointer border border-[#00C9A7]/20"
                 >
                   {copiedLink ? 'COPIED' : 'COPY'}
                 </button>
@@ -345,7 +345,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
                 </div>
                 <button
                   onClick={copyReferralCode}
-                  className="bg-[#00BFA6]/10 text-[#C13A5A] hover:bg-[#C13A5A] hover:text-slate-950 text-[10px] font-black px-3 py-1.5 rounded-xl shrink-0 transition-all cursor-pointer border border-[#00BFA6]/20"
+                  className="bg-[#00C9A7]/10 text-[#7EE8D3] hover:bg-[#7EE8D3] hover:text-slate-950 text-[10px] font-black px-3 py-1.5 rounded-xl shrink-0 transition-all cursor-pointer border border-[#00C9A7]/20"
                 >
                   {copiedCode ? 'COPIED' : 'COPY'}
                 </button>
@@ -355,7 +355,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
 
           <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] font-medium text-slate-400">
             <span>Instant payouts on verified referrals</span>
-            <Link to="/referrals" className="text-[#C13A5A] hover:underline flex items-center gap-1 font-bold">
+            <Link to="/referrals" className="text-[#7EE8D3] hover:underline flex items-center gap-1 font-bold">
               <span>Analytics</span>
               <ArrowRight className="w-3 h-3" />
             </Link>
@@ -367,10 +367,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
           <div>
             <div className="flex items-center justify-between mb-3.5">
               <h3 className="font-extrabold text-white text-sm flex items-center gap-1.5">
-                <CheckSquare className="w-4 h-4 text-[#C13A5A]" />
+                <CheckSquare className="w-4 h-4 text-[#7EE8D3]" />
                 <span>Daily Tasks</span>
               </h3>
-              <Link to="/tasks" className="text-[11px] font-bold text-[#C13A5A] hover:underline">
+              <Link to="/tasks" className="text-[11px] font-bold text-[#7EE8D3] hover:underline">
                 View All
               </Link>
             </div>
@@ -386,16 +386,16 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
                   >
                     <div className="min-w-0 pr-2">
                       <p className="text-xs font-bold text-white truncate">{task.title}</p>
-                      <p className="text-[10px] text-[#C13A5A] font-black">+₦{task.rewardAmount}</p>
+                      <p className="text-[10px] text-[#7EE8D3] font-black">+₦{task.rewardAmount}</p>
                     </div>
                     {task.completed ? (
-                      <span className="text-[9px] font-bold text-[#00BFA6] bg-[#00C9A7]/10 px-2.5 py-1 rounded-full border border-[#00C9A7]/20 shrink-0">
+                      <span className="text-[9px] font-bold text-[#00C9A7] bg-[#00C9A7]/10 px-2.5 py-1 rounded-full border border-[#00C9A7]/20 shrink-0">
                         Done
                       </span>
                     ) : (
                       <Link
                         to="/tasks"
-                        className="text-[10px] font-black bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white px-3 py-1.5 rounded-xl shrink-0"
+                        className="text-[10px] font-black bg-gradient-to-r from-[#008F7A] to-[#00C9A7] hover:from-[#00C9A7] hover:to-[#7EE8D3] text-white px-3 py-1.5 rounded-xl shrink-0"
                       >
                         Start
                       </Link>
@@ -418,7 +418,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
       <div className="nivo-glass-surface border border-white/10 rounded-3xl p-5 shadow-xl">
         <div className="flex items-center justify-between mb-3.5">
           <h3 className="text-sm font-extrabold text-white">Recent Transactions</h3>
-          <Link to="/history" className="text-[11px] font-bold text-[#C13A5A] hover:underline">
+          <Link to="/history" className="text-[11px] font-bold text-[#7EE8D3] hover:underline">
             View All
           </Link>
         </div>
@@ -436,8 +436,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
                   <div
                     className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
                       tx.type.includes('deposit') || tx.type.includes('bonus') || tx.type.includes('reward')
-                        ? 'bg-[#00C9A7]/10 text-[#00BFA6] border border-[#00C9A7]/20'
-                        : 'bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20'
+                        ? 'bg-[#00C9A7]/10 text-[#00C9A7] border border-[#00C9A7]/20'
+                        : 'bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20'
                     }`}
                   >
                     {tx.type.includes('deposit') || tx.type.includes('bonus') || tx.type.includes('reward') ? (
@@ -459,10 +459,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
                   <span
                     className={`text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mt-0.5 ${
                       tx.status === 'completed' || tx.status === 'approved'
-                        ? 'bg-[#00C9A7]/10 text-[#00BFA6] border border-[#00C9A7]/20'
+                        ? 'bg-[#00C9A7]/10 text-[#00C9A7] border border-[#00C9A7]/20'
                         : tx.status === 'pending'
-                        ? 'bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20'
-                        : 'bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20'
+                        ? 'bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20'
+                        : 'bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20'
                     }`}
                   >
                     {tx.status}

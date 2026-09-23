@@ -1737,7 +1737,7 @@ export default function AdminPanel({
       colorClass: string = "text-teal-400",
       borderLeftClass: string = "border-l-teal-500"
     ) => (
-      <div className={`p-3 sm:p-3.5 flex items-center gap-3 border border-white/10 bg-[#0d0d18] rounded-xl border-l-4 ${borderLeftClass} hover:border-white/20 transition-all shadow-sm`}>
+      <div className={`p-3 sm:p-3.5 flex items-center gap-3 border border-white/10 bg-[#0A1216] rounded-xl border-l-4 ${borderLeftClass} hover:border-white/20 transition-all shadow-sm`}>
         <div className={`p-2 rounded-lg bg-white/[0.03] border border-white/5 ${colorClass} shrink-0`}>
           <IconComponent className="h-4 w-4" />
         </div>
@@ -1799,7 +1799,7 @@ export default function AdminPanel({
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#07070e] text-white p-2.5 sm:p-4 md:p-5 space-y-4 overflow-x-hidden font-sans animate-[fadeIn_0.2s_ease-out]">
+    <div className="w-full min-h-screen bg-[#070A0D] text-white p-2.5 sm:p-4 md:p-5 space-y-4 overflow-x-hidden font-sans animate-[fadeIn_0.2s_ease-out]">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/10 pb-3 gap-2">
         <div className="flex items-center gap-2.5">
@@ -1865,7 +1865,7 @@ export default function AdminPanel({
             <>
               {/* Overview Statistics Cards Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
+        <GlassCard className="p-3 bg-[#062C2C]/10 border-white/5 flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-teal-500/10 text-teal-400">
             <Users className="h-4 w-4" />
           </div>
@@ -1875,7 +1875,7 @@ export default function AdminPanel({
           </div>
         </GlassCard>
 
-        <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
+        <GlassCard className="p-3 bg-[#062C2C]/10 border-white/5 flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-teal-500/10 text-teal-400">
             <Coins className="h-4 w-4" />
           </div>
@@ -1885,7 +1885,7 @@ export default function AdminPanel({
           </div>
         </GlassCard>
 
-        <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
+        <GlassCard className="p-3 bg-[#062C2C]/10 border-white/5 flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400">
             <ShoppingBag className="h-4 w-4" />
           </div>
@@ -1895,7 +1895,7 @@ export default function AdminPanel({
           </div>
         </GlassCard>
 
-        <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
+        <GlassCard className="p-3 bg-[#062C2C]/10 border-white/5 flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400">
             <Database className="h-4 w-4" />
           </div>
@@ -2189,7 +2189,8 @@ export default function AdminPanel({
         </form>
       </GlassCard>
 
-      {/* LEGACY_VOUCHER Payment & System Configurations */}
+      {false && (
+      /* Legacy payment compatibility panel intentionally disabled. */
       <GlassCard className="p-4 border-white/5 space-y-4">
         <div className="flex justify-between items-center pb-2 border-b border-white/5">
           <div>
@@ -2197,7 +2198,7 @@ export default function AdminPanel({
               <ShoppingBag className="h-4 w-4 text-teal-400" />
               LEGACY_VOUCHER Payment details &amp; Pricing Config
             </h5>
-            <p className="text-[10px] text-slate-400 mt-0.5">Control payment settings, verification rules, and support details dynamically</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">Control system bank transfer details, warning notices, and voucher pricing dynamically</p>
           </div>
         </div>
 
@@ -2291,6 +2292,7 @@ export default function AdminPanel({
           </div>
         </form>
       </GlassCard>
+      )}
             </>
           )}
 
@@ -2470,7 +2472,7 @@ export default function AdminPanel({
 
                             <td className="p-3 font-mono text-[10px] text-slate-400">
                               <div>Reg: {new Date(u.registeredAt || Date.now()).toLocaleDateString()}</div>
-                              <div>Ref: {u.referralCount || 0} • LEGACY_VOUCHER: {u.legacyVoucherPurchases || 0}</div>
+                              <div>Referrals: {u.referralCount || 0}</div>
                             </td>
 
                             <td className="p-3 text-right">
@@ -2817,9 +2819,9 @@ export default function AdminPanel({
                   <div>
                     <h5 className="text-xs font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
                       <CreditCard className="h-4 w-4 text-teal-400" />
-                      Deposits & Payment Log
+                      LEGACY_VOUCHER Payments & Transfers Log
                     </h5>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Tracking of deposits, payment references, and verification states</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Tracking of user bank transfer payments, references, and voucher issuances</p>
                   </div>
 
                   <button
@@ -2855,13 +2857,14 @@ export default function AdminPanel({
                         <th className="px-3 py-3 font-bold">Amount</th>
                         <th className="px-3 py-3 font-bold">Virtual Account</th>
                         <th className="px-3 py-3 font-bold">Status</th>
+                        <th className="px-3 py-3 font-bold">Voucher Code</th>
                         <th className="px-3 py-3 font-bold text-right">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
                       {loadingPayments ? (
                         <tr>
-                          <td colSpan={6} className="text-center py-8 text-slate-400 text-xs font-sans">
+                          <td colSpan={7} className="text-center py-8 text-slate-400 text-xs font-sans">
                             <RefreshCw className="h-4 w-4 animate-spin mx-auto mb-2 text-teal-400" />
                             Loading virtual account payment logs...
                           </td>
@@ -2872,10 +2875,11 @@ export default function AdminPanel({
                           return (p.reference || '').toLowerCase().includes(term) ||
                                  (p.userEmail || '').toLowerCase().includes(term) ||
                                  (p.bankName || '').toLowerCase().includes(term) ||
-                                 (p.accountNumber || '').toLowerCase().includes(term);
+                                 (p.accountNumber || '').toLowerCase().includes(term) ||
+                                 (p.voucherCode || '').toLowerCase().includes(term);
                         }).length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="text-center py-8 text-slate-500 text-xs font-sans">
+                          <td colSpan={7} className="text-center py-8 text-slate-500 text-xs font-sans">
                             No payment records found.
                           </td>
                         </tr>
@@ -2886,7 +2890,8 @@ export default function AdminPanel({
                           return (p.reference || '').toLowerCase().includes(term) ||
                                  (p.userEmail || '').toLowerCase().includes(term) ||
                                  (p.bankName || '').toLowerCase().includes(term) ||
-                                 (p.accountNumber || '').toLowerCase().includes(term);
+                                 (p.accountNumber || '').toLowerCase().includes(term) ||
+                                 (p.voucherCode || '').toLowerCase().includes(term);
                         }).map((p) => {
                           const isSuccessful = p.status === 'successful' || p.status === 'settled';
                           const isPending = p.status === 'pending';
@@ -2914,13 +2919,22 @@ export default function AdminPanel({
                                   {p.status}
                                 </span>
                               </td>
+                              <td className="px-3 py-3 text-teal-300 font-bold text-[10px]">
+                                {p.voucherCode ? (
+                                  <span className="bg-teal-500/10 text-teal-300 px-2 py-0.5 rounded border border-teal-500/20">
+                                    {p.voucherCode}
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-500">-</span>
+                                )}
+                              </td>
                               <td className="px-3 py-3 text-right">
                                 {!isSuccessful && (
                                   <button
                                     onClick={() => handleAdminConfirmPayment(p.reference)}
                                     className="px-2.5 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded text-[9px] font-bold uppercase transition-all cursor-pointer"
                                   >
-                                    Verify Payment
+                                    Verify & Issue Voucher
                                   </button>
                                 )}
                               </td>
@@ -2963,7 +2977,7 @@ export default function AdminPanel({
 
               {/* Live Statistics Cards (Section 8) */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
+                <GlassCard className="p-3 bg-[#062C2C]/10 border-white/5 flex items-center gap-3">
                   <div className="p-2.5 rounded-xl bg-teal-500/10 text-teal-400">
                     <DollarSign className="h-4 w-4" />
                   </div>
@@ -2973,7 +2987,7 @@ export default function AdminPanel({
                   </div>
                 </GlassCard>
 
-                <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
+                <GlassCard className="p-3 bg-[#062C2C]/10 border-white/5 flex items-center gap-3">
                   <div className="p-2.5 rounded-xl bg-yellow-500/10 text-yellow-400">
                     <Clock className="h-4 w-4 animate-pulse" />
                   </div>
@@ -2983,7 +2997,7 @@ export default function AdminPanel({
                   </div>
                 </GlassCard>
 
-                <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
+                <GlassCard className="p-3 bg-[#062C2C]/10 border-white/5 flex items-center gap-3">
                   <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400">
                     <RefreshCw className="h-4 w-4 animate-spin" style={{ animationDuration: '3s' }} />
                   </div>
@@ -2993,7 +3007,7 @@ export default function AdminPanel({
                   </div>
                 </GlassCard>
 
-                <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
+                <GlassCard className="p-3 bg-[#062C2C]/10 border-white/5 flex items-center gap-3">
                   <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400">
                     <CheckCircle className="h-4 w-4" />
                   </div>
@@ -3003,7 +3017,7 @@ export default function AdminPanel({
                   </div>
                 </GlassCard>
 
-                <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
+                <GlassCard className="p-3 bg-[#062C2C]/10 border-white/5 flex items-center gap-3">
                   <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-400">
                     <XCircle className="h-4 w-4" />
                   </div>
@@ -3013,7 +3027,7 @@ export default function AdminPanel({
                   </div>
                 </GlassCard>
 
-                <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
+                <GlassCard className="p-3 bg-[#062C2C]/10 border-white/5 flex items-center gap-3">
                   <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400">
                     <ArrowUpRight className="h-4 w-4" />
                   </div>
@@ -3023,7 +3037,7 @@ export default function AdminPanel({
                   </div>
                 </GlassCard>
 
-                <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
+                <GlassCard className="p-3 bg-[#062C2C]/10 border-white/5 flex items-center gap-3">
                   <div className="p-2.5 rounded-xl bg-teal-500/10 text-teal-400">
                     <ArrowUpRight className="h-4 w-4" />
                   </div>
@@ -3033,7 +3047,7 @@ export default function AdminPanel({
                   </div>
                 </GlassCard>
 
-                <GlassCard className="p-3 bg-[#1e1b4b]/10 border-white/5 flex items-center gap-3">
+                <GlassCard className="p-3 bg-[#062C2C]/10 border-white/5 flex items-center gap-3">
                   <div className="p-2.5 rounded-xl bg-teal-500/10 text-teal-400">
                     <ArrowUpRight className="h-4 w-4" />
                   </div>
@@ -3343,7 +3357,7 @@ export default function AdminPanel({
                               LEGACY_VOUCHER Payment Account Management
                             </h4>
                             <p className="text-[11px] text-slate-400">
-                              Configure live payment details, support contacts, and instructions displayed to users.
+                              Configure the live bank payment details, voucher pricing, WhatsApp support number, and instructions displayed to users purchasing LEGACY_VOUCHER Vouchers.
                             </p>
                           </div>
                         </div>
@@ -3870,6 +3884,7 @@ export default function AdminPanel({
                 </label>
               </div>
 
+              {false && (
               <div className="flex items-center gap-2 bg-slate-900/60 p-2.5 rounded-xl border border-white/5">
                 <input
                   type="checkbox"
@@ -3882,6 +3897,7 @@ export default function AdminPanel({
                   LEGACY_VOUCHER Voucher Purchases
                 </label>
               </div>
+              )}
 
               <div className="flex items-center gap-2 bg-slate-900/60 p-2.5 rounded-xl border border-white/5">
                 <input
@@ -4527,7 +4543,7 @@ export default function AdminPanel({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-slate-950/40 p-4 rounded-xl border border-white/5 space-y-2">
                   <div className="text-[10px] text-slate-400 font-mono font-bold uppercase">Account Protection Status</div>
-                  <div className="text-xl font-bold text-white">Security controls enabled</div>
+                  <div className="text-xl font-bold text-white">100% Protected</div>
                   <p className="text-[10px] text-slate-500">2FA verification active for admin operations</p>
                 </div>
                 <div className="bg-slate-950/40 p-4 rounded-xl border border-white/5 space-y-2">
@@ -4577,7 +4593,7 @@ export default function AdminPanel({
                     <FileSpreadsheet className="h-5 w-5 text-teal-400" />
                     System Reports &amp; Financial Audits
                   </h5>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Comprehensive transaction summaries, revenue analytics, and exportable financial reports.</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Comprehensive transaction summaries, voucher revenue analytics, and exportable financial reports.</p>
                 </div>
                 <button
                   onClick={() => {
@@ -4754,8 +4770,8 @@ export default function AdminPanel({
                     <span className="text-amber-400 font-bold">{selectedUserForView.referralCount || 0} Users</span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-white/5">
-                    <span className="text-slate-400">LEGACY_VOUCHER Purchases Count:</span>
-                    <span className="text-teal-400 font-bold">{selectedUserForView.legacyVoucherPurchases || 0} Transactions</span>
+                    <span className="text-slate-400">Recorded Transactions:</span>
+                    <span className="text-teal-400 font-bold">{Array.isArray(selectedUserForView.transactions) ? selectedUserForView.transactions.length : 0}</span>
                   </div>
                   <div className="flex justify-between py-1">
                     <span className="text-slate-400">Withdrawal Status:</span>

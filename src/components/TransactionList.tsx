@@ -105,6 +105,7 @@ export default function TransactionList({
               { id: 'all', label: 'All' },
               { id: 'in', label: 'Incoming' },
               { id: 'out', label: 'Payments' },
+              { id: 'legacyVoucher', label: 'LEGACY_VOUCHER Codes' }
             ].map((btn) => (
               <button
                 id={`btn-tx-filter-${btn.id}`}
@@ -140,7 +141,7 @@ export default function TransactionList({
                 id={`tx-row-${tx.id}`}
                 key={tx.id}
                 onClick={() => onViewDetails && onViewDetails(tx)}
-                className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-white/5 bg-[#0a0a14] hover:bg-[#10101f] hover:border-white/10 transition-all cursor-pointer group shadow-sm active:scale-[0.99]"
+                className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-white/5 bg-[#070A0D] hover:bg-[#0B1517] hover:border-white/10 transition-all cursor-pointer group shadow-sm active:scale-[0.99]"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className={`p-2 rounded-lg border ${style.bg} shrink-0 group-hover:scale-105 transition-transform`}>

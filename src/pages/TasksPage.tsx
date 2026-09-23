@@ -39,7 +39,7 @@ export const TasksPage: React.FC = () => {
       particleCount: 100,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#071114', '#008F7A', '#00BFA6', '#C13A5A', '#ffffff'],
+      colors: ['#071114', '#008F7A', '#00C9A7', '#7EE8D3', '#ffffff'],
     });
 
     setMsg({ type: 'success', text: message });
@@ -62,11 +62,11 @@ export const TasksPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-            <CheckSquare className="w-6 h-6 text-[#C13A5A]" />
+            <CheckSquare className="w-6 h-6 text-[#7EE8D3]" />
             Verified Task & Reward Hub
           </h1>
           <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#00BFA6]" />
+            <ShieldCheck className="w-3.5 h-3.5 text-[#00C9A7]" />
             Backend-verified completion engine prevents double claiming & exploits
           </p>
         </div>
@@ -74,9 +74,9 @@ export const TasksPage: React.FC = () => {
         <div className="nivo-glass-surface border border-white/10 px-4 py-2.5 rounded-2xl flex items-center gap-3 shadow-lg shrink-0">
           <div>
             <p className="text-[10px] text-slate-400 font-bold uppercase">Claimable Cash</p>
-            <p className="text-base font-black text-[#C13A5A]">₦{totalAvailableRewards.toLocaleString()}</p>
+            <p className="text-base font-black text-[#7EE8D3]">₦{totalAvailableRewards.toLocaleString()}</p>
           </div>
-          <Sparkles className="w-5 h-5 text-[#C13A5A]" />
+          <Sparkles className="w-5 h-5 text-[#7EE8D3]" />
         </div>
       </div>
 
@@ -84,8 +84,8 @@ export const TasksPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
-              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
+              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00C9A7]'
+              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#7EE8D3]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -97,13 +97,13 @@ export const TasksPage: React.FC = () => {
       <div className="nivo-glass-surface border border-white/10 rounded-3xl p-5 shadow-xl">
         <div className="flex justify-between items-center mb-2.5">
           <span className="text-xs font-bold text-white">Your Task Progress</span>
-          <span className="text-xs font-mono text-[#C13A5A] font-bold">
+          <span className="text-xs font-mono text-[#7EE8D3] font-bold">
             {completedCount} of {tasks.length} Verified & Claimed
           </span>
         </div>
         <div className="w-full bg-[#071114] h-3 rounded-full overflow-hidden border border-white/10">
           <div
-            className="bg-gradient-to-r from-[#008F7A] to-[#C13A5A] h-full transition-all duration-500"
+            className="bg-gradient-to-r from-[#008F7A] to-[#7EE8D3] h-full transition-all duration-500"
             style={{ width: `${tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0}%` }}
           ></div>
         </div>

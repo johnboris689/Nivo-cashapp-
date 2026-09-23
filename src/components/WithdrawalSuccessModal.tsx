@@ -105,10 +105,10 @@ Support: support@nivocash.app
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="bg-[#1A080E] border border-[#00C9A7]/30 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative my-auto"
+        className="bg-[#0B1517] border border-[#00C9A7]/30 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative my-auto"
       >
         {/* Top Decorative Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-[#00BFA6]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-[#00C9A7]/15 rounded-full blur-3xl pointer-events-none" />
 
         {/* Close Button */}
         <button
@@ -125,16 +125,16 @@ Support: support@nivocash.app
               initial={{ scale: 0 }}
               animate={{ scale: [0, 1.2, 1] }}
               transition={{ duration: 0.5, ease: 'backOut' }}
-              className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#008F7A] via-[#C13A5A] to-[#00BFA6] p-0.5 shadow-xl shadow-[#C13A5A]/20 flex items-center justify-center"
+              className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#008F7A] via-[#7EE8D3] to-[#00C9A7] p-0.5 shadow-xl shadow-[#7EE8D3]/20 flex items-center justify-center"
             >
-              <div className="w-full h-full bg-[#1A080E] rounded-full flex items-center justify-center">
-                <CheckCircle2 className="w-11 h-11 text-[#C13A5A] stroke-[2.5]" />
+              <div className="w-full h-full bg-[#0B1517] rounded-full flex items-center justify-center">
+                <CheckCircle2 className="w-11 h-11 text-[#7EE8D3] stroke-[2.5]" />
               </div>
             </motion.div>
           </div>
 
           <div>
-            <span className="text-[10px] font-extrabold text-[#C13A5A] uppercase tracking-widest bg-[#00BFA6]/10 border border-[#00BFA6]/20 px-3 py-1 rounded-full">
+            <span className="text-[10px] font-extrabold text-[#7EE8D3] uppercase tracking-widest bg-[#00C9A7]/10 border border-[#00C9A7]/20 px-3 py-1 rounded-full">
               Transaction Submitted
             </span>
             <h2 className="text-xl font-black text-white mt-2">Withdrawal Request Sent</h2>
@@ -144,14 +144,14 @@ Support: support@nivocash.app
           </div>
 
           {/* Amount Hero Badge */}
-          <div className="bg-gradient-to-br from-[#071114] to-[#100709] border border-white/10 p-4 rounded-2xl">
+          <div className="bg-gradient-to-br from-[#071114] to-[#070A0D] border border-white/10 p-4 rounded-2xl">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
               Withdrawal Amount
             </span>
             <span className="text-3xl font-black text-white font-mono tracking-tight block mt-1">
               ₦{data.amount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
             </span>
-            <div className="flex items-center justify-center gap-1.5 mt-2 text-[11px] text-[#C13A5A] font-bold">
+            <div className="flex items-center justify-center gap-1.5 mt-2 text-[11px] text-[#7EE8D3] font-bold">
               <Clock className="w-3.5 h-3.5" />
               <span>Est. Processing Time: Instant - 15 mins</span>
             </div>
@@ -166,7 +166,7 @@ Support: support@nivocash.app
 
             <div className="flex justify-between items-center py-1 border-b border-white/10">
               <span className="text-slate-400 font-medium">Bank Name</span>
-              <span className="font-bold text-[#C13A5A] flex items-center gap-1">
+              <span className="font-bold text-[#7EE8D3] flex items-center gap-1">
                 <Building2 className="w-3.5 h-3.5" />
                 {data.bankName}
               </span>
@@ -180,13 +180,13 @@ Support: support@nivocash.app
             <div className="flex justify-between items-center py-1 border-b border-white/10">
               <span className="text-slate-400 font-medium">Transaction Reference</span>
               <div className="flex items-center gap-1">
-                <span className="font-mono text-[11px] font-bold text-[#C13A5A]">{data.reference}</span>
+                <span className="font-mono text-[11px] font-bold text-[#7EE8D3]">{data.reference}</span>
                 <button
                   onClick={handleCopyRef}
                   className="p-1 hover:bg-white/10 rounded text-slate-400 hover:text-white transition-colors cursor-pointer"
                   title="Copy reference"
                 >
-                  {copied ? <Check className="w-3.5 h-3.5 text-[#00BFA6]" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? <Check className="w-3.5 h-3.5 text-[#00C9A7]" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
               </div>
             </div>
@@ -198,14 +198,14 @@ Support: support@nivocash.app
 
             <div className="flex justify-between items-center py-1 border-b border-white/10">
               <span className="text-slate-400 font-medium">Status</span>
-              <span className="font-bold text-[#C13A5A] bg-[#00C9A7]/10 px-2 py-0.5 rounded text-[10px] border border-[#00C9A7]/20">
+              <span className="font-bold text-[#7EE8D3] bg-[#00C9A7]/10 px-2 py-0.5 rounded text-[10px] border border-[#00C9A7]/20">
                 Processing / Pending
               </span>
             </div>
 
             <div className="flex justify-between items-center py-1">
               <span className="text-slate-400 font-medium">Remaining Balance</span>
-              <span className="font-bold text-[#00BFA6] font-mono">
+              <span className="font-bold text-[#00C9A7] font-mono">
                 ₦{data.remainingBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
               </span>
             </div>
@@ -217,7 +217,7 @@ Support: support@nivocash.app
               onClick={handleDownloadReceipt}
               className="flex items-center justify-center gap-1.5 bg-[#071114] hover:bg-[#071114] text-white border border-white/10 font-bold text-xs py-2.5 rounded-xl cursor-pointer transition-all active:scale-95"
             >
-              <Download className="w-3.5 h-3.5 text-[#C13A5A]" />
+              <Download className="w-3.5 h-3.5 text-[#7EE8D3]" />
               <span>Receipt</span>
             </button>
 
@@ -225,7 +225,7 @@ Support: support@nivocash.app
               onClick={handleShareReceipt}
               className="flex items-center justify-center gap-1.5 bg-[#071114] hover:bg-[#071114] text-white border border-white/10 font-bold text-xs py-2.5 rounded-xl cursor-pointer transition-all active:scale-95"
             >
-              <Share2 className="w-3.5 h-3.5 text-[#00BFA6]" />
+              <Share2 className="w-3.5 h-3.5 text-[#00C9A7]" />
               <span>Share</span>
             </button>
           </div>
@@ -235,9 +235,9 @@ Support: support@nivocash.app
             href="https://t.me/NivoCashSupport"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 text-xs text-slate-400 hover:text-[#C13A5A] py-1 font-semibold transition-colors"
+            className="flex items-center justify-center gap-1.5 text-xs text-slate-400 hover:text-[#7EE8D3] py-1 font-semibold transition-colors"
           >
-            <MessageCircle className="w-3.5 h-3.5 text-[#C13A5A]" />
+            <MessageCircle className="w-3.5 h-3.5 text-[#7EE8D3]" />
             <span>Need Help? Contact Live Support</span>
             <ExternalLink className="w-3 h-3" />
           </a>
@@ -248,7 +248,7 @@ Support: support@nivocash.app
               onClose();
               navigate('/dashboard');
             }}
-            className="w-full bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-black text-xs py-3.5 rounded-xl shadow-lg shadow-[#008F7A]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-full bg-gradient-to-r from-[#008F7A] to-[#00C9A7] hover:from-[#00C9A7] hover:to-[#7EE8D3] text-white font-black text-xs py-3.5 rounded-xl shadow-lg shadow-[#008F7A]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <span>Return to Dashboard</span>
             <ArrowRight className="w-4 h-4" />

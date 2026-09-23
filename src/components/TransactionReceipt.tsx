@@ -109,7 +109,7 @@ export default function TransactionReceipt({
       });
 
       // Colors
-      const primaryDark = [12, 12, 20]; // #0c0c14
+      const primaryDark = [12, 12, 20]; // #070A0D
       const tealAccent = [45, 212, 191]; // #2dd4bf
       const slateDark = [15, 23, 42]; // #0f172a
       const borderGray = [226, 232, 240]; // #e2e8f0
@@ -242,7 +242,7 @@ export default function TransactionReceipt({
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-[#0c0c14] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl relative animate-[scaleUp_0.25s_ease-out] font-sans">
+      <div className="w-full max-w-sm bg-[#070A0D] border border-white/10 rounded-[32px] overflow-hidden shadow-2xl relative animate-[scaleUp_0.25s_ease-out] font-sans">
         
         {/* Receipt Header Banner */}
         <div className="bg-gradient-to-r from-teal-600 to-teal-500 p-6 text-center text-white relative">

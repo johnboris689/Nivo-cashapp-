@@ -26,14 +26,14 @@ export default function BottomNav({ activeTab, currentScreen, onTabChange, onFab
           type="button"
           onClick={onFabClick}
           aria-label="Open Quick Actions Menu"
-          className="h-12 w-12 rounded-full bg-gradient-to-tr from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white shadow-xl shadow-teal-500/30 flex items-center justify-center transition-all duration-300 active:scale-95 border-2 border-[#0a0a12] cursor-pointer"
+          className="h-12 w-12 rounded-full bg-gradient-to-tr from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white shadow-xl shadow-teal-500/30 flex items-center justify-center transition-all duration-300 active:scale-95 border-2 border-[#070A0D] cursor-pointer"
         >
           <Plus className="h-6 w-6 stroke-[2.5]" />
         </button>
       </div>
 
       {/* Fixed Bottom Navigation Bar */}
-      <div className="w-full max-w-full h-16 bg-[#0a0a12]/95 backdrop-blur-xl border-t border-white/[0.08] flex items-center justify-around px-2 sm:px-4 py-1 shadow-2xl pointer-events-auto pb-safe">
+      <div className="w-full max-w-full h-16 bg-[#070A0D]/95 backdrop-blur-xl border-t border-white/[0.08] flex items-center justify-around px-2 sm:px-4 py-1 shadow-2xl pointer-events-auto pb-safe">
         {tabs.map((tab, idx) => {
           if (tab.isFabSpace) {
             return <div key={`spacer-${idx}`} className="w-12 h-12 shrink-0" />; // Spacer for center FAB

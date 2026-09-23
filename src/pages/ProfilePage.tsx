@@ -50,7 +50,7 @@ export const ProfilePage: React.FC = () => {
         particleCount: 80,
         spread: 60,
         origin: { y: 0.6 },
-        colors: ['#071114', '#008F7A', '#00BFA6', '#C13A5A', '#ffffff'],
+        colors: ['#071114', '#008F7A', '#00C9A7', '#7EE8D3', '#ffffff'],
       });
 
       setMsg({ type: 'success', text: `Avatar updated to "${avatar.name}"!` });
@@ -67,7 +67,7 @@ export const ProfilePage: React.FC = () => {
       {/* Title */}
       <div>
         <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-          <UserIcon className="w-6 h-6 text-[#C13A5A]" />
+          <UserIcon className="w-6 h-6 text-[#7EE8D3]" />
           My Profile & Settings
         </h1>
         <p className="text-xs text-slate-400 mt-1">Manage your identity, 3D avatar, account credentials, and security</p>
@@ -78,8 +78,8 @@ export const ProfilePage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl flex items-center gap-3 text-xs font-bold border transition-all ${
             msg.type === 'success'
-              ? 'bg-[#00C9A7]/10 text-[#00BFA6] border-[#00C9A7]/20'
-              : 'bg-[#00C9A7]/10 text-[#C13A5A] border-[#00C9A7]/20'
+              ? 'bg-[#00C9A7]/10 text-[#00C9A7] border-[#00C9A7]/20'
+              : 'bg-[#00C9A7]/10 text-[#7EE8D3] border-[#00C9A7]/20'
           }`}
         >
           <Sparkles className="w-4 h-4 shrink-0" />
@@ -89,14 +89,14 @@ export const ProfilePage: React.FC = () => {
 
       {/* Main Account Card */}
       <div className="nivo-glass-surface border border-white/10 rounded-3xl p-5 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
-        <div className="absolute -right-16 -top-16 w-64 h-64 bg-[#00BFA6]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-16 -top-16 w-64 h-64 bg-[#00C9A7]/5 rounded-full blur-3xl pointer-events-none" />
 
         {/* User Card Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 border-b border-white/10">
           <div className="flex items-center gap-4">
             {/* Avatar display */}
             <div className="relative group">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-[#008F7A] to-[#C13A5A] p-0.5 shadow-xl shadow-[#00C9A7]/20">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-[#008F7A] to-[#7EE8D3] p-0.5 shadow-xl shadow-[#00C9A7]/20">
                 <div className="w-full h-full rounded-[14px] bg-[#071114] overflow-hidden flex items-center justify-center text-white font-black text-3xl">
                   {user?.avatarUrl ? (
                     <img
@@ -110,7 +110,7 @@ export const ProfilePage: React.FC = () => {
                   )}
                 </div>
               </div>
-              <label className="absolute -bottom-1 -right-1 nivo-glass-surface p-1 rounded-full border border-white/10 text-[#C13A5A] cursor-pointer" title="Upload profile picture">
+              <label className="absolute -bottom-1 -right-1 nivo-glass-surface p-1 rounded-full border border-white/10 text-[#7EE8D3] cursor-pointer" title="Upload profile picture">
                 <Camera className="w-3.5 h-3.5" />
                 <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" disabled={uploadingPhoto} onChange={e => handleProfilePhoto(e.target.files?.[0])} />
               </label>
@@ -119,13 +119,13 @@ export const ProfilePage: React.FC = () => {
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-xl font-black text-white">{user?.fullName}</h2>
-                <span className="bg-[#00C9A7]/10 text-[#00BFA6] text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border border-[#00C9A7]/20 flex items-center gap-1">
+                <span className="bg-[#00C9A7]/10 text-[#00C9A7] text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border border-[#00C9A7]/20 flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3" /> Verified Account
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5 font-mono">@{user?.username}</p>
               <div className="mt-2 flex items-center gap-3">
-                <span className="text-xs bg-[#00BFA6]/10 text-[#C13A5A] border border-[#00BFA6]/20 font-bold px-3 py-1 rounded-xl">
+                <span className="text-xs bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20 font-bold px-3 py-1 rounded-xl">
                   Wallet: ₦{user?.walletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -138,14 +138,14 @@ export const ProfilePage: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <h3 className="text-sm font-black text-white flex items-center gap-2">
-                <Camera className="w-4 h-4 text-[#C13A5A]" />
+                <Camera className="w-4 h-4 text-[#7EE8D3]" />
                 Select Default Profile Avatar
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
                 Choose a default avatar or upload your own profile picture. Your selected image is stored with your Nevo account.
               </p>
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#C13A5A] bg-[#00BFA6]/10 px-3 py-1 rounded-full border border-[#00BFA6]/20 self-start sm:self-auto">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#7EE8D3] bg-[#00C9A7]/10 px-3 py-1 rounded-full border border-[#00C9A7]/20 self-start sm:self-auto">
               3D AI Rendered
             </span>
           </div>
@@ -159,7 +159,7 @@ export const ProfilePage: React.FC = () => {
                   onClick={() => handleSelectAvatar(av)}
                   className={`group relative nivo-glass-surface rounded-2xl border p-3 flex flex-col items-center text-center transition-all cursor-pointer hover:scale-[1.02] ${
                     isSelected
-                      ? 'border-[#C13A5A] bg-[#00BFA6]/10 shadow-lg shadow-[#C13A5A]/20'
+                      ? 'border-[#7EE8D3] bg-[#00C9A7]/10 shadow-lg shadow-[#7EE8D3]/20'
                       : 'border-white/10 hover:border-[#00C9A7]/30'
                   }`}
                 >
@@ -174,7 +174,7 @@ export const ProfilePage: React.FC = () => {
 
                     {isSelected && (
                       <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
-                        <div className="bg-[#C13A5A] text-slate-950 rounded-full p-2 shadow-xl animate-bounce">
+                        <div className="bg-[#7EE8D3] text-slate-950 rounded-full p-2 shadow-xl animate-bounce">
                           <Check className="w-5 h-5 stroke-[3]" />
                         </div>
                       </div>
@@ -188,8 +188,8 @@ export const ProfilePage: React.FC = () => {
                     disabled={updatingAvatar || isSelected}
                     className={`mt-2.5 w-full text-[11px] font-black py-1.5 px-2 rounded-xl transition-all ${
                       isSelected
-                        ? 'bg-[#C13A5A] text-slate-950 shadow-md'
-                        : 'bg-white/5 text-slate-300 group-hover:bg-gradient-to-r group-hover:from-[#008F7A] group-hover:to-[#00BFA6] group-hover:text-white'
+                        ? 'bg-[#7EE8D3] text-slate-950 shadow-md'
+                        : 'bg-white/5 text-slate-300 group-hover:bg-gradient-to-r group-hover:from-[#008F7A] group-hover:to-[#00C9A7] group-hover:text-white'
                     }`}
                   >
                     {isSelected ? 'Current Avatar' : 'Set Avatar'}
@@ -204,7 +204,7 @@ export const ProfilePage: React.FC = () => {
         <div className="grid sm:grid-cols-2 gap-3 pt-4 border-t border-white/10">
           <div className="nivo-glass-surface p-4 rounded-2xl border border-white/10 space-y-1">
             <span className="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1">
-              <Mail className="w-3.5 h-3.5 text-[#C13A5A]" />
+              <Mail className="w-3.5 h-3.5 text-[#7EE8D3]" />
               Email Address
             </span>
             <p className="text-sm font-bold text-white truncate">{user?.email}</p>
@@ -212,7 +212,7 @@ export const ProfilePage: React.FC = () => {
 
           <div className="nivo-glass-surface p-4 rounded-2xl border border-white/10 space-y-1">
             <span className="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1">
-              <Phone className="w-3.5 h-3.5 text-[#C13A5A]" />
+              <Phone className="w-3.5 h-3.5 text-[#7EE8D3]" />
               Phone Number
             </span>
             <p className="text-sm font-bold text-white">{user?.phone || 'Not provided'}</p>
@@ -220,16 +220,16 @@ export const ProfilePage: React.FC = () => {
 
           <div className="nivo-glass-surface p-4 rounded-2xl border border-white/10 space-y-1">
             <span className="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-[#C13A5A]" />
+              <Sparkles className="w-3.5 h-3.5 text-[#7EE8D3]" />
               Referral Code
             </span>
             <div className="flex items-center justify-between">
-              <p className="text-base font-mono font-black text-[#C13A5A]">{user?.referralCode}</p>
+              <p className="text-base font-mono font-black text-[#7EE8D3]">{user?.referralCode}</p>
               <button
                 onClick={copyCode}
-                className="text-xs font-bold text-[#C13A5A] hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-xs font-bold text-[#7EE8D3] hover:underline flex items-center gap-1 cursor-pointer"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-[#00BFA6]" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? <Check className="w-3.5 h-3.5 text-[#00C9A7]" /> : <Copy className="w-3.5 h-3.5" />}
                 {copied ? 'Copied' : 'Copy'}
               </button>
             </div>
@@ -237,7 +237,7 @@ export const ProfilePage: React.FC = () => {
 
           <div className="nivo-glass-surface p-4 rounded-2xl border border-white/10 space-y-1">
             <span className="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-[#C13A5A]" />
+              <Calendar className="w-3.5 h-3.5 text-[#7EE8D3]" />
               Member Since
             </span>
             <p className="text-sm font-bold text-white">
@@ -249,7 +249,7 @@ export const ProfilePage: React.FC = () => {
         {/* Security / Sign out */}
         <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row gap-3 justify-between items-center">
           <div className="flex items-center gap-2 text-xs text-slate-400">
-            <ShieldCheck className="w-4 h-4 text-[#00BFA6]" />
+            <ShieldCheck className="w-4 h-4 text-[#00C9A7]" />
             <span>Encrypted Session Active</span>
           </div>
 
@@ -258,7 +258,7 @@ export const ProfilePage: React.FC = () => {
               logout();
               navigate('/login');
             }}
-            className="w-full sm:w-auto bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 text-[#C13A5A] border border-[#00C9A7]/30 font-extrabold text-xs px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-full sm:w-auto bg-[#00C9A7]/10 hover:bg-[#00C9A7]/20 text-[#7EE8D3] border border-[#00C9A7]/30 font-extrabold text-xs px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             Sign Out of Account

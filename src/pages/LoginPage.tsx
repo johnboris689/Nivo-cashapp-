@@ -34,7 +34,7 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#100709] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#070A0D] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#008F7A]/10 rounded-full blur-[140px] pointer-events-none"></div>
 
@@ -42,11 +42,11 @@ export const LoginPage: React.FC = () => {
         {/* Logo Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2.5 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#008F7A] to-[#C13A5A] flex items-center justify-center shadow-lg shadow-[#00C9A7]/20">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#008F7A] to-[#7EE8D3] flex items-center justify-center shadow-lg shadow-[#00C9A7]/20">
               <Zap className="w-6 h-6 text-white fill-white" />
             </div>
             <span className="font-black text-2xl tracking-tight text-white">
-              NIVO <span className="text-[#C13A5A]">CASH</span>
+              NIVO <span className="text-[#7EE8D3]">CASH</span>
             </span>
           </Link>
           <h1 className="text-xl font-black text-white mt-2">Welcome Back!</h1>
@@ -54,8 +54,8 @@ export const LoginPage: React.FC = () => {
         </div>
 
         {error && (
-          <div className="mb-6 p-3.5 bg-[#00C9A7]/10 border border-[#00C9A7]/30 rounded-xl text-[#C13A5A] text-xs flex items-center gap-2.5 font-semibold">
-            <AlertCircle className="w-4 h-4 shrink-0 text-[#C13A5A]" />
+          <div className="mb-6 p-3.5 bg-[#00C9A7]/10 border border-[#00C9A7]/30 rounded-xl text-[#7EE8D3] text-xs flex items-center gap-2.5 font-semibold">
+            <AlertCircle className="w-4 h-4 shrink-0 text-[#7EE8D3]" />
             <span>{error}</span>
           </div>
         )}
@@ -73,7 +73,7 @@ export const LoginPage: React.FC = () => {
                 value={emailOrUsername}
                 onChange={(e) => setEmailOrUsername(e.target.value)}
                 placeholder="email@example.com or username"
-                className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#C13A5A] transition-colors"
+                className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#7EE8D3] transition-colors"
               />
             </div>
           </div>
@@ -81,7 +81,7 @@ export const LoginPage: React.FC = () => {
           <div>
             <div className="flex justify-between items-center mb-1.5">
               <label className="text-xs font-bold text-slate-300">Password</label>
-              <Link to="/forgot-password" className="text-xs text-[#C13A5A] hover:underline">
+              <Link to="/forgot-password" className="text-xs text-[#7EE8D3] hover:underline">
                 Forgot password?
               </Link>
             </div>
@@ -93,7 +93,7 @@ export const LoginPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-10 py-3 text-white text-sm focus:outline-none focus:border-[#C13A5A] transition-colors"
+                className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-10 py-3 text-white text-sm focus:outline-none focus:border-[#7EE8D3] transition-colors"
               />
               <button
                 type="button"
@@ -108,7 +108,7 @@ export const LoginPage: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] disabled:opacity-50 text-white font-black text-sm py-3.5 rounded-xl shadow-lg shadow-[#008F7A]/25 flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
+            className="w-full bg-gradient-to-r from-[#008F7A] to-[#00C9A7] hover:from-[#00C9A7] hover:to-[#7EE8D3] disabled:opacity-50 text-white font-black text-sm py-3.5 rounded-xl shadow-lg shadow-[#008F7A]/25 flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
           >
             {loading ? 'Signing In...' : 'Sign In to Account'}
             {!loading && <ArrowRight className="w-4 h-4" />}
@@ -117,7 +117,7 @@ export const LoginPage: React.FC = () => {
 
         <div className="mt-8 text-center text-xs text-slate-400 border-t border-white/10 pt-6">
           Don't have an account yet?{' '}
-          <Link to="/register" className="font-black text-[#C13A5A] hover:underline">
+          <Link to="/register" className="font-black text-[#7EE8D3] hover:underline">
             Create Free Account
           </Link>
         </div>

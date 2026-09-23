@@ -49,6 +49,7 @@ import {
 } from 'lucide-react';
 
 import { AdsPage } from './pages/AdsPage';
+import { LandingPage } from './pages/LandingPage';
 
 import { registerDeviceBiometric, loginWithBiometric, isWebAuthnSupported } from './lib/webauthn';
 import { api, getAuthToken, setAuthToken, removeAuthToken } from './lib/api';
@@ -78,8 +79,6 @@ import { TermsOfService, PrivacyPolicy } from './components/LegalPages';
 import { StandaloneTermsPage, StandalonePrivacyPage, Custom404Page } from './components/StandaloneLegalPages';
 import LiveTicker from './components/LiveTicker';
 import AiSupportChat from './components/AiSupportChat';
-import LandingPage from './components/LandingPage';
-import NevoLogo from './components/NevoLogo';
 
 const isVoucherValid = (code: string) => {
   if (!code) return false;
@@ -201,8 +200,20 @@ export default function App() {
   });
 
   const navigateTo = (path: string) => {
-    window.history.pushState({}, '', path);
+    window.history.pushState({ appScreen: path === '/' ? 'dashboard' : undefined }, '', path);
     setAdminPath(path);
+    const normalized = path.toLowerCase().replace(/\/$/, '') || '/';
+    if (normalized === '/login') {
+      setAuthMode('signin');
+      setCurrentScreen('onboarding');
+    } else if (normalized === '/register') {
+      setAuthMode('signup');
+      const ref = new URLSearchParams(window.location.search).get('ref');
+      if (ref) setReferralCodeInput(ref.toUpperCase());
+      setCurrentScreen('onboarding');
+    } else if (normalized === '/') {
+      setCurrentScreen('dashboard');
+    }
   };
 
   useEffect(() => {
@@ -901,7 +912,7 @@ export default function App() {
   }, []);
 
   const getContainerClasses = () => {
-    return "w-full max-w-full min-w-0 min-h-screen bg-[#0c0c14] relative flex flex-col overflow-x-hidden transition-colors duration-300";
+    return "w-full max-w-full min-w-0 min-h-screen bg-[#070A0D] relative flex flex-col overflow-x-hidden transition-colors duration-300";
   };
 
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -2481,6 +2492,10 @@ export default function App() {
   // Render Standalone Legal Pages and handle 404 routing
   const normalizedPath = adminPath.replace(/\/$/, '') || '/';
 
+  if (normalizedPath === '/' && !isAuthenticated) {
+    return <LandingPage navigateTo={navigateTo} />;
+  }
+
   if (normalizedPath === '/terms') {
     return <StandaloneTermsPage navigateTo={navigateTo} />;
   }
@@ -2517,15 +2532,10 @@ export default function App() {
     return <Custom404Page navigateTo={navigateTo} />;
   }
 
-  // Public landing page. Authentication routes remain the real sign-in/sign-up flow.
-  if (!isAuthenticated && (normalizedPath === '/' || normalizedPath === '/index.html')) {
-    return <LandingPage navigateTo={navigateTo} />;
-  }
-
   // Render Secure Admin Login Router for unauthenticated admin access
   if (isBorisRoute && !isAdminAuthenticated) {
     return (
-      <div className="min-h-screen nevo-admin-login-shell text-white flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-[#070A0D] [background:radial-gradient(circle_at_0%_0%,#062C2C_0%,#070A0D_50%),radial-gradient(circle_at_100%_100%,#082f49_0%,#070A0D_50%)] text-white flex flex-col items-center justify-center p-4">
         {toastMessage && (
           <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 animate-[slideDown_0.2s_ease-out]">
             <div className="p-3.5 rounded-xl text-xs font-semibold shadow-xl border backdrop-blur-md flex items-center gap-2.5 bg-red-500/10 text-red-400 border-red-500/20 font-sans">
@@ -2534,12 +2544,12 @@ export default function App() {
             </div>
           </div>
         )}
-        <div className="nevo-admin-login-card w-full max-w-md p-7 sm:p-8 relative font-sans">
+        <div className="w-full max-w-md bg-[#070A0D]/90 border border-white/10 rounded-3xl p-8 backdrop-blur-xl shadow-2xl relative font-sans">
           <div className="flex flex-col items-center mb-8 text-center">
-            <div className="h-14 w-14 bg-emerald-400/10 border border-emerald-300/20 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-teal-500/10">
-              <Shield className="h-7 w-7 text-[#2dd4bf]" />
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#00C9A7]/30 bg-[#00C9A7]/[0.06] shadow-[0_0_30px_rgba(0,201,167,.14)]">
+              <img src="/nevo-logo.svg" alt="Nevo" className="h-10 w-10 rounded-xl" />
             </div>
-            <h1 className="text-2xl font-black font-display bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-black font-display text-white">
               Nevo Admin Portal
             </h1>
             <p className="text-xs text-slate-400 mt-2 font-mono uppercase tracking-wider">SECURE AUTHORIZATION</p>
@@ -2555,7 +2565,7 @@ export default function App() {
                 value={adminEmailInput}
                 onChange={(e) => setAdminEmailInput(e.target.value)}
                 placeholder="Enter Admin Email"
-                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#818cf8] transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#00C9A7] transition-colors"
                 required
               />
             </div>
@@ -2569,7 +2579,7 @@ export default function App() {
                 value={adminPasswordInput}
                 onChange={(e) => setAdminPasswordInput(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#818cf8] transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#00C9A7] transition-colors"
                 required
               />
             </div>
@@ -2577,7 +2587,7 @@ export default function App() {
             <button
               type="submit"
               disabled={isAdminSubmitting}
-              className={`w-full py-3.5 bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-white font-bold rounded-xl text-sm uppercase tracking-wider transition-all duration-200 active:scale-[0.98] cursor-pointer shadow-lg shadow-teal-500/10 ${
+              className={`w-full py-3.5 bg-gradient-to-r from-[#009B83] to-[#00C9A7] hover:from-[#00C9A7] hover:to-[#7EE8D3] text-white font-bold rounded-xl text-sm uppercase tracking-wider transition-all duration-200 active:scale-[0.98] cursor-pointer shadow-lg shadow-teal-500/10 ${
                 isAdminSubmitting ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
@@ -2588,7 +2598,7 @@ export default function App() {
           <div className="mt-8 pt-6 border-t border-white/5 text-center flex flex-col gap-2">
             <button
               onClick={() => navigateTo('/')}
-              className="text-xs text-[#2dd4bf] hover:underline"
+              className="text-xs text-[#7EE8D3] hover:underline"
             >
               Return to Customer App
             </button>
@@ -2602,7 +2612,7 @@ export default function App() {
   if (isBorisRoute && isAdminAuthenticated) {
     const isWithdrawalDetailsPath = lowerAdminPath.startsWith('/boris/withdrawals/');
     return (
-      <div className="min-h-screen nevo-admin-shell text-white flex flex-col font-sans">
+      <div className="min-h-screen bg-[#070A0D] [background:radial-gradient(circle_at_0%_0%,#062C2C_0%,#070A0D_50%),radial-gradient(circle_at_100%_100%,#0f172a_0%,#070A0D_50%)] text-white flex flex-col font-sans">
         {toastMessage && (
           <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 animate-[slideDown_0.2s_ease-out]">
             <div className={`p-3.5 rounded-xl text-xs font-semibold shadow-xl border backdrop-blur-md flex items-center gap-2.5 ${
@@ -2648,8 +2658,8 @@ export default function App() {
             </ErrorBoundary>
           </div>
         ) : (
-          <div className="w-full flex-1 flex flex-col p-3 sm:p-6 bg-[#0c0c14]">
-            <div className="w-full nevo-admin-frame flex-1 flex flex-col">
+          <div className="w-full flex-1 flex flex-col p-3 sm:p-6 bg-[#070A0D]">
+            <div className="w-full bg-[#070A0D] border border-white/10 rounded-2xl p-4 sm:p-6 shadow-2xl backdrop-blur-xl flex-1 flex flex-col">
               <ErrorBoundary fallbackTitle="Admin Panel Error">
                 <AdminPanel
                   currentUserEmail="admin@nevo.ng"
@@ -2699,7 +2709,7 @@ export default function App() {
         />
       )}
       {/* Full-Screen Edge-to-Edge Container */}
-      <div className="w-full min-h-screen bg-[#0c0c14] text-white flex flex-col font-sans">
+      <div className="w-full min-h-screen bg-[#070A0D] text-white flex flex-col font-sans">
         {/* Main Core Viewport Container */}
         <div
           id="nevo-mobile-container"
@@ -2735,25 +2745,23 @@ export default function App() {
 
         {/* -------------------- VIEW 1 & 2: AUTH / ONBOARDING SCREEN -------------------- */}
         {!isAuthenticated && (
-          <div className="nevo-auth-shell flex-1 flex flex-col justify-between p-4 sm:p-6 overflow-y-auto no-scrollbar">
+          <div className="nevo-auth-shell flex-1 flex flex-col justify-between p-5 sm:p-7 overflow-y-auto no-scrollbar">
             
             {/* Upper Splash Logo & Slogan */}
-            <div className="text-center pt-8">
-              <div className="mx-auto mb-4 flex justify-center">
-                <NevoLogo size={72} showName={false} />
+            <div className="text-center pt-4 sm:pt-8">
+              <div className="mx-auto mb-4 flex w-fit items-center justify-center">
+                <img src="/nevo-logo.svg" alt="Nevo" className="h-16 w-16 rounded-[22%] shadow-[0_0_34px_rgba(0,201,167,.2)]" />
               </div>
-              <h2 className="text-3xl font-black font-display tracking-tight bg-gradient-to-r from-white via-slate-100 to-teal-200 bg-clip-text text-transparent">
-                {systemSettings.websiteName || "Nevo"}
-              </h2>
-              <span className="text-[10px] tracking-wider uppercase font-mono font-bold text-teal-400 block mt-1">{systemSettings.websiteName || "Nevo"} Digital Platform</span>
+              <h2 className="text-3xl font-black font-display tracking-tight text-white">Nevo</h2>
+              <span className="text-[10px] tracking-[0.24em] uppercase font-bold text-[#7EE8D3] block mt-1">Financial Freedom In Your Hands</span>
               <p className="text-xs text-slate-300 mt-4 px-3 leading-relaxed">
-                Get your account ready and instantly start buying, selling airtime and data online and start paying all your bills in cheaper price
+                Manage your wallet, deposits, withdrawals, tasks and referrals from one secure Nevo account.
               </p>
             </div>
 
             {/* Middle Input Forms */}
             <div className="my-6">
-              <GlassCard className="nevo-auth-card p-5 border-white/5 bg-slate-900/40">
+              <GlassCard className="nevo-auth-card p-5 sm:p-6">
                 {authMode !== 'forgot' ? (
                   <>
                     <div className="flex border-b border-white/10 mb-4 pb-2">
@@ -2780,13 +2788,13 @@ export default function App() {
                     </div>
 
                     {authMode === 'signin' && (
-                      <div className="grid grid-cols-3 gap-1 bg-slate-950/60 p-1 rounded-xl border border-white/10 mb-4 text-[10px] font-semibold">
+                      <div className="grid grid-cols-3 gap-1 bg-[#070A0D]/80 p-1 rounded-xl border border-white/[0.07] mb-4 text-[10px] font-semibold">
                         <button
                           type="button"
                           onClick={() => setSignInMethod('password')}
                           className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition-all ${
                             signInMethod === 'password'
-                              ? 'bg-gradient-to-r from-teal-500 to-teal-500 text-white font-bold shadow'
+                              ? 'bg-gradient-to-r from-[#009B83] to-[#00C9A7] text-white font-bold shadow'
                               : 'text-slate-400 hover:text-white'
                           }`}
                         >
@@ -2797,7 +2805,7 @@ export default function App() {
                           onClick={() => setSignInMethod('biometric')}
                           className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition-all ${
                             signInMethod === 'biometric'
-                              ? 'bg-gradient-to-r from-teal-500 to-teal-500 text-white font-bold shadow'
+                              ? 'bg-gradient-to-r from-[#009B83] to-[#00C9A7] text-white font-bold shadow'
                               : 'text-slate-400 hover:text-white'
                           }`}
                         >
@@ -2808,7 +2816,7 @@ export default function App() {
                           onClick={() => setSignInMethod('pin')}
                           className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition-all ${
                             signInMethod === 'pin'
-                              ? 'bg-gradient-to-r from-teal-500 to-teal-500 text-white font-bold shadow'
+                              ? 'bg-gradient-to-r from-[#009B83] to-[#00C9A7] text-white font-bold shadow'
                               : 'text-slate-400 hover:text-white'
                           }`}
                         >
@@ -2829,7 +2837,7 @@ export default function App() {
                               required
                               value={fullName}
                               onChange={(e) => setFullName(e.target.value)}
-                              className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
+                              className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                             />
                           </div>
                         )}
@@ -2843,7 +2851,7 @@ export default function App() {
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
+                            className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                           />
                         </div>
 
@@ -2873,7 +2881,7 @@ export default function App() {
                               required
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
-                              className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl pl-4 pr-10 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
+                              className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl pl-4 pr-10 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                             />
                             <button
                               type="button"
@@ -2897,7 +2905,7 @@ export default function App() {
                                 required
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl pl-4 pr-10 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
+                                className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl pl-4 pr-10 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                               />
                               <button
                                 type="button"
@@ -2920,7 +2928,7 @@ export default function App() {
                               placeholder="NEVOXXXX"
                               value={referralCodeInput}
                               onChange={e => setReferralCodeInput(e.target.value.toUpperCase())}
-                              className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400 uppercase font-mono"
+                              className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7] uppercase font-mono"
                             />
                           </div>
                         )}
@@ -2929,7 +2937,7 @@ export default function App() {
                           id="btn-auth-submit"
                           type="submit"
                           disabled={isAuthSubmitting}
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-teal-500 to-teal-500 hover:from-teal-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-[#009B83] via-[#00C9A7] to-[#7EE8D3] hover:from-teal-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                           {isAuthSubmitting ? (
                             <>
@@ -2955,7 +2963,7 @@ export default function App() {
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
+                            className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                           />
                         </div>
 
@@ -2989,7 +2997,7 @@ export default function App() {
                               setEmailOrPhoneInput(e.target.value);
                               setEmail(e.target.value);
                             }}
-                            className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
+                            className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                           />
                         </div>
 
@@ -3003,14 +3011,14 @@ export default function App() {
                             required
                             value={pinLoginInput}
                             onChange={(e) => setPinLoginInput(e.target.value.replace(/\D/g, ''))}
-                            className="w-full text-center tracking-[0.5em] font-mono text-lg font-extrabold bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-teal-300 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-teal-400"
+                            className="w-full text-center tracking-[0.5em] font-mono text-lg font-extrabold bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-teal-300 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                           />
                         </div>
 
                         <button
                           type="submit"
                           disabled={isAuthSubmitting}
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-teal-500 to-teal-500 hover:from-teal-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-[#009B83] via-[#00C9A7] to-[#7EE8D3] hover:from-teal-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                           {isAuthSubmitting ? 'Verifying PIN...' : 'Sign In With Security PIN'}
                         </button>
@@ -3044,13 +3052,13 @@ export default function App() {
                             required
                             value={forgotEmail}
                             onChange={(e) => setForgotEmail(e.target.value)}
-                            className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
+                            className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                           />
                         </div>
                         <button
                           id="btn-send-otp"
                           type="submit"
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-teal-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-[#009B83] via-[#00C9A7] to-[#7EE8D3] text-white rounded-xl active:scale-95 transition-all mt-2"
                         >
                           Send Verification Code
                         </button>
@@ -3091,7 +3099,7 @@ export default function App() {
                             placeholder="e.g. 123456"
                             value={resetOtp}
                             onChange={(e) => setResetOtp(e.target.value)}
-                            className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400 font-mono tracking-widest text-center"
+                            className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7] font-mono tracking-widest text-center"
                           />
                         </div>
 
@@ -3105,14 +3113,14 @@ export default function App() {
                             placeholder="Reset Token"
                             value={resetToken}
                             onChange={(e) => setResetToken(e.target.value)}
-                            className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400 font-mono"
+                            className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7] font-mono"
                           />
                         </div>
 
                         <button
                           id="btn-verify-otp"
                           type="submit"
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-teal-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-[#009B83] via-[#00C9A7] to-[#7EE8D3] text-white rounded-xl active:scale-95 transition-all mt-2"
                         >
                           Verify Code
                         </button>
@@ -3135,7 +3143,7 @@ export default function App() {
                               required
                               value={newPassword}
                               onChange={(e) => setNewPassword(e.target.value)}
-                              className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
+                              className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                             />
                             <button
                               type="button"
@@ -3156,14 +3164,14 @@ export default function App() {
                             required
                             value={confirmNewPassword}
                             onChange={(e) => setConfirmNewPassword(e.target.value)}
-                            className="w-full text-xs bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-400"
+                            className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                           />
                         </div>
 
                         <button
                           id="btn-submit-reset-password"
                           type="submit"
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-teal-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-[#009B83] via-[#00C9A7] to-[#7EE8D3] text-white rounded-xl active:scale-95 transition-all mt-2"
                         >
                           Complete Password Reset
                         </button>
@@ -3204,18 +3212,18 @@ export default function App() {
 
         {/* -------------------- MAIN DASHBOARD WRAPPER -------------------- */}
         {isAuthenticated && currentScreen !== 'congratulations' && (
-          <div className="flex-1 flex flex-row relative bg-[#0c0c14] text-white min-h-screen w-full max-w-full min-w-0 overflow-x-hidden">
+          <div className="flex-1 flex flex-row relative bg-[#070A0D] text-white min-h-screen w-full max-w-full min-w-0 overflow-x-hidden">
             
             {/* Expanded Persistent Sidebar for Tablets, Laptops, Desktops, and Large Screens */}
             {(deviceType === 'laptop' || deviceType === 'desktop' || deviceType === 'large') && (
-              <div className="w-[260px] shrink-0 border-r border-white/5 bg-[#07070b]/60 backdrop-blur-md p-5 flex flex-col justify-between z-20 sticky top-0 h-screen">
+              <div className="w-[260px] shrink-0 border-r border-white/5 bg-[#070A0D]/60 backdrop-blur-md p-5 flex flex-col justify-between z-20 sticky top-0 h-screen">
                 <div className="space-y-6">
                   <div className="flex items-center justify-between border-b border-white/5 pb-4">
                     <div>
                       <span className="text-xl font-black font-display bg-gradient-to-r from-teal-400 to-teal-300 bg-clip-text text-transparent">
                         Nevo
                       </span>
-                      <span className="text-[8px] font-mono text-slate-400 block uppercase tracking-widest mt-0.5">Version 4.1.0</span>
+                      <span className="text-[8px] font-mono text-slate-400 block uppercase tracking-widest mt-0.5">Secure wallet experience</span>
                     </div>
                   </div>
 
@@ -3270,9 +3278,9 @@ export default function App() {
             )}
 
             {/* Main view container containing top-bar and actual tab routes */}
-            <div className="flex-1 min-w-0 w-full max-w-full flex flex-col relative bg-[#0c0c14] min-h-screen overflow-x-hidden">
+            <div className="flex-1 min-w-0 w-full max-w-full flex flex-col relative bg-[#070A0D] min-h-screen overflow-x-hidden">
               {/* Fixed Top Header (Never Scroll) */}
-              <div className="shrink-0 z-30 bg-[#0c0c14]/95 backdrop-blur-xl border-b border-white/5 w-full max-w-full min-w-0 pt-safe overflow-x-hidden">
+              <div className="shrink-0 z-30 bg-[#070A0D]/95 backdrop-blur-xl border-b border-white/5 w-full max-w-full min-w-0 pt-safe overflow-x-hidden">
                 <div className="px-4 py-2 sm:px-5 sm:py-2.5 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     {(deviceType === 'mobile' || deviceType === 'tablet') && (
@@ -3284,14 +3292,14 @@ export default function App() {
                         <Menu className="h-4.5 w-4.5" />
                       </button>
                     )}
-                    <span className="text-lg font-black font-display bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent">
+                    <span className="text-lg font-black font-display text-white">
                       Nevo
                     </span>
 
                     {/* Adaptive Device Layout Detected Badge */}
                     <div className="flex items-center gap-1 bg-white/5 border border-white/10 px-2 py-0.5 rounded-full shadow-inner">
                       <div className="h-1.5 w-1.5 rounded-full bg-teal-400 animate-pulse" />
-                      <span className="text-[8px] font-mono text-[#2dd4bf] uppercase tracking-wider font-bold">
+                      <span className="text-[8px] font-mono text-[#7EE8D3] uppercase tracking-wider font-bold">
                         {deviceType === 'mobile' && 'Mobile Phone'}
                         {deviceType === 'tablet' && 'Tablet'}
                         {deviceType === 'laptop' && 'Laptop'}
@@ -3342,7 +3350,7 @@ export default function App() {
                       </div>
 
                       {/* COMPACT FINTECH BALANCE CARD */}
-                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#13201e] via-[#0c1515] to-[#08100f] p-5 sm:p-6 text-white border border-teal-500/20 shadow-xl shadow-teal-950/50">
+                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#062C2C] via-[#0B2425] to-[#0D3532] p-5 sm:p-6 text-white border border-teal-500/20 shadow-xl shadow-teal-950/50">
                         {/* Subtle background glow elements */}
                         <div className="absolute -right-12 -top-12 w-36 h-36 rounded-full bg-teal-400/10 blur-2xl pointer-events-none" />
                         <div className="absolute -left-12 -bottom-12 w-32 h-32 rounded-full bg-teal-400/15 blur-2xl pointer-events-none" />
@@ -3378,7 +3386,7 @@ export default function App() {
                             id="btn-deposit-trigger"
                             type="button"
                             onClick={() => setPaymentModalOpen(true)}
-                            className="w-full py-2.5 px-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-teal-500 hover:from-teal-400 hover:to-teal-500 text-white text-xs font-black shadow-md shadow-teal-500/25 active:scale-95 hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer border border-teal-400/30"
+                            className="w-full py-2.5 px-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-violet-600 hover:from-teal-400 hover:to-violet-500 text-white text-xs font-black shadow-md shadow-teal-500/25 active:scale-95 hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer border border-teal-400/30"
                           >
                             <Send className="h-4 w-4 stroke-[2.5]" />
                             <span>Deposit</span>
@@ -3444,7 +3452,7 @@ export default function App() {
                                   setActiveTab('social'); 
                                 }
                               }} 
-                              className="p-1.5 sm:p-2.5 rounded-xl bg-[#0a0a14] border border-white/5 hover:border-white/15 flex flex-col items-center hover:bg-[#10101f] active:scale-95 transition-all text-center w-full min-w-0 shadow-sm cursor-pointer"
+                              className="p-1.5 sm:p-2.5 rounded-xl bg-[#070A0D] border border-white/5 hover:border-white/15 flex flex-col items-center hover:bg-[#0B1517] active:scale-95 transition-all text-center w-full min-w-0 shadow-sm cursor-pointer"
                             >
                               <div className={`p-1.5 rounded-lg mb-1 shrink-0 ${item.bg}`}><item.icon className="h-4 w-4" /></div>
                               <span className="text-[9px] font-bold text-slate-300 uppercase leading-none truncate w-full block">{item.label}</span>
@@ -3458,10 +3466,10 @@ export default function App() {
                         <h5 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-2">More Services</h5>
                         <div className="grid grid-cols-4 gap-1.5 sm:gap-2.5 w-full max-w-full min-w-0">
                           {[
-                            { id: 'data', label: 'Data bundles', icon: Smartphone, bg: 'bg-orange-500/15 text-orange-400' },
+                            { id: 'data', label: 'Data bundles', icon: Smartphone, bg: 'bg-teal-500/15 text-teal-300' },
                             { id: 'bills', label: 'Pay Bills', icon: CreditCard, bg: 'bg-emerald-500/15 text-emerald-400' },
-                            { id: 'support', label: 'Support Chat', icon: MessageSquare, bg: 'bg-rose-500/15 text-rose-400' },
-                            { id: 'about', label: 'About App', icon: Info, bg: 'bg-blue-500/15 text-blue-400' }
+                            { id: 'support', label: 'Support Chat', icon: MessageSquare, bg: 'bg-teal-500/15 text-teal-300' },
+                            { id: 'about', label: 'About App', icon: Info, bg: 'bg-teal-500/15 text-teal-300' }
                           ].map((srv) => (
                             <button
                               id={`btn-service-${srv.id}`}
@@ -3477,7 +3485,7 @@ export default function App() {
                                   setCurrentScreen('about_info');
                                 }
                               }}
-                              className="p-1.5 sm:p-2.5 rounded-xl bg-[#0a0a14] border border-white/5 hover:border-white/15 flex flex-col items-center hover:bg-[#10101f] active:scale-95 transition-all text-center w-full min-w-0 shadow-sm"
+                              className="p-1.5 sm:p-2.5 rounded-xl bg-[#070A0D] border border-white/5 hover:border-white/15 flex flex-col items-center hover:bg-[#0B1517] active:scale-95 transition-all text-center w-full min-w-0 shadow-sm"
                             >
                               <div className={`p-1.5 rounded-lg mb-1 shrink-0 ${srv.bg}`}>
                                 <srv.icon className="h-4 w-4" />
@@ -4162,7 +4170,7 @@ export default function App() {
                   </div>
 
                   {/* Voucher Display Card */}
-                  <div className="bg-[#0a0a14] border border-emerald-500/30 p-5 rounded-2xl text-center space-y-3 relative overflow-hidden">
+                  <div className="bg-[#070A0D] border border-emerald-500/30 p-5 rounded-2xl text-center space-y-3 relative overflow-hidden">
                     <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold uppercase tracking-wider font-mono">
                       Nevo Verified & Active
                     </div>
@@ -4300,7 +4308,7 @@ export default function App() {
                             required
                             value={airtimePhone}
                             onChange={(e) => setAirtimePhone(e.target.value)}
-                            className="flex-1 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-teal-400 font-mono"
+                            className="flex-1 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#00C9A7] font-mono"
                           />
                           <button
                             type="button"
@@ -4336,7 +4344,7 @@ export default function App() {
                           required
                           value={airtimeAmount}
                           onChange={(e) => setAirtimeAmount(e.target.value)}
-                          className="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-teal-400 font-mono"
+                          className="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#00C9A7] font-mono"
                         />
                         
                         {/* Quick Selection Pills */}
@@ -4528,7 +4536,7 @@ export default function App() {
                             required
                             value={dataPhone}
                             onChange={(e) => setDataPhone(e.target.value)}
-                            className="flex-1 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-teal-400 font-mono"
+                            className="flex-1 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#00C9A7] font-mono"
                           />
                           <button
                             type="button"
@@ -5039,7 +5047,7 @@ export default function App() {
                                 setWithdrawNameConfirmed(false);
                               }
                             }}
-                            className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono tracking-widest focus:outline-none focus:ring-1 focus:ring-teal-400"
+                            className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono tracking-widest focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                           />
                         </div>
 
@@ -5147,7 +5155,7 @@ export default function App() {
                             required
                             value={withdrawAmount}
                             onChange={(e) => setWithdrawAmount(e.target.value)}
-                            className="w-full text-sm bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono font-bold focus:outline-none focus:ring-1 focus:ring-teal-400"
+                            className="w-full text-sm bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono font-bold focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                           />
                           {withdrawAmount && (parseInt(withdrawAmount) < 5000 || parseInt(withdrawAmount) > 200000) && (
                             <p className="text-[10px] text-rose-400 font-mono mt-1">Amount must be between ₦5,000 and ₦200,000.</p>
@@ -5307,7 +5315,7 @@ export default function App() {
                                 setTransferAccNum(val);
                               }
                             }}
-                            className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono tracking-widest focus:outline-none focus:ring-1 focus:ring-teal-400"
+                            className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono tracking-widest focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                           />
                         </div>
 
@@ -5352,7 +5360,7 @@ export default function App() {
                         type="button"
                         disabled={!transferBank || transferAccNum.length !== 10 || !transferVerified || !transferAccName}
                         onClick={() => setTransferStep(2)}
-                        className={`w-full py-4 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-500 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
+                        className={`w-full py-4 bg-gradient-to-r from-teal-600 to-violet-600 hover:from-teal-500 hover:to-violet-500 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
                           (!transferBank || transferAccNum.length !== 10 || !transferVerified || !transferAccName) ? 'opacity-40 cursor-not-allowed' : ''
                         }`}
                       >
@@ -5409,7 +5417,7 @@ export default function App() {
                             required
                             value={transferAmount}
                             onChange={(e) => setTransferAmount(e.target.value)}
-                            className="w-full text-sm bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono font-bold focus:outline-none focus:ring-1 focus:ring-teal-400"
+                            className="w-full text-sm bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono font-bold focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                           />
                           {transferAmount && (parseInt(transferAmount) < 50 || parseInt(transferAmount) > 200000) && (
                             <p className="text-[10px] text-rose-400 font-mono mt-1">Amount must be between ₦5,000 and ₦200,000.</p>
@@ -5445,7 +5453,7 @@ export default function App() {
                                 placeholder="No voucher required"
                                 value={transferLegacyVoucherCode}
                                 onChange={(e) => setTransferLegacyVoucherCode(e.target.value)}
-                                className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono tracking-widest uppercase focus:outline-none focus:ring-1 focus:ring-teal-400"
+                                className="w-full text-xs bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono tracking-widest uppercase focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
                               />
                             </div>
                           )}
@@ -5463,7 +5471,7 @@ export default function App() {
                             parseInt(transferAmount) > 200000 ||
                             isSubmitting
                           }
-                          className={`w-full py-4 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
+                          className={`w-full py-4 bg-gradient-to-r from-teal-600 to-violet-600 hover:from-teal-500 hover:to-violet-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
                             (!transferAccNum || transferAccNum.length !== 10 || !transferAccName || !transferAmount || parseInt(transferAmount) < 50 || parseInt(transferAmount) > 200000 || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
                         >
@@ -5684,7 +5692,7 @@ export default function App() {
 
             {/* Fixed Bottom Navigation Bar (Never Scroll) */}
             {(currentScreen === 'dashboard' || currentScreen === 'buy_data') && (
-              <div className="shrink-0 z-30 w-full bg-[#0c0c14] border-t border-white/5 pb-safe">
+              <div className="shrink-0 z-30 w-full bg-[#070A0D] border-t border-white/5 pb-safe">
                 <BottomNav
                   activeTab={activeTab}
                   currentScreen={currentScreen}
@@ -5760,7 +5768,7 @@ export default function App() {
                         <span className="text-base font-black font-display bg-gradient-to-r from-teal-600 to-teal-500 dark:from-teal-400 dark:to-teal-300 bg-clip-text text-transparent">
                           Nevo
                         </span>
-                        <span className="text-[8px] font-mono text-slate-400 block uppercase tracking-widest mt-0.5">Version 4.1.0</span>
+                        <span className="text-[8px] font-mono text-slate-400 block uppercase tracking-widest mt-0.5">Secure wallet experience</span>
                       </div>
                       <button
                         id="btn-close-sidebar"
@@ -5851,9 +5859,9 @@ export default function App() {
                   </div>
 
                   <div>
-                    <h5 className="text-sm font-bold text-white font-display">Voucher Redemptions Guide</h5>
+                    <h5 className="text-sm font-bold text-white font-display">Nevo Walkthrough</h5>
                     <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                      This walkthrough simulated guide explains how copying PalmPay account credentials, initiating standard transfers, and generating Withdrawal Vouchers (LEGACY_VOUCHER) operates with zero fees on Nevo.
+                      This walkthrough explains how to navigate Nevo's wallet, account actions and available services.
                     </p>
                   </div>
 
@@ -5946,7 +5954,7 @@ export default function App() {
                       placeholder="e.g. 123456"
                       value={securityOtp}
                       onChange={(e) => setSecurityOtp(e.target.value)}
-                      className="w-full text-center text-sm tracking-widest bg-slate-950 border border-white/10 rounded-xl py-3 text-white focus:outline-none focus:ring-1 focus:ring-teal-400 font-mono"
+                      className="w-full text-center text-sm tracking-widest bg-slate-950 border border-white/10 rounded-xl py-3 text-white focus:outline-none focus:ring-1 focus:ring-[#00C9A7] font-mono"
                     />
                   </div>
                   <div className="flex gap-3">

@@ -181,10 +181,10 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
   ];
 
   const content = (
-    <div className="flex flex-col h-full w-full bg-[#07070c] text-white overflow-hidden font-sans relative">
+    <div className="flex flex-col h-full w-full bg-[#070A0D] text-white overflow-hidden font-sans relative">
       
       {/* Header */}
-      <div className="px-4 py-3 bg-[#0a0a12] border-b border-white/[0.08] flex items-center justify-between shrink-0 z-10">
+      <div className="px-4 py-3 bg-[#070A0D] border-b border-white/[0.08] flex items-center justify-between shrink-0 z-10">
         <div className="flex items-center gap-3">
           {onBack && (
             <button
@@ -200,11 +200,11 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
 
           <div className="relative">
             <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-teal-600 to-teal-500 p-0.5 shadow-lg shadow-teal-500/20">
-              <div className="h-full w-full bg-[#0c0c14] rounded-[10px] flex items-center justify-center">
+              <div className="h-full w-full bg-[#070A0D] rounded-[10px] flex items-center justify-center">
                 <Bot className="h-5 w-5 text-teal-400 animate-pulse" />
               </div>
             </div>
-            <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 border-2 border-[#0a0a12] flex items-center justify-center">
+            <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 border-2 border-[#070A0D] flex items-center justify-center">
               <span className="animate-ping h-full w-full rounded-full bg-emerald-400 opacity-75" />
             </span>
           </div>
@@ -418,7 +418,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
       </div>
 
       {/* Quick Action Suggestion Bar */}
-      <div className="px-3 py-2 bg-[#090910] border-t border-white/5 overflow-x-auto no-scrollbar flex items-center gap-1.5 shrink-0">
+      <div className="px-3 py-2 bg-[#070A0D] border-t border-white/5 overflow-x-auto no-scrollbar flex items-center gap-1.5 shrink-0">
         <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider shrink-0 font-bold">Quick Topics:</span>
         {quickChips.map((chip, cIdx) => (
           <button
@@ -434,7 +434,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
       </div>
 
       {/* Input Bar */}
-      <div className="p-3 bg-[#0a0a12] border-t border-white/[0.08] shrink-0">
+      <div className="p-3 bg-[#070A0D] border-t border-white/[0.08] shrink-0">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -483,7 +483,7 @@ export default function AiSupportChat({ mode = 'embedded', onClose, onBack }: Ai
     return (
       <div 
         id="nevo-ai-assistant-modal"
-        className="fixed inset-0 z-[200] w-full h-full h-[100dvh] max-h-[100dvh] bg-[#07070c] flex flex-col pt-safe pb-safe overflow-hidden"
+        className="fixed inset-0 z-[200] w-full h-full h-[100dvh] max-h-[100dvh] bg-[#070A0D] flex flex-col pt-safe pb-safe overflow-hidden"
       >
         {content}
       </div>

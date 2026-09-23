@@ -381,7 +381,7 @@ export const PaymentAdminTab: React.FC<PaymentAdminTabProps> = ({
                         {tx.provider || 'korapay'}
                       </td>
                       <td className="py-3 px-3 text-slate-400">
-                        {'Wallet Funding'}
+                        {tx.purpose === 'legacyVoucher_voucher' ? 'LEGACY_VOUCHER Voucher' : 'Wallet Funding'}
                       </td>
                       <td className="py-3 px-3">
                         {isSuccess ? (

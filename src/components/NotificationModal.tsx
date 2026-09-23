@@ -34,11 +34,11 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-[#1A080E] border border-[#00C9A7]/30 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
+      <div className="bg-[#0B1517] border border-[#00C9A7]/30 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#1A080E]">
+        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#0B1517]">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-[#00C9A7]/10 text-[#C13A5A] border border-[#00C9A7]/20">
+            <div className="p-2 rounded-xl bg-[#00C9A7]/10 text-[#7EE8D3] border border-[#00C9A7]/20">
               <Bell className="w-5 h-5" />
             </div>
             <div>
@@ -49,7 +49,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleMarkAllRead}
-              className="text-xs font-semibold text-[#C13A5A] hover:text-[#D46A83] transition-colors flex items-center gap-1 bg-[#00BFA6]/10 px-3 py-1.5 rounded-xl border border-[#00BFA6]/20 cursor-pointer"
+              className="text-xs font-semibold text-[#7EE8D3] hover:text-[#7EE8D3] transition-colors flex items-center gap-1 bg-[#00C9A7]/10 px-3 py-1.5 rounded-xl border border-[#00C9A7]/20 cursor-pointer"
             >
               <Check className="w-3.5 h-3.5" />
               Mark all read
@@ -85,11 +85,11 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                 <div className="flex gap-3">
                   <div className="mt-0.5 shrink-0">
                     {n.type === 'success' ? (
-                      <CheckCircle2 className="w-5 h-5 text-[#00BFA6]" />
+                      <CheckCircle2 className="w-5 h-5 text-[#00C9A7]" />
                     ) : n.type === 'alert' || n.type === 'warning' ? (
-                      <AlertCircle className="w-5 h-5 text-[#C13A5A]" />
+                      <AlertCircle className="w-5 h-5 text-[#7EE8D3]" />
                     ) : (
-                      <Info className="w-5 h-5 text-[#C13A5A]" />
+                      <Info className="w-5 h-5 text-[#7EE8D3]" />
                     )}
                   </div>
                   <div className="flex-1">

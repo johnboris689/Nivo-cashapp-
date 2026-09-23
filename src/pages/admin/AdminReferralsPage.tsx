@@ -48,7 +48,7 @@ export const AdminReferralsPage: React.FC = () => {
     <div className="space-y-6 animate-fade-in pb-12">
       <div>
         <h1 className="text-2xl font-black text-white flex items-center gap-2">
-          <Sparkles className="w-6 h-6 text-[#00BFA6]" />
+          <Sparkles className="w-6 h-6 text-[#00C9A7]" />
           Referral System Controls & Logs
         </h1>
         <p className="text-xs text-zinc-400 mt-1">Set registration referral payouts and audit system referral bonus credits</p>
@@ -58,8 +58,8 @@ export const AdminReferralsPage: React.FC = () => {
         <div
           className={`p-4 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
             msg.type === 'success'
-              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00BFA6]'
-              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#C13A5A]'
+              ? 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#00C9A7]'
+              : 'bg-[#00C9A7]/10 border-[#00C9A7]/30 text-[#7EE8D3]'
           }`}
         >
           {msg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -83,14 +83,14 @@ export const AdminReferralsPage: React.FC = () => {
               min={100}
               value={referralBonusAmount}
               onChange={(e) => setReferralBonusAmount(e.target.value)}
-              className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-[#C13A5A] font-mono font-black text-base focus:outline-none focus:border-[#00C9A7]"
+              className="w-full nivo-glass-surface border border-zinc-800 rounded-xl px-4 py-3 text-[#7EE8D3] font-mono font-black text-base focus:outline-none focus:border-[#00C9A7]"
             />
           </div>
 
           <button
             type="submit"
             disabled={saving}
-            className="bg-[#00C9A7] hover:bg-[#00BFA6] disabled:opacity-50 text-black font-extrabold text-xs px-6 py-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+            className="bg-[#00C9A7] hover:bg-[#00C9A7] disabled:opacity-50 text-black font-extrabold text-xs px-6 py-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
           >
             <Save className="w-4 h-4" />
             <span>{saving ? 'Updating...' : 'Save New Reward Amount'}</span>
@@ -130,10 +130,10 @@ export const AdminReferralsPage: React.FC = () => {
                       <p className="text-[10px] text-zinc-500">{r.referredUserEmail}</p>
                     </td>
 
-                    <td className="py-3 px-3 font-black text-[#C13A5A]">₦{r.bonusAmount.toLocaleString()}</td>
+                    <td className="py-3 px-3 font-black text-[#7EE8D3]">₦{r.bonusAmount.toLocaleString()}</td>
 
                     <td className="py-3 px-3">
-                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#00C9A7]/10 text-[#00BFA6] border border-[#00C9A7]/20">
+                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#00C9A7]/10 text-[#00C9A7] border border-[#00C9A7]/20">
                         {r.status}
                       </span>
                     </td>

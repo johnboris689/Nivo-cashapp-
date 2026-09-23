@@ -96,17 +96,17 @@ export const ForgotPasswordPage: React.FC = () => {
     : 'Your Nevo password has been changed successfully.';
 
   return (
-    <div className="min-h-screen bg-[#100709] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#070A0D] flex items-center justify-center p-4 relative overflow-hidden">
       <div className="absolute -top-24 -left-24 w-80 h-80 bg-[#00C9A7]/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[#071114]/25 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="w-full max-w-md nivo-glass-strong rounded-[28px] p-7 sm:p-8 relative z-10">
         <div className="text-center mb-7">
           <Link to="/" className="inline-flex items-center gap-2.5 mb-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#071114] via-[#008F7A] to-[#C13A5A] flex items-center justify-center shadow-lg shadow-[#00C9A7]/25">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#071114] via-[#008F7A] to-[#7EE8D3] flex items-center justify-center shadow-lg shadow-[#00C9A7]/25">
               <Zap className="w-6 h-6 text-white fill-white" />
             </div>
-            <span className="font-black text-2xl tracking-tight text-white">NIVO <span className="text-[#C13A5A]">CASH</span></span>
+            <span className="font-black text-2xl tracking-tight text-white">NIVO <span className="text-[#7EE8D3]">CASH</span></span>
           </Link>
           <h1 className="text-xl font-black text-white">{title}</h1>
           <p className="text-xs text-[#B99BA3] mt-1.5 leading-relaxed">{subtitle}</p>
@@ -114,13 +114,13 @@ export const ForgotPasswordPage: React.FC = () => {
 
         <div className="flex gap-1.5 mb-6">
           {['email', 'otp', 'password'].map((s, i) => (
-            <div key={s} className={`h-1.5 flex-1 rounded-full ${step === 'success' || i < ['email','otp','password'].indexOf(step) + (step !== 'email' ? 1 : 0) ? 'bg-gradient-to-r from-[#008F7A] to-[#C13A5A]' : 'bg-[#071114]'}`} />
+            <div key={s} className={`h-1.5 flex-1 rounded-full ${step === 'success' || i < ['email','otp','password'].indexOf(step) + (step !== 'email' ? 1 : 0) ? 'bg-gradient-to-r from-[#008F7A] to-[#7EE8D3]' : 'bg-[#071114]'}`} />
           ))}
         </div>
 
         {error && (
-          <div className="mb-5 p-3.5 bg-[#071114]/25 border border-[#00BFA6]/30 rounded-2xl text-[#E6B8C3] text-xs flex items-center gap-2 font-semibold">
-            <AlertCircle className="w-4 h-4 shrink-0 text-[#C13A5A]" />
+          <div className="mb-5 p-3.5 bg-[#071114]/25 border border-[#00C9A7]/30 rounded-2xl text-[#E6B8C3] text-xs flex items-center gap-2 font-semibold">
+            <AlertCircle className="w-4 h-4 shrink-0 text-[#7EE8D3]" />
             <span>{error}</span>
           </div>
         )}
@@ -143,7 +143,7 @@ export const ForgotPasswordPage: React.FC = () => {
         {step === 'otp' && (
           <div className="space-y-4">
             <div className="nivo-glass-surface rounded-2xl p-4 text-center">
-              <ShieldCheck className="w-7 h-7 text-[#C13A5A] mx-auto mb-2" />
+              <ShieldCheck className="w-7 h-7 text-[#7EE8D3] mx-auto mb-2" />
               <p className="text-xs text-[#E6D5DA]">A 6-digit verification code was sent to</p>
               <p className="text-xs font-black text-white mt-1 break-all">{email}</p>
               <p className="text-[10px] text-[#B99BA3] mt-2">The code expires in 10 minutes.</p>
@@ -152,7 +152,7 @@ export const ForgotPasswordPage: React.FC = () => {
             <button onClick={verifyOtp} disabled={loading || otp.length !== 6} className="w-full nivo-primary rounded-2xl py-3.5 text-sm font-black disabled:opacity-50">
               {loading ? 'Verifying Code...' : 'Verify Code'}
             </button>
-            <button onClick={sendOtp} disabled={loading || cooldown > 0} className="w-full nivo-glass-surface rounded-2xl py-3 text-xs font-bold text-[#C13A5A] disabled:opacity-40 flex items-center justify-center gap-2">
+            <button onClick={sendOtp} disabled={loading || cooldown > 0} className="w-full nivo-glass-surface rounded-2xl py-3 text-xs font-bold text-[#7EE8D3] disabled:opacity-40 flex items-center justify-center gap-2">
               <RefreshCw className="w-3.5 h-3.5" />
               {cooldown > 0 ? `Resend available in ${cooldown}s` : 'Resend Code'}
             </button>
@@ -186,8 +186,8 @@ export const ForgotPasswordPage: React.FC = () => {
 
         {step === 'success' && (
           <div className="nivo-glass-surface rounded-2xl p-6 text-center space-y-3">
-            <div className="w-14 h-14 rounded-full bg-[#00C9A7]/20 border border-[#C13A5A]/30 flex items-center justify-center mx-auto shadow-lg">
-              <CheckCircle2 className="w-8 h-8 text-[#C13A5A]" />
+            <div className="w-14 h-14 rounded-full bg-[#00C9A7]/20 border border-[#7EE8D3]/30 flex items-center justify-center mx-auto shadow-lg">
+              <CheckCircle2 className="w-8 h-8 text-[#7EE8D3]" />
             </div>
             <h2 className="text-base font-black text-white">Password Changed Successfully</h2>
             <p className="text-xs text-[#B99BA3] leading-relaxed">Your password has been updated. You can now sign in with your new password.</p>

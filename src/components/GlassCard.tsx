@@ -11,7 +11,7 @@ export default function GlassCard({ children, className = '', id }: GlassCardPro
   return (
     <div
       id={id}
-      className={`rounded-2xl border border-teal-500/20 bg-[#090d18]/85 backdrop-blur-xl shadow-[0_0_25px_rgba(0,0,0,0.6)] transition-all duration-300 hover:border-teal-500/40 ${className}`}
+      className={`rounded-2xl border border-teal-500/20 bg-[#0A1216]/85 backdrop-blur-xl shadow-[0_0_25px_rgba(0,0,0,0.6)] transition-all duration-300 hover:border-teal-500/40 ${className}`}
     >
       {children}
     </div>

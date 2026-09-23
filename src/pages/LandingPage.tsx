@@ -1,218 +1,167 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import {
-  Zap,
-  Users,
+  ArrowRight,
   ShieldCheck,
   Wallet,
-  ArrowRight,
-  Sparkles,
-  Gift,
   CheckCircle2,
-  Lock,
+  Users,
+  Sparkles,
+  Landmark,
   Smartphone,
-  TrendingUp,
+  LockKeyhole,
+  ChevronRight,
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 
-export const LandingPage: React.FC = () => {
-  const { user, settings } = useAuth();
-  const bonusAmount = settings?.referralBonusAmount || 1200;
+interface LandingPageProps {
+  navigateTo: (path: string) => void;
+}
 
+export const LandingPage: React.FC<LandingPageProps> = ({ navigateTo }) => {
   return (
-    <div className="min-h-screen bg-[#100709] text-white font-sans selection:bg-[#00BFA6] selection:text-slate-950">
-      {/* Top Notice Banner */}
-      <div className="bg-gradient-to-r from-[#008F7A] via-[#00BFA6] to-[#008F7A] text-white py-2 px-4 text-center font-extrabold text-xs tracking-wide shadow-lg">
-        🔥 Special Offer: Register now & earn ₦{bonusAmount.toLocaleString()} instantly per referral!
-      </div>
+    <main className="nevo-landing min-h-screen text-white overflow-x-hidden">
+      <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#070A0D]/75 backdrop-blur-2xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
+          <button onClick={() => navigateTo('/')} className="flex items-center gap-3 cursor-pointer" aria-label="Nevo home">
+            <img src="/nevo-logo.svg" alt="Nevo" className="h-11 w-11 rounded-2xl shadow-[0_0_30px_rgba(0,201,167,.18)]" />
+            <div className="text-left">
+              <div className="font-display text-xl font-bold tracking-tight">Nevo</div>
+              <div className="text-[9px] uppercase tracking-[0.28em] text-[#8E9A9A]">Financial freedom</div>
+            </div>
+          </button>
 
-      {/* Hero Section */}
-      <section className="relative pt-16 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden">
-        {/* Glow Effects */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#008F7A]/10 rounded-full blur-[150px] pointer-events-none" />
-
-        <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 nivo-glass-surface border border-[#C13A5A]/30 px-4 py-1.5 rounded-full text-xs font-bold text-[#C13A5A] mb-8 shadow-lg shadow-[#C13A5A]/10">
-            <Sparkles className="w-4 h-4 text-[#C13A5A]" />
-            <span>Premier Digital Earnings & Wallet App</span>
+          <div className="hidden items-center gap-7 md:flex">
+            <a href="#features" className="text-xs font-semibold text-[#8E9A9A] hover:text-white">Features</a>
+            <a href="#how-it-works" className="text-xs font-semibold text-[#8E9A9A] hover:text-white">How it works</a>
+            <a href="#security" className="text-xs font-semibold text-[#8E9A9A] hover:text-white">Security</a>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] max-w-4xl mx-auto">
-            Earn, Manage & Withdraw Cash <span className="bg-gradient-to-r from-[#00BFA6] to-[#C13A5A] bg-clip-text text-transparent">Instantly</span>
-          </h1>
-
-          <p className="mt-6 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Welcome to <strong className="text-white">Nevo</strong>. Earn guaranteed income by completing daily tasks and referring friends. Enjoy instant bank deposits and lightning-fast withdrawals 24/7.
-          </p>
-
-          {/* Action CTA Buttons */}
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            {user ? (
-              <Link
-                to="/dashboard"
-                className="w-full sm:w-auto bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-black text-base px-8 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#008F7A]/25"
-              >
-                <span>Go to My Dashboard</span>
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            ) : (
-              <>
-                <Link
-                  to="/register"
-                  className="w-full sm:w-auto bg-gradient-to-r from-[#008F7A] to-[#00BFA6] hover:from-[#00C9A7] hover:to-[#C13A5A] text-white font-black text-base px-8 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#008F7A]/25"
-                >
-                  <span>Get Started Now</span>
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link
-                  to="/login"
-                  className="w-full sm:w-auto bg-[#071114] hover:bg-[#071114] text-white font-black text-base px-8 py-4 rounded-2xl border border-white/10 transition-colors"
-                >
-                  Sign In to Account
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Live Metrics Ticker */}
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-8 border-t border-white/10">
-            <div className="nivo-glass-surface p-6 rounded-3xl border border-white/10 shadow-xl">
-              <p className="text-2xl font-black text-white font-mono">₦12.5M+</p>
-              <p className="text-xs text-slate-400 mt-1">Total Paid Out</p>
-            </div>
-            <div className="nivo-glass-surface p-6 rounded-3xl border border-white/10 shadow-xl">
-              <p className="text-2xl font-black text-[#C13A5A] font-mono">₦1,200</p>
-              <p className="text-xs text-slate-400 mt-1">Per Referral Bonus</p>
-            </div>
-            <div className="nivo-glass-surface p-6 rounded-3xl border border-white/10 shadow-xl">
-              <p className="text-2xl font-black text-white font-mono">48,000+</p>
-              <p className="text-xs text-slate-400 mt-1">Active Members</p>
-            </div>
-            <div className="nivo-glass-surface p-6 rounded-3xl border border-white/10 shadow-xl">
-              <p className="text-2xl font-black text-[#00BFA6] font-mono">Instant</p>
-              <p className="text-xs text-slate-400 mt-1">Bank Payouts</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Referral System Feature Highlight */}
-      <section className="py-16 bg-[#090506] border-y border-[#00C9A7]/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-[#071114]/90 border border-[#00C9A7]/30 rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-2xl">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 bg-[#00BFA6]/10 text-[#C13A5A] border border-[#00BFA6]/20 px-3 py-1 rounded-full text-xs font-bold mb-4">
-                  <Gift className="w-4 h-4" />
-                  REAL REFERRAL SYSTEM
-                </div>
-                <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight">
-                  Invite Friends & Earn <span className="text-[#C13A5A]">₦1,200</span> On Every Registration!
-                </h2>
-                <p className="text-slate-300 text-sm mt-4 leading-relaxed">
-                  Every user automatically gets a unique referral code and referral link. Share your link via WhatsApp, Telegram, or social media. When someone registers through your link, your wallet is credited instantly!
-                </p>
-
-                <ul className="mt-6 space-y-2.5 text-xs font-semibold text-slate-200">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#00BFA6] shrink-0" />
-                    Automatic wallet crediting upon new registration
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#00BFA6] shrink-0" />
-                    Unique referral code & link generated automatically
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#00BFA6] shrink-0" />
-                    1-Click Copy Code, Copy Link & Native Share buttons
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#00BFA6] shrink-0" />
-                    Zero limit on referral earnings — invite unlimited friends
-                  </li>
-                </ul>
-              </div>
-
-              <div className="nivo-glass-surface p-6 rounded-2xl border border-[#00C9A7]/20 space-y-4">
-                <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                  <span className="text-xs text-slate-400 font-bold uppercase">Sample Referral Link</span>
-                  <span className="text-xs text-[#C13A5A] font-bold">Live Backend</span>
-                </div>
-                <div className="bg-[#090506] p-3 rounded-xl border border-white/10 font-mono text-xs text-[#C13A5A] break-all">
-                  https://nivocash.app/register?ref=NIVO9821X
-                </div>
-                <div className="bg-[#00BFA6]/10 border border-[#00BFA6]/20 p-4 rounded-xl flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-slate-400">Referral Bonus Per User</p>
-                    <p className="text-xl font-black text-white font-mono">₦1,200.00</p>
-                  </div>
-                  <span className="bg-gradient-to-r from-[#008F7A] to-[#00BFA6] text-white font-extrabold text-xs px-3 py-1.5 rounded-lg shadow-md">
-                    Instant Credit
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Core Features Section */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-3xl font-black text-white">Why Choose Nevo?</h2>
-          <p className="text-sm text-slate-400 mt-2">
-            Built with modern fintech security and automated processing to guarantee you the best experience.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="nivo-glass-surface p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#00C9A7]/40 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#00C9A7]/10 text-[#C13A5A] flex items-center justify-center font-bold">
-              <Wallet className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white">Instant Wallet System</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Your wallet balance updates immediately whenever you complete tasks, earn referral bonuses, or deposit funds.
-            </p>
-          </div>
-
-          <div className="nivo-glass-surface p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#00C9A7]/40 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#00BFA6]/10 text-[#C13A5A] flex items-center justify-center font-bold">
-              <TrendingUp className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white">Daily Tasks & Rewards</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Earn extra cash daily by following social channels, participating in surveys, checking in daily, and downloading apps.
-            </p>
-          </div>
-
-          <div className="nivo-glass-surface p-6 rounded-2xl border border-white/10 space-y-3 hover:border-[#00C9A7]/40 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#00C9A7]/10 text-[#00BFA6] flex items-center justify-center font-bold">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white">Bank Grade Security</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Protected routes, password hashing, and server-side verification keep your funds and personal data completely safe.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-white/10 bg-[#090506] py-10 px-4 text-center">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[#008F7A] to-[#C13A5A] flex items-center justify-center">
-              <Zap className="w-4 h-4 text-white fill-white" />
+            <button onClick={() => navigateTo('/login')} className="rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#B8C4C4] hover:bg-white/5 hover:text-white cursor-pointer">Sign in</button>
+            <button onClick={() => navigateTo('/register')} className="nevo-primary-button rounded-xl px-4 py-2.5 text-xs font-extrabold cursor-pointer">Create account</button>
+          </div>
+        </div>
+      </header>
+
+      <section className="relative mx-auto max-w-6xl px-5 pb-20 pt-14 sm:px-8 sm:pt-20 lg:pb-28">
+        <div className="nevo-orb nevo-orb-one" />
+        <div className="nevo-orb nevo-orb-two" />
+        <div className="relative grid items-center gap-12 lg:grid-cols-[1.05fr_.95fr]">
+          <div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#00C9A7]/20 bg-[#00C9A7]/[0.06] px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#7EE8D3]">
+              <Sparkles className="h-3.5 w-3.5" />
+              A smarter way to manage your money
             </div>
-            <span className="font-black text-sm text-white">NEVO</span>
+            <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[1.02] tracking-[-0.045em] sm:text-6xl lg:text-7xl">
+              Your wallet.
+              <span className="block text-[#7EE8D3]">Your everyday flow.</span>
+            </h1>
+            <p className="mt-6 max-w-xl text-sm leading-7 text-[#9BA8A8] sm:text-base">
+              Nevo brings your wallet, deposits, withdrawals, tasks, referrals and transaction history into one focused fintech experience.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <button onClick={() => navigateTo('/register')} className="nevo-primary-button flex items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-extrabold cursor-pointer">
+                Get started <ArrowRight className="h-4 w-4" />
+              </button>
+              <button onClick={() => navigateTo('/login')} className="nevo-secondary-button flex items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-bold cursor-pointer">
+                Sign in to Nevo
+              </button>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-[10px] font-semibold text-[#7F8C8C]">
+              <span className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-[#00C9A7]" /> Real account data</span>
+              <span className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-[#00C9A7]" /> Secure payment flow</span>
+              <span className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-[#00C9A7]" /> Mobile-first</span>
+            </div>
           </div>
 
-          <p className="text-xs text-slate-400">
-            © {new Date().getFullYear()} Nevo. All rights reserved. Premium Digital Fintech Platform.
-          </p>
+          <div className="relative mx-auto w-full max-w-[440px] lg:ml-auto">
+            <div className="nevo-phone-glow" />
+            <div className="nevo-phone-shell rounded-[32px] p-2">
+              <div className="rounded-[26px] border border-white/[0.07] bg-[#071114] p-4 sm:p-5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <img src="/nevo-logo.svg" alt="" className="h-9 w-9 rounded-xl" />
+                    <div><p className="text-xs font-bold">Nevo</p><p className="text-[9px] text-[#718080]">Wallet overview</p></div>
+                  </div>
+                  <span className="rounded-full border border-[#00C9A7]/20 bg-[#00C9A7]/[0.06] px-2 py-1 text-[8px] font-bold text-[#7EE8D3]">Verified</span>
+                </div>
+                <div className="mt-5 rounded-[22px] border border-[#00C9A7]/20 bg-gradient-to-br from-[#0E2928] via-[#09201F] to-[#071114] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,.04)]">
+                  <div className="flex items-center justify-between text-[9px] text-[#90A0A0]"><span>Available balance</span><Wallet className="h-4 w-4 text-[#00C9A7]" /></div>
+                  <div className="mt-2 font-display text-3xl font-semibold tracking-tight">₦—</div>
+                  <div className="mt-5 grid grid-cols-3 gap-2">
+                    {[
+                      ['Deposit', Landmark],
+                      ['Withdraw', ArrowRight],
+                      ['History', ChevronRight],
+                    ].map(([label, Icon]: any) => (
+                      <div key={label} className="rounded-xl border border-white/[0.06] bg-black/20 p-2.5 text-center">
+                        <Icon className="mx-auto h-4 w-4 text-[#7EE8D3]" />
+                        <span className="mt-1 block text-[8px] text-[#91A0A0]">{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <div className="rounded-2xl border border-white/[0.06] bg-white/[0.025] p-3"><Users className="h-4 w-4 text-[#7EE8D3]" /><p className="mt-2 text-[9px] text-[#849292]">Referrals</p><p className="mt-1 text-sm font-bold">Your data</p></div>
+                  <div className="rounded-2xl border border-white/[0.06] bg-white/[0.025] p-3"><Sparkles className="h-4 w-4 text-[#7EE8D3]" /><p className="mt-2 text-[9px] text-[#849292]">Tasks</p><p className="mt-1 text-sm font-bold">Live tasks</p></div>
+                </div>
+                <div className="mt-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3 text-[9px] text-[#7B8888]">Sign in to see your actual wallet balance and account activity.</div>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
+
+      <section id="features" className="border-y border-white/[0.05] bg-white/[0.012] py-20">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8">
+          <div className="max-w-2xl"><p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#00C9A7]">Built around your account</p><h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Everything important stays in one place.</h2><p className="mt-4 text-sm leading-6 text-[#8E9A9A]">The interface is designed around the real services already available in your Nevo account.</p></div>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              [Wallet, 'Wallet & balance', 'See your current wallet balance and account activity from the same persistent account.'],
+              [Landmark, 'Deposits & withdrawals', 'Use the live payment and bank withdrawal flows connected to your account.'],
+              [Users, 'Referrals', 'Use your real referral code and track referral activity from your account.'],
+              [Sparkles, 'Tasks & rewards', 'Browse available tasks and rewards that are managed through the platform.'],
+              [ShieldCheck, 'Account security', 'Authentication, password recovery and account controls stay part of the product.'],
+              [Smartphone, 'Mobile-first', 'A responsive experience designed to feel natural on phones, tablets and desktop.'],
+            ].map(([Icon, title, text]: any) => (
+              <div key={title} className="nevo-feature-card rounded-3xl p-6">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[#00C9A7]/20 bg-[#00C9A7]/[0.07] text-[#7EE8D3]"><Icon className="h-5 w-5" /></div>
+                <h3 className="mt-5 text-sm font-bold">{title}</h3><p className="mt-2 text-xs leading-6 text-[#849191]">{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+          <div><p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#00C9A7]">Simple by design</p><h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">From account creation to everyday wallet actions.</h2></div>
+          <div className="space-y-3">
+            {[
+              ['01', 'Create your Nevo account', 'Register with your account details and keep your credentials secure.'],
+              ['02', 'Use your wallet', 'Deposit, review activity and manage available wallet actions.'],
+              ['03', 'Explore tasks & referrals', 'Use the real task and referral systems available to your account.'],
+              ['04', 'Withdraw when eligible', 'Complete the real withdrawal flow using your verified bank details.'],
+            ].map(([num, title, text]) => (
+              <div key={num} className="nevo-step-card flex gap-4 rounded-2xl p-4"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#00C9A7]/[0.08] text-[10px] font-bold text-[#7EE8D3]">{num}</span><div><p className="text-xs font-bold">{title}</p><p className="mt-1 text-[10px] leading-5 text-[#7F8C8C]">{text}</p></div></div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="security" className="border-y border-white/[0.05] bg-[#081113] py-20">
+        <div className="mx-auto grid max-w-6xl gap-10 px-5 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
+          <div className="rounded-[28px] border border-[#00C9A7]/15 bg-[#070A0D]/70 p-7 shadow-[0_25px_80px_rgba(0,0,0,.28)]">
+            <div className="flex items-center gap-3"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#00C9A7]/[0.08] text-[#7EE8D3]"><LockKeyhole className="h-6 w-6" /></div><div><p className="text-sm font-bold">Your account stays yours</p><p className="text-[10px] text-[#7F8C8C]">Security-first product language</p></div></div>
+            <div className="mt-7 space-y-3">{['Protected account credentials','Verified transaction flows','Persistent account records','Clear transaction history'].map(item => <div key={item} className="flex items-center gap-2 text-xs text-[#B3BEBE]"><CheckCircle2 className="h-4 w-4 text-[#00C9A7]" />{item}</div>)}</div>
+          </div>
+          <div><p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#00C9A7]">A calmer fintech experience</p><h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">Less clutter. More clarity.</h2><p className="mt-5 max-w-xl text-sm leading-7 text-[#8E9A9A]">Nevo uses a restrained smoky glass interface so balances, actions, tasks and account information remain easy to find without sacrificing the premium feel.</p><button onClick={() => navigateTo('/register')} className="nevo-primary-button mt-7 inline-flex items-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-extrabold cursor-pointer">Create your account <ArrowRight className="h-4 w-4" /></button></div>
+        </div>
+      </section>
+
+      <footer className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-10 sm:px-8 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-3"><img src="/nevo-logo.svg" alt="Nevo" className="h-9 w-9 rounded-xl" /><div><p className="text-sm font-bold">Nevo</p><p className="text-[9px] uppercase tracking-[0.2em] text-[#6E7A7A]">Financial freedom in your hands</p></div></div>
+        <div className="flex flex-wrap gap-4 text-[10px] font-semibold text-[#748080]"><button onClick={() => navigateTo('/terms')} className="hover:text-white cursor-pointer">Terms</button><button onClick={() => navigateTo('/privacy')} className="hover:text-white cursor-pointer">Privacy</button><button onClick={() => navigateTo('/login')} className="hover:text-white cursor-pointer">Sign in</button></div>
       </footer>
-    </div>
+    </main>
   );
 };

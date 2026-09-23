@@ -58,18 +58,18 @@ export default function AdminSidebar({
     badge?: number | string | null;
     badgeColor?: string;
   }[] = [
-    { id: 'overview', label: 'Overview', icon: BarChart3 },
+    { id: 'overview', label: 'Dashboard Overview', icon: BarChart3 },
     { id: 'nivo_rewards', label: 'Tasks & Rewards', icon: Gift },
     {
       id: 'users',
-      label: 'Users',
+      label: 'User Database',
       icon: Users,
       badge: usersCount > 0 ? usersCount : null,
       badgeColor: 'bg-teal-500/10 text-teal-400 border border-teal-500/20'
     },
     {
       id: 'payments',
-      label: 'Deposits & Payments',
+      label: 'Bank Payments',
       icon: CreditCard,
       badge: pendingPaymentsCount > 0 ? pendingPaymentsCount : null,
       badgeColor: 'bg-teal-500/20 text-teal-400 border border-teal-500/30 animate-pulse'
@@ -81,12 +81,12 @@ export default function AdminSidebar({
       badge: pendingWithdrawalsCount > 0 ? pendingWithdrawalsCount : null,
       badgeColor: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
     },
-    { id: 'reports', label: 'Reports', icon: FileSpreadsheet },
-    { id: 'security', label: 'Security', icon: ShieldAlert },
-    { id: 'payment_settings', label: 'Payment Settings', icon: Building },
-    { id: 'settings', label: 'Settings', icon: Settings },
-    { id: 'ai_support', label: 'Support', icon: Bot },
-    { id: 'logs', label: 'Audit Log', icon: FileText }
+    { id: 'reports', label: 'System Reports', icon: FileSpreadsheet },
+    { id: 'security', label: 'Security Center', icon: ShieldAlert },
+    { id: 'payment_settings', label: 'Payment Account Management', icon: Building },
+    { id: 'settings', label: 'Master Settings', icon: Settings },
+    { id: 'ai_support', label: 'AI Assistant & Support', icon: Bot },
+    { id: 'logs', label: 'Audit Trail Logs', icon: FileText }
   ];
 
   const handleSelect = (tab: AdminTab) => {
@@ -99,7 +99,7 @@ export default function AdminSidebar({
   if (isCyberStyle) {
     return (
       <aside
-        className={`fixed lg:static inset-y-24 left-0 z-40 w-64 bg-[#080c16]/95 border-r border-white/10 flex flex-col p-3 space-y-1.5 transition-transform duration-300 ${
+        className={`fixed lg:static inset-y-24 left-0 z-40 w-64 bg-[#0A1216]/95 border-r border-white/10 flex flex-col p-3 space-y-1.5 transition-transform duration-300 ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
@@ -152,7 +152,7 @@ export default function AdminSidebar({
 
   return (
     <div
-      className={`w-full lg:w-64 shrink-0 flex flex-col space-y-1.5 bg-[#0d0d18] border border-white/10 rounded-xl p-2.5 transition-all duration-300 ${
+      className={`w-full lg:w-64 shrink-0 flex flex-col space-y-1.5 bg-[#0A1216] border border-white/10 rounded-xl p-2.5 transition-all duration-300 ${
         mobileMenuOpen ? 'flex' : 'hidden lg:flex'
       }`}
     >

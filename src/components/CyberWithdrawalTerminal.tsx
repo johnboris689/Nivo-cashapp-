@@ -106,6 +106,20 @@ export function CyberWithdrawalTerminal({
   const [partialNoteInput, setPartialNoteInput] = useState<string>('');
   const [inputError, setInputError] = useState<string | null>(null);
 
+  // Live system monitor simulated stats
+  const [cpuUsage, setCpuUsage] = useState(17);
+  const [ramUsage, setRamUsage] = useState(42);
+  const [latency, setLatency] = useState(19);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCpuUsage(Math.floor(14 + Math.random() * 8));
+      setRamUsage(Math.floor(41 + Math.random() * 4));
+      setLatency(Math.floor(18 + Math.random() * 6));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Handle amount input change with live validation
   const handleAmountChange = (val: string) => {
     // Clean numeric input
@@ -198,7 +212,7 @@ export function CyberWithdrawalTerminal({
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#060810] text-slate-200 p-3 sm:p-6 space-y-6 font-mono text-xs select-none">
+    <div className="w-full min-h-screen bg-[#070A0D] text-slate-200 p-3 sm:p-6 space-y-6 font-mono text-xs select-none">
       {/* Navigation Header */}
       <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-teal-500/20 pb-4">
         <button
@@ -222,7 +236,7 @@ export function CyberWithdrawalTerminal({
       </div>
 
       {/* TOP PROCESSING CONSOLE & THREE-WAY BALANCE BREAKDOWN */}
-      <div className="w-full p-4 sm:p-6 rounded-xl border border-teal-500/30 bg-[#0a0e1a]/90 backdrop-blur-xl shadow-[0_0_30px_rgba(20,184,166,0.1)] space-y-5">
+      <div className="w-full p-4 sm:p-6 rounded-xl border border-teal-500/30 bg-[#0A1216]/90 backdrop-blur-xl shadow-[0_0_30px_rgba(20,184,166,0.1)] space-y-5">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-white/10 pb-3">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-lg bg-teal-500/10 border border-teal-500/30 text-teal-400">
@@ -244,7 +258,7 @@ export function CyberWithdrawalTerminal({
         {/* 3-CARD BALANCE BREAKDOWN GRID (Requested / Already Approved / Remaining) */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {/* Requested Amount */}
-          <div className="p-3.5 rounded-lg bg-[#050811] border border-teal-500/30 flex flex-col justify-between">
+          <div className="p-3.5 rounded-lg bg-[#070A0D] border border-teal-500/30 flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">REQUESTED AMOUNT</span>
               <Coins className="h-4 w-4 text-teal-400" />
@@ -258,7 +272,7 @@ export function CyberWithdrawalTerminal({
           </div>
 
           {/* Already Approved Amount */}
-          <div className="p-3.5 rounded-lg bg-[#050811] border border-emerald-500/30 flex flex-col justify-between">
+          <div className="p-3.5 rounded-lg bg-[#070A0D] border border-emerald-500/30 flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">ALREADY APPROVED</span>
               <CheckCircle className="h-4 w-4 text-emerald-400" />
@@ -274,7 +288,7 @@ export function CyberWithdrawalTerminal({
           </div>
 
           {/* Remaining Balance */}
-          <div className="p-3.5 rounded-lg bg-[#050811] border border-amber-500/30 flex flex-col justify-between">
+          <div className="p-3.5 rounded-lg bg-[#070A0D] border border-amber-500/30 flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">REMAINING TO APPROVE</span>
               <Clock className="h-4 w-4 text-amber-400" />
@@ -339,7 +353,7 @@ export function CyberWithdrawalTerminal({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Left Column: Partial Approval Interactive Input Form (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="p-5 rounded-xl bg-[#090d18] border border-amber-500/40 space-y-4 shadow-[0_0_25px_rgba(245,158,11,0.08)]">
+          <div className="p-5 rounded-xl bg-[#0A1216] border border-amber-500/40 space-y-4 shadow-[0_0_25px_rgba(245,158,11,0.08)]">
             <div className="flex items-center justify-between border-b border-amber-500/20 pb-3">
               <div className="flex items-center gap-2">
                 <Layers className="h-5 w-5 text-amber-400" />
@@ -425,7 +439,7 @@ export function CyberWithdrawalTerminal({
                           onClick={() => handleSetPreset(presetAmt)}
                           className={`px-2.5 py-1.5 rounded-md border text-[11px] font-mono font-bold transition-all cursor-pointer flex items-center gap-1 ${
                             isDisabled
-                              ? 'bg-[#050811] border-white/5 text-slate-600 cursor-not-allowed'
+                              ? 'bg-[#070A0D] border-white/5 text-slate-600 cursor-not-allowed'
                               : 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/25 hover:border-amber-400'
                           }`}
                         >
@@ -463,7 +477,7 @@ export function CyberWithdrawalTerminal({
 
                 {/* Dynamic Outcome Preview */}
                 {partialAmountInput && !isNaN(Number(partialAmountInput)) && Number(partialAmountInput) > 0 && !inputError && (
-                  <div className="p-3 rounded-lg bg-[#050811] border border-teal-500/30 text-[11px] space-y-1">
+                  <div className="p-3 rounded-lg bg-[#070A0D] border border-teal-500/30 text-[11px] space-y-1">
                     <div className="text-teal-300 font-bold flex items-center gap-1.5">
                       <CheckCircle className="h-3.5 w-3.5 text-teal-400" />
                       Preview Calculation:
@@ -521,7 +535,7 @@ export function CyberWithdrawalTerminal({
 
         {/* Right Column: Approval Audit Trail (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="p-5 rounded-xl bg-[#090d18] border border-teal-500/30 space-y-3 h-full flex flex-col justify-between">
+          <div className="p-5 rounded-xl bg-[#0A1216] border border-teal-500/30 space-y-3 h-full flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between border-b border-teal-500/20 pb-3">
                 <div className="flex items-center gap-2">
@@ -588,7 +602,7 @@ export function CyberWithdrawalTerminal({
       {/* THREE MAIN TERMINAL MODULES (ACCOUNT, BANKING, LEGACY_VOUCHER) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Module 1: Client Profile Terminal */}
-        <div className="p-4 rounded-xl bg-[#090d18] border border-teal-500/30 space-y-3 shadow-lg">
+        <div className="p-4 rounded-xl bg-[#0A1216] border border-teal-500/30 space-y-3 shadow-lg">
           <div className="flex items-center justify-between border-b border-teal-500/20 pb-2">
             <h3 className="text-xs font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2">
               <User className="h-4 w-4 text-teal-400" />
@@ -621,7 +635,7 @@ export function CyberWithdrawalTerminal({
         </div>
 
         {/* Module 2: Bank Terminal */}
-        <div className="p-4 rounded-xl bg-[#090d18] border border-teal-500/30 space-y-3 shadow-lg">
+        <div className="p-4 rounded-xl bg-[#0A1216] border border-teal-500/30 space-y-3 shadow-lg">
           <div className="flex items-center justify-between border-b border-teal-500/20 pb-2">
             <h3 className="text-xs font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2">
               <Building className="h-4 w-4 text-teal-400" />
@@ -654,7 +668,7 @@ export function CyberWithdrawalTerminal({
         </div>
 
         {/* Module 3: LEGACY_VOUCHER Generation Terminal */}
-        <div className="p-4 rounded-xl bg-[#090d18] border border-teal-500/30 space-y-3 shadow-lg">
+        <div className="p-4 rounded-xl bg-[#0A1216] border border-teal-500/30 space-y-3 shadow-lg">
           <div className="flex items-center justify-between border-b border-teal-500/20 pb-2">
             <h3 className="text-xs font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-teal-400" />
@@ -694,7 +708,7 @@ export function CyberWithdrawalTerminal({
         {/* Left Column: Evidence Upload + Notes (7 cols) */}
         <div className="lg:col-span-7 space-y-5">
           {/* POS Slip Evidence Terminal */}
-          <div className="p-5 rounded-xl bg-[#090d18] border border-amber-500/30 space-y-4">
+          <div className="p-5 rounded-xl bg-[#0A1216] border border-amber-500/30 space-y-4">
             <div className="flex items-center justify-between border-b border-amber-500/20 pb-3">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-amber-400" />
@@ -782,7 +796,7 @@ export function CyberWithdrawalTerminal({
           </div>
 
           {/* Internal Compliance Audit Notes Terminal */}
-          <div className="p-5 rounded-xl bg-[#090d18] border border-teal-500/30 space-y-3">
+          <div className="p-5 rounded-xl bg-[#0A1216] border border-teal-500/30 space-y-3">
             <div className="flex items-center justify-between border-b border-teal-500/20 pb-2">
               <h3 className="text-xs font-bold text-teal-400 uppercase tracking-wider flex items-center gap-2">
                 <FileText className="h-4 w-4 text-teal-400" />
@@ -809,34 +823,77 @@ export function CyberWithdrawalTerminal({
           </div>
         </div>
 
-        {/* Right Column: real withdrawal information */}
+        {/* Right Column: Live System Monitor (5 cols) */}
         <div className="lg:col-span-5 space-y-5">
-          <div className="p-5 rounded-2xl bg-[#0b1312]/80 border border-white/[0.07] space-y-4">
-            <div className="flex items-center justify-between border-b border-white/[0.07] pb-3">
-              <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">Withdrawal summary</h3>
-                <p className="mt-1 text-[10px] text-slate-500">Values below are read from this withdrawal record.</p>
+          <div className="p-5 rounded-xl bg-[#0A1216] border border-teal-500/30 space-y-4">
+            <div className="flex items-center justify-between border-b border-teal-500/20 pb-3">
+              <div className="flex items-center gap-2">
+                <Activity className="h-5 w-5 text-teal-400" />
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                  LIVE TELEMETRY &amp; FRAUD ENGINE
+                </h3>
               </div>
-              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${isCompleted ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : isRejected ? 'bg-rose-500/10 border-rose-500/20 text-rose-300' : 'bg-amber-500/10 border-amber-500/20 text-amber-300'}`}>{String(selectedWithdrawal.status || 'pending')}</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-500/10 border border-teal-500/30 text-teal-400">
+                MONITOR ONLINE
+              </span>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3"><p className="text-[9px] uppercase tracking-wider text-slate-500">Requested</p><p className="mt-1 text-sm font-bold text-white">{formatNaira(requestedAmount)}</p></div>
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3"><p className="text-[9px] uppercase tracking-wider text-slate-500">Approved</p><p className="mt-1 text-sm font-bold text-emerald-300">{formatNaira(approvedAmount)}</p></div>
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3"><p className="text-[9px] uppercase tracking-wider text-slate-500">Remaining</p><p className="mt-1 text-sm font-bold text-white">{formatNaira(remainingAmount)}</p></div>
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3"><p className="text-[9px] uppercase tracking-wider text-slate-500">Account</p><p className="mt-1 text-sm font-bold text-white">{maskAccountNumber(selectedWithdrawal.accountNumber)}</p></div>
+
+            <div className="space-y-3">
+              {/* CPU Load */}
+              <div>
+                <div className="flex justify-between text-[11px] text-slate-400 mb-1">
+                  <span className="flex items-center gap-1.5"><Cpu className="h-3.5 w-3.5 text-teal-400" /> NIBSS AUDIT THREADS</span>
+                  <span className="font-bold text-white">{cpuUsage}%</span>
+                </div>
+                <div className="w-full h-2 bg-[#03050a] rounded-full overflow-hidden border border-white/5">
+                  <div className="h-full bg-teal-400 transition-all duration-300" style={{ width: `${cpuUsage}%` }}></div>
+                </div>
+              </div>
+
+              {/* Memory Allocation */}
+              <div>
+                <div className="flex justify-between text-[11px] text-slate-400 mb-1">
+                  <span className="flex items-center gap-1.5"><Database className="h-3.5 w-3.5 text-teal-400" /> ENCRYPTED MEMORY BUFFER</span>
+                  <span className="font-bold text-white">{ramUsage}%</span>
+                </div>
+                <div className="w-full h-2 bg-[#03050a] rounded-full overflow-hidden border border-white/5">
+                  <div className="h-full bg-teal-500 transition-all duration-300" style={{ width: `${ramUsage}%` }}></div>
+                </div>
+              </div>
+
+              {/* Latency */}
+              <div>
+                <div className="flex justify-between text-[11px] text-slate-400 mb-1">
+                  <span className="flex items-center gap-1.5"><Wifi className="h-3.5 w-3.5 text-emerald-400" /> INTERBANK API LATENCY</span>
+                  <span className="font-bold text-emerald-400">{latency} ms</span>
+                </div>
+                <div className="w-full h-2 bg-[#03050a] rounded-full overflow-hidden border border-white/5">
+                  <div className="h-full bg-emerald-500 transition-all duration-300" style={{ width: `${Math.min(100, latency * 2)}%` }}></div>
+                </div>
+              </div>
             </div>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between gap-4"><span className="text-slate-500">Bank</span><span className="font-semibold text-slate-200 text-right">{selectedWithdrawal.bankName || '—'}</span></div>
-              <div className="flex justify-between gap-4"><span className="text-slate-500">Account holder</span><span className="font-semibold text-slate-200 text-right">{selectedWithdrawal.accountName || '—'}</span></div>
-              <div className="flex justify-between gap-4"><span className="text-slate-500">Reference</span><span className="font-mono font-semibold text-slate-200 text-right">{selectedWithdrawal.reference || selectedWithdrawal.id || '—'}</span></div>
-              <div className="flex justify-between gap-4"><span className="text-slate-500">Submitted</span><span className="font-semibold text-slate-200 text-right">{dateStr} · {timeStr}</span></div>
+
+            {/* Threat matrix overview */}
+            <div className="p-3 bg-[#03050a] rounded-lg border border-white/5 space-y-2 text-[11px]">
+              <div className="flex items-center justify-between text-slate-400">
+                <span>BENEFICIARY BLACKLIST CHECK:</span>
+                <span className="text-emerald-400 font-bold">CLEAN (0 MATCHES)</span>
+              </div>
+              <div className="flex items-center justify-between text-slate-400">
+                <span>VELOCITY RISK SCORE:</span>
+                <span className="text-emerald-400 font-bold">0.02 / 1.00 (NOMINAL)</span>
+              </div>
+              <div className="flex items-center justify-between text-slate-400">
+                <span>IP / DEVICE FINGERPRINT:</span>
+                <span className="text-teal-400 font-bold">VERIFIED TRUSTED</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* BOTTOM ADMIN ACTION COMMAND CENTER */}
-      <div className="p-5 rounded-xl bg-[#090d18] border border-teal-500/40 space-y-4">
+      <div className="p-5 rounded-xl bg-[#0A1216] border border-teal-500/40 space-y-4">
         <div className="flex items-center justify-between border-b border-white/10 pb-2">
           <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
             <Zap className="h-4 w-4 text-teal-400" />

@@ -3832,7 +3832,7 @@ const getPublicSettingsHandler = async (req: any, res: any) => {
       websiteUrl: (settings.websiteUrl && !/nevo/i.test(settings.websiteUrl)) ? settings.websiteUrl : "https://nevo.ng",
       privacyPolicy: (settings.privacyPolicy && !/nevo/i.test(settings.privacyPolicy)) ? settings.privacyPolicy : "Nevo Privacy Policy details...",
       termsOfService: (settings.termsOfService && !/nevo/i.test(settings.termsOfService)) ? settings.termsOfService : "Nevo Terms of Service details...",
-      aboutUs: (settings.aboutUs && !/(legacy_swiftpay_brand|legacy_voucher|settlement voucher|cashout)/i.test(settings.aboutUs)) ? settings.aboutUs : "Nevo is a digital rewards and wallet platform built to give users simple, transparent ways to earn through verified tasks, referrals and other available opportunities.",
+      aboutUs: (settings.aboutUs && !/(swiftpay|legacy_voucher|settlement voucher|cashout)/i.test(settings.aboutUs)) ? settings.aboutUs : "Nevo is a digital rewards and wallet platform built to give users simple, transparent ways to earn through verified tasks, referrals and other available opportunities.",
       contactUs: settings.contactUs || "Contact support via WhatsApp or Email.",
       faqContent: settings.faqContent || "Frequently Asked Questions...",
 
@@ -4626,7 +4626,7 @@ app.get('/api/admin/settings', authenticateAdminToken, async (req, res) => {
       settings[r.key] = r.value;
     }
     settings.websiteName = 'Nevo';
-    if (/legacy_swiftpay_brand|legacy_voucher|settlement voucher|cashout/i.test(String(settings.aboutUs || ''))) {
+    if (/swiftpay|legacy_voucher|settlement voucher|cashout/i.test(String(settings.aboutUs || ''))) {
       settings.aboutUs = 'Nevo is a digital rewards and wallet platform built to give users simple, transparent ways to earn through verified tasks, referrals and other available opportunities.';
     }
     res.json({ success: true, settings });
