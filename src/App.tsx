@@ -78,6 +78,8 @@ import { TermsOfService, PrivacyPolicy } from './components/LegalPages';
 import { StandaloneTermsPage, StandalonePrivacyPage, Custom404Page } from './components/StandaloneLegalPages';
 import LiveTicker from './components/LiveTicker';
 import AiSupportChat from './components/AiSupportChat';
+import LandingPage from './components/LandingPage';
+import NevoLogo from './components/NevoLogo';
 
 const isVoucherValid = (code: string) => {
   if (!code) return false;
@@ -2515,10 +2517,15 @@ export default function App() {
     return <Custom404Page navigateTo={navigateTo} />;
   }
 
+  // Public landing page. Authentication routes remain the real sign-in/sign-up flow.
+  if (!isAuthenticated && (normalizedPath === '/' || normalizedPath === '/index.html')) {
+    return <LandingPage navigateTo={navigateTo} />;
+  }
+
   // Render Secure Admin Login Router for unauthenticated admin access
   if (isBorisRoute && !isAdminAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#050507] [background:radial-gradient(circle_at_0%_0%,#1e1b4b_0%,#050507_50%),radial-gradient(circle_at_100%_100%,#082f49_0%,#050507_50%)] text-white flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen nevo-admin-login-shell text-white flex flex-col items-center justify-center p-4">
         {toastMessage && (
           <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 animate-[slideDown_0.2s_ease-out]">
             <div className="p-3.5 rounded-xl text-xs font-semibold shadow-xl border backdrop-blur-md flex items-center gap-2.5 bg-red-500/10 text-red-400 border-red-500/20 font-sans">
@@ -2527,12 +2534,12 @@ export default function App() {
             </div>
           </div>
         )}
-        <div className="w-full max-w-md bg-[#0c0c14]/90 border border-white/10 rounded-3xl p-8 backdrop-blur-xl shadow-2xl relative font-sans">
+        <div className="nevo-admin-login-card w-full max-w-md p-7 sm:p-8 relative font-sans">
           <div className="flex flex-col items-center mb-8 text-center">
-            <div className="h-14 w-14 bg-[#312e81]/60 border border-[#818cf8]/40 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-teal-500/10">
+            <div className="h-14 w-14 bg-emerald-400/10 border border-emerald-300/20 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-teal-500/10">
               <Shield className="h-7 w-7 text-[#2dd4bf]" />
             </div>
-            <h1 className="text-2xl font-black font-display bg-gradient-to-r from-[#818cf8] to-[#2dd4bf] bg-clip-text text-transparent">
+            <h1 className="text-2xl font-black font-display bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent">
               Nevo Admin Portal
             </h1>
             <p className="text-xs text-slate-400 mt-2 font-mono uppercase tracking-wider">SECURE AUTHORIZATION</p>
@@ -2570,7 +2577,7 @@ export default function App() {
             <button
               type="submit"
               disabled={isAdminSubmitting}
-              className={`w-full py-3.5 bg-gradient-to-r from-[#6366f1] to-[#0d9488] hover:from-[#4f46e5] hover:to-[#0f766e] text-white font-bold rounded-xl text-sm uppercase tracking-wider transition-all duration-200 active:scale-[0.98] cursor-pointer shadow-lg shadow-teal-500/10 ${
+              className={`w-full py-3.5 bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-white font-bold rounded-xl text-sm uppercase tracking-wider transition-all duration-200 active:scale-[0.98] cursor-pointer shadow-lg shadow-teal-500/10 ${
                 isAdminSubmitting ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
@@ -2595,7 +2602,7 @@ export default function App() {
   if (isBorisRoute && isAdminAuthenticated) {
     const isWithdrawalDetailsPath = lowerAdminPath.startsWith('/boris/withdrawals/');
     return (
-      <div className="min-h-screen bg-[#050507] [background:radial-gradient(circle_at_0%_0%,#1e1b4b_0%,#050507_50%),radial-gradient(circle_at_100%_100%,#0f172a_0%,#050507_50%)] text-white flex flex-col font-sans">
+      <div className="min-h-screen nevo-admin-shell text-white flex flex-col font-sans">
         {toastMessage && (
           <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 animate-[slideDown_0.2s_ease-out]">
             <div className={`p-3.5 rounded-xl text-xs font-semibold shadow-xl border backdrop-blur-md flex items-center gap-2.5 ${
@@ -2642,7 +2649,7 @@ export default function App() {
           </div>
         ) : (
           <div className="w-full flex-1 flex flex-col p-3 sm:p-6 bg-[#0c0c14]">
-            <div className="w-full bg-[#0c0c14] border border-white/10 rounded-2xl p-4 sm:p-6 shadow-2xl backdrop-blur-xl flex-1 flex flex-col">
+            <div className="w-full nevo-admin-frame flex-1 flex flex-col">
               <ErrorBoundary fallbackTitle="Admin Panel Error">
                 <AdminPanel
                   currentUserEmail="admin@nevo.ng"
@@ -2728,19 +2735,13 @@ export default function App() {
 
         {/* -------------------- VIEW 1 & 2: AUTH / ONBOARDING SCREEN -------------------- */}
         {!isAuthenticated && (
-          <div className="flex-1 flex flex-col justify-between p-6 bg-gradient-to-b from-teal-950 via-purple-950 to-slate-950 overflow-y-auto no-scrollbar">
+          <div className="nevo-auth-shell flex-1 flex flex-col justify-between p-4 sm:p-6 overflow-y-auto no-scrollbar">
             
             {/* Upper Splash Logo & Slogan */}
             <div className="text-center pt-8">
-              {systemSettings.websiteLogo ? (
-                <div className="mx-auto h-16 w-16 rounded-2xl overflow-hidden flex items-center justify-center mb-4 shadow-lg shadow-teal-500/20">
-                  <img src={systemSettings.websiteLogo} alt={systemSettings.websiteName || 'Logo'} className="h-full w-full object-contain" />
-                </div>
-              ) : (
-                <div className="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-tr from-teal-500 via-violet-500 to-teal-400 flex items-center justify-center shadow-lg shadow-teal-500/20 mb-4 animate-bounce">
-                  <Sparkles className="h-8 w-8 text-white stroke-[2.5]" />
-                </div>
-              )}
+              <div className="mx-auto mb-4 flex justify-center">
+                <NevoLogo size={72} showName={false} />
+              </div>
               <h2 className="text-3xl font-black font-display tracking-tight bg-gradient-to-r from-white via-slate-100 to-teal-200 bg-clip-text text-transparent">
                 {systemSettings.websiteName || "Nevo"}
               </h2>
@@ -2752,7 +2753,7 @@ export default function App() {
 
             {/* Middle Input Forms */}
             <div className="my-6">
-              <GlassCard className="p-5 border-white/5 bg-slate-900/40">
+              <GlassCard className="nevo-auth-card p-5 border-white/5 bg-slate-900/40">
                 {authMode !== 'forgot' ? (
                   <>
                     <div className="flex border-b border-white/10 mb-4 pb-2">
@@ -2928,7 +2929,7 @@ export default function App() {
                           id="btn-auth-submit"
                           type="submit"
                           disabled={isAuthSubmitting}
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-violet-500 to-teal-500 hover:from-teal-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-teal-500 to-teal-500 hover:from-teal-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                           {isAuthSubmitting ? (
                             <>
@@ -3009,7 +3010,7 @@ export default function App() {
                         <button
                           type="submit"
                           disabled={isAuthSubmitting}
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-violet-500 to-teal-500 hover:from-teal-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-teal-500 to-teal-500 hover:from-teal-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                           {isAuthSubmitting ? 'Verifying PIN...' : 'Sign In With Security PIN'}
                         </button>
@@ -3049,7 +3050,7 @@ export default function App() {
                         <button
                           id="btn-send-otp"
                           type="submit"
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-violet-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-teal-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
                         >
                           Send Verification Code
                         </button>
@@ -3111,7 +3112,7 @@ export default function App() {
                         <button
                           id="btn-verify-otp"
                           type="submit"
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-violet-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-teal-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
                         >
                           Verify Code
                         </button>
@@ -3162,7 +3163,7 @@ export default function App() {
                         <button
                           id="btn-submit-reset-password"
                           type="submit"
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-violet-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
+                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-teal-500 via-teal-500 to-teal-500 text-white rounded-xl active:scale-95 transition-all mt-2"
                         >
                           Complete Password Reset
                         </button>
@@ -3283,7 +3284,7 @@ export default function App() {
                         <Menu className="h-4.5 w-4.5" />
                       </button>
                     )}
-                    <span className="text-lg font-black font-display bg-gradient-to-r from-[#818cf8] to-[#2dd4bf] bg-clip-text text-transparent">
+                    <span className="text-lg font-black font-display bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent">
                       Nevo
                     </span>
 
@@ -3341,7 +3342,7 @@ export default function App() {
                       </div>
 
                       {/* COMPACT FINTECH BALANCE CARD */}
-                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#4c1d95] p-5 sm:p-6 text-white border border-teal-500/20 shadow-xl shadow-teal-950/50">
+                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#13201e] via-[#0c1515] to-[#08100f] p-5 sm:p-6 text-white border border-teal-500/20 shadow-xl shadow-teal-950/50">
                         {/* Subtle background glow elements */}
                         <div className="absolute -right-12 -top-12 w-36 h-36 rounded-full bg-teal-400/10 blur-2xl pointer-events-none" />
                         <div className="absolute -left-12 -bottom-12 w-32 h-32 rounded-full bg-teal-400/15 blur-2xl pointer-events-none" />
@@ -3377,7 +3378,7 @@ export default function App() {
                             id="btn-deposit-trigger"
                             type="button"
                             onClick={() => setPaymentModalOpen(true)}
-                            className="w-full py-2.5 px-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-violet-600 hover:from-teal-400 hover:to-violet-500 text-white text-xs font-black shadow-md shadow-teal-500/25 active:scale-95 hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer border border-teal-400/30"
+                            className="w-full py-2.5 px-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-teal-500 hover:from-teal-400 hover:to-teal-500 text-white text-xs font-black shadow-md shadow-teal-500/25 active:scale-95 hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer border border-teal-400/30"
                           >
                             <Send className="h-4 w-4 stroke-[2.5]" />
                             <span>Deposit</span>
@@ -5351,7 +5352,7 @@ export default function App() {
                         type="button"
                         disabled={!transferBank || transferAccNum.length !== 10 || !transferVerified || !transferAccName}
                         onClick={() => setTransferStep(2)}
-                        className={`w-full py-4 bg-gradient-to-r from-teal-600 to-violet-600 hover:from-teal-500 hover:to-violet-500 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
+                        className={`w-full py-4 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-500 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
                           (!transferBank || transferAccNum.length !== 10 || !transferVerified || !transferAccName) ? 'opacity-40 cursor-not-allowed' : ''
                         }`}
                       >
@@ -5462,7 +5463,7 @@ export default function App() {
                             parseInt(transferAmount) > 200000 ||
                             isSubmitting
                           }
-                          className={`w-full py-4 bg-gradient-to-r from-teal-600 to-violet-600 hover:from-teal-500 hover:to-violet-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
+                          className={`w-full py-4 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
                             (!transferAccNum || transferAccNum.length !== 10 || !transferAccName || !transferAmount || parseInt(transferAmount) < 50 || parseInt(transferAmount) > 200000 || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
                         >

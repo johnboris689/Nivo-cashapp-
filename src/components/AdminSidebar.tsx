@@ -58,18 +58,18 @@ export default function AdminSidebar({
     badge?: number | string | null;
     badgeColor?: string;
   }[] = [
-    { id: 'overview', label: 'Dashboard Overview', icon: BarChart3 },
+    { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'nivo_rewards', label: 'Tasks & Rewards', icon: Gift },
     {
       id: 'users',
-      label: 'User Database',
+      label: 'Users',
       icon: Users,
       badge: usersCount > 0 ? usersCount : null,
       badgeColor: 'bg-teal-500/10 text-teal-400 border border-teal-500/20'
     },
     {
       id: 'payments',
-      label: 'Bank Payments',
+      label: 'Deposits & Payments',
       icon: CreditCard,
       badge: pendingPaymentsCount > 0 ? pendingPaymentsCount : null,
       badgeColor: 'bg-teal-500/20 text-teal-400 border border-teal-500/30 animate-pulse'
@@ -81,12 +81,12 @@ export default function AdminSidebar({
       badge: pendingWithdrawalsCount > 0 ? pendingWithdrawalsCount : null,
       badgeColor: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
     },
-    { id: 'reports', label: 'System Reports', icon: FileSpreadsheet },
-    { id: 'security', label: 'Security Center', icon: ShieldAlert },
-    { id: 'payment_settings', label: 'Payment Account Management', icon: Building },
-    { id: 'settings', label: 'Master Settings', icon: Settings },
-    { id: 'ai_support', label: 'AI Assistant & Support', icon: Bot },
-    { id: 'logs', label: 'Audit Trail Logs', icon: FileText }
+    { id: 'reports', label: 'Reports', icon: FileSpreadsheet },
+    { id: 'security', label: 'Security', icon: ShieldAlert },
+    { id: 'payment_settings', label: 'Payment Settings', icon: Building },
+    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'ai_support', label: 'Support', icon: Bot },
+    { id: 'logs', label: 'Audit Log', icon: FileText }
   ];
 
   const handleSelect = (tab: AdminTab) => {

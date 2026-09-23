@@ -835,7 +835,7 @@ export async function initDb() {
     console.log('[Nevo DB] Default admin settings seeded.');
   }
 
-  // Nevo is the canonical product brand. Normalize any legacy SwiftPay setting
+  // Nevo is the canonical product brand. Normalize any legacy brand setting
   // so old persisted configuration cannot reintroduce the previous brand.
   try {
     await execute(`INSERT INTO admin_settings (key, value) VALUES ($1, $2) ON CONFLICT(key) DO UPDATE SET value = EXCLUDED.value`, ['websiteName', 'Nevo']);

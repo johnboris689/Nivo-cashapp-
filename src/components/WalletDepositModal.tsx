@@ -52,8 +52,8 @@ export default function WalletDepositModal({ isOpen, onClose, onToast }: WalletD
   };
 
   return (
-    <div className="fixed inset-0 z-[180] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
-      <div className="w-full max-w-lg bg-[#0b0c16] border border-white/10 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden">
+    <div className="nevo-deposit-overlay fixed inset-0 z-[180] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-0 sm:p-4">
+      <div className="nevo-deposit-sheet w-full max-w-lg bg-[#0b0c16] border border-white/10 rounded-none sm:rounded-3xl shadow-2xl overflow-hidden">
         <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400"><Wallet className="w-4 h-4" /></div>

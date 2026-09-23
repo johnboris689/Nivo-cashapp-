@@ -349,7 +349,7 @@ export default function NotificationsModal({
                   )}
 
                   {/* Voucher Code */}
-                  {details.voucherCode && (
+                  {false && details.voucherCode && (
                     <div className="flex items-center justify-between py-2 border-b border-slate-800/60 bg-teal-950/20 px-2.5 rounded-xl border-teal-900/30">
                       <span className="text-teal-300 font-semibold flex items-center gap-1.5">
                         <Ticket className="h-3.5 w-3.5 text-teal-400" /> Voucher Code
@@ -415,7 +415,7 @@ export default function NotificationsModal({
 
               {/* Action Footer */}
               <div className="pt-4 border-t border-slate-800 shrink-0 flex items-center gap-3 mt-2">
-                {details.voucherCode && (
+                {false && details.voucherCode && (
                   <button
                     type="button"
                     onClick={() => handleCopy(details.voucherCode!, 'voucher_btn')}

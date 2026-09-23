@@ -2197,7 +2197,7 @@ export default function AdminPanel({
               <ShoppingBag className="h-4 w-4 text-teal-400" />
               LEGACY_VOUCHER Payment details &amp; Pricing Config
             </h5>
-            <p className="text-[10px] text-slate-400 mt-0.5">Control system bank transfer details, warning notices, and voucher pricing dynamically</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">Control payment settings, verification rules, and support details dynamically</p>
           </div>
         </div>
 
@@ -2565,7 +2565,7 @@ export default function AdminPanel({
             </div>
           )}
 
-          {activeTab === 'voucher_generator' && (
+          {false && activeTab === 'voucher_generator' && (
             <div className="space-y-6 animate-[fadeIn_0.2s_ease-out]">
               {/* Introduction Header card */}
               <GlassCard className="p-5 border-white/5 bg-gradient-to-br from-teal-950/10 via-slate-900/10 to-teal-950/5">
@@ -2817,9 +2817,9 @@ export default function AdminPanel({
                   <div>
                     <h5 className="text-xs font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
                       <CreditCard className="h-4 w-4 text-teal-400" />
-                      LEGACY_VOUCHER Payments & Transfers Log
+                      Deposits & Payment Log
                     </h5>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Tracking of user bank transfer payments, references, and voucher issuances</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Tracking of deposits, payment references, and verification states</p>
                   </div>
 
                   <button
@@ -2855,14 +2855,13 @@ export default function AdminPanel({
                         <th className="px-3 py-3 font-bold">Amount</th>
                         <th className="px-3 py-3 font-bold">Virtual Account</th>
                         <th className="px-3 py-3 font-bold">Status</th>
-                        <th className="px-3 py-3 font-bold">Voucher Code</th>
                         <th className="px-3 py-3 font-bold text-right">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
                       {loadingPayments ? (
                         <tr>
-                          <td colSpan={7} className="text-center py-8 text-slate-400 text-xs font-sans">
+                          <td colSpan={6} className="text-center py-8 text-slate-400 text-xs font-sans">
                             <RefreshCw className="h-4 w-4 animate-spin mx-auto mb-2 text-teal-400" />
                             Loading virtual account payment logs...
                           </td>
@@ -2873,11 +2872,10 @@ export default function AdminPanel({
                           return (p.reference || '').toLowerCase().includes(term) ||
                                  (p.userEmail || '').toLowerCase().includes(term) ||
                                  (p.bankName || '').toLowerCase().includes(term) ||
-                                 (p.accountNumber || '').toLowerCase().includes(term) ||
-                                 (p.voucherCode || '').toLowerCase().includes(term);
+                                 (p.accountNumber || '').toLowerCase().includes(term);
                         }).length === 0 ? (
                         <tr>
-                          <td colSpan={7} className="text-center py-8 text-slate-500 text-xs font-sans">
+                          <td colSpan={6} className="text-center py-8 text-slate-500 text-xs font-sans">
                             No payment records found.
                           </td>
                         </tr>
@@ -2888,8 +2886,7 @@ export default function AdminPanel({
                           return (p.reference || '').toLowerCase().includes(term) ||
                                  (p.userEmail || '').toLowerCase().includes(term) ||
                                  (p.bankName || '').toLowerCase().includes(term) ||
-                                 (p.accountNumber || '').toLowerCase().includes(term) ||
-                                 (p.voucherCode || '').toLowerCase().includes(term);
+                                 (p.accountNumber || '').toLowerCase().includes(term);
                         }).map((p) => {
                           const isSuccessful = p.status === 'successful' || p.status === 'settled';
                           const isPending = p.status === 'pending';
@@ -2917,22 +2914,13 @@ export default function AdminPanel({
                                   {p.status}
                                 </span>
                               </td>
-                              <td className="px-3 py-3 text-teal-300 font-bold text-[10px]">
-                                {p.voucherCode ? (
-                                  <span className="bg-teal-500/10 text-teal-300 px-2 py-0.5 rounded border border-teal-500/20">
-                                    {p.voucherCode}
-                                  </span>
-                                ) : (
-                                  <span className="text-slate-500">-</span>
-                                )}
-                              </td>
                               <td className="px-3 py-3 text-right">
                                 {!isSuccessful && (
                                   <button
                                     onClick={() => handleAdminConfirmPayment(p.reference)}
                                     className="px-2.5 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded text-[9px] font-bold uppercase transition-all cursor-pointer"
                                   >
-                                    Verify & Issue Voucher
+                                    Verify Payment
                                   </button>
                                 )}
                               </td>
@@ -3355,7 +3343,7 @@ export default function AdminPanel({
                               LEGACY_VOUCHER Payment Account Management
                             </h4>
                             <p className="text-[11px] text-slate-400">
-                              Configure the live bank payment details, voucher pricing, WhatsApp support number, and instructions displayed to users purchasing LEGACY_VOUCHER Vouchers.
+                              Configure live payment details, support contacts, and instructions displayed to users.
                             </p>
                           </div>
                         </div>
@@ -4539,7 +4527,7 @@ export default function AdminPanel({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-slate-950/40 p-4 rounded-xl border border-white/5 space-y-2">
                   <div className="text-[10px] text-slate-400 font-mono font-bold uppercase">Account Protection Status</div>
-                  <div className="text-xl font-bold text-white">100% Protected</div>
+                  <div className="text-xl font-bold text-white">Security controls enabled</div>
                   <p className="text-[10px] text-slate-500">2FA verification active for admin operations</p>
                 </div>
                 <div className="bg-slate-950/40 p-4 rounded-xl border border-white/5 space-y-2">
@@ -4589,7 +4577,7 @@ export default function AdminPanel({
                     <FileSpreadsheet className="h-5 w-5 text-teal-400" />
                     System Reports &amp; Financial Audits
                   </h5>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Comprehensive transaction summaries, voucher revenue analytics, and exportable financial reports.</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Comprehensive transaction summaries, revenue analytics, and exportable financial reports.</p>
                 </div>
                 <button
                   onClick={() => {

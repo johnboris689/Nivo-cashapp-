@@ -106,20 +106,6 @@ export function CyberWithdrawalTerminal({
   const [partialNoteInput, setPartialNoteInput] = useState<string>('');
   const [inputError, setInputError] = useState<string | null>(null);
 
-  // Live system monitor simulated stats
-  const [cpuUsage, setCpuUsage] = useState(17);
-  const [ramUsage, setRamUsage] = useState(42);
-  const [latency, setLatency] = useState(19);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCpuUsage(Math.floor(14 + Math.random() * 8));
-      setRamUsage(Math.floor(41 + Math.random() * 4));
-      setLatency(Math.floor(18 + Math.random() * 6));
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
   // Handle amount input change with live validation
   const handleAmountChange = (val: string) => {
     // Clean numeric input
@@ -823,70 +809,27 @@ export function CyberWithdrawalTerminal({
           </div>
         </div>
 
-        {/* Right Column: Live System Monitor (5 cols) */}
+        {/* Right Column: real withdrawal information */}
         <div className="lg:col-span-5 space-y-5">
-          <div className="p-5 rounded-xl bg-[#090d18] border border-teal-500/30 space-y-4">
-            <div className="flex items-center justify-between border-b border-teal-500/20 pb-3">
-              <div className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-teal-400" />
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-                  LIVE TELEMETRY &amp; FRAUD ENGINE
-                </h3>
+          <div className="p-5 rounded-2xl bg-[#0b1312]/80 border border-white/[0.07] space-y-4">
+            <div className="flex items-center justify-between border-b border-white/[0.07] pb-3">
+              <div>
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">Withdrawal summary</h3>
+                <p className="mt-1 text-[10px] text-slate-500">Values below are read from this withdrawal record.</p>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-500/10 border border-teal-500/30 text-teal-400">
-                MONITOR ONLINE
-              </span>
+              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${isCompleted ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : isRejected ? 'bg-rose-500/10 border-rose-500/20 text-rose-300' : 'bg-amber-500/10 border-amber-500/20 text-amber-300'}`}>{String(selectedWithdrawal.status || 'pending')}</span>
             </div>
-
-            <div className="space-y-3">
-              {/* CPU Load */}
-              <div>
-                <div className="flex justify-between text-[11px] text-slate-400 mb-1">
-                  <span className="flex items-center gap-1.5"><Cpu className="h-3.5 w-3.5 text-teal-400" /> NIBSS AUDIT THREADS</span>
-                  <span className="font-bold text-white">{cpuUsage}%</span>
-                </div>
-                <div className="w-full h-2 bg-[#03050a] rounded-full overflow-hidden border border-white/5">
-                  <div className="h-full bg-teal-400 transition-all duration-300" style={{ width: `${cpuUsage}%` }}></div>
-                </div>
-              </div>
-
-              {/* Memory Allocation */}
-              <div>
-                <div className="flex justify-between text-[11px] text-slate-400 mb-1">
-                  <span className="flex items-center gap-1.5"><Database className="h-3.5 w-3.5 text-teal-400" /> ENCRYPTED MEMORY BUFFER</span>
-                  <span className="font-bold text-white">{ramUsage}%</span>
-                </div>
-                <div className="w-full h-2 bg-[#03050a] rounded-full overflow-hidden border border-white/5">
-                  <div className="h-full bg-teal-500 transition-all duration-300" style={{ width: `${ramUsage}%` }}></div>
-                </div>
-              </div>
-
-              {/* Latency */}
-              <div>
-                <div className="flex justify-between text-[11px] text-slate-400 mb-1">
-                  <span className="flex items-center gap-1.5"><Wifi className="h-3.5 w-3.5 text-emerald-400" /> INTERBANK API LATENCY</span>
-                  <span className="font-bold text-emerald-400">{latency} ms</span>
-                </div>
-                <div className="w-full h-2 bg-[#03050a] rounded-full overflow-hidden border border-white/5">
-                  <div className="h-full bg-emerald-500 transition-all duration-300" style={{ width: `${Math.min(100, latency * 2)}%` }}></div>
-                </div>
-              </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3"><p className="text-[9px] uppercase tracking-wider text-slate-500">Requested</p><p className="mt-1 text-sm font-bold text-white">{formatNaira(requestedAmount)}</p></div>
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3"><p className="text-[9px] uppercase tracking-wider text-slate-500">Approved</p><p className="mt-1 text-sm font-bold text-emerald-300">{formatNaira(approvedAmount)}</p></div>
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3"><p className="text-[9px] uppercase tracking-wider text-slate-500">Remaining</p><p className="mt-1 text-sm font-bold text-white">{formatNaira(remainingAmount)}</p></div>
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] p-3"><p className="text-[9px] uppercase tracking-wider text-slate-500">Account</p><p className="mt-1 text-sm font-bold text-white">{maskAccountNumber(selectedWithdrawal.accountNumber)}</p></div>
             </div>
-
-            {/* Threat matrix overview */}
-            <div className="p-3 bg-[#03050a] rounded-lg border border-white/5 space-y-2 text-[11px]">
-              <div className="flex items-center justify-between text-slate-400">
-                <span>BENEFICIARY BLACKLIST CHECK:</span>
-                <span className="text-emerald-400 font-bold">CLEAN (0 MATCHES)</span>
-              </div>
-              <div className="flex items-center justify-between text-slate-400">
-                <span>VELOCITY RISK SCORE:</span>
-                <span className="text-emerald-400 font-bold">0.02 / 1.00 (NOMINAL)</span>
-              </div>
-              <div className="flex items-center justify-between text-slate-400">
-                <span>IP / DEVICE FINGERPRINT:</span>
-                <span className="text-teal-400 font-bold">VERIFIED TRUSTED</span>
-              </div>
+            <div className="space-y-2 text-xs">
+              <div className="flex justify-between gap-4"><span className="text-slate-500">Bank</span><span className="font-semibold text-slate-200 text-right">{selectedWithdrawal.bankName || '—'}</span></div>
+              <div className="flex justify-between gap-4"><span className="text-slate-500">Account holder</span><span className="font-semibold text-slate-200 text-right">{selectedWithdrawal.accountName || '—'}</span></div>
+              <div className="flex justify-between gap-4"><span className="text-slate-500">Reference</span><span className="font-mono font-semibold text-slate-200 text-right">{selectedWithdrawal.reference || selectedWithdrawal.id || '—'}</span></div>
+              <div className="flex justify-between gap-4"><span className="text-slate-500">Submitted</span><span className="font-semibold text-slate-200 text-right">{dateStr} · {timeStr}</span></div>
             </div>
           </div>
         </div>
