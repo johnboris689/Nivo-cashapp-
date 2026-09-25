@@ -105,7 +105,7 @@ export default function TransactionList({
               { id: 'all', label: 'All' },
               { id: 'in', label: 'Incoming' },
               { id: 'out', label: 'Payments' },
-              { id: 'legacyVoucher', label: 'LEGACY_VOUCHER Codes' }
+              { id: 'legacyVoucher', label: 'Credits' }
             ].map((btn) => (
               <button
                 id={`btn-tx-filter-${btn.id}`}

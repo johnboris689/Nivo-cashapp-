@@ -17,7 +17,6 @@ import {
 export type AdminTab =
   | 'overview'
   | 'users'
-  | 'voucher_generator'
   | 'payments'
   | 'withdrawals'
   | 'reports'
