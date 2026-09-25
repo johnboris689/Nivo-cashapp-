@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 import multer from 'multer';
 import bcrypt from 'bcryptjs';
 import { GoogleGenAI } from '@google/genai';
-import { initDb, getRow, getAllRows, execute } from './db';
+import { initDb, getRow, getAllRows, execute, isPostgresActive } from './db';
 import { sendEmail, sendSms } from './email_sms_service';
 import { paymentManager, PaymentProviderName } from './server/payments/index';
 
@@ -209,6 +209,11 @@ function rateLimiter(req: any, res: any, next: any) {
     limit.count += 1;
   }
   rateLimits.set(ip, limit);
+
+  // Only rate limit API requests, never static assets or Vite internals
+  if (!req.path.startsWith('/api')) {
+    return next();
+  }
 
   if (limit.count > 100) { // 100 requests per minute
     return res.status(429).json({ error: 'Rate limit exceeded. Please try again after 1 minute.' });
@@ -5885,6 +5890,7 @@ app.get('/api/health', (_req, res) => {
     service: 'Nevo',
     status: databaseReady ? 'ready' : 'starting',
     database: databaseReady ? 'ready' : 'initializing',
+    storageMode: isPostgresActive() ? 'postgresql' : 'json_fallback',
     timestamp: new Date().toISOString()
   });
 });

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Zap, Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { NevoBrandLockup } from '../components/NevoLogo';
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
@@ -34,94 +35,101 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#070A0D] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#008F7A]/10 rounded-full blur-[140px] pointer-events-none"></div>
-
-      <div className="w-full max-w-md nivo-glass-strong border border-[#00C9A7]/30 rounded-3xl p-8 shadow-2xl relative z-10">
-        {/* Logo Header */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2.5 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#008F7A] to-[#7EE8D3] flex items-center justify-center shadow-lg shadow-[#00C9A7]/20">
-              <Zap className="w-6 h-6 text-white fill-white" />
-            </div>
-            <span className="font-black text-2xl tracking-tight text-white">
-              NIVO <span className="text-[#7EE8D3]">CASH</span>
-            </span>
-          </Link>
-          <h1 className="text-xl font-black text-white mt-2">Welcome Back!</h1>
-          <p className="text-xs text-slate-400 mt-1">Sign in to manage your wallet and earnings</p>
+    <div className="nevo-auth-shell min-h-screen flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-hidden">
+      <div className="w-full max-w-[460px] mx-auto z-10">
+        {/* Centered Brand Lockup - Required by specification */}
+        <div className="mb-6">
+          <NevoBrandLockup
+            logoSize={54}
+            subtitle="Sign in to manage your wallet, tasks and earnings."
+          />
         </div>
 
-        {error && (
-          <div className="mb-6 p-3.5 bg-[#00C9A7]/10 border border-[#00C9A7]/30 rounded-xl text-[#7EE8D3] text-xs flex items-center gap-2.5 font-semibold">
-            <AlertCircle className="w-4 h-4 shrink-0 text-[#7EE8D3]" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1.5">
-              Email or Username
-            </label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                required
-                value={emailOrUsername}
-                onChange={(e) => setEmailOrUsername(e.target.value)}
-                placeholder="email@example.com or username"
-                className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-[#7EE8D3] transition-colors"
-              />
+        <div className="nevo-auth-card rounded-2xl p-6 sm:p-7 shadow-2xl">
+          {/* Segmented Auth Switch */}
+          <div className="p-1 bg-[#050C0E] border border-white/[0.08] rounded-xl flex items-center mb-5">
+            <Link
+              to="/register"
+              className="flex-1 h-10 flex items-center justify-center text-xs font-bold uppercase tracking-wider rounded-lg text-[#8E9A9A] hover:text-white border border-transparent transition-all"
+            >
+              Sign Up
+            </Link>
+            <div className="flex-1 h-10 flex items-center justify-center text-xs font-bold uppercase tracking-wider rounded-lg bg-gradient-to-r from-[#008F7A]/30 to-[#00C9A7]/25 text-[#7EE8D3] border border-[#00C9A7]/30 shadow-[0_2px_12px_rgba(0,201,167,0.15)]">
+              Sign In
             </div>
           </div>
 
-          <div>
-            <div className="flex justify-between items-center mb-1.5">
-              <label className="text-xs font-bold text-slate-300">Password</label>
-              <Link to="/forgot-password" className="text-xs text-[#7EE8D3] hover:underline">
-                Forgot password?
-              </Link>
+          {error && (
+            <div className="mb-5 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs flex items-center gap-2.5 font-medium">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+              <span>{error}</span>
             </div>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full nivo-glass-surface border border-[#00C9A7]/20 rounded-xl pl-10 pr-10 py-3 text-white text-sm focus:outline-none focus:border-[#7EE8D3] transition-colors"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                Email or Username
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  required
+                  value={emailOrUsername}
+                  onChange={(e) => setEmailOrUsername(e.target.value)}
+                  placeholder="john@example.com or username"
+                  className="w-full h-12 bg-[#050C0E]/90 border border-white/[0.08] rounded-xl pl-10 pr-4 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-[#00C9A7] focus:ring-1 focus:ring-[#00C9A7]/20 transition-colors"
+                />
+              </div>
             </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="text-xs font-semibold text-slate-300">Password</label>
+                <Link to="/forgot-password" className="text-xs font-semibold text-[#7EE8D3] hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full h-12 bg-[#050C0E]/90 border border-white/[0.08] rounded-xl pl-10 pr-11 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-[#00C9A7] focus:ring-1 focus:ring-[#00C9A7]/20 transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 text-xs font-bold uppercase tracking-wider nevo-primary-button rounded-xl shadow-lg shadow-[#00C9A7]/20 active:scale-[0.98] transition-all mt-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+            >
+              {loading ? 'Signing In...' : 'Sign In to Account'}
+              {!loading && <ArrowRight className="w-4 h-4" />}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center text-xs text-slate-400 border-t border-white/[0.08] pt-4">
+            Don't have an account yet?{' '}
+            <Link to="/register" className="font-bold text-[#7EE8D3] hover:underline ml-1">
+              Create Account
+            </Link>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-[#008F7A] to-[#00C9A7] hover:from-[#00C9A7] hover:to-[#7EE8D3] disabled:opacity-50 text-white font-black text-sm py-3.5 rounded-xl shadow-lg shadow-[#008F7A]/25 flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
-          >
-            {loading ? 'Signing In...' : 'Sign In to Account'}
-            {!loading && <ArrowRight className="w-4 h-4" />}
-          </button>
-        </form>
-
-        <div className="mt-8 text-center text-xs text-slate-400 border-t border-white/10 pt-6">
-          Don't have an account yet?{' '}
-          <Link to="/register" className="font-black text-[#7EE8D3] hover:underline">
-            Create Free Account
-          </Link>
         </div>
       </div>
     </div>
   );
 };
+

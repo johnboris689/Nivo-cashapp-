@@ -13,7 +13,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ onClose }) => {
   const [copiedLink, setCopiedLink] = useState(false);
 
   const bonusAmount = settings?.referralBonusAmount || 1200;
-  const referralCode = user?.referralCode || 'NIVO123';
+  const referralCode = user?.referralCode || 'NEVO123';
   const referralLink = user?.referralLink || `${window.location.origin}/register?ref=${referralCode}`;
 
   const copyCode = () => {

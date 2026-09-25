@@ -1,0 +1,143 @@
+{
+  "users": [
+    {
+      "fullname": "Aegis wealth",
+      "username": "aegisaitrade",
+      "email": "aegisaitrade@gmail.com",
+      "phone": "",
+      "passwordhash": "$2b$10$U.gk2mQ8w9HR7.n9nqxtAO8mb/LskaKP4NLP5dKL8eLJzGTeWzNwO",
+      "balance": 750,
+      "dailytarget": 50000,
+      "dailyspent": 0,
+      "pincreated": 0,
+      "pincode": "",
+      "biometricenabled": 0,
+      "profilepic": "",
+      "tier": 3,
+      "issuspended": 0,
+      "isfrozen": 0,
+      "registrationdate": "2026-09-25T09:25:44.413Z",
+      "accountstatus": "active",
+      "beneficiaries": "[]",
+      "phonebeneficiaries": "[]",
+      "loginhistory": "[{\"id\":\"log-1790328344479\",\"date\":\"9/25/2026\",\"time\":\"9:25:44 AM\",\"device\":\"Web Client\",\"browser\":\"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Mobile Safari/537.36\",\"ip\":\"127.0.0.1\",\"location\":\"Lagos, Nigeria\",\"status\":\"success\"}]",
+      "notifications": "[{\"id\":\"notif-1790328344413-bonus\",\"title\":\"Welcome Bonus Added\",\"body\":\"Congratulations! Your ₦750 welcome reward has been added to your wallet.\",\"date\":\"2026-09-25T09:25:44.479Z\",\"unread\":true},{\"id\":\"notif-1790328344479\",\"title\":\"Welcome to Nevo!\",\"body\":\"Welcome to your premium bill payments gateway! Please create a 4-digit security PIN to get started.\",\"date\":\"2026-09-25T09:25:44.479Z\",\"unread\":true}]",
+      "transactions": "[{\"id\":\"tx-1790328344413-bonus\",\"type\":\"promotional_bonus\",\"amount\":750,\"date\":\"2026-09-25T09:25:44.413Z\",\"status\":\"success\",\"description\":\"Registration Bonus\",\"narration\":\"Welcome Reward\"}]",
+      "wdvverified": 0,
+      "iswdvverified": 0,
+      "welcomerewardshown": 1,
+      "giftday": 1,
+      "giftactive": 1,
+      "lastgiftcredittime": "2026-09-25T09:25:44.413Z",
+      "giftexpiresat": "2026-09-28T09:25:44.413Z"
+    }
+  ],
+  "vouchers": [],
+  "password_resets": [],
+  "admin_settings": {
+    "websiteName": "Nevo",
+    "supportEmail": "aegisaitrade@gmail.com",
+    "supportPhone": "09130892957",
+    "whatsappNumber": "09130892957",
+    "senderName": "Nevo",
+    "currency": "₦",
+    "registrationBonus": "750",
+    "minWithdrawal": "5000",
+    "maxWithdrawal": "500000",
+    "referralRequired": "5",
+    "depositMinimum": "520",
+    "recoveryEnabled": "true",
+    "smsRecoveryEnabled": "true",
+    "aiSupportEnabled": "true",
+    "videoUrl": "",
+    "wdvBankName": "PalmPay",
+    "wdvAccountNumber": "8960723295",
+    "wdvAccountName": "pwamunadi ishaku",
+    "wdvWhatsappLink": "https://wa.me/2349162845073",
+    "wdvVoucherPrice": "6500",
+    "wdvInstructions": "Copy the system account details below. Make a manual bank transfer of the exact locked amount. Return here and click 'I have made this bank Transfer' to trigger operator check.",
+    "wdvMaintenanceNotice": "Wema Bank transfers are temporarily delayed. Please use other supported banks (like PalmPay or GTBank) for instant manual validation."
+  },
+  "logs": [
+    {
+      "id": "log-1790328344488-12467a88",
+      "timestamp": "2026-09-25T09:25:44.488Z",
+      "message": "User account registered - {\"email\":\"ae***@gmail.com\"}",
+      "type": "INFO"
+    }
+  ],
+  "admins": [
+    {
+      "email": "talkdavidjohn@gmail.com",
+      "passwordhash": "447b3ce899e1ccf581589e2efc0c3aa1c75c9c4619d294b0b5f0cd04aa28fb50"
+    }
+  ],
+  "withdraw_requests": [],
+  "wdv_payments": [],
+  "payment_transactions": [],
+  "ai_chat_logs": [],
+  "ai_custom_faqs": [],
+  "nivo_tasks": [
+    {
+      "id": "task-1",
+      "title": "Follow Nevo on X",
+      "description": "Follow the official Nevo social account for product updates and announcements.",
+      "rewardamount": 500,
+      "category": "social",
+      "actionurl": "https://x.com/Nevo",
+      "verificationtype": "proof",
+      "timerseconds": 0,
+      "proofinstructions": "Enter your X username or profile link.",
+      "enabled": null,
+      "createdat": "2026-09-25T09:22:32.872Z",
+      "completioncount": 0
+    },
+    {
+      "id": "task-2",
+      "title": "Join the Nevo Telegram Community",
+      "description": "Join the official community to receive updates and reward announcements.",
+      "rewardamount": 600,
+      "category": "social",
+      "actionurl": "https://t.me/Nevo",
+      "verificationtype": "proof",
+      "timerseconds": 0,
+      "proofinstructions": "Enter your Telegram username.",
+      "enabled": null,
+      "createdat": "2026-09-25T09:22:32.873Z",
+      "completioncount": 0
+    },
+    {
+      "id": "task-3",
+      "title": "Daily Check-In",
+      "description": "Visit the featured Nevo page for 30 seconds to complete today’s check-in.",
+      "rewardamount": 300,
+      "category": "daily",
+      "actionurl": "/",
+      "verificationtype": "timer",
+      "timerseconds": 30,
+      "proofinstructions": "",
+      "enabled": null,
+      "createdat": "2026-09-25T09:22:32.873Z",
+      "completioncount": 0
+    },
+    {
+      "id": "task-4",
+      "title": "Watch Advert & Earn",
+      "description": "Watch the featured advert for 45 seconds and submit completion.",
+      "rewardamount": 500,
+      "category": "special",
+      "actionurl": "/",
+      "verificationtype": "timer",
+      "timerseconds": 45,
+      "proofinstructions": "",
+      "enabled": null,
+      "createdat": "2026-09-25T09:22:32.873Z",
+      "completioncount": 0
+    }
+  ],
+  "nivo_task_submissions": [],
+  "nivo_referrals": [],
+  "nivo_activations": [],
+  "ad_reward_sessions": [],
+  "ad_rewards": []
+}

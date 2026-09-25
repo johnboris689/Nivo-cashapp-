@@ -298,7 +298,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenDeposit, onO
         />
         <StatCard
           title="Referral Code"
-          value={user?.referralCode || 'NIVO123'}
+          value={user?.referralCode || 'NEVO123'}
           subtitle={copiedCode ? 'Code copied!' : 'Click to copy code'}
           icon={Copy}
           onClick={copyReferralCode}

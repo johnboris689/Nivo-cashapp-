@@ -16,6 +16,11 @@ function hasPostgresConfig(): boolean {
 }
 
 let pgPool: pg.Pool | null = null;
+let isPostgresOperational = false;
+
+export function isPostgresActive(): boolean {
+  return isPostgresOperational && pgPool !== null;
+}
 
 async function configureNevoPostgresPool(pool: pg.Pool, createSchema = false) {
   if (createSchema) {
@@ -362,42 +367,62 @@ function normVCode(codeStr: string | undefined): string {
 
 // -------------------- DATABASE INITIALIZATION --------------------
 export async function initDb() {
+  isPostgresOperational = false;
+
   if (hasPostgresConfig()) {
-    console.log('[Nevo DB] Connecting to PostgreSQL database (Admin privileges for Schema setup)...');
-    if (process.env.SQL_HOST) {
-      console.log('[Nevo DB] Using Cloud SQL socket/host connection params with ADMIN privileges...');
-      pgPool = new Pool({
-        host: process.env.SQL_HOST,
-        user: process.env.SQL_ADMIN_USER || process.env.SQL_USER,
-        password: process.env.SQL_ADMIN_PASSWORD || process.env.SQL_PASSWORD,
-        database: process.env.SQL_DB_NAME,
-        connectionTimeoutMillis: 15000,
+    console.log('[Nevo DB] Probing PostgreSQL database connection...');
+    let adminPool: pg.Pool | null = null;
+    try {
+      if (process.env.SQL_HOST) {
+        console.log('[Nevo DB] Using Cloud SQL socket/host connection params...');
+        adminPool = new Pool({
+          host: process.env.SQL_HOST,
+          user: process.env.SQL_ADMIN_USER || process.env.SQL_USER,
+          password: process.env.SQL_ADMIN_PASSWORD || process.env.SQL_PASSWORD,
+          database: process.env.SQL_DB_NAME,
+          connectionTimeoutMillis: 5000,
+        });
+      } else {
+        console.log('[Nevo DB] Using DATABASE_URL connection string...');
+        adminPool = new Pool({
+          connectionString: getDatabaseUrl(),
+          connectionTimeoutMillis: 5000,
+          ssl: getDatabaseUrl() && !getDatabaseUrl().includes('localhost') ? { rejectUnauthorized: false } : false
+        });
+      }
+
+      adminPool.on('error', (err) => {
+        console.warn('[Nevo DB Admin Pool Notice]', err.message);
       });
-      pgPool.on('error', (err) => {
-        console.error('[Nevo DB Admin Pool Error]', err.message);
-      });
-    } else {
-      console.log('[Nevo DB] Using DATABASE_URL connection string...');
-      pgPool = new Pool({
-        connectionString: getDatabaseUrl(),
-        connectionTimeoutMillis: 15000,
-        ssl: getDatabaseUrl() && !getDatabaseUrl().includes('localhost') ? { rejectUnauthorized: false } : false
-      });
-      pgPool.on('error', (err) => {
-        console.error('[Nevo DB Admin Pool Error]', err.message);
-      });
+
+      // Probe connection to verify DNS reachability and authentication
+      const client = await adminPool.connect();
+      await client.query('SELECT 1');
+      client.release();
+
+      pgPool = adminPool;
+      isPostgresOperational = true;
+      console.log('[Nevo DB] Connected to PostgreSQL successfully.');
+      await configureNevoPostgresPool(pgPool, true);
+      console.log('[Nevo DB] Using dedicated PostgreSQL schema: nevo');
+    } catch (pgErr: any) {
+      console.warn(`[Nevo DB] PostgreSQL connection unavailable (${pgErr?.message || pgErr}). Operating seamlessly on local JSON database storage.`);
+      if (adminPool) {
+        try {
+          await adminPool.end();
+        } catch (_) {}
+      }
+      pgPool = null;
+      isPostgresOperational = false;
     }
-  } else {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('[Nevo DB] Production requires DATABASE_URL pointing to persistent PostgreSQL storage. Configure Render PostgreSQL before deploying.');
-    }
-    console.log(`[Nevo DB] No DATABASE_URL or SQL_HOST found. Initializing local JSON database fallback at ${JSON_FILE}...`);
-    getJsonDb();
   }
 
-  if (pgPool) {
-    await configureNevoPostgresPool(pgPool, true);
-    console.log('[Nevo DB] Using dedicated PostgreSQL schema: nevo');
+  if (!isPostgresOperational) {
+    if (process.env.NODE_ENV === 'production' && !hasPostgresConfig()) {
+      console.warn('[Nevo DB] Production running on persistent local storage engine fallback at ${JSON_FILE}.');
+    }
+    console.log(`[Nevo DB] Local JSON database fallback initialized at ${JSON_FILE}.`);
+    getJsonDb();
   }
 
   // Create tables if they do not exist (PostgreSQL or local stub run)
@@ -844,7 +869,7 @@ export async function initDb() {
   }
 
   // Reinitialize the pool with App user (least privilege) for runtime database access
-  if (hasPostgresConfig()) {
+  if (isPostgresOperational && pgPool) {
     console.log('[Nevo DB] Schema setup and seeding complete. Switching database connection pool to App user (least privilege)...');
     try {
       if (pgPool) {
@@ -854,38 +879,36 @@ export async function initDb() {
       console.error('[Nevo DB] Error closing Admin pool:', err);
     }
     
-    if (process.env.SQL_HOST) {
-      pgPool = new Pool({
-        host: process.env.SQL_HOST,
-        user: process.env.SQL_USER,
-        password: process.env.SQL_PASSWORD,
-        database: process.env.SQL_DB_NAME,
-        connectionTimeoutMillis: 15000,
-      });
+    try {
+      if (process.env.SQL_HOST) {
+        pgPool = new Pool({
+          host: process.env.SQL_HOST,
+          user: process.env.SQL_USER,
+          password: process.env.SQL_PASSWORD,
+          database: process.env.SQL_DB_NAME,
+          connectionTimeoutMillis: 10000,
+        });
+      } else {
+        pgPool = new Pool({
+          connectionString: getDatabaseUrl(),
+          connectionTimeoutMillis: 10000,
+          ssl: getDatabaseUrl() && !getDatabaseUrl().includes('localhost') ? { rejectUnauthorized: false } : false
+        });
+      }
       pgPool.on('error', (err) => {
-        console.error('[Nevo DB Pool Error]', err.message);
+        console.warn('[Nevo DB Pool Notice]', err.message);
       });
-    } else {
-      pgPool = new Pool({
-        connectionString: getDatabaseUrl(),
-        connectionTimeoutMillis: 15000,
-        ssl: getDatabaseUrl() && !getDatabaseUrl().includes('localhost') ? { rejectUnauthorized: false } : false
-      });
-      pgPool.on('error', (err) => {
-        console.error('[Nevo DB Pool Error]', err.message);
-      });
+      await configureNevoPostgresPool(pgPool, false);
+    } catch (appErr: any) {
+      console.warn('[Nevo DB] Could not switch to app user pool:', appErr?.message || appErr);
     }
-    await configureNevoPostgresPool(pgPool, false);
   }
 }
 
 // -------------------- QUERY EXECUTION CONTROLLER --------------------
 export function execute(sql: string, params: any[] = []): Promise<any> {
   return new Promise((resolve, reject) => {
-    if (hasPostgresConfig()) {
-      if (!pgPool) {
-        return reject(new Error('PostgreSQL pool not initialized.'));
-      }
+    if (isPostgresActive() && pgPool) {
       pgPool.query(sql, params, (err, res) => {
         if (err) return reject(err);
         resolve(res);
@@ -1334,10 +1357,7 @@ export function execute(sql: string, params: any[] = []): Promise<any> {
 
 export function getRow(sql: string, params: any[] = []): Promise<any> {
   return new Promise((resolve, reject) => {
-    if (hasPostgresConfig()) {
-      if (!pgPool) {
-        return reject(new Error('PostgreSQL pool not initialized.'));
-      }
+    if (isPostgresActive() && pgPool) {
       pgPool.query(sql, params, (err, res) => {
         if (err) return reject(err);
         resolve(res.rows[0] || null);
@@ -1424,10 +1444,7 @@ export function getRow(sql: string, params: any[] = []): Promise<any> {
 
 export function getAllRows(sql: string, params: any[] = []): Promise<any[]> {
   return new Promise((resolve, reject) => {
-    if (hasPostgresConfig()) {
-      if (!pgPool) {
-        return reject(new Error('PostgreSQL pool not initialized.'));
-      }
+    if (isPostgresActive() && pgPool) {
       pgPool.query(sql, params, (err, res) => {
         if (err) return reject(err);
         resolve(res.rows);

@@ -50,6 +50,7 @@ import {
 
 import { AdsPage } from './pages/AdsPage';
 import { LandingPage } from './pages/LandingPage';
+import NevoLogo, { NevoBrandLockup } from './components/NevoLogo';
 
 import { registerDeviceBiometric, loginWithBiometric, isWebAuthnSupported } from './lib/webauthn';
 import { api, getAuthToken, setAuthToken, removeAuthToken } from './lib/api';
@@ -2544,64 +2545,62 @@ export default function App() {
             </div>
           </div>
         )}
-        <div className="w-full max-w-md bg-[#070A0D]/90 border border-white/10 rounded-3xl p-8 backdrop-blur-xl shadow-2xl relative font-sans">
-          <div className="flex flex-col items-center mb-8 text-center">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#00C9A7]/30 bg-[#00C9A7]/[0.06] shadow-[0_0_30px_rgba(0,201,167,.14)]">
-              <img src="/nevo-logo.svg" alt="Nevo" className="h-10 w-10 rounded-xl" />
-            </div>
-            <h1 className="text-2xl font-black font-display text-white">
-              Nevo Admin Portal
-            </h1>
-            <p className="text-xs text-slate-400 mt-2 font-mono uppercase tracking-wider">SECURE AUTHORIZATION</p>
+        <div className="w-full max-w-[460px] mx-auto z-10">
+          <div className="mb-6">
+            <NevoBrandLockup
+              logoSize={54}
+              tagline="ADMINISTRATOR ACCESS"
+              subtitle="Nevo Operations & Security Management Portal"
+            />
           </div>
 
-          <form onSubmit={handleAdminLoginSubmit} className="space-y-5">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2 font-mono">
-                Admin Email Address
-              </label>
-              <input
-                type="email"
-                value={adminEmailInput}
-                onChange={(e) => setAdminEmailInput(e.target.value)}
-                placeholder="Enter Admin Email"
-                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#00C9A7] transition-colors"
-                required
-              />
+          <div className="nevo-auth-card rounded-2xl p-6 sm:p-7 shadow-2xl">
+            <form onSubmit={handleAdminLoginSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Admin Email Address
+                </label>
+                <input
+                  type="email"
+                  value={adminEmailInput}
+                  onChange={(e) => setAdminEmailInput(e.target.value)}
+                  placeholder="admin@nevo.ng"
+                  className="w-full bg-[#050C0E]/90 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-[#00C9A7] focus:ring-1 focus:ring-[#00C9A7]/20 transition-colors"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Admin Password
+                </label>
+                <input
+                  type="password"
+                  value={adminPasswordInput}
+                  onChange={(e) => setAdminPasswordInput(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full bg-[#050C0E]/90 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-[#00C9A7] focus:ring-1 focus:ring-[#00C9A7]/20 transition-colors"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isAdminSubmitting}
+                className="w-full text-xs font-bold uppercase tracking-wider py-3.5 nevo-primary-button rounded-xl shadow-lg shadow-[#00C9A7]/20 active:scale-[0.98] transition-all mt-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {isAdminSubmitting ? 'Verifying Credentials...' : 'Sign In To Terminal'}
+              </button>
+            </form>
+
+            <div className="mt-6 pt-4 border-t border-white/[0.08] text-center">
+              <button
+                onClick={() => navigateTo('/')}
+                className="text-xs font-semibold text-[#7EE8D3] hover:underline cursor-pointer"
+              >
+                Return to Customer App
+              </button>
             </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2 font-mono">
-                Admin Password
-              </label>
-              <input
-                type="password"
-                value={adminPasswordInput}
-                onChange={(e) => setAdminPasswordInput(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#00C9A7] transition-colors"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isAdminSubmitting}
-              className={`w-full py-3.5 bg-gradient-to-r from-[#009B83] to-[#00C9A7] hover:from-[#00C9A7] hover:to-[#7EE8D3] text-white font-bold rounded-xl text-sm uppercase tracking-wider transition-all duration-200 active:scale-[0.98] cursor-pointer shadow-lg shadow-teal-500/10 ${
-                isAdminSubmitting ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-            >
-              {isAdminSubmitting ? 'Verifying Credentials...' : 'Sign In To Terminal'}
-            </button>
-          </form>
-
-          <div className="mt-8 pt-6 border-t border-white/5 text-center flex flex-col gap-2">
-            <button
-              onClick={() => navigateTo('/')}
-              className="text-xs text-[#7EE8D3] hover:underline"
-            >
-              Return to Customer App
-            </button>
           </div>
         </div>
       </div>
@@ -2745,32 +2744,31 @@ export default function App() {
 
         {/* -------------------- VIEW 1 & 2: AUTH / ONBOARDING SCREEN -------------------- */}
         {!isAuthenticated && (
-          <div className="nevo-auth-shell flex-1 flex flex-col justify-between p-5 sm:p-7 overflow-y-auto no-scrollbar">
+          <div className="nevo-auth-shell flex-1 flex flex-col justify-between p-4 sm:p-7 overflow-y-auto no-scrollbar">
             
-            {/* Upper Splash Logo & Slogan */}
-            <div className="text-center pt-4 sm:pt-8">
-              <div className="mx-auto mb-4 flex w-fit items-center justify-center">
-                <img src="/nevo-logo.svg" alt="Nevo" className="h-16 w-16 rounded-[22%] shadow-[0_0_34px_rgba(0,201,167,.2)]" />
-              </div>
-              <h2 className="text-3xl font-black font-display tracking-tight text-white">Nevo</h2>
-              <span className="text-[10px] tracking-[0.24em] uppercase font-bold text-[#7EE8D3] block mt-1">Financial Freedom In Your Hands</span>
-              <p className="text-xs text-slate-300 mt-4 px-3 leading-relaxed">
-                Manage your wallet, deposits, withdrawals, tasks and referrals from one secure Nevo account.
-              </p>
+            {/* Upper Centered Brand Lockup - Required by specification */}
+            <div className="pt-4 sm:pt-8 pb-3">
+              <NevoBrandLockup
+                logoSize={54}
+                subtitle="Manage your wallet, deposits, withdrawals, tasks and referrals from one secure Nevo account."
+              />
             </div>
 
             {/* Middle Input Forms */}
-            <div className="my-6">
-              <GlassCard className="nevo-auth-card p-5 sm:p-6">
+            <div className="my-4">
+              <GlassCard className="nevo-auth-card p-5 sm:p-7">
                 {authMode !== 'forgot' ? (
                   <>
-                    <div className="flex border-b border-white/10 mb-4 pb-2">
+                    {/* Professional Segmented Auth Switch */}
+                    <div className="p-1 bg-[#050C0E] border border-white/[0.08] rounded-xl flex items-center mb-5">
                       <button
                         id="btn-tab-signup"
                         type="button"
                         onClick={() => setAuthMode('signup')}
-                        className={`flex-1 text-center pb-2 text-xs font-bold uppercase tracking-wider transition-colors ${
-                          authMode === 'signup' ? 'text-teal-400 border-b-2 border-teal-400' : 'text-slate-400'
+                        className={`flex-1 h-10 flex items-center justify-center text-xs font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+                          authMode === 'signup'
+                            ? 'bg-gradient-to-r from-[#008F7A]/30 to-[#00C9A7]/25 text-[#7EE8D3] border border-[#00C9A7]/30 shadow-[0_2px_12px_rgba(0,201,167,0.15)]'
+                            : 'text-[#8E9A9A] hover:text-white border border-transparent'
                         }`}
                       >
                         Sign Up
@@ -2779,8 +2777,10 @@ export default function App() {
                         id="btn-tab-signin"
                         type="button"
                         onClick={() => setAuthMode('signin')}
-                        className={`flex-1 text-center pb-2 text-xs font-bold uppercase tracking-wider transition-colors ${
-                          authMode === 'signin' ? 'text-teal-400 border-b-2 border-teal-400' : 'text-slate-400'
+                        className={`flex-1 h-10 flex items-center justify-center text-xs font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+                          authMode === 'signin'
+                            ? 'bg-gradient-to-r from-[#008F7A]/30 to-[#00C9A7]/25 text-[#7EE8D3] border border-[#00C9A7]/30 shadow-[0_2px_12px_rgba(0,201,167,0.15)]'
+                            : 'text-[#8E9A9A] hover:text-white border border-transparent'
                         }`}
                       >
                         Sign In
@@ -2788,14 +2788,14 @@ export default function App() {
                     </div>
 
                     {authMode === 'signin' && (
-                      <div className="grid grid-cols-3 gap-1 bg-[#070A0D]/80 p-1 rounded-xl border border-white/[0.07] mb-4 text-[10px] font-semibold">
+                      <div className="grid grid-cols-3 gap-1 bg-[#050C0E] p-1 rounded-xl border border-white/[0.06] mb-4 text-[10px] font-semibold">
                         <button
                           type="button"
                           onClick={() => setSignInMethod('password')}
-                          className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition-all ${
+                          className={`py-2 rounded-lg flex items-center justify-center gap-1 transition-all cursor-pointer ${
                             signInMethod === 'password'
-                              ? 'bg-gradient-to-r from-[#009B83] to-[#00C9A7] text-white font-bold shadow'
-                              : 'text-slate-400 hover:text-white'
+                              ? 'bg-[#00C9A7]/15 border border-[#00C9A7]/30 text-[#7EE8D3] font-bold'
+                              : 'text-slate-400 hover:text-white border border-transparent'
                           }`}
                         >
                           <Lock className="h-3 w-3" /> Password
@@ -2803,10 +2803,10 @@ export default function App() {
                         <button
                           type="button"
                           onClick={() => setSignInMethod('biometric')}
-                          className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition-all ${
+                          className={`py-2 rounded-lg flex items-center justify-center gap-1 transition-all cursor-pointer ${
                             signInMethod === 'biometric'
-                              ? 'bg-gradient-to-r from-[#009B83] to-[#00C9A7] text-white font-bold shadow'
-                              : 'text-slate-400 hover:text-white'
+                              ? 'bg-[#00C9A7]/15 border border-[#00C9A7]/30 text-[#7EE8D3] font-bold'
+                              : 'text-slate-400 hover:text-white border border-transparent'
                           }`}
                         >
                           <Fingerprint className="h-3 w-3" /> Biometric
@@ -2814,13 +2814,13 @@ export default function App() {
                         <button
                           type="button"
                           onClick={() => setSignInMethod('pin')}
-                          className={`py-1.5 rounded-lg flex items-center justify-center gap-1 transition-all ${
+                          className={`py-2 rounded-lg flex items-center justify-center gap-1 transition-all cursor-pointer ${
                             signInMethod === 'pin'
-                              ? 'bg-gradient-to-r from-[#009B83] to-[#00C9A7] text-white font-bold shadow'
-                              : 'text-slate-400 hover:text-white'
+                              ? 'bg-[#00C9A7]/15 border border-[#00C9A7]/30 text-[#7EE8D3] font-bold'
+                              : 'text-slate-400 hover:text-white border border-transparent'
                           }`}
                         >
-                          <ShieldCheck className="h-3 w-3" /> Security PIN
+                          <ShieldCheck className="h-3 w-3" /> PIN
                         </button>
                       </div>
                     )}
@@ -2829,7 +2829,7 @@ export default function App() {
                       <form onSubmit={authMode === 'signup' ? handleSignUp : handleSignIn} className="space-y-4">
                         {authMode === 'signup' && (
                           <div>
-                            <label className="text-[10px] font-mono text-slate-400 block mb-1">Full Name</label>
+                            <label className="text-xs font-semibold text-slate-300 block mb-1.5">Full Name</label>
                             <input
                               id="signup-fullname"
                               type="text"
@@ -2837,13 +2837,13 @@ export default function App() {
                               required
                               value={fullName}
                               onChange={(e) => setFullName(e.target.value)}
-                              className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
+                              className="w-full h-12 text-sm bg-[#050C0E]/90 border border-white/[0.08] rounded-xl px-4 text-white placeholder-slate-500 focus:outline-none focus:border-[#00C9A7] focus:ring-1 focus:ring-[#00C9A7]/20 transition-colors"
                             />
                           </div>
                         )}
 
                         <div>
-                          <label className="text-[10px] font-mono text-slate-400 block mb-1">Email Address</label>
+                          <label className="text-xs font-semibold text-slate-300 block mb-1.5">Email Address</label>
                           <input
                             id="auth-email"
                             type="email"
@@ -2851,13 +2851,13 @@ export default function App() {
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
+                            className="w-full h-12 text-sm bg-[#050C0E]/90 border border-white/[0.08] rounded-xl px-4 text-white placeholder-slate-500 focus:outline-none focus:border-[#00C9A7] focus:ring-1 focus:ring-[#00C9A7]/20 transition-colors"
                           />
                         </div>
 
                         <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <label className="text-[10px] font-mono text-slate-400">Password</label>
+                          <div className="flex justify-between items-center mb-1.5">
+                            <label className="text-xs font-semibold text-slate-300">Password</label>
                             {authMode === 'signin' && (
                               <button
                                 id="btn-goto-forgot"
@@ -2867,9 +2867,9 @@ export default function App() {
                                   setAuthMode('forgot');
                                   setResetStep('request');
                                 }}
-                                className="text-[10px] font-bold text-teal-400 hover:underline cursor-pointer"
+                                className="text-xs font-semibold text-[#7EE8D3] hover:underline cursor-pointer"
                               >
-                                Forgot Password?
+                                Forgot password?
                               </button>
                             )}
                           </div>
@@ -2881,22 +2881,22 @@ export default function App() {
                               required
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
-                              className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl pl-4 pr-10 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
+                              className="w-full h-12 text-sm bg-[#050C0E]/90 border border-white/[0.08] rounded-xl pl-4 pr-11 text-white placeholder-slate-500 focus:outline-none focus:border-[#00C9A7] focus:ring-1 focus:ring-[#00C9A7]/20 transition-colors"
                             />
                             <button
                               type="button"
                               aria-label={showPassword ? 'Hide password' : 'Show password'}
                               onClick={() => setShowPassword(v => !v)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer"
                             >
-                              {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                           </div>
                         </div>
 
                         {authMode === 'signup' && (
                           <div>
-                            <label className="text-[10px] font-mono text-slate-400 block mb-1">Confirm Password</label>
+                            <label className="text-xs font-semibold text-slate-300 block mb-1.5">Confirm Password</label>
                             <div className="relative">
                               <input
                                 id="signup-confirm-password"
@@ -2905,15 +2905,15 @@ export default function App() {
                                 required
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl pl-4 pr-10 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
+                                className="w-full h-12 text-sm bg-[#050C0E]/90 border border-white/[0.08] rounded-xl pl-4 pr-11 text-white placeholder-slate-500 focus:outline-none focus:border-[#00C9A7] focus:ring-1 focus:ring-[#00C9A7]/20 transition-colors"
                               />
                               <button
                                 type="button"
                                 aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                                 onClick={() => setShowConfirmPassword(v => !v)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer"
                               >
-                                {showConfirmPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                               </button>
                             </div>
                           </div>
@@ -2921,14 +2921,14 @@ export default function App() {
 
                         {authMode === 'signup' && (
                           <div>
-                            <label className="text-[10px] font-mono text-slate-400 block mb-1">Referral Code <span className="text-slate-600">(optional)</span></label>
+                            <label className="text-xs font-semibold text-slate-300 block mb-1.5">Referral Code <span className="text-slate-500 font-normal">(optional)</span></label>
                             <input
                               id="signup-referral-code"
                               type="text"
-                              placeholder="NEVOXXXX"
+                              placeholder="e.g. NEVO8912"
                               value={referralCodeInput}
                               onChange={e => setReferralCodeInput(e.target.value.toUpperCase())}
-                              className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7] uppercase font-mono"
+                              className="w-full h-12 text-sm bg-[#050C0E]/90 border border-white/[0.08] rounded-xl px-4 text-[#7EE8D3] font-mono font-bold placeholder-slate-500 focus:outline-none focus:border-[#00C9A7] focus:ring-1 focus:ring-[#00C9A7]/20 uppercase transition-colors"
                             />
                           </div>
                         )}
@@ -2937,25 +2937,25 @@ export default function App() {
                           id="btn-auth-submit"
                           type="submit"
                           disabled={isAuthSubmitting}
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-[#009B83] via-[#00C9A7] to-[#7EE8D3] hover:from-teal-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          className="w-full h-12 text-xs font-bold uppercase tracking-wider nevo-primary-button rounded-xl shadow-lg shadow-[#00C9A7]/20 active:scale-[0.98] transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                         >
                           {isAuthSubmitting ? (
                             <>
-                              <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                              <svg className="animate-spin h-4 w-4 text-black" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                               </svg>
-                              {authMode === 'signup' ? 'Creating Account...' : 'Signing In...'}
+                              <span>{authMode === 'signup' ? 'Creating Account...' : 'Signing In...'}</span>
                             </>
                           ) : (
-                            authMode === 'signup' ? 'Create Account' : 'Sign In'
+                            <span>{authMode === 'signup' ? 'Create Account' : 'Sign In to Account'}</span>
                           )}
                         </button>
                       </form>
                     ) : signInMethod === 'biometric' ? (
                       <div className="space-y-4">
                         <div>
-                          <label className="text-[10px] font-mono text-slate-400 block mb-1">Registered Email</label>
+                          <label className="text-xs font-semibold text-slate-300 block mb-1.5">Registered Email</label>
                           <input
                             id="auth-email-bio"
                             type="email"
@@ -2963,30 +2963,30 @@ export default function App() {
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
+                            className="w-full text-sm bg-[#050C0E]/90 border border-white/[0.08] rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-[#00C9A7] focus:ring-1 focus:ring-[#00C9A7]/20 transition-colors"
                           />
                         </div>
 
-                        <div className="pt-2 flex flex-col items-center justify-center p-4 bg-slate-950/40 rounded-2xl border border-white/5">
+                        <div className="pt-2 flex flex-col items-center justify-center p-5 bg-[#050C0E] rounded-2xl border border-white/[0.06]">
                           <button
                             type="button"
                             onClick={handleBiometricSignIn}
                             disabled={isAuthSubmitting}
-                            className="relative group h-20 w-20 rounded-full bg-gradient-to-tr from-teal-500/20 via-teal-500/20 to-emerald-500/20 border-2 border-teal-400/40 flex items-center justify-center shadow-lg hover:border-teal-400 active:scale-95 transition-all cursor-pointer"
+                            className="relative group h-20 w-20 rounded-full bg-gradient-to-tr from-[#008F7A]/25 via-[#00C9A7]/20 to-[#7EE8D3]/20 border-2 border-[#00C9A7]/40 flex items-center justify-center shadow-lg hover:border-[#00C9A7] active:scale-95 transition-all cursor-pointer"
                           >
-                            <div className="absolute inset-0 rounded-full bg-teal-400/10 animate-ping opacity-75" />
-                            <Fingerprint className="h-10 w-10 text-teal-400 stroke-[1.75] group-hover:scale-110 transition-transform" />
+                            <div className="absolute inset-0 rounded-full bg-[#00C9A7]/10 animate-ping opacity-75" />
+                            <Fingerprint className="h-10 w-10 text-[#00C9A7] stroke-[1.75] group-hover:scale-110 transition-transform" />
                           </button>
-                          <span className="text-[11px] font-bold text-white mt-3 block">Scan Fingerprint or Face ID</span>
-                          <p className="text-[9.5px] text-slate-400 mt-1 text-center max-w-[220px] leading-tight">
-                            Tap the scanner above to trigger your phone or computer's native biometric prompt.
+                          <span className="text-xs font-bold text-white mt-3 block">Scan Fingerprint or Face ID</span>
+                          <p className="text-[10px] text-slate-400 mt-1 text-center max-w-[240px] leading-relaxed">
+                            Tap the scanner to trigger your device's native biometric prompt.
                           </p>
                         </div>
                       </div>
                     ) : (
                       <form onSubmit={handlePinSignIn} className="space-y-4">
                         <div>
-                          <label className="text-[10px] font-mono text-slate-400 block mb-1">Email or Phone Number</label>
+                          <label className="text-xs font-semibold text-slate-300 block mb-1.5">Email or Phone Number</label>
                           <input
                             id="auth-email-pin"
                             type="text"
@@ -2997,12 +2997,12 @@ export default function App() {
                               setEmailOrPhoneInput(e.target.value);
                               setEmail(e.target.value);
                             }}
-                            className="w-full text-xs bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
+                            className="w-full text-sm bg-[#050C0E]/90 border border-white/[0.08] rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-[#00C9A7] focus:ring-1 focus:ring-[#00C9A7]/20 transition-colors"
                           />
                         </div>
 
                         <div>
-                          <label className="text-[10px] font-mono text-slate-400 block mb-1">4 or 6-Digit Wallet PIN</label>
+                          <label className="text-xs font-semibold text-slate-300 block mb-1.5">4 or 6-Digit Wallet PIN</label>
                           <input
                             id="auth-pin-input"
                             type="password"
@@ -3011,14 +3011,14 @@ export default function App() {
                             required
                             value={pinLoginInput}
                             onChange={(e) => setPinLoginInput(e.target.value.replace(/\D/g, ''))}
-                            className="w-full text-center tracking-[0.5em] font-mono text-lg font-extrabold bg-[#070A0D]/75 border border-white/[0.08] rounded-xl px-4 py-2.5 text-teal-300 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-[#00C9A7]"
+                            className="w-full text-center tracking-[0.5em] font-mono text-xl font-bold bg-[#050C0E]/90 border border-white/[0.08] rounded-xl px-4 py-3 text-[#7EE8D3] placeholder-slate-600 focus:outline-none focus:border-[#00C9A7] focus:ring-1 focus:ring-[#00C9A7]/20 transition-colors"
                           />
                         </div>
 
                         <button
                           type="submit"
                           disabled={isAuthSubmitting}
-                          className="w-full text-xs font-bold uppercase tracking-widest py-3 bg-gradient-to-r from-[#009B83] via-[#00C9A7] to-[#7EE8D3] hover:from-teal-600 hover:to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20 active:scale-95 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          className="w-full text-xs font-bold uppercase tracking-wider py-3.5 nevo-primary-button rounded-xl shadow-lg shadow-[#00C9A7]/20 active:scale-[0.98] transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                         >
                           {isAuthSubmitting ? 'Verifying PIN...' : 'Sign In With Security PIN'}
                         </button>

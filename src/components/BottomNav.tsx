@@ -26,9 +26,9 @@ export default function BottomNav({ activeTab, currentScreen, onTabChange, onFab
           type="button"
           onClick={onFabClick}
           aria-label="Open Quick Actions Menu"
-          className="h-12 w-12 rounded-full bg-gradient-to-tr from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white shadow-xl shadow-teal-500/30 flex items-center justify-center transition-all duration-300 active:scale-95 border-2 border-[#070A0D] cursor-pointer"
+          className="h-12 w-12 rounded-full nevo-primary-button text-[#070A0D] shadow-xl shadow-[#00C9A7]/30 flex items-center justify-center transition-all duration-300 active:scale-95 border-2 border-[#070A0D] cursor-pointer"
         >
-          <Plus className="h-6 w-6 stroke-[2.5]" />
+          <Plus className="h-6 w-6 stroke-[3]" />
         </button>
       </div>
 
@@ -56,21 +56,21 @@ export default function BottomNav({ activeTab, currentScreen, onTabChange, onFab
             >
               {/* Highlight indicator bar */}
               {isActive && (
-                <span className="absolute -top-1 w-6 h-0.5 rounded-full bg-teal-400 theme-primary-bg shadow-[0_2px_8px_rgba(20,184,166,0.6)]" />
+                <span className="absolute -top-1 w-6 h-0.5 rounded-full bg-[#00C9A7] shadow-[0_2px_8px_rgba(0,201,167,0.6)]" />
               )}
               
               <Icon
                 className={`h-5 w-5 transition-all duration-200 ${
                   isActive
-                    ? 'text-teal-400 theme-primary-text scale-110 stroke-[2.5]'
-                    : 'text-slate-400 group-hover:text-slate-200'
+                    ? 'text-[#7EE8D3] scale-110 stroke-[2.5]'
+                    : 'text-[#7A8888] group-hover:text-slate-200'
                 }`}
               />
               <span
                 className={`text-[10px] mt-0.5 font-medium transition-colors ${
                   isActive
-                    ? 'text-teal-400 theme-primary-text font-bold'
-                    : 'text-slate-400 group-hover:text-slate-200'
+                    ? 'text-[#7EE8D3] font-bold'
+                    : 'text-[#7A8888] group-hover:text-slate-200'
                 }`}
               >
                 {tab.label}

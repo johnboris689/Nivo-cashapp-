@@ -107,7 +107,7 @@ export const ReferralsPage: React.FC = () => {
 
             <div className="nivo-glass-surface border border-white/10 p-4 rounded-2xl flex items-center justify-between mt-2">
               <span className="text-2xl font-mono font-black text-white tracking-widest">
-                {user?.referralCode || 'NIVO123'}
+                {user?.referralCode || 'NEVO123'}
               </span>
               <button
                 onClick={copyCode}
